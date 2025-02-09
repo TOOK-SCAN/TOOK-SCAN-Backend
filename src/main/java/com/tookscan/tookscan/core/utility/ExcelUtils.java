@@ -125,7 +125,7 @@ public class ExcelUtils {
             workbook.write(outputStream);
             return outputStream.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException("엑셀 파일 생성 중 오류가 발생했습니다.", e);
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "엑셀 파일 생성 중 오류가 발생했습니다." + e);
         }
     }
 }
