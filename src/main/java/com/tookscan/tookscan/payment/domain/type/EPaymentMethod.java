@@ -21,10 +21,10 @@ public enum EPaymentMethod {
             throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         }
         return switch (value.toUpperCase()) {
-            case "CARD" -> CARD;
-            case "VIRTUAL_ACCOUNT" -> VIRTUAL_ACCOUNT;
-            case "EASY_PAYMENT" -> EASY_PAYMENT;
-            case "ACCOUNT_TRANSFER" -> ACCOUNT_TRANSFER;
+            case "카드" -> CARD;
+            case "가상계좌" -> VIRTUAL_ACCOUNT;
+            case "간편결제" -> EASY_PAYMENT;
+            case "계좌이체" -> ACCOUNT_TRANSFER;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
