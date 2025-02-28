@@ -52,6 +52,9 @@ public class Constants {
             // Test Email
             "/v1/test-email",
 
+            // Payment
+            "/v1/payments",
+
             // Swagger
             "/api-docs.html",
             "/api-docs/**",
