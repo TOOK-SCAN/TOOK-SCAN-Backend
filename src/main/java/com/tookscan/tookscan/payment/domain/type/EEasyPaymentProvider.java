@@ -25,15 +25,15 @@ public enum EEasyPaymentProvider {
             throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         }
         return switch (value.toUpperCase()) {
-            case "TOSS_PAY" -> TOSS_PAY;
-            case "NAVER_PAY" -> NAVER_PAY;
-            case "SAMSUNG_PAY" -> SAMSUNG_PAY;
-            case "APPLE_PAY" -> APPLE_PAY;
-            case "L_PAY" -> L_PAY;
-            case "KAKAO_PAY" -> KAKAO_PAY;
-            case "PIN_PAY" -> PIN_PAY;
-            case "PAYCO" -> PAYCO;
-            case "SSG_PAY" -> SSG_PAY;
+            case "토스페이" -> TOSS_PAY;
+            case "네이버페이" -> NAVER_PAY;
+            case "삼성페이" -> SAMSUNG_PAY;
+            case "애플페이" -> APPLE_PAY;
+            case "엘페이" -> L_PAY;
+            case "카카오페이" -> KAKAO_PAY;
+            case "핀페이" -> PIN_PAY;
+            case "페이코" -> PAYCO;
+            case "SSG페이" -> SSG_PAY;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
