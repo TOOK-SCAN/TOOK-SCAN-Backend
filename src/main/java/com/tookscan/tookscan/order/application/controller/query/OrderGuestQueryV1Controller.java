@@ -1,14 +1,17 @@
 package com.tookscan.tookscan.order.application.controller.query;
 
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderDetailResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderSummaryResponseDto;
+import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderSummaryUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +24,7 @@ public class OrderGuestQueryV1Controller {
 
     private final ReadGuestOrderDetailUseCase readGuestOrderDetailUseCase;
     private final ReadGuestOrderSummaryUseCase readGuestOrderSummaryUseCase;
+    private final ReadGuestOrderDeliveryUseCase readGuestOrderDeliveryUseCase;
 
     /**
      * 4.2.1 비회원 주문 상세 조회
@@ -44,4 +48,16 @@ public class OrderGuestQueryV1Controller {
     ) {
         return ResponseDto.ok(readGuestOrderSummaryUseCase.execute(orderNumber));
     }
+
+    /**
+     * 4.2.18 비회원 상세 배송 정보 조회
+     */
+    @Operation(summary = "비회원 상세 배송 정보 조회", description = "비회원이 상세 배송 정보를 조회합니다.")
+    @GetMapping(value = "/{orderId}/delivery")
+    public ResponseDto<ReadGuestOrderDeliveryResponseDto> getUserOrderDelivery(
+            @PathVariable Long orderId
+    ) {
+        return ResponseDto.ok(readGuestOrderDeliveryUseCase.execute(orderId));
+    }
+
 }
