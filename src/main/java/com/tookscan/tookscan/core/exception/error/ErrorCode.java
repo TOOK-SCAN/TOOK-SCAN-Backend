@@ -26,6 +26,7 @@ public enum ErrorCode {
     NOT_FOUND_TERM(40410, HttpStatus.NOT_FOUND, "존재하지 않는 약관입니다."),
     NOT_FOUND_USER_GROUP(40411, HttpStatus.NOT_FOUND, "존재하지 않는 사용자 그룹입니다."),
     NOT_FOUND_AUTHENTICATION_CODE(40413, HttpStatus.NOT_FOUND, "존재하지 않는 인증 코드입니다."),
+    NOT_FOUND_PAYMENT_SESSION(40414, HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
 
 
     // Invalid Argument Error
@@ -43,6 +44,35 @@ public enum ErrorCode {
     INVALID_ENUM_TYPE(40011, HttpStatus.BAD_REQUEST, "유효하지 않은 Enum 타입입니다."),
     PAYMENT_INCOMPLETE(40012, HttpStatus.BAD_REQUEST, "결제가 완료되지 않았습니다."),
     INVALID_ORDER_STATUS(40013, HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
+    ALREADY_PROCESSED_PAYMENT(40014, HttpStatus.BAD_REQUEST, "이미 처리된 결제 입니다."),
+    PROVIDER_ERROR(40015, HttpStatus.BAD_REQUEST, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
+    EXCEED_MAX_CARD_INSTALLMENT_PLAN(40016, HttpStatus.BAD_REQUEST, "설정 가능한 최대 할부 개월 수를 초과했습니다."),
+    NOT_ALLOWED_POINT_USE(40017, HttpStatus.BAD_REQUEST, "포인트 사용이 불가한 카드로 카드 포인트 결제에 실패했습니다."),
+    INVALID_API_KEY(40018, HttpStatus.BAD_REQUEST, "잘못된 시크릿키 연동 정보 입니다."),
+    INVALID_REJECT_CARD(40019, HttpStatus.BAD_REQUEST, "카드 사용이 거절되었습니다. 카드사 문의가 필요합니다."),
+    BELOW_MINIMUM_AMOUNT(40020, HttpStatus.BAD_REQUEST, "신용카드는 결제금액이 100원 이상, 계좌는 200원이상부터 결제가 가능합니다."),
+    INVALID_CARD_EXPIRATION(40021, HttpStatus.BAD_REQUEST, "카드 정보를 다시 확인해주세요. (유효기간)"),
+    INVALID_STOPPED_CARD(40022, HttpStatus.BAD_REQUEST, "정지된 카드 입니다."),
+    EXCEED_MAX_DAILY_PAYMENT_COUNT(40023, HttpStatus.BAD_REQUEST, "하루 결제 가능 횟수를 초과했습니다."),
+    NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT(40024, HttpStatus.BAD_REQUEST, "할부가 지원되지 않는 카드 또는 가맹점 입니다."),
+    INVALID_CARD_INSTALLMENT_PLAN(40025, HttpStatus.BAD_REQUEST, "할부 개월 정보가 잘못되었습니다."),
+    NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN(40026, HttpStatus.BAD_REQUEST, "할부가 지원되지 않는 카드입니다."),
+    EXCEED_MAX_PAYMENT_AMOUNT(40027, HttpStatus.BAD_REQUEST, "하루 결제 가능 금액을 초과했습니다."),
+    NOT_FOUND_TERMINAL_ID(40028, HttpStatus.BAD_REQUEST, "단말기번호(Terminal Id)가 없습니다. 토스페이먼츠로 문의 바랍니다."),
+    INVALID_AUTHORIZE_AUTH(40029, HttpStatus.BAD_REQUEST, "유효하지 않은 인증 방식입니다."),
+    INVALID_CARD_LOST_OR_STOLEN(40030, HttpStatus.BAD_REQUEST, "분실 혹은 도난 카드입니다."),
+    RESTRICTED_TRANSFER_ACCOUNT(40031, HttpStatus.BAD_REQUEST, "계좌는 등록 후 12시간 뒤부터 결제할 수 있습니다. 관련 정책은 해당 은행으로 문의해주세요."),
+    INVALID_CARD_NUMBER(40032, HttpStatus.BAD_REQUEST, "카드번호를 다시 확인해주세요."),
+    INVALID_UNREGISTERED_SUBMALL(40033, HttpStatus.BAD_REQUEST, "등록되지 않은 서브몰입니다. 서브몰이 없는 가맹점이라면 안심클릭이나 ISP 결제가 필요합니다."),
+    NOT_REGISTERED_BUSINESS(40034, HttpStatus.BAD_REQUEST, "등록되지 않은 사업자 번호입니다."),
+    EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT(40035, HttpStatus.BAD_REQUEST, "1일 출금 한도를 초과했습니다."),
+    EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT(40036, HttpStatus.BAD_REQUEST, "1회 출금 한도를 초과했습니다."),
+    CARD_PROCESSING_ERROR(40037, HttpStatus.BAD_REQUEST, "카드사에서 오류가 발생했습니다."),
+    EXCEED_MAX_AMOUNT(40038, HttpStatus.BAD_REQUEST, "거래금액 한도를 초과했습니다."),
+    INVALID_ACCOUNT_INFO_RE_REGISTER(40039, HttpStatus.BAD_REQUEST, "유효하지 않은 계좌입니다. 계좌 재등록 후 시도해주세요."),
+    NOT_AVAILABLE_PAYMENT(40040, HttpStatus.BAD_REQUEST, "결제가 불가능한 시간대입니다."),
+    UNAPPROVED_ORDER_ID(40041, HttpStatus.BAD_REQUEST, "아직 승인되지 않은 주문번호입니다."),
+    EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT(40042, HttpStatus.BAD_REQUEST, "당월 결제 가능금액인 1,000,000원을 초과 하셨습니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
@@ -53,6 +83,17 @@ public enum ErrorCode {
     NOT_LOGIN_USER(40301, HttpStatus.FORBIDDEN, "로그인하지 않은 사용자입니다."),
     NOT_MATCH_AUTHENTICATION_CODE(40302, HttpStatus.FORBIDDEN, "인증 코드가 일치하지 않습니다."),
     NOT_MATCH_ORDER_USER(40303, HttpStatus.FORBIDDEN, "주문자가 일치하지 않습니다."),
+    REJECT_ACCOUNT_PAYMENT(40304, HttpStatus.FORBIDDEN, "잔액부족으로 결제에 실패했습니다."),
+    REJECT_CARD_PAYMENT(40305, HttpStatus.FORBIDDEN, "한도초과 혹은 잔액부족으로 결제에 실패했습니다."),
+    REJECT_CARD_COMPANY(40306, HttpStatus.FORBIDDEN, "결제 승인이 거절되었습니다."),
+    FORBIDDEN_REQUEST(40307, HttpStatus.FORBIDDEN, "허용되지 않은 요청입니다."),
+    REJECT_TOSSPAY_INVALID_ACCOUNT(40308, HttpStatus.FORBIDDEN, "선택하신 출금 계좌가 출금이체 등록이 되어 있지 않아요. 계좌를 다시 등록해 주세요."),
+    EXCEED_MAX_AUTH_COUNT(40309, HttpStatus.FORBIDDEN, "최대 인증 횟수를 초과했습니다. 카드사로 문의해주세요."),
+    EXCEED_MAX_ONE_DAY_AMOUNT(40310, HttpStatus.FORBIDDEN, "일일 한도를 초과했습니다."),
+    NOT_AVAILABLE_BANK(40311, HttpStatus.FORBIDDEN, "은행 서비스 시간이 아닙니다."),
+    INVALID_PASSWORD(40312, HttpStatus.FORBIDDEN, "결제 비밀번호가 일치하지 않습니다."),
+    INCORRECT_BASIC_AUTH_FORMAT(40313, HttpStatus.FORBIDDEN, "잘못된 요청입니다. ':' 를 포함해 인코딩해주세요."),
+    FDS_ERROR(40314, HttpStatus.FORBIDDEN, "[토스페이먼츠] 위험거래가 감지되어 결제가 제한됩니다. 발송된 문자에 포함된 링크를 통해 본인인증 후 결제가 가능합니다. (고객센터: 1644-8051)"),
 
     // Unauthorized Error
     FAILURE_LOGIN(40100, HttpStatus.UNAUTHORIZED, "잘못된 아이디 또는 비밀번호입니다."),
@@ -64,6 +105,7 @@ public enum ErrorCode {
     TOKEN_GENERATION_ERROR(40106, HttpStatus.UNAUTHORIZED, "토큰 생성에 실패하였습니다."),
     TOKEN_UNKNOWN_ERROR(40107, HttpStatus.UNAUTHORIZED, "알 수 없는 토큰입니다."),
     NOT_VERIFIED_AUTHENTICATION_CODE(40108, HttpStatus.UNAUTHORIZED, "인증 코드 인증이 완료되지 않았습니다."),
+    UNAUTHORIZED_KEY(40109, HttpStatus.UNAUTHORIZED, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
 
     // Too Many Requests Error
     TOO_FAST_AUTHENTICATION_CODE_REQUESTS(42900, HttpStatus.TOO_MANY_REQUESTS, "인증코드 발급 속도가 너무 빠릅니다."),
@@ -73,6 +115,12 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러입니다."),
     INTERNAL_DATA_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 데이터 에러입니다."),
     UPLOAD_FILE_ERROR(50002, HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패하였습니다."),
+    FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING(50003, HttpStatus.INTERNAL_SERVER_ERROR, "결제가 완료되지 않았어요. 다시 시도해주세요."),
+    FAILED_INTERNAL_SYSTEM_PROCESSING(50004, HttpStatus.INTERNAL_SERVER_ERROR, "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."),
+    UNKNOWN_PAYMENT_ERROR(50005, HttpStatus.INTERNAL_SERVER_ERROR, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."),
+
+    // RestClient Error
+    REST_CLIENT_ERROR(50006, HttpStatus.INTERNAL_SERVER_ERROR, "RestClient 에러입니다."),
 
     // External Server Error
     EXTERNAL_SERVER_ERROR(50200, HttpStatus.BAD_GATEWAY, "서버 외부 에러입니다."),
