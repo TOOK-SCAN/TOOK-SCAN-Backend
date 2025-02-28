@@ -2,6 +2,7 @@ package com.tookscan.tookscan.payment.application.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record ConfirmPaymentRequestDto(
         @JsonProperty("order_number")
@@ -11,7 +12,7 @@ public record ConfirmPaymentRequestDto(
         @NotBlank(message = "결제키는 필수입니다.")
         String paymentKey,
         @JsonProperty("amount")
-        @NotBlank(message = "결제금액은 필수입니다.")
+        @NotNull(message = "결제금액은 필수입니다.")
         Integer amount
 ) {
 }
