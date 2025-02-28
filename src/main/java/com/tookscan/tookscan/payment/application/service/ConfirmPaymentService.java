@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +56,8 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 response.method() != null ? EPaymentMethod.fromString(response.method()) : null,
                 response.totalAmount(),
                 EPaymentStatus.fromString(response.status()),
-                LocalDateTime.parse(response.requestedAt()),
-                response.approvedAt() != null ? LocalDateTime.parse(response.approvedAt()) : null,
+                OffsetDateTime.parse(response.requestedAt()).toLocalDateTime(),
+                response.approvedAt() != null ? OffsetDateTime.parse(response.approvedAt()).toLocalDateTime() : null,
                 response.easyPay() != null ? EEasyPaymentProvider.fromString(response.easyPay().provider()) : null,
                 order
         );
