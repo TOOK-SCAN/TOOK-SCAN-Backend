@@ -83,9 +83,7 @@ public class MailUtil {
                   </div>
             
                   <div class="img">
-                    <a href="https://imgbb.com/">
-                      <img src="https://i.ibb.co/HTS5jm9m/testmail.png" alt="testmail" />
-                    </a>
+                    <img src="https://i.ibb.co/HTS5jm9m/testmail.png" alt="testmail" />
                   </div>
             
                   <div class="message-section">
