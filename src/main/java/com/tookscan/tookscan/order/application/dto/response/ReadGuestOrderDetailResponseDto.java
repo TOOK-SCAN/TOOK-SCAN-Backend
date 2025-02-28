@@ -65,6 +65,9 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
     @JsonProperty("payment_total")
     private final Integer paymentTotal;
 
+    @JsonProperty("user_info")
+    private final UserInfoDto userInfo;
+
     @Getter
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
         @JsonProperty("name")
@@ -101,6 +104,31 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
                     .build();
         }
     }
+
+    @Getter
+    public static class UserInfoDto extends SelfValidating<ReadUserOrderDetailResponseDto.UserInfoDto> {
+
+        @JsonProperty("name")
+        @NotNull
+        private final String name;
+
+        @JsonProperty("email")
+        @NotNull
+        private final String email;
+
+        @JsonProperty("phone_number")
+        @NotNull
+        private final String phoneNumber;
+
+        @Builder
+        public UserInfoDto(String name, String phoneNumber, String email) {
+            this.name = name;
+            this.phoneNumber = phoneNumber;
+            this.email = email;
+            this.validateSelf();
+        }
+    }
+
     @Builder
     public ReadGuestOrderDetailResponseDto(
             Long orderId,
@@ -115,7 +143,8 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
             EPaymentMethod paymentMethod,
             EEasyPaymentProvider easyPaymentProvider,
             Integer paymentTotal,
-            Integer deliveryPrice
+            Integer deliveryPrice,
+            UserInfoDto userInfo
     ) {
         this.orderId = orderId;
         this.orderNumber = orderNumber;
@@ -130,6 +159,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
         this.paymentTotal = paymentTotal;
         this.trackingNumber = trackingNumber;
         this.deliveryPrice = deliveryPrice;
+        this.userInfo = userInfo;
         this.validateSelf();
     }
 
@@ -157,6 +187,11 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
                 .easyPaymentProvider(easyPaymentProvider)
                 .paymentTotal(paymentTotal)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
+                .userInfo(UserInfoDto.builder()
+                        .name(order.getDelivery().getReceiverName())
+                        .phoneNumber(order.getDelivery().getPhoneNumber())
+                        .email(order.getDelivery().getEmail())
+                        .build())
                 .build();
     }
 }
