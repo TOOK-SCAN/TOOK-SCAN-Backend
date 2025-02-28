@@ -23,7 +23,7 @@ public class Constants {
     public static String GOOGLE_OAUTH2_HREF = "/oauth2/authorization/google";
 
     // Additional Info Input Url
-    public static String ADDITIONAL_INFO_INPUT_PATH = "/join";
+    public static String ADDITIONAL_INFO_INPUT_PATH = "/auth/join?provider=easy";
     
     /**
      * 인증이 필요 없는 URL
