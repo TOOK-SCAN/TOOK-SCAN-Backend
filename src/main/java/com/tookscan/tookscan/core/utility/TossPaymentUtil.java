@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 @Component
 public class TossPaymentUtil {
     @Value("${toss.payments.secret-key}")
@@ -27,8 +30,8 @@ public class TossPaymentUtil {
     public HttpHeaders getTossConfirmRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Basic " + tossSecretKey);
-
+        String encodedKey = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        headers.set("Authorization", "Basic " + encodedKey);
         return headers;
     }
 
