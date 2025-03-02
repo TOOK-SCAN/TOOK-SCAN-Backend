@@ -31,7 +31,7 @@ public class ReadUserOrderOverviewService implements ReadUserOrderOverviewUseCas
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Direction.fromString(direction), sort));
 
         // 주문 조회
-        Page<Order> orders = orderRepository.findAllByUserAndSearchOrElseThrow(user, search, pageRequest);
+        Page<Order> orders = orderRepository.findAllByUserAndSearchOrElseNull(user, search, pageRequest);
 
         return ReadUserOrderOverviewResponseDto.fromEntity(orders);
     }
