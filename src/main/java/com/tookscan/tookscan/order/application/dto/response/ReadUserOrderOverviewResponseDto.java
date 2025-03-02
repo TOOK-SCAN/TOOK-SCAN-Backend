@@ -112,6 +112,14 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
     }
 
     public static ReadUserOrderOverviewResponseDto fromEntity(Page<Order> orders) {
+
+        if (orders.isEmpty()) {
+            return ReadUserOrderOverviewResponseDto.builder()
+                    .orders(List.of())
+                    .pageInfo(PageInfoDto.fromEntity(orders))
+                    .build();
+        }
+
         return ReadUserOrderOverviewResponseDto.builder()
                 .orders(orders.stream()
                         .map(OrderInfoDto::fromEntity)

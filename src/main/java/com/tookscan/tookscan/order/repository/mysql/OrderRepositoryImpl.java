@@ -222,7 +222,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> findAllByUserAndSearchOrElseThrow(User user, String search, Pageable pageable) {
+    public Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable) {
         if (search == null) {
             Page<Order> orders = orderJpaRepository.findAllByUser(user, pageable);
             System.out.println("orders: " + orders.getContent());
@@ -232,12 +232,8 @@ public class OrderRepositoryImpl implements OrderRepository {
 
             return orders;
         }
-        Page<Order> orders = orderJpaRepository.findAllByUserAndSearch(user, search, pageable);
 
-        if (orders.isEmpty()) {
-            throw new CommonException(ErrorCode.NOT_FOUND_ORDER);
-        }
-        return orders;
+        return orderJpaRepository.findAllByUserAndSearch(user, search, pageable);
     }
 
     @Override
