@@ -20,7 +20,7 @@ public enum EPaymentMethod {
         if (value == null || value.trim().isEmpty()) {
             throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         }
-        return switch (value.toUpperCase()) {
+        return switch (value) {
             case "카드" -> CARD;
             case "가상계좌" -> VIRTUAL_ACCOUNT;
             case "간편결제" -> EASY_PAYMENT;

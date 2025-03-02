@@ -4,6 +4,7 @@ import com.tookscan.tookscan.core.dto.PaymentDto;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.payment.application.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.application.usecase.ConfirmPaymentUseCase;
@@ -63,5 +64,12 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
         );
 
         paymentRepository.save(payment);
+
+        // 결제 완료 시 주문 상태 변경
+        if (payment.getStatus().equals(EPaymentStatus.DONE)) {
+            order.updateOrderStatus(EOrderStatus.PAYMENT_COMPLETED);
+            orderRepository.save(order);
+        }
+
     }
 }
