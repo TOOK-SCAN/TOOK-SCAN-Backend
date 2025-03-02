@@ -40,6 +40,7 @@ public class Payment extends BaseEntity {
     private String type;
 
     @Column(name = "method")
+    @Enumerated(EnumType.STRING)
     private EPaymentMethod method;
 
     @Column(name = "total_amount", nullable = false)
