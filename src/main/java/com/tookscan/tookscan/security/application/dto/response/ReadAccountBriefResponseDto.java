@@ -3,6 +3,7 @@ package com.tookscan.tookscan.security.application.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.security.domain.mysql.Account;
+import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -22,10 +23,16 @@ public class ReadAccountBriefResponseDto extends SelfValidating<ReadAccountBrief
     @NotNull(message = "이름은 필수입니다")
     private String name;
 
+    @JsonProperty("provider")
+    @Schema(description = "제공자", example = "GOOGLE")
+    @NotNull(message = "제공자는 필수입니다")
+    private ESecurityProvider provider;
+
     @Builder
-    public ReadAccountBriefResponseDto(ESecurityRole accountType, String name) {
+    public ReadAccountBriefResponseDto(ESecurityRole accountType, String name, ESecurityProvider provider) {
         this.accountType = accountType;
         this.name = name;
+        this.provider = provider;
         this.validateSelf();
     }
 
@@ -33,6 +40,7 @@ public class ReadAccountBriefResponseDto extends SelfValidating<ReadAccountBrief
         return ReadAccountBriefResponseDto.builder()
                 .accountType(account.getRole())
                 .name(account.getName())
+                .provider(account.getProvider())
                 .build();
     }
 }
