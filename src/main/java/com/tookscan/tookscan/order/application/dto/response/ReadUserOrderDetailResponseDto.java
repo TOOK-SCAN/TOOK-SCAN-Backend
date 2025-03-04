@@ -169,7 +169,12 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
         EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
         EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount()) + order.getDelivery().getDeliveryPrice();
+        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
+
+        if (order.getDocuments().stream()
+                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
+            paymentTotal += order.getDelivery().getDeliveryPrice();
+        }
 
         return ReadUserOrderDetailResponseDto.builder()
                 .orderId(order.getId())
