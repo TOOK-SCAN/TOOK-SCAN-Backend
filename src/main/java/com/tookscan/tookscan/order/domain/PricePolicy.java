@@ -60,6 +60,7 @@ public class PricePolicy extends BaseEntity {
 
     public int calculatePrice(int pageCount, ERecoveryOption recoveryOption) {
         int price = 0;
+        price += defaultPrice;
         price += pricePerPage * pageCount;
         price += recoveryOption.getPrice();
         return price;

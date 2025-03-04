@@ -163,13 +163,13 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.validateSelf();
     }
 
-    public static ReadUserOrderDetailResponseDto fromEntity(Order order, Integer defaultPrice) {
+    public static ReadUserOrderDetailResponseDto fromEntity(Order order) {
 
         Optional<Payment> payment = Optional.ofNullable(order.getPayment());
 
         EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
         EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(defaultPrice + order.getDocumentsTotalAmount());
+        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
 
         if (order.getDocuments().stream()
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
