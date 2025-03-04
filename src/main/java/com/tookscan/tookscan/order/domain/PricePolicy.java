@@ -31,6 +31,9 @@ public class PricePolicy extends BaseEntity {
     /* Information Column ------------------------- */
     /* -------------------------------------------- */
 
+    @Column(name = "default_price", nullable = false)
+    private Integer defaultPrice;
+
     @Column(name = "price_per_page", nullable = false)
     private Integer pricePerPage;
 
@@ -47,7 +50,8 @@ public class PricePolicy extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public PricePolicy(Integer pricePerPage, Integer deliveryPrice, LocalDate startDate, LocalDate endDate) {
+    public PricePolicy(Integer defaultPrice, Integer pricePerPage, Integer deliveryPrice, LocalDate startDate, LocalDate endDate) {
+        this.defaultPrice = defaultPrice;
         this.pricePerPage = pricePerPage;
         this.deliveryPrice = deliveryPrice;
         this.startDate = startDate;

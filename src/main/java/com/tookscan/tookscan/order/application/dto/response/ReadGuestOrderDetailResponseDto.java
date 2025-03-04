@@ -163,13 +163,13 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
         this.validateSelf();
     }
 
-    public static ReadGuestOrderDetailResponseDto fromEntity(Order order) {
+    public static ReadGuestOrderDetailResponseDto fromEntity(Order order, Integer defaultPrice) {
 
         Optional<Payment> payment = Optional.ofNullable(order.getPayment());
 
         EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
         EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
+        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(defaultPrice + order.getDocumentsTotalAmount());
 
         if (order.getDocuments().stream()
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {

@@ -125,24 +125,24 @@ public class ReadAdminOrderSummariesResponseDto extends SelfValidating<ReadAdmin
             }
         }
 
-        public static OrderSummaryDto fromEntity(Order order) {
+        public static OrderSummaryDto fromEntity(Order order, Integer defaultPrice) {
             return OrderSummaryDto.builder()
                     .id(order.getId())
                     .orderNumber(order.getOrderNumber())
                     .name(order.isByUser() ? order.getUser().getName() : order.getDelivery().getReceiverName())
                     .phoneNumber(order.isByUser() ? order.getUser().getPhoneNumber() : order.getDelivery().getPhoneNumber())
                     .orderStatus(order.getOrderStatus())
-                    .predictedPrice(order.getTotalAmount())
+                    .predictedPrice(order.getAmountWithoutDefaultPrice() + defaultPrice)
                     .applyDate(DateTimeUtil.convertLocalDateToString(LocalDate.from(order.getCreatedAt())))
                     .documents(DocumentsDto.fromEntities(order.getDocuments()))
                     .build();
         }
     }
 
-    public static ReadAdminOrderSummariesResponseDto of(List<Order> orders, PageInfoDto pageInfoDto) {
+    public static ReadAdminOrderSummariesResponseDto of(List<Order> orders, PageInfoDto pageInfoDto, Integer defaultPrice) {
         return ReadAdminOrderSummariesResponseDto.builder()
                 .orders(orders.stream()
-                        .map(OrderSummaryDto::fromEntity)
+                        .map(order -> OrderSummaryDto.fromEntity(order, defaultPrice))
                         .toList())
                 .pageInfoDto(pageInfoDto)
                 .build();

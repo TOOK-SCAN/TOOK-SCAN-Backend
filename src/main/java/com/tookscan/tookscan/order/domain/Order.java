@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.dto.BaseEntity;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -134,8 +135,15 @@ public class Order extends BaseEntity {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 
-    public int getTotalAmount() {
-        return getDocumentsTotalAmount() + delivery.getDeliveryPrice();
+    public int getAmountWithoutDefaultPrice() {
+
+        Integer amount = getDocumentsTotalAmount();
+
+        if (documents.stream()
+                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
+           amount += delivery.getDeliveryPrice();
+        }
+        return amount;
     }
 
     public void createMemo(String memo) {
