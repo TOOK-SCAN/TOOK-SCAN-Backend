@@ -225,7 +225,6 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable) {
         if (search == null) {
             Page<Order> orders = orderJpaRepository.findAllByUser(user, pageable);
-            System.out.println("orders: " + orders.getContent());
             if (orders.isEmpty()) {
                 throw new CommonException(ErrorCode.NOT_FOUND_ORDER);
             }
