@@ -55,7 +55,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
         this.validateSelf();
     }
 
-    public static ReadAdminOrderDocumentsOverviewsResponseDto of(Order order, Map<Long, EScanStatus> scanStatuses) {
+    public static ReadAdminOrderDocumentsOverviewsResponseDto of(Order order, Map<Long, EScanStatus> scanStatuses, Integer defaultPrice) {
         return ReadAdminOrderDocumentsOverviewsResponseDto.builder()
                 .orderStatus(order.getOrderStatus())
                 .orderNumber(order.getOrderNumber())
@@ -66,7 +66,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
                 .realDocumentDtos(order.getDocuments().stream()
                         .map(document -> RealDocumentDto.of(document, scanStatuses.get(document.getId())))
                         .toList())
-                .paymentInfoDto(PaymentInfoDto.fromEntity(order))
+                .paymentInfoDto(PaymentInfoDto.fromEntity(order, defaultPrice))
                 .build();
     }
 
@@ -195,11 +195,11 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
             this.validateSelf();
         }
 
-        public static PaymentInfoDto fromEntity(Order order) {
+        public static PaymentInfoDto fromEntity(Order order, Integer defaultPrice) {
             return PaymentInfoDto.builder()
                     .documentsPrice(order.getDocumentsTotalAmount())
                     .deliveryPrice(order.getDelivery().getDeliveryPrice())
-                    .totalPrice(order.getTotalAmount())
+                    .totalPrice(order.getAmountWithoutDefaultPrice() + defaultPrice)
                     .build();
         }
     }

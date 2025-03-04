@@ -47,13 +47,13 @@ public class ReadUserOrderSummaryResponseDto extends SelfValidating<ReadUserOrde
         this.validateSelf();
     }
 
-    public static ReadUserOrderSummaryResponseDto fromEntity(Order order) {
+    public static ReadUserOrderSummaryResponseDto fromEntity(Order order, Integer defaultPrice) {
         return ReadUserOrderSummaryResponseDto.builder()
                 .orderNumber(order.getOrderNumber())
                 .orderDate(DateTimeUtil.convertLocalDateTimeToKOREString(order.getCreatedAt()))
                 .receiverName(order.getDelivery().getReceiverName())
                 .documentDescription(order.getDocumentsDescription())
-                .paymentPrediction(order.getTotalAmount())
+                .paymentPrediction(order.getAmountWithoutDefaultPrice() + defaultPrice)
                 .address(order.getDelivery().getAddress().getFullAddress())
                 .build();
     }

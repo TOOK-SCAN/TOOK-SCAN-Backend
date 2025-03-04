@@ -4,8 +4,13 @@ import com.tookscan.tookscan.core.dto.PageInfoDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderSummariesResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.PricePolicy;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+
+import java.time.LocalDate;
 import java.util.List;
+
+import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReadAdminOrderSummariesService implements ReadAdminOrderSummariesUseCase {
 
     private final OrderRepository orderRepository;
+    private final PricePolicyRepository pricePolicyRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -32,8 +38,11 @@ public class ReadAdminOrderSummariesService implements ReadAdminOrderSummariesUs
 
         List<Order> orders = orderRepository.findAllWithDocumentsByIdIn(orderIdPages.getContent());
 
+        // 가격 정책 조회
+        PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(LocalDate.now(), LocalDate.now());
+
         PageInfoDto pageInfo = PageInfoDto.fromEntity(orderIdPages);
 
-        return ReadAdminOrderSummariesResponseDto.of(orders, pageInfo);
+        return ReadAdminOrderSummariesResponseDto.of(orders, pageInfo, pricePolicy.getDefaultPrice());
     }
 }

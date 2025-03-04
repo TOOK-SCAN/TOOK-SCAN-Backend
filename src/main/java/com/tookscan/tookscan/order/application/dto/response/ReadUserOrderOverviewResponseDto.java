@@ -6,6 +6,7 @@ import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
@@ -82,12 +83,17 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             this.validateSelf();
         }
 
-        public static OrderInfoDto fromEntity(Order order) {
+        public static OrderInfoDto fromEntity(Order order, Integer defaultPrice) {
             Optional<Payment> payment = Optional.ofNullable(order.getPayment());
 
             EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
             EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
+            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(defaultPrice + order.getDocumentsTotalAmount());
+
+            if (order.getDocuments().stream()
+                    .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
+                paymentTotal += order.getDelivery().getDeliveryPrice();
+            }
 
             return OrderInfoDto.builder()
                     .orderId(order.getId())
@@ -111,7 +117,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         this.validateSelf();
     }
 
-    public static ReadUserOrderOverviewResponseDto fromEntity(Page<Order> orders) {
+    public static ReadUserOrderOverviewResponseDto fromEntity(Page<Order> orders, Integer defaultPrice) {
 
         if (orders.isEmpty()) {
             return ReadUserOrderOverviewResponseDto.builder()
@@ -122,7 +128,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
 
         return ReadUserOrderOverviewResponseDto.builder()
                 .orders(orders.stream()
-                        .map(OrderInfoDto::fromEntity)
+                        .map(order -> OrderInfoDto.fromEntity(order, defaultPrice))
                         .toList())
                 .pageInfo(PageInfoDto.fromEntity(orders))
                 .build();
