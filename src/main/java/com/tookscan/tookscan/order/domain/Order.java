@@ -135,7 +135,7 @@ public class Order extends BaseEntity {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 
-    public int getAmountWithoutDefaultPrice() {
+    public int getTotalAmount() {
 
         Integer amount = getDocumentsTotalAmount();
 

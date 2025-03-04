@@ -83,12 +83,12 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             this.validateSelf();
         }
 
-        public static OrderInfoDto fromEntity(Order order, Integer defaultPrice) {
+        public static OrderInfoDto fromEntity(Order order) {
             Optional<Payment> payment = Optional.ofNullable(order.getPayment());
 
             EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
             EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(defaultPrice + order.getDocumentsTotalAmount());
+            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
 
             if (order.getDocuments().stream()
                     .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
@@ -117,7 +117,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         this.validateSelf();
     }
 
-    public static ReadUserOrderOverviewResponseDto fromEntity(Page<Order> orders, Integer defaultPrice) {
+    public static ReadUserOrderOverviewResponseDto fromEntity(Page<Order> orders) {
 
         if (orders.isEmpty()) {
             return ReadUserOrderOverviewResponseDto.builder()
@@ -128,7 +128,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
 
         return ReadUserOrderOverviewResponseDto.builder()
                 .orders(orders.stream()
-                        .map(order -> OrderInfoDto.fromEntity(order, defaultPrice))
+                        .map(OrderInfoDto::fromEntity)
                         .toList())
                 .pageInfo(PageInfoDto.fromEntity(orders))
                 .build();
