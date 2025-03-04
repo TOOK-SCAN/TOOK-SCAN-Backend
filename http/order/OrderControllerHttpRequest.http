@@ -30,3 +30,8 @@ Content-Type: application/json
   }
 }
 
+### 주문 조회
+//@no-log
+GET {{host_url}}/v1/users/orders/overviews?page=1&size=10&sort=createdAt
+Authorization: Bearer {{access_token}}
+

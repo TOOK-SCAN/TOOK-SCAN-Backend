@@ -6,6 +6,6 @@ import java.time.LocalDateTime;
 
 public interface PaymentRepository {
     Integer sumTotalAmountByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
-    void save(Payment payment);
+    Payment saveAndReturn(Payment payment);
     Payment findByOrderNumberOrElseThrow(String orderNumber);
 }

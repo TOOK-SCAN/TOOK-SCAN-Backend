@@ -4,7 +4,6 @@ import com.tookscan.tookscan.core.dto.PaymentDto;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.Order;
-import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.payment.application.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.application.usecase.ConfirmPaymentUseCase;
@@ -19,7 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Service
@@ -63,11 +61,11 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 order
         );
 
-        paymentRepository.save(payment);
+        payment = paymentRepository.saveAndReturn(payment);
 
         // 결제 완료 시 주문 상태 변경
         if (payment.getStatus().equals(EPaymentStatus.DONE)) {
-            order.updateOrderStatus(EOrderStatus.PAYMENT_COMPLETED);
+            order.finishPayment(payment);
             orderRepository.save(order);
         }
 

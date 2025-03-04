@@ -20,14 +20,12 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o FROM Order o " +
             "JOIN o.documents d " +
-            "JOIN FETCH o.payment p " +
             "WHERE o.user = :user " +
             "AND (o.orderNumber LIKE %:search% " +
             "OR d.name LIKE %:search%)")
     Page<Order> findAllByUserAndSearch(@Param("user") User user, @Param("search") String search, Pageable pageable);
 
     @Query("SELECT o FROM Order o " +
-            "JOIN FETCH o.payment p " +
             "WHERE o.user = :user")
     Page<Order> findAllByUser(User user, Pageable pageable);
 
