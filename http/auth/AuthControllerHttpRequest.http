@@ -54,7 +54,8 @@ Content-Type: application/json
     "serial_id": "{{auth.API_2_1_2.serial_id}}",
     "password": "{{auth.API_2_1_2.password}}",
     "phone_number": "{{auth.API_2_1_2.phone_number}}",
-    "marketing_allowed": {{auth.API_2_1_2.marketing_allowed}}
+    "is_receive_email" : true,
+    "is_receive_sms" : true
 }
 
 ### 2.1.5 관리자 회원가입
@@ -69,7 +70,7 @@ Content-Type: application/json
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "329523"
+@authentication_code = "412065"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 

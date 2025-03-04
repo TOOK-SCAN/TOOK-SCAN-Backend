@@ -18,8 +18,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         return paymentJpaRepository.sumTotalAmountByCreatedAtBetween(startDate, endDate);
     }
     @Override
-    public void save(Payment payment) {
-        paymentJpaRepository.save(payment);
+    public Payment saveAndReturn(Payment payment) {
+        return paymentJpaRepository.save(payment);
     }
 
     @Override

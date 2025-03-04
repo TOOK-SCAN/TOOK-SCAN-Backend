@@ -104,8 +104,22 @@ public class Order extends BaseEntity {
         this.orderStatus = orderStatus;
     }
 
+    public void finishPayment(Payment payment) {
+        this.orderStatus = EOrderStatus.PAYMENT_COMPLETED;
+        this.payment = payment;
+    }
+
     public String getDocumentsDescription() {
-        String documentName = documents.stream()
+        String documentName;
+
+        if (documents.size() == 1) {
+            documentName = documents.stream()
+                    .findFirst()
+                    .map(Document::getName)
+                    .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+            return documentName;
+        }
+        documentName = documents.stream()
                 .findFirst()
                 .map(Document::getName)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
