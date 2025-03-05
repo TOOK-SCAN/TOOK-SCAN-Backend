@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.security.application.dto.response.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.dto.response.OauthJsonWebTokenDto;
+import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,7 +103,9 @@ public class HttpServletUtil {
 
     public void onSuccessBodyResponseWithJWTBody(
             HttpServletResponse response,
-            DefaultJsonWebTokenDto tokenDto
+            DefaultJsonWebTokenDto tokenDto,
+            ESecurityRole role
+
     ) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -113,7 +116,8 @@ public class HttpServletUtil {
         result.put("success", true);
         result.put("data", Map.of(
                         "access_token", tokenDto.getAccessToken(),
-                        "refresh_token", tokenDto.getRefreshToken()
+                        "refresh_token", tokenDto.getRefreshToken(),
+                        "account_type", role
                 )
         );
         result.put("error", null);
