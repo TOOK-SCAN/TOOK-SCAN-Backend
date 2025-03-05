@@ -38,6 +38,6 @@ public class DefaultLoginSuccessHandler implements AuthenticationSuccessHandler 
 
         loginByDefaultUseCase.execute(principal, jsonWebTokenDto);
 
-        httpServletUtil.onSuccessBodyResponseWithJWTBody(response, jsonWebTokenDto);
+        httpServletUtil.onSuccessBodyResponseWithJWTBody(response, jsonWebTokenDto, principal.getRole());
     }
 }
