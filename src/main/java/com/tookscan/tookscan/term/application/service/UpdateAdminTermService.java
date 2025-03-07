@@ -28,6 +28,12 @@ public class UpdateAdminTermService implements UpdateAdminTermUseCase {
     @Transactional
     public void execute(UpdateAdminTermRequestDto requestDto) {
 
+        boolean isSignUpChanged = requestDto.terms().stream()
+                .anyMatch(dto -> dto.type() == ETermType.SIGN_UP);
+
+        boolean isScanChanged = requestDto.terms().stream()
+                .anyMatch(dto -> dto.type() == ETermType.SCAN);
+
         List<Term> terms = termRepository.findAll();
 
         List<Term> signupTerms = terms.stream()
@@ -72,7 +78,11 @@ public class UpdateAdminTermService implements UpdateAdminTermUseCase {
             }
         });
 
-        if (checkSignupSortOrder.containsValue(false) || checkScanSortOrder.containsValue(false)) {
+        if (isSignUpChanged && checkSignupSortOrder.containsValue(false)) {
+            throw new CommonException(ErrorCode.SORT_ORDER_NOT_CONTINUOUS);
+        }
+
+        if (isScanChanged && checkScanSortOrder.containsValue(false)) {
             throw new CommonException(ErrorCode.SORT_ORDER_NOT_CONTINUOUS);
         }
 
