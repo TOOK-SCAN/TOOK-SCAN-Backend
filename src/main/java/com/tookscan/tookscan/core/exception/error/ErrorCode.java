@@ -109,6 +109,7 @@ public enum ErrorCode {
     TOKEN_UNKNOWN_ERROR(40107, HttpStatus.UNAUTHORIZED, "알 수 없는 토큰입니다."),
     NOT_VERIFIED_AUTHENTICATION_CODE(40108, HttpStatus.UNAUTHORIZED, "인증 코드 인증이 완료되지 않았습니다."),
     UNAUTHORIZED_KEY(40109, HttpStatus.UNAUTHORIZED, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
+    TYPE_COEXISTENCE_ERROR(40110, HttpStatus.UNAUTHORIZED, "약관 타입은 동시에 존재할 수 없습니다."),
 
     // Too Many Requests Error
     TOO_FAST_AUTHENTICATION_CODE_REQUESTS(42900, HttpStatus.TOO_MANY_REQUESTS, "인증코드 발급 속도가 너무 빠릅니다."),
