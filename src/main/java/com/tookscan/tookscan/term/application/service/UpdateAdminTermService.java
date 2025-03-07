@@ -26,6 +26,13 @@ public class UpdateAdminTermService implements UpdateAdminTermUseCase {
     @Override
     @Transactional
     public void execute(UpdateAdminTermRequestDto requestDto) {
+        
+        if(requestDto.terms().stream()
+                .map(UpdateAdminTermRequestDto.TermInfoDto::type)
+                .distinct() // 중복 제거
+                .count() > 1) {
+            throw new CommonException(ErrorCode.TYPE_COEXISTENCE_ERROR);
+        }
 
         List<Term> terms = termRepository.findAllByTypeOrElseThrow(
                 requestDto.terms().get(0).type()
