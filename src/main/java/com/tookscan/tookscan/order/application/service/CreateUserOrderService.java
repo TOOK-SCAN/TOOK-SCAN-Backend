@@ -65,6 +65,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         // 쿠폰 조회
         if (requestDto.couponId() != null) {
             coupon = couponRepository.findByIdOrElseThrow(requestDto.couponId());
+            couponService.validateCouponExpiration(coupon);
         }
 
         // 주소 정보 생성
