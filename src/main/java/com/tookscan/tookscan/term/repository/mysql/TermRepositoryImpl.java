@@ -21,6 +21,11 @@ public class TermRepositoryImpl implements TermRepository {
     }
 
     @Override
+    public Term saveAndReturn(Term term) {
+        return termJpaRepository.save(term);
+    }
+
+    @Override
     public Term findByIdOrElseThrow(Long id) {
         return termJpaRepository.findById(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_TERM));

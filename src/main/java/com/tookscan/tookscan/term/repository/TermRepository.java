@@ -8,6 +8,8 @@ public interface TermRepository {
 
     void save(Term term);
 
+    Term saveAndReturn(Term term);
+
     Term findByIdOrElseThrow(Long id);
 
     List<Term> findAll();

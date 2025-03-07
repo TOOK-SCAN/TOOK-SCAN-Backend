@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class TermService {
 
-    public Term createTerm(String type, String title, String content, Boolean isRequired, Boolean isVisible) {
+    public Term createTerm(String type, String title, String content, Boolean isRequired, Boolean isVisible, Integer sortOrder) {
         return Term.builder()
                 .type(ETermType.fromString(type))
                 .title(title)
                 .content(content)
                 .isRequired(isRequired)
                 .isVisible(isVisible)
+                .sortOrder(sortOrder)
                 .build();
     }
 
