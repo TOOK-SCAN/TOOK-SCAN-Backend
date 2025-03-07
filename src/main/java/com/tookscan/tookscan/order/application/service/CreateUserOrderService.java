@@ -7,16 +7,19 @@ import com.tookscan.tookscan.address.domain.service.AddressService;
 import com.tookscan.tookscan.order.application.dto.request.CreateUserOrderRequestDto;
 import com.tookscan.tookscan.order.application.dto.response.CreateUserOrderResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
+import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.InitialDocument;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.PricePolicy;
+import com.tookscan.tookscan.order.domain.service.CouponService;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.InitialDocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
+import com.tookscan.tookscan.order.repository.CouponRepository;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.InitialDocumentRepository;
@@ -38,12 +41,14 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
     private final InitialDocumentRepository initialDocumentRepository;
     private final DeliveryRepository deliveryRepository;
     private final PricePolicyRepository pricePolicyRepository;
+    private final CouponRepository couponRepository;
 
     private final OrderService orderService;
     private final DocumentService documentService;
     private final InitialDocumentService initialDocumentService;
     private final AddressService addressService;
     private final DeliveryService deliveryService;
+    private final CouponService couponService;
 
     @Override
     @Transactional
@@ -54,6 +59,13 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         // 가격 정책 조회
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
                 LocalDate.now(), LocalDate.now());
+
+        Coupon coupon = null;
+
+        // 쿠폰 조회
+        if (requestDto.couponId() != null) {
+            coupon = couponRepository.findByIdOrElseThrow(requestDto.couponId());
+        }
 
         // 주소 정보 생성
         Address address = addressService.createAddress(
@@ -80,8 +92,13 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         deliveryRepository.save(delivery);
 
         // 주문 생성
-        Order order = orderService.createOrder(user, true, delivery);
+        Order order = orderService.createOrder(user, true, delivery, coupon);
         orderRepository.save(order);
+
+        // 쿠폰 적용
+        if (coupon != null) {
+            couponService.applyCoupon(coupon, order);
+        }
 
         // 문서 생성
         requestDto.documents().forEach(doc -> {

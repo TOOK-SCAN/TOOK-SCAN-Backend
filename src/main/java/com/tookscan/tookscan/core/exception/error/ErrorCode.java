@@ -27,6 +27,7 @@ public enum ErrorCode {
     NOT_FOUND_USER_GROUP(40411, HttpStatus.NOT_FOUND, "존재하지 않는 사용자 그룹입니다."),
     NOT_FOUND_AUTHENTICATION_CODE(40413, HttpStatus.NOT_FOUND, "존재하지 않는 인증 코드입니다."),
     NOT_FOUND_PAYMENT_SESSION(40414, HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
+    NOT_FOUND_COUPON(40415, HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
 
 
     // Invalid Argument Error
@@ -76,6 +77,7 @@ public enum ErrorCode {
     SORT_ORDER_OUT_OF_RANGE(40043, HttpStatus.BAD_REQUEST, "정렬 순서가 범위를 벗어났습니다."),
     SORT_ORDER_DUPLICATE(40044, HttpStatus.BAD_REQUEST, "정렬 순서가 중복되었습니다."),
     SORT_ORDER_NOT_CONTINUOUS(40045, HttpStatus.BAD_REQUEST, "정렬 순서가 연속되지 않았습니다."),
+    EXPIRED_COUPON(40046, HttpStatus.BAD_REQUEST, "만료된 쿠폰입니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),

@@ -1,9 +1,11 @@
 package com.tookscan.tookscan.order.application.controller.query;
 
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderDetailResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderSummaryResponseDto;
+import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderCouponDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderSummaryUseCase;
@@ -25,6 +27,7 @@ public class OrderGuestQueryV1Controller {
     private final ReadGuestOrderDetailUseCase readGuestOrderDetailUseCase;
     private final ReadGuestOrderSummaryUseCase readGuestOrderSummaryUseCase;
     private final ReadGuestOrderDeliveryUseCase readGuestOrderDeliveryUseCase;
+    private final ReadGuestOrderCouponDetailUseCase readGuestOrderCouponDetailUseCase;
 
     /**
      * 4.2.1 비회원 주문 상세 조회
@@ -58,6 +61,17 @@ public class OrderGuestQueryV1Controller {
             @PathVariable Long orderId
     ) {
         return ResponseDto.ok(readGuestOrderDeliveryUseCase.execute(orderId));
+    }
+
+    /**
+     * 4.2.20 비회원 쿠폰 정보 조회
+     */
+    @Operation(summary = "회원 쿠폰 정보 조회", description = "회원이 쿠폰 정보를 조회합니다.")
+    @GetMapping(value = "/coupon/detail")
+    public ResponseDto<ReadGuestOrderCouponDetailResponseDto> getUserCouponDetail(
+            @RequestParam(value = "coupon-code") String couponCode
+    ) {
+        return ResponseDto.ok(readGuestOrderCouponDetailUseCase.execute(couponCode));
     }
 
 }
