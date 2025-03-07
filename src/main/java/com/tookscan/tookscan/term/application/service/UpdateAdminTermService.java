@@ -9,7 +9,6 @@ import com.tookscan.tookscan.term.domain.service.TermService;
 import com.tookscan.tookscan.term.domain.type.ETermType;
 import com.tookscan.tookscan.term.repository.TermRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UpdateAdminTermService implements UpdateAdminTermUseCase {
@@ -55,9 +53,6 @@ public class UpdateAdminTermService implements UpdateAdminTermUseCase {
         requestDto.terms().forEach(dto -> {
             if (dto.type() == ETermType.SIGN_UP) {
                 if (dto.sortOrder() < 0 || dto.sortOrder() > signupSize) {
-                    log.info("dto.sortOrder(): {}", dto.sortOrder());
-                    log.info("signupSize: {}", signupSize);
-                    log.info("dto.sortOrder() >= signupSize: {}", dto.sortOrder() >= signupSize);
                     throw new CommonException(ErrorCode.SORT_ORDER_OUT_OF_RANGE);
                 }
                 if (checkSignupSortOrder.get(dto.sortOrder())) {
@@ -68,9 +63,6 @@ public class UpdateAdminTermService implements UpdateAdminTermUseCase {
 
             if (dto.type() == ETermType.SCAN) {
                 if (dto.sortOrder() < 0 || dto.sortOrder() > scanSize) {
-                    log.info("dto.sortOrder(): {}", dto.sortOrder());
-                    log.info("scanSize: {}", scanSize);
-                    log.info("dto.sortOrder() >= scanSize: {}", dto.sortOrder() >= scanSize);
                     throw new CommonException(ErrorCode.SORT_ORDER_OUT_OF_RANGE);
                 }
                 if (checkScanSortOrder.get(dto.sortOrder())) {
