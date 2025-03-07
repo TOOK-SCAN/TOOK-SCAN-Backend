@@ -3,6 +3,7 @@ package com.tookscan.tookscan.term.application.controller.command;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.term.application.dto.request.CreateAdminTermRequestDto;
 import com.tookscan.tookscan.term.application.dto.request.UpdateAdminTermRequestDto;
+import com.tookscan.tookscan.term.application.dto.response.CreateAdminTermResponseDto;
 import com.tookscan.tookscan.term.application.usecase.CreateAdminTermUseCase;
 import com.tookscan.tookscan.term.application.usecase.UpdateAdminTermUseCase;
 import jakarta.validation.Valid;
@@ -21,11 +22,10 @@ public class TermAdminCommandV1Controller {
      * 8.1.1 (관리자) 약관 추가
      */
      @PostMapping("/terms")
-    public ResponseDto<Void> createAdminTerm(
+    public ResponseDto<CreateAdminTermResponseDto> createAdminTerm(
              @RequestBody @Valid CreateAdminTermRequestDto requestDto
      ) {
-         createAdminTermUseCase.execute(requestDto);
-         return ResponseDto.created(null);
+         return ResponseDto.created(createAdminTermUseCase.execute(requestDto));
      }
 
     /**
