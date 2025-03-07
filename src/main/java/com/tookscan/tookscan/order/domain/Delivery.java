@@ -110,4 +110,8 @@ public class Delivery extends BaseEntity {
     public void updateAddress(Address address) {
         this.address = address;
     }
+
+    public void updateDeliveryPrice(Integer deliveryPrice) {
+        this.deliveryPrice = deliveryPrice;
+    }
 }

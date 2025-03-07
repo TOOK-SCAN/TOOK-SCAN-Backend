@@ -22,7 +22,10 @@ public record CreateUserOrderRequestDto(
         @JsonProperty("delivery_info")
         @Valid
         @NotNull(message = "배송 정보를 입력해주세요.")
-        DeliveryInfo deliveryInfo
+        DeliveryInfo deliveryInfo,
+
+        @JsonProperty("coupon_id")
+        Long couponId
 ) {
     public record RequestDocument(
 

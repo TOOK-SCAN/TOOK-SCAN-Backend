@@ -84,16 +84,26 @@ public class Order extends BaseEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InitialDocument> initialDocuments = new ArrayList<>();
+
+    /* -------------------------------------------- */
+    /* Many To One Mapping ------------------------ */
+    /* -------------------------------------------- */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
+
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Order(String orderNumber, EOrderStatus orderStatus, boolean isByUser, User user, Delivery delivery) {
+    public Order(String orderNumber, EOrderStatus orderStatus, boolean isByUser, User user, Delivery delivery,
+                 Coupon coupon) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
         this.isByUser = isByUser;
         this.user = user;
         this.delivery = delivery;
+        this.coupon = coupon;
     }
 
     /**
@@ -143,6 +153,11 @@ public class Order extends BaseEntity {
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
            amount += delivery.getDeliveryPrice();
         }
+
+        if (coupon != null) {
+            amount -= coupon.calculateDiscount(amount);
+        }
+
         return amount;
     }
 

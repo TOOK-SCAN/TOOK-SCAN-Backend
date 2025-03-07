@@ -2,10 +2,12 @@ package com.tookscan.tookscan.order.application.controller.query;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderDetailResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderOverviewResponseDto;
 import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderSummaryResponseDto;
+import com.tookscan.tookscan.order.application.usecase.ReadUserOrderCouponDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderOverviewUseCase;
@@ -31,6 +33,7 @@ public class OrderUserQueryV1Controller {
     private final ReadUserOrderDetailUseCase readUserOrderDetailUseCase;
     private final ReadUserOrderSummaryUseCase readUserOrderSummaryUseCase;
     private final ReadUserOrderDeliveryUseCase readUserOrderDeliveryUseCase;
+    private final ReadUserOrderCouponDetailUseCase readUserOrderCouponDetailUseCase;
 
     /**
      * 4.2.2 회원 주문 내역 조회
@@ -83,6 +86,18 @@ public class OrderUserQueryV1Controller {
             @RequestParam(value = "order-number") String orderNumber
     ) {
         return ResponseDto.ok(readUserOrderSummaryUseCase.execute(accountId, orderNumber));
+    }
+
+    /**
+     * 4.2.19 회원 쿠폰 정보 조회
+     */
+    @Operation(summary = "회원 쿠폰 정보 조회", description = "회원이 쿠폰 정보를 조회합니다.")
+    @GetMapping(value = "/coupon/detail")
+    public ResponseDto<ReadUserOrderCouponDetailResponseDto> getUserCouponDetail(
+            @Parameter(hidden = true) @AccountID UUID accountId,
+            @RequestParam(value = "coupon-code") String couponCode
+    ) {
+        return ResponseDto.ok(readUserOrderCouponDetailUseCase.execute(accountId, couponCode));
     }
 
 }

@@ -22,7 +22,10 @@ public record CreateGuestOrderRequestDto(
         @NotNull(message = "배송 정보를 입력해주세요.")
         @Valid
         @JsonProperty("delivery_info")
-        DeliveryInfo deliveryInfo
+        DeliveryInfo deliveryInfo,
+
+        @JsonProperty("coupon_id")
+        Long couponId
 ) {
     public record RequestDocument(
 
