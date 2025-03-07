@@ -44,16 +44,20 @@ public class Term extends BaseEntity {
     @Column(name = "is_visible", nullable = false)
     private Boolean isVisible = true;
 
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder;
+
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Term(ETermType type, String title, String content, Boolean isRequired, Boolean isVisible) {
+    public Term(ETermType type, String title, String content, Boolean isRequired, Boolean isVisible, Integer sortOrder) {
         this.type = type;
         this.title = title;
         this.content = content;
         this.isRequired = isRequired;
         this.isVisible = isVisible;
+        this.sortOrder = sortOrder;
     }
 
     public void updateTitle(String title) {
@@ -70,6 +74,10 @@ public class Term extends BaseEntity {
 
     public void updateIsVisible(Boolean isVisible) {
         this.isVisible = isVisible;
+    }
+
+    public void updateSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }
 

@@ -17,11 +17,12 @@ public class TermService {
                 .build();
     }
 
-    public Term updateTerm(Term term, String title, String content, Boolean isRequired, Boolean isVisible) {
+    public Term updateTerm(Term term, String title, String content, Boolean isRequired, Boolean isVisible, Integer sortOrder) {
         term.updateTitle(title);
         term.updateContent(content);
         term.updateIsRequired(isRequired);
         term.updateIsVisible(isVisible);
+        term.updateSortOrder(sortOrder);
         return term;
     }
 }

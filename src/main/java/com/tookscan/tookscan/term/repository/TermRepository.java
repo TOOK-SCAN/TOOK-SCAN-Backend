@@ -10,6 +10,8 @@ public interface TermRepository {
 
     Term findByIdOrElseThrow(Long id);
 
+    List<Term> findAll();
+
     List<Term> findAllByTypeOrElseThrow(ETermType type);
 
     void deleteById(Long id);

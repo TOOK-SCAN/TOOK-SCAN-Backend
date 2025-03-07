@@ -73,6 +73,9 @@ public enum ErrorCode {
     NOT_AVAILABLE_PAYMENT(40040, HttpStatus.BAD_REQUEST, "결제가 불가능한 시간대입니다."),
     UNAPPROVED_ORDER_ID(40041, HttpStatus.BAD_REQUEST, "아직 승인되지 않은 주문번호입니다."),
     EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT(40042, HttpStatus.BAD_REQUEST, "당월 결제 가능금액인 1,000,000원을 초과 하셨습니다."),
+    SORT_ORDER_OUT_OF_RANGE(40043, HttpStatus.BAD_REQUEST, "정렬 순서가 범위를 벗어났습니다."),
+    SORT_ORDER_DUPLICATE(40044, HttpStatus.BAD_REQUEST, "정렬 순서가 중복되었습니다."),
+    SORT_ORDER_NOT_CONTINUOUS(40045, HttpStatus.BAD_REQUEST, "정렬 순서가 연속되지 않았습니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),

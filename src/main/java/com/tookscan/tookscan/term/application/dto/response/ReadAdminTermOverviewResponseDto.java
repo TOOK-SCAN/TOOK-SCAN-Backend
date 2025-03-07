@@ -43,22 +43,27 @@ public class ReadAdminTermOverviewResponseDto extends SelfValidating<ReadAdminTe
         @NotBlank(message = "content는 null이 될 수 없습니다.")
         private final String content;
 
-        @JsonProperty("isRequired")
-        @NotNull(message = "isRequired는 null이 될 수 없습니다.")
+        @JsonProperty("is_required")
+        @NotNull(message = "is_required는 null이 될 수 없습니다.")
         private final Boolean isRequired;
 
-        @JsonProperty("isVisible")
-        @NotNull(message = "isVisible는 null이 될 수 없습니다.")
+        @JsonProperty("is_visible")
+        @NotNull(message = "is_visible는 null이 될 수 없습니다.")
         private final Boolean isVisible;
 
+        @JsonProperty("sort_order")
+        @NotNull(message = "sort_order는 null이 될 수 없습니다.")
+        private final Integer sortOrder;
+
         @Builder
-        public TermInfoDto(Long id, ETermType type, String title, String content, Boolean isRequired, Boolean isVisible) {
+        public TermInfoDto(Long id, ETermType type, String title, String content, Boolean isRequired, Boolean isVisible, Integer sortOrder) {
             this.id = id;
             this.type = type;
             this.title = title;
             this.content = content;
             this.isRequired = isRequired;
             this.isVisible = isVisible;
+            this.sortOrder = sortOrder;
             this.validateSelf();
         }
 
@@ -70,6 +75,7 @@ public class ReadAdminTermOverviewResponseDto extends SelfValidating<ReadAdminTe
                     .content(term.getContent())
                     .isRequired(term.getIsRequired())
                     .isVisible(term.getIsVisible())
+                    .sortOrder(term.getSortOrder())
                     .build();
         }
     }

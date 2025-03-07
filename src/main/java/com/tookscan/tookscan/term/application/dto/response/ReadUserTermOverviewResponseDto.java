@@ -43,12 +43,12 @@ public class ReadUserTermOverviewResponseDto extends SelfValidating<ReadUserTerm
         @NotBlank(message = "content는 null이 될 수 없습니다.")
         private final String content;
 
-        @JsonProperty("isRequired")
-        @NotNull(message = "isRequired는 null이 될 수 없습니다.")
+        @JsonProperty("is_required")
+        @NotNull(message = "is_required는 null이 될 수 없습니다.")
         private final Boolean isRequired;
 
-        @JsonProperty("isVisible")
-        @NotNull(message = "isVisible는 null이 될 수 없습니다.")
+        @JsonProperty("is_visible")
+        @NotNull(message = "is_visible는 null이 될 수 없습니다.")
         private final Boolean isVisible;
 
         @Builder
