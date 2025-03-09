@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ECouponType {
-    DELIVERY_PRICE("배송비"),
+    DELIVERY_PRICE_FREE("배송비 무료"),
     PERCENTAGE("퍼센트"),
     AMOUNT("금액");
 
@@ -16,7 +16,7 @@ public enum ECouponType {
 
     public static ECouponType fromString(String value) {
         return switch (value.toUpperCase()) {
-            case "DELIVERY_PRICE" -> DELIVERY_PRICE;
+            case "DELIVERY_PRICE_FREE" -> DELIVERY_PRICE_FREE;
             case "PERCENTAGE" -> PERCENTAGE;
             case "AMOUNT" -> AMOUNT;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);

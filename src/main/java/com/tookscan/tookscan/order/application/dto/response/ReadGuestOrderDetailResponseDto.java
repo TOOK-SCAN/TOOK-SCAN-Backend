@@ -169,12 +169,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
 
         EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
         EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
-
-        if (order.getDocuments().stream()
-                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
-            paymentTotal += order.getDelivery().getDeliveryPrice();
-        }
+        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
 
         return ReadGuestOrderDetailResponseDto.builder()
                 .orderId(order.getId())
