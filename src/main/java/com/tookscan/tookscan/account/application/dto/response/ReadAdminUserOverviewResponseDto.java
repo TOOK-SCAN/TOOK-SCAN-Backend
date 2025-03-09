@@ -9,11 +9,10 @@ import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUserOverviewResponseDto> {
@@ -108,7 +107,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
                     .totalOrderAmount(
                             orders.stream()
                                     .filter(order -> order.getUser().getId().equals(user.getId()))
-                                    .mapToInt(Order::getDocumentsTotalAmount).sum())
+                                    .mapToInt(Order::getTotalAmount).sum())
                     .totalOrderCount((int) orders.stream()
                             .filter(order -> order.getUser().getId().equals(user.getId()))
                             .count())
