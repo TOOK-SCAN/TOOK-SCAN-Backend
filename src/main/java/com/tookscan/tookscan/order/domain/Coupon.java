@@ -12,13 +12,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -46,24 +47,33 @@ public class Coupon extends BaseEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "code", length = 20, nullable = false)
+    @Column(name = "code", length = 10, unique = true, nullable = false)
     private String code;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private ECouponType type;
 
+    @Column(name = "is_possible_duplicated_apply_", nullable = false)
+    private boolean isPossibleDuplicatedApply;
+
     @Column(name = "discount_price")
+    @ColumnDefault("0")
     private Integer discountPrice;
 
     @Column(name = "discount_percent")
+    @ColumnDefault("0")
     private Integer discountPercent;
 
+    @Column(name = "is_used", nullable = false)
+    @ColumnDefault("false")
+    private boolean isUsed;
+
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    private LocalDateTime startDateTime;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private LocalDateTime endDateTime;
 
     /* -------------------------------------------- */
     /* One To Many Mapping ------------------------ */
@@ -73,32 +83,38 @@ public class Coupon extends BaseEntity {
 
     @Builder
     public Coupon(String name, String description, String code, ECouponType type, Integer discountPrice,
-                  Integer discountPercent, LocalDate startDate, LocalDate endDate) {
+                  Integer discountPercent, LocalDateTime startDateTime, LocalDateTime endDateTime,
+                  boolean isPossibleDuplicatedApply) {
         this.name = name;
         this.description = description;
         this.code = code;
         this.type = type;
         this.discountPrice = discountPrice;
         this.discountPercent = discountPercent;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.isPossibleDuplicatedApply = isPossibleDuplicatedApply;
+    }
+
+    public void updateIsUsed(boolean isUsed) {
+        this.isUsed = isUsed;
     }
 
     public boolean isAvailable() {
-        LocalDate now = LocalDate.now();
-        return now.isAfter(startDate) && (endDate == null || now.isBefore(endDate));
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(startDateTime) && (endDateTime == null || now.isBefore(endDateTime)) && !isUsed;
     }
 
-    public int calculateDiscount(int price) {
+    public int calculatePrice(int price) {
         return switch (type) {
-            case AMOUNT -> discountPrice;
-            case PERCENTAGE -> price * discountPercent / 100;
-            case DELIVERY_PRICE -> 0;
+            case AMOUNT -> price - discountPrice;
+            case PERCENTAGE -> price - (price * discountPercent / 100);
+            case DELIVERY_PRICE_FREE -> price;
         };
     }
 
     public String getExpirationDate() {
-        return DateTimeUtil.convertLocalDateToString(startDate)
-                + " ~ " + DateTimeUtil.convertLocalDateToString(endDate);
+        return DateTimeUtil.convertLocalDateTimeToString(startDateTime)
+                + " ~ " + DateTimeUtil.convertLocalDateTimeToString(endDateTime);
     }
 }
