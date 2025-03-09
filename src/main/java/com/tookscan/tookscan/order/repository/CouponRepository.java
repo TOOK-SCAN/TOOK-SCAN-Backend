@@ -6,4 +6,8 @@ public interface CouponRepository {
     Coupon findByCodeOrElseThrow(String code);
 
     Coupon findByIdOrElseThrow(Long id);
+
+    boolean existsByCode(String code);
+
+    void save(Coupon coupon);
 }

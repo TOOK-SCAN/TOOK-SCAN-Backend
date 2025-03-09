@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ERecoveryOption {
     DISCARD("폐기", 0),
-    RAW("원본", 2500),
-    SPRING("스프링", 5000);
+    RAW("원본", 0),
+    SPRING("스프링", 4000);
 
     private final String description;
     private final Integer price;
