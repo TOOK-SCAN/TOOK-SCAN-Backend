@@ -2,7 +2,7 @@ name: Renewal Main Server Develop Server CI/CD
 
 on:
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "prod" ]
     types:
       - opened
       - reopened
@@ -35,7 +35,7 @@ jobs:
       ### application.yml 설정
       - name: Set YML
         run: |
-          echo "${{ secrets.APPLICATION_DEV_YML }}" | base64 --decode > ./src/main/resources/application-dev.yml
+          echo "${{ secrets.APPLICATION_PROD_YML }}" | base64 --decode > ./src/main/resources/application-prod.yml
 
       ### gradlew 실행 권한 부여
       - name: Grant execute Permission for gradlew
@@ -64,9 +64,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./dev.Dockerfile
+          file: ./prod.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
 
   # closed에 대한 server deploy
   CD:
@@ -79,15 +79,15 @@ jobs:
       - name: Docker Image Pull and Container Run
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.DEV_SSH_HOST }}
-          username: ${{ secrets.DEV_SSH_USERNAME }}
-          key: ${{ secrets.DEV_SSH_KEY }}
-          port: ${{ secrets.DEV_SSH_PORT }}
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT }}
           script: |
             docker stop api-server
             docker rm api-server
-            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
-            docker run -d -p 8080:8080 -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --name api-server --network ${{secrets.DOCKER_NETWORKNAME}} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
+            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
+            docker run -d -p 8080:8080 -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --name api-server --network ${{secrets.DOCKER_NETWORKNAME}} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
             
             # 사용되지 않는 이미지 정리
             docker image prune -f
