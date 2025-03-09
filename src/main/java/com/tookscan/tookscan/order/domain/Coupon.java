@@ -102,7 +102,7 @@ public class Coupon extends BaseEntity {
 
     public boolean isAvailable() {
         LocalDateTime now = LocalDateTime.now();
-        return now.isAfter(startDateTime) && (endDateTime == null || now.isBefore(endDateTime)) && !isUsed;
+        return now.isAfter(startDateTime) && (endDateTime == null || now.isBefore(endDateTime));
     }
 
     public int calculatePrice(int price) {

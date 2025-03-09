@@ -45,8 +45,11 @@ public class CouponService {
     }
 
     public void validateCouponExpiration(Coupon coupon) {
+        if (coupon.isUsed()) {
+            throw new CommonException(ErrorCode.USED_COUPON);
+        }
         if (!coupon.isAvailable()) {
-            throw new CommonException(ErrorCode.EXPIRED_COUPON);
+            throw new CommonException(ErrorCode.NOT_AVAILABLE_COUPON);
         }
     }
 
