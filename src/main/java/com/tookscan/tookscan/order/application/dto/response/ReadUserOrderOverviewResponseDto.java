@@ -6,16 +6,14 @@ import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
-import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 import org.springframework.data.domain.Page;
 
 @Getter
@@ -88,12 +86,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
 
             EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
             EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getDocumentsTotalAmount());
-
-            if (order.getDocuments().stream()
-                    .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
-                paymentTotal += order.getDelivery().getDeliveryPrice();
-            }
+            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
 
             return OrderInfoDto.builder()
                     .orderId(order.getId())
