@@ -10,16 +10,7 @@ import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrderDeliv
 import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrderDocumentsRequestDto;
 import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrdersStatusRequestDto;
-import com.tookscan.tookscan.order.application.usecase.CreateAdminDocumentsPdfUseCase;
-import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
-import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
-import com.tookscan.tookscan.order.application.usecase.DeleteAdminOrdersUseCase;
-import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDocumentsUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
+import com.tookscan.tookscan.order.application.usecase.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -50,6 +41,8 @@ public class OrderAdminCommandV1Controller {
     private final UpdateAdminOrdersStatusUseCase updateAdminOrdersStatusUseCase;
     private final DeleteAdminOrdersUseCase deleteAdminOrdersUseCase;
     private final UpdateAdminOrderDeliveryUseCase updateAdminOrderDeliveryUseCase;
+    private final SendAdminPdfUseCase sendAdminPdfUseCase;
+    private final UpdateAdminOrderStatusPaymentWaitingUseCase updateAdminOrderStatusPaymentWaitingUseCase;
     private final UpdateAdminOrdersDeliveriesTrackingNumberUseCase updateAdminOrdersDeliveriesTrackingNumberUseCase;
     private final UpdateAdminOrderDeliveryTrackingNumberUseCase updateAdminOrderDeliveryTrackingNumberUseCase;
     private final DeleteAdminDocumentsUseCase deleteAdminDocumentsUseCase;
@@ -127,6 +120,30 @@ public class OrderAdminCommandV1Controller {
             @RequestBody @Valid UpdateAdminOrderDeliveryRequestDto requestDto
     ) {
         updateAdminOrderDeliveryUseCase.execute(deliveryId, requestDto);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 4.3.5 관리자 파일 전송
+     */
+    @Operation(summary = "관리자 파일 전송", description = "관리자가 주문의 파일을 전송합니다.")
+    @PostMapping(value = "/orders/{id}/send-pdfs")
+    public ResponseDto<Void> sendPdf(
+            @PathVariable Long id
+    ) {
+        sendAdminPdfUseCase.execute(id);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 4.3.6 관리자 결제 요청
+     */
+    @Operation(summary = "관리자 결제 요청", description = "관리자가 주문에 대해 결제를 요청합니다.")
+    @PatchMapping(value = "/orders/{id}/payment-requests")
+    public ResponseDto<Void> requestPayment(
+            @PathVariable Long id
+    ) {
+        updateAdminOrderStatusPaymentWaitingUseCase.execute(id);
         return ResponseDto.ok(null);
     }
 
