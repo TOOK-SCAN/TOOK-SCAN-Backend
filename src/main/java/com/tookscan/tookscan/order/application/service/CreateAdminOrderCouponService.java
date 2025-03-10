@@ -33,7 +33,7 @@ public class CreateAdminOrderCouponService implements CreateAdminOrderCouponUseC
             Coupon coupon = couponService.createCoupon(requestDto.name(), couponCode, requestDto.description(),
                     requestDto.type(), requestDto.discountPrice(), requestDto.discountPercent(),
                     requestDto.startDateTime(),
-                    requestDto.endDateTime(), requestDto.isPossibleDuplicatedApply());
+                    requestDto.endDateTime(), requestDto.isPossibleDuplicatedApply(), requestDto.isUserOnly());
             couponRepository.save(coupon);
         }
     }

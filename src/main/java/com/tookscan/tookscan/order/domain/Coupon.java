@@ -57,6 +57,10 @@ public class Coupon extends BaseEntity {
     @Column(name = "is_possible_duplicated_apply_", nullable = false)
     private boolean isPossibleDuplicatedApply;
 
+    @Column(name = "is_user_only", nullable = false)
+    @ColumnDefault("false")
+    private boolean isUserOnly;
+
     @Column(name = "discount_price")
     @ColumnDefault("0")
     private Integer discountPrice;
@@ -84,7 +88,7 @@ public class Coupon extends BaseEntity {
     @Builder
     public Coupon(String name, String description, String code, ECouponType type, Integer discountPrice,
                   Integer discountPercent, LocalDateTime startDateTime, LocalDateTime endDateTime,
-                  boolean isPossibleDuplicatedApply) {
+                  boolean isPossibleDuplicatedApply, boolean isUserOnly) {
         this.name = name;
         this.description = description;
         this.code = code;
@@ -94,6 +98,7 @@ public class Coupon extends BaseEntity {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.isPossibleDuplicatedApply = isPossibleDuplicatedApply;
+        this.isUserOnly = isUserOnly;
     }
 
     public void updateIsUsed(boolean isUsed) {

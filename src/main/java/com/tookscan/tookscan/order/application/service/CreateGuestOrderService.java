@@ -2,23 +2,38 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.dto.request.CreateGuestOrderRequestDto;
 import com.tookscan.tookscan.order.application.dto.response.CreateGuestOrderResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateGuestOrderUseCase;
-import com.tookscan.tookscan.order.domain.*;
-import com.tookscan.tookscan.order.domain.service.*;
+import com.tookscan.tookscan.order.domain.Coupon;
+import com.tookscan.tookscan.order.domain.Delivery;
+import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.InitialDocument;
+import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.PricePolicy;
+import com.tookscan.tookscan.order.domain.service.CouponService;
+import com.tookscan.tookscan.order.domain.service.DeliveryService;
+import com.tookscan.tookscan.order.domain.service.DocumentService;
+import com.tookscan.tookscan.order.domain.service.InitialDocumentService;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
-import com.tookscan.tookscan.order.repository.*;
+import com.tookscan.tookscan.order.repository.CouponRepository;
+import com.tookscan.tookscan.order.repository.DeliveryRepository;
+import com.tookscan.tookscan.order.repository.DocumentRepository;
+import com.tookscan.tookscan.order.repository.InitialDocumentRepository;
+import com.tookscan.tookscan.order.repository.OrderRepository;
+import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +77,9 @@ public class CreateGuestOrderService implements CreateGuestOrderUseCase {
         if (requestDto.couponId() != null) {
             coupon = couponRepository.findByIdOrElseThrow(requestDto.couponId());
             couponService.validateCouponExpiration(coupon);
+            if (coupon.isUserOnly()) {
+                throw new CommonException(ErrorCode.USER_ONLY_COUPON);
+            }
         }
 
         // 주소 정보 생성
