@@ -77,12 +77,12 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
             // 스캔 요청 메시지 전송
             kakaoMessageUtil.sendRequestScanMessage(
-                    order.getUser() != null ? ESecurityRole.USER : ESecurityRole.GUEST,
-                    order.getUser() != null ? order.getUser().getName() : order.getDelivery().getReceiverName(),
+                    order.getRole(),
+                    order.getUserName(),
                     order.getOrderNumber(),
                     order.getDocumentsDescription(),
                     order.getId(),
-                    order.getUser() != null ? order.getUser().getPhoneNumber() : order.getDelivery().getPhoneNumber(),
+                    order.getPhoneNumber(),
                     sender
             );
         }

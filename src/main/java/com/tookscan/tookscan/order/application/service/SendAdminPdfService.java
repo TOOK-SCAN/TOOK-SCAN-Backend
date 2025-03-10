@@ -31,9 +31,9 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         Order order = orderRepository.findByIdWithDocumentsAndPdfsOrElseThrow(orderId);
 
         kakaoMessageUtil.sendAnnounceScanFinishMessage(
-                order.getUser() != null ? order.getUser().getName() : order.getDelivery().getReceiverName(),
+                order.getUserName(),
                 order.getDocumentsDescription(),
-                order.getUser() != null ? order.getUser().getPhoneNumber() : order.getDelivery().getPhoneNumber(),
+                order.getPhoneNumber(),
                 sender
         );
 
@@ -53,7 +53,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
             // 감사 메세지 전송
             kakaoMessageUtil.sendThanksForUsingMessage(
-                    order.getUser() != null ? order.getUser().getPhoneNumber() : order.getDelivery().getPhoneNumber(),
+                    order.getPhoneNumber(),
                     sender
             );
         }

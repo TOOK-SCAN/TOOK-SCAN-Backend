@@ -7,6 +7,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
+import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -177,5 +178,18 @@ public class Order extends BaseEntity {
                 .reduce((doc1, doc2) -> doc1 + "<br>" + doc2)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
+
+    public String getUserName() {
+        return getUser() != null ? getUser().getName() : getDelivery().getReceiverName();
+    }
+
+    public String getPhoneNumber() {
+        return getUser() != null ? getUser().getPhoneNumber() : getDelivery().getPhoneNumber();
+    }
+
+    public ESecurityRole getRole() {
+        return getUser() != null ? ESecurityRole.USER : ESecurityRole.GUEST;
+    }
+
 
 }
