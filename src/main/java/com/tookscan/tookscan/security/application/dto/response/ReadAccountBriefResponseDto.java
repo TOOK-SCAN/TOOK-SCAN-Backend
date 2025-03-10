@@ -37,6 +37,15 @@ public class ReadAccountBriefResponseDto extends SelfValidating<ReadAccountBrief
     }
 
     public static ReadAccountBriefResponseDto fromEntity(Account account) {
+
+        if (account == null) {
+            return ReadAccountBriefResponseDto.builder()
+                    .accountType(ESecurityRole.GUEST)
+                    .name(null)
+                    .provider(null)
+                    .build();
+        }
+
         return ReadAccountBriefResponseDto.builder()
                 .accountType(account.getRole())
                 .name(account.getName())
