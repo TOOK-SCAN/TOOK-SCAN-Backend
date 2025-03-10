@@ -155,9 +155,9 @@ public class Order extends BaseEntity {
         }
 
         if (coupon != null) {
-            amount -= coupon.calculateDiscount(amount);
+            amount = coupon.calculatePrice(amount);
         }
-
+        
         return amount;
     }
 

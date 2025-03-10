@@ -23,4 +23,14 @@ public class CouponRepositoryImpl implements CouponRepository {
         return couponJpaRepository.findById(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_COUPON, "쿠폰 ID: " + id));
     }
+
+    @Override
+    public boolean existsByCode(String code) {
+        return couponJpaRepository.existsByCode(code);
+    }
+
+    @Override
+    public void save(Coupon coupon) {
+        couponJpaRepository.save(coupon);
+    }
 }

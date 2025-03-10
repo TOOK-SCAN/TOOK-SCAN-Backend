@@ -77,7 +77,8 @@ public enum ErrorCode {
     SORT_ORDER_OUT_OF_RANGE(40043, HttpStatus.BAD_REQUEST, "정렬 순서가 범위를 벗어났습니다."),
     SORT_ORDER_DUPLICATE(40044, HttpStatus.BAD_REQUEST, "정렬 순서가 중복되었습니다."),
     SORT_ORDER_NOT_CONTINUOUS(40045, HttpStatus.BAD_REQUEST, "정렬 순서가 연속되지 않았습니다."),
-    EXPIRED_COUPON(40046, HttpStatus.BAD_REQUEST, "만료된 쿠폰입니다."),
+    NOT_AVAILABLE_COUPON(40046, HttpStatus.BAD_REQUEST, "사용할 수 없는 쿠폰입니다."),
+    USED_COUPON(40047, HttpStatus.BAD_REQUEST, "이미 사용된 쿠폰입니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),

@@ -2,6 +2,7 @@ package com.tookscan.tookscan.order.application.controller.command;
 
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
+import com.tookscan.tookscan.order.application.dto.request.CreateAdminOrderCouponRequestDto;
 import com.tookscan.tookscan.order.application.dto.request.CreateAdminOrderMemoRequestDto;
 import com.tookscan.tookscan.order.application.dto.request.DeleteAdminDocumentsRequestDto;
 import com.tookscan.tookscan.order.application.dto.request.DeleteAdminOrdersRequestDto;
@@ -49,6 +50,7 @@ public class OrderAdminCommandV1Controller {
     private final UpdateAdminOrderDocumentsUseCase updateAdminOrderDocumentsUseCase;
     private final ExportAdminDeliveriesUseCase exportAdminDeliveriesUseCase;
     private final CreateAdminDocumentsPdfUseCase createAdminDocumentsPdfUseCase;
+    private final CreateAdminOrderCouponUseCase createAdminOrderCouponUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -86,6 +88,18 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
+     * 4.1.7 관리자 쿠폰 등록
+     */
+    @Operation(summary = "관리자 쿠폰 등록", description = "관리자가 쿠폰을 등록합니다.")
+    @PostMapping(value = "/orders/coupons")
+    public ResponseDto<CreateAdminOrderCouponRequestDto> createCoupon(
+            @RequestBody @Valid CreateAdminOrderCouponRequestDto requestDto
+    ) {
+        createAdminOrderCouponUseCase.execute(requestDto);
+        return ResponseDto.created(null);
+    }
+
+    /**
      * 4.3.2 관리자 주문 상태 일괄 변경
      */
     @Operation(summary = "관리자 주문 상태 일괄 변경", description = "관리자가 여러 주문의 상태를 일괄 변경합니다.")
@@ -107,7 +121,7 @@ public class OrderAdminCommandV1Controller {
             @RequestBody @Valid CreateAdminOrderMemoRequestDto requestDto
     ) {
         createAdminOrderMemoUseCase.execute(orderId, requestDto);
-        return ResponseDto.ok(null);
+        return ResponseDto.created(null);
     }
 
     /**
