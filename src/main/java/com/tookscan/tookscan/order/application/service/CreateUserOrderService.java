@@ -4,6 +4,7 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.dto.request.CreateUserOrderRequestDto;
 import com.tookscan.tookscan.order.application.dto.response.CreateUserOrderResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
@@ -28,6 +29,7 @@ import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,11 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
     private final AddressService addressService;
     private final DeliveryService deliveryService;
     private final CouponService couponService;
+
+    private final KakaoMessageUtil kakaoMessageUtil;
+
+    @Value("${ncp.sms.sender")
+    private String sender;
 
     @Override
     @Transactional
@@ -124,6 +131,13 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
             );
             initialDocumentRepository.save(initialDocument);
         });
+
+        // 주문 접수 문자 발송
+        kakaoMessageUtil.sendCreateOrderMessage(
+                user.getName(),
+                user.getPhoneNumber(),
+                sender
+        );
 
         return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber()).build();
     }

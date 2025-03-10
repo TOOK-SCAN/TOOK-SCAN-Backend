@@ -2,6 +2,7 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.dto.request.CreateGuestOrderRequestDto;
 import com.tookscan.tookscan.order.application.dto.response.CreateGuestOrderResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateGuestOrderUseCase;
@@ -29,6 +30,7 @@ import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryReposi
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,11 @@ public class CreateGuestOrderService implements CreateGuestOrderUseCase {
     private final InitialDocumentService initialDocumentService;
     private final AuthenticationCodeService authenticationCodeService;
     private final CouponService couponService;
+
+    private final KakaoMessageUtil kakaoMessageUtil;
+
+    @Value("${ncp.sms.sender}")
+    private String sender;
 
     @Override
     @Transactional
@@ -136,6 +143,13 @@ public class CreateGuestOrderService implements CreateGuestOrderUseCase {
 
         // 인증번호 발급 이력 삭제
         authenticationCodeHistoryRepository.deleteById(requestDto.deliveryInfo().phoneNumber());
+
+        // 주문 접수 문자 발송
+        kakaoMessageUtil.sendCreateOrderMessage(
+                requestDto.deliveryInfo().receiverName(),
+                requestDto.deliveryInfo().phoneNumber(),
+                sender
+        );
 
         return CreateGuestOrderResponseDto.builder().orderNumber(order.getOrderNumber()).build();
     }

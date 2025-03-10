@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.payment.application.service;
 
 import com.tookscan.tookscan.core.dto.PaymentDto;
+import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.Order;
@@ -13,7 +14,9 @@ import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import com.tookscan.tookscan.payment.domain.type.EPaymentStatus;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
+import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,10 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
     private final TossPaymentUtil tossPaymentUtil;
     private final RestClientUtil restClientUtil;
+    private final KakaoMessageUtil kakaoMessageUtil;
+
+    @Value("${ncp.sms.sender}")
+    private String sender;
 
     @Override
     @Transactional
@@ -67,6 +74,17 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
         if (payment.getStatus().equals(EPaymentStatus.DONE)) {
             order.finishPayment(payment);
             orderRepository.save(order);
+
+            // 스캔 요청 메시지 전송
+            kakaoMessageUtil.sendRequestScanMessage(
+                    order.getUser() != null ? ESecurityRole.USER : ESecurityRole.GUEST,
+                    order.getUser() != null ? order.getUser().getName() : order.getDelivery().getReceiverName(),
+                    order.getOrderNumber(),
+                    order.getDocumentsDescription(),
+                    order.getId(),
+                    order.getUser() != null ? order.getUser().getPhoneNumber() : order.getDelivery().getPhoneNumber(),
+                    sender
+            );
         }
 
     }
