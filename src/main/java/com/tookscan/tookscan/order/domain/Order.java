@@ -164,4 +164,18 @@ public class Order extends BaseEntity {
     public void createMemo(String memo) {
         this.memo = memo;
     }
+
+    public String getPdfUrls() {
+        if (documents.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
+        }
+
+        return documents.stream()
+                .map(doc -> doc.getName() + " : " +
+                        "<a href=\"" + doc.getPdf().getPdfUrl() + "\" target=\"_blank\">"
+                        + doc.getPdf().getPdfUrl() + "</a>")
+                .reduce((doc1, doc2) -> doc1 + "<br>" + doc2)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+    }
+
 }
