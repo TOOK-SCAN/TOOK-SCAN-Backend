@@ -97,6 +97,7 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
         Map<String, Object> guestData = new HashMap<>();
         guestData.put("account_type", ESecurityRole.GUEST);
         guestData.put("name", null);
+        guestData.put("provider", null);
 
         Map<String, Object> guestResponse = new HashMap<>();
         guestResponse.put("success", true);

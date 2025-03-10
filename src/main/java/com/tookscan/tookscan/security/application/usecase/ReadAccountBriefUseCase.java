@@ -2,6 +2,8 @@ package com.tookscan.tookscan.security.application.usecase;
 
 import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.UUID;
 
@@ -12,5 +14,5 @@ public interface ReadAccountBriefUseCase {
      * @param accountId UUID
      * @return ReadAccountBriefResponseDto
      */
-    ReadAccountBriefResponseDto execute(UUID accountId);
+    ReadAccountBriefResponseDto execute(HttpServletRequest request, HttpServletResponse response, UUID accountId);
 }

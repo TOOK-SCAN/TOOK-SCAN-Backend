@@ -23,6 +23,11 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
+    public Account findByIdOrElseNull(UUID id) {
+        return accountJpaRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public void save(Account account) {
         accountJpaRepository.save(account);
     }

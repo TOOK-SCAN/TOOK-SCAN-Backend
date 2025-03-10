@@ -10,6 +10,8 @@ public interface AccountRepository {
 
     Account findByIdOrElseThrow(UUID accountId);
 
+    Account findByIdOrElseNull(UUID accountId);
+
     void save(Account account);
 
     void deleteById(UUID accountId);
