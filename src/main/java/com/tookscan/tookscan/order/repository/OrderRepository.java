@@ -15,6 +15,8 @@ public interface OrderRepository {
 
     void save(Order order);
 
+    void saveAll(List<Order> orders);
+
     Order findByIdOrElseThrow(Long id);
 
     List<Order> findAllByIdOrElseThrow(List<Long> ids);
@@ -55,5 +57,7 @@ public interface OrderRepository {
     Integer countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     Order findByIdWithDocumentsOrElseThrow(Long id);
+
+    Order findByIdWithDocumentsAndPdfsOrElseThrow(Long id);
 
 }

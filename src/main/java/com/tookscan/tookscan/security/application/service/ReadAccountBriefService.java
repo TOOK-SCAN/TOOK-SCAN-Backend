@@ -1,9 +1,12 @@
 package com.tookscan.tookscan.security.application.service;
 
+import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.repository.AccountRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +21,16 @@ public class ReadAccountBriefService implements ReadAccountBriefUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadAccountBriefResponseDto execute(UUID accountId) {
+    public ReadAccountBriefResponseDto execute(HttpServletRequest request, HttpServletResponse response, UUID accountId) {
 
         // Account 조회
-        Account account = accountRepository.findByIdOrElseThrow(accountId);
+        Account account = accountRepository.findByIdOrElseNull(accountId);
+
+        // 잘못된 쿠키가 있는 경우 삭제
+        if (account == null) {
+            CookieUtil.deleteCookie(request, response, "refresh_token");
+            CookieUtil.deleteCookie(request, response, "access_token");
+        }
 
         // Account 정보를 ReadAccountBriefResponseDto로 변환
         return ReadAccountBriefResponseDto.fromEntity(account);

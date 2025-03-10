@@ -73,4 +73,8 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"documents", "documents.pricePolicy", "delivery"})
     @Query("SELECT o FROM Order o WHERE o.id = :id")
     Optional<Order> findByIdWithDocuments(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = {"delivery","documents", "documents.pdf"})
+    @Query("SELECT o FROM Order o WHERE o.id = :id")
+    Optional<Order> findByIdWithDocumentsAndPdf(@Param("id") Long id);
 }

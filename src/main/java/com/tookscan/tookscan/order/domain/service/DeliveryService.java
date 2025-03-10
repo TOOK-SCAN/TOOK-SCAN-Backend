@@ -44,8 +44,4 @@ public class DeliveryService {
         delivery.updateAddress(address);
 
     }
-
-    public void updateTrackingNumber(Delivery delivery, String trackingNumber) {
-        delivery.updateTrackingNumber(trackingNumber);
-    }
 }
