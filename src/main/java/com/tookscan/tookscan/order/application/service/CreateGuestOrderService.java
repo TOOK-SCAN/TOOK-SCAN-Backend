@@ -56,7 +56,7 @@ public class CreateGuestOrderService implements CreateGuestOrderUseCase {
 
     private final KakaoMessageUtil kakaoMessageUtil;
 
-    @Value("${ncp.sms.sender}")
+    @Value("${solapi.sender}")
     private String sender;
 
     @Override

@@ -35,7 +35,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
     private final RestClientUtil restClientUtil;
     private final KakaoMessageUtil kakaoMessageUtil;
 
-    @Value("${ncp.sms.sender}")
+    @Value("${solapi.sender}")
     private String sender;
 
     @Override

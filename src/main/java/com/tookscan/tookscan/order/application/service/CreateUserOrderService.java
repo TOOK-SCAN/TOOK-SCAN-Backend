@@ -54,7 +54,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
 
     private final KakaoMessageUtil kakaoMessageUtil;
 
-    @Value("${ncp.sms.sender")
+    @Value("${solapi.sender}")
     private String sender;
 
     @Override

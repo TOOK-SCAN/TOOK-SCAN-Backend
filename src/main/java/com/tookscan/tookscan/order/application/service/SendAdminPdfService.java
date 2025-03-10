@@ -22,7 +22,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    @Value("${ncp.sms.sender}")
+    @Value("${solapi.sender}")
     private String sender;
 
     @Override

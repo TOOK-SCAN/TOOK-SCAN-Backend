@@ -4,10 +4,8 @@ import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
-import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
-import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,7 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
 
     private final KakaoMessageUtil kakaoMessageUtil;
 
-    @Value("${ncp.sms.sender}")
+    @Value("${solapi.sender}")
     private String sender;
 
     @Override
