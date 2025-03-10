@@ -3,6 +3,7 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.order.application.dto.response.ReadAdminDeliveriesSummariesResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDeliveriesSummariesUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ReadAdminDeliveriesSummariesService implements ReadAdminDeliveriesS
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<Long> orderIdPages = orderRepository.findDeliveriesSummaries(startDate, endDate, search, searchType,
-                pageable);
+                EOrderStatus.RECOVERY_IN_PROGRESS, pageable);
 
         List<Order> orders = orderRepository.findAllWithDocumentsAndUserByIdIn(orderIdPages.getContent());
 
