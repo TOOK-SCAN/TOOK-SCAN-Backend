@@ -48,7 +48,7 @@ public class KakaoMessageUtil {
     @Value("${solapi.path-for-guest}")
     private String pathForGuest;
 
-    @Value("{solapi.sender}")
+    @Value("${solapi.sender}")
     private String sender;
 
     public KakaoMessageUtil(
