@@ -24,4 +24,10 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
         return deliveryJpaRepository.findById(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DELIVERY, "배송 ID: " + id));
     }
+
+    @Override
+    public Delivery findByIdWithOrderOrElseThrow(Long id) {
+        return deliveryJpaRepository.findByIdWithOrder(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DELIVERY, "배송 ID: " + id));
+    }
 }

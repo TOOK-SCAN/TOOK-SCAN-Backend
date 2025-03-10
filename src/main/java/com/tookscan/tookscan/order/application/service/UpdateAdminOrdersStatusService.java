@@ -1,13 +1,17 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrdersStatusRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +23,19 @@ public class UpdateAdminOrdersStatusService implements UpdateAdminOrdersStatusUs
     @Transactional
     public void execute(UpdateAdminOrdersStatusRequestDto requestDto) {
 
+        if (requestDto.status().equals(EOrderStatus.PAYMENT_WAITING) ||
+                requestDto.status().equals(EOrderStatus.PAYMENT_COMPLETED)
+        ) {
+            throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
+        }
+
         List<Order> orders = orderRepository.findAllByIdOrElseThrow(requestDto.orderIds());
 
-        orders.forEach(order -> order.updateOrderStatus(requestDto.status()));
+        orders.forEach(
+                order -> order.updateOrderStatus(requestDto.status())
+        );
+
+        orderRepository.saveAll(orders);
     }
 
 }

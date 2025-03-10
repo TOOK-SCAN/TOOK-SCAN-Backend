@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -172,7 +173,11 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
-    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(@AccountID UUID accountId) {
-        return ResponseDto.ok(readAccountBriefUseCase.execute(accountId));
+    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @AccountID UUID accountId
+    ) {
+        return ResponseDto.ok(readAccountBriefUseCase.execute(request, response, accountId));
     }
 }

@@ -38,6 +38,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public void saveAll(List<Order> orders) {
+        orderJpaRepository.saveAll(orders);
+    }
+
+    @Override
     public Order findByIdOrElseThrow(Long id) {
         return orderJpaRepository.findById(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
@@ -249,6 +254,12 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order findByIdWithDocumentsOrElseThrow(Long id) {
         return orderJpaRepository.findByIdWithDocuments(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
+    }
+
+    @Override
+    public Order findByIdWithDocumentsAndPdfsOrElseThrow(Long id) {
+        return orderJpaRepository.findByIdWithDocumentsAndPdf(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
     }
 
