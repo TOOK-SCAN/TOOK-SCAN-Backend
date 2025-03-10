@@ -5,9 +5,7 @@ import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPay
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,9 +15,6 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
     private final OrderRepository orderRepository;
 
     private final KakaoMessageUtil kakaoMessageUtil;
-
-    @Value("${solapi.sender}")
-    private String sender;
 
     @Override
     public void execute(Long orderId) {
@@ -33,8 +28,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                 order.getUserName(),
                 order.getOrderNumber(),
                 order.getId(),
-                order.getPhoneNumber(),
-                sender
+                order.getPhoneNumber()
         );
 
         orderRepository.save(order);

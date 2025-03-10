@@ -14,9 +14,7 @@ import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import com.tookscan.tookscan.payment.domain.type.EPaymentStatus;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
-import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +32,6 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
     private final TossPaymentUtil tossPaymentUtil;
     private final RestClientUtil restClientUtil;
     private final KakaoMessageUtil kakaoMessageUtil;
-
-    @Value("${solapi.sender}")
-    private String sender;
 
     @Override
     @Transactional
@@ -82,8 +77,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                     order.getOrderNumber(),
                     order.getDocumentsDescription(),
                     order.getId(),
-                    order.getPhoneNumber(),
-                    sender
+                    order.getPhoneNumber()
             );
         }
 

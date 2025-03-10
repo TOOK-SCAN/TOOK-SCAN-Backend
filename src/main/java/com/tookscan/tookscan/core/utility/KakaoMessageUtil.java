@@ -48,6 +48,9 @@ public class KakaoMessageUtil {
     @Value("${solapi.path-for-guest}")
     private String pathForGuest;
 
+    @Value("{solapi.sender}")
+    private String sender;
+
     public KakaoMessageUtil(
             @Value("${solapi.api-key}") String apiKey,
             @Value("${solapi.api-secret}") String apiSecret,
@@ -56,7 +59,7 @@ public class KakaoMessageUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, url);
     }
 
-    public void sendCreateOrderMessage(String userName, String to, String from) {
+    public void sendCreateOrderMessage(String userName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -69,7 +72,7 @@ public class KakaoMessageUtil {
 
         Message message = new Message();
         message.setTo(to);
-        message.setFrom(from);
+        message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
@@ -78,7 +81,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(ESecurityRole role, String userName, String orderNumber, Long orderId, String to, String from) {
+    public void sendRequestPaymentMessage(ESecurityRole role, String userName, String orderNumber, Long orderId, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -103,7 +106,7 @@ public class KakaoMessageUtil {
 
         Message message = new Message();
         message.setTo(to);
-        message.setFrom(from);
+        message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
@@ -112,7 +115,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestScanMessage(ESecurityRole role, String userName, String orderNumber, String orderName, Long orderId, String to, String from) {
+    public void sendRequestScanMessage(ESecurityRole role, String userName, String orderNumber, String orderName, Long orderId, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -139,7 +142,7 @@ public class KakaoMessageUtil {
 
         Message message = new Message();
         message.setTo(to);
-        message.setFrom(from);
+        message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
@@ -148,7 +151,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendAnnounceScanFinishMessage(String userName, String orderName, String to, String from) {
+    public void sendAnnounceScanFinishMessage(String userName, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -162,7 +165,7 @@ public class KakaoMessageUtil {
 
         Message message = new Message();
         message.setTo(to);
-        message.setFrom(from);
+        message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
@@ -171,7 +174,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendAnnounceDeliveryMessage(String to, String from) {
+    public void sendAnnounceDeliveryMessage(String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -180,7 +183,7 @@ public class KakaoMessageUtil {
 
         Message message = new Message();
         message.setTo(to);
-        message.setFrom(from);
+        message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
@@ -189,7 +192,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendThanksForUsingMessage(String to, String from) {
+    public void sendThanksForUsingMessage(String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -198,7 +201,7 @@ public class KakaoMessageUtil {
 
         Message message = new Message();
         message.setTo(to);
-        message.setFrom(from);
+        message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));

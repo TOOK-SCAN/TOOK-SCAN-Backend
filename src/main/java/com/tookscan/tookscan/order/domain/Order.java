@@ -180,15 +180,15 @@ public class Order extends BaseEntity {
     }
 
     public String getUserName() {
-        return getUser() != null ? getUser().getName() : getDelivery().getReceiverName();
+        return user != null ? user.getName() : delivery.getReceiverName();
     }
 
     public String getPhoneNumber() {
-        return getUser() != null ? getUser().getPhoneNumber() : getDelivery().getPhoneNumber();
+        return user != null ? user.getPhoneNumber() : delivery.getPhoneNumber();
     }
 
     public ESecurityRole getRole() {
-        return getUser() != null ? ESecurityRole.USER : ESecurityRole.GUEST;
+        return user != null ? ESecurityRole.USER : ESecurityRole.GUEST;
     }
 
 

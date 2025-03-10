@@ -7,7 +7,6 @@ import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +16,6 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
     private final DeliveryRepository deliveryRepository;
 
     private final KakaoMessageUtil kakaoMessageUtil;
-
-    @Value("${solapi.sender}")
-    private String sender;
 
     @Override
     @Transactional
@@ -32,15 +28,13 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
 
         // 운송장 등록 메세지 전송
         kakaoMessageUtil.sendAnnounceDeliveryMessage(
-                delivery.getOrder().getUser() != null ? delivery.getOrder().getUser().getPhoneNumber() : delivery.getPhoneNumber(),
-                sender
+                delivery.getPhoneNumber()
         );
 
 
         // 감사 메세지 전송
         kakaoMessageUtil.sendThanksForUsingMessage(
-                delivery.getOrder().getUser() != null ? delivery.getOrder().getUser().getPhoneNumber() : delivery.getPhoneNumber(),
-                sender
+                delivery.getPhoneNumber()
         );
     }
 }

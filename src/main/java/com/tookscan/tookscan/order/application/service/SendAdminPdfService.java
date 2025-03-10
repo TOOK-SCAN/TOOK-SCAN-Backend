@@ -8,7 +8,6 @@ import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +21,6 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    @Value("${solapi.sender}")
-    private String sender;
-
     @Override
     public void execute(Long orderId) {
 
@@ -33,8 +29,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         kakaoMessageUtil.sendAnnounceScanFinishMessage(
                 order.getUserName(),
                 order.getDocumentsDescription(),
-                order.getPhoneNumber(),
-                sender
+                order.getPhoneNumber()
         );
 
         applicationEventPublisher.publishEvent(
@@ -53,8 +48,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
             // 감사 메세지 전송
             kakaoMessageUtil.sendThanksForUsingMessage(
-                    order.getPhoneNumber(),
-                    sender
+                    order.getPhoneNumber()
             );
         }
     }
