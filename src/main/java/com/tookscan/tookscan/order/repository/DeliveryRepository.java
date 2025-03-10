@@ -6,4 +6,6 @@ public interface DeliveryRepository {
     void save(Delivery delivery);
 
     Delivery findByIdOrElseThrow(Long id);
+
+    Delivery findByIdWithOrderOrElseThrow(Long id);
 }

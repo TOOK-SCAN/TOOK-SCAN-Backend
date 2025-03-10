@@ -35,7 +35,7 @@ public class Term extends BaseEntity {
     @Column(name = "title", length = 50, nullable = false)
     private String title;
 
-    @Column(name = "content", length = 2000, nullable = false)
+    @Column(name = "content", length = 3000, nullable = false)
     private String content;
 
     @Column(name = "is_required", nullable = false)

@@ -83,6 +83,9 @@ dependencies {
 	implementation 'org.apache.poi:poi:5.2.3'
 	implementation 'org.apache.poi:poi-ooxml:5.2.3'
 
+	// Solapi
+	implementation 'net.nurigo:sdk:4.3.2'
+
 	// Testing Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

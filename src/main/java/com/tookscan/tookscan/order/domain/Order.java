@@ -7,6 +7,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
+import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -164,4 +165,31 @@ public class Order extends BaseEntity {
     public void createMemo(String memo) {
         this.memo = memo;
     }
+
+    public String getPdfUrls() {
+        if (documents.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
+        }
+
+        return documents.stream()
+                .map(doc -> doc.getName() + " : " +
+                        "<a href=\"" + doc.getPdf().getPdfUrl() + "\" target=\"_blank\">"
+                        + doc.getPdf().getPdfUrl() + "</a>")
+                .reduce((doc1, doc2) -> doc1 + "<br>" + doc2)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+    }
+
+    public String getUserName() {
+        return user != null ? user.getName() : delivery.getReceiverName();
+    }
+
+    public String getPhoneNumber() {
+        return user != null ? user.getPhoneNumber() : delivery.getPhoneNumber();
+    }
+
+    public ESecurityRole getRole() {
+        return user != null ? ESecurityRole.USER : ESecurityRole.GUEST;
+    }
+
+
 }

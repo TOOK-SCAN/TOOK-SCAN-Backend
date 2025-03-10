@@ -2,6 +2,7 @@ package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.MailUtil;
 import com.tookscan.tookscan.mail.event.EmailEvent;
+import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.security.event.ChangePasswordBySystemEvent;
 import com.tookscan.tookscan.security.event.CompleteEmailValidationEvent;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,21 @@ public class EmailListener {
             e.printStackTrace();
         }
     }
+
+    @Async
+    @EventListener(classes = {SendPdfEmailEvent.class})
+    public void handleSendPdfEmailEvent(SendPdfEmailEvent event) {
+        try {
+            mailUtil.sendPdfEmail(
+                    event.getEmail(),
+                    event.getOrderName(),
+                    event.getPdfUrl()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Async
     @EventListener(classes = {ChangePasswordBySystemEvent.class})
