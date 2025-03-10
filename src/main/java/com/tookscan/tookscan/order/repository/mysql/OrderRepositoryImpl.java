@@ -114,6 +114,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
         // 검색 조건 동적 생성
         BooleanExpression predicate = buildPredicate(order, startDate, endDate, search, searchType);
+        predicate = predicate.and(order.orderStatus.eq(EOrderStatus.COMPANY_ARRIVED));
 
         // 데이터 조회
         List<Long> orderIds = jpaQueryFactory.select(order.id)
@@ -173,11 +174,13 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Page<Long> findDeliveriesSummaries(String startDate, String endDate, String search, String searchType,
+                                              EOrderStatus orderStatus,
                                               Pageable pageable) {
         QOrder order = QOrder.order;
 
         // 검색 조건 동적 생성
         BooleanExpression predicate = buildPredicate(order, startDate, endDate, search, searchType);
+        predicate = predicate.and(order.orderStatus.eq(orderStatus));
 
         // 데이터 조회
         List<Long> orderIds = jpaQueryFactory.select(order.id)
