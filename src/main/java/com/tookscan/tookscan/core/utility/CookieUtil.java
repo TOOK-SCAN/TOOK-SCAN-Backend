@@ -84,10 +84,13 @@ public class CookieUtil {
      */
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         Cookie[] cookies = request.getCookies();
+        log.info("Cookies: {}", (Object) cookies);
         if (cookies == null) {
+            log.info("CookieUtil.deleteCookie - cookies is null");
             return;
         }
         for (Cookie cookie : cookies) {
+            log.info("지워지기 전 쿠키 이름 - cookie: {}", cookie);
             if (cookie.getName().equals(name)) {
                 log.info("CookieUtil.deleteCookie - name: {}", name);
                 log.info("CookieUtil.deleteCookie - domain: {}", cookie.getDomain());
