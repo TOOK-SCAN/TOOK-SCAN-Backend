@@ -148,6 +148,7 @@ public class CreateGuestOrderService implements CreateGuestOrderUseCase {
         // 주문 접수 문자 발송
         kakaoMessageUtil.sendCreateOrderMessage(
                 requestDto.deliveryInfo().receiverName(),
+                order.getDocumentsDescription(),
                 requestDto.deliveryInfo().phoneNumber()
         );
 

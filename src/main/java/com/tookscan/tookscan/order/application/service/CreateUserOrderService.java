@@ -118,6 +118,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         // 주문 접수 문자 발송
         kakaoMessageUtil.sendCreateOrderMessage(
                 user.getName(),
+                order.getDocumentsDescription(),
                 user.getPhoneNumber()
         );
 
