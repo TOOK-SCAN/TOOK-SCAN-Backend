@@ -134,6 +134,7 @@ public class MailUtil {
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
         mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${OrderName}", orderName), true);
+        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${OrderName}", orderName), true);
         mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${PdfUrl}", pdfUrl), true);
 
         javaMailSender.send(mimeMessage);
