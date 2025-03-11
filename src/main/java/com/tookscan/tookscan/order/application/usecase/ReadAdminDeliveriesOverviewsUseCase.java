@@ -6,5 +6,5 @@ import com.tookscan.tookscan.order.application.dto.response.ReadAdminDeliveriesO
 @UseCase
 public interface ReadAdminDeliveriesOverviewsUseCase {
     ReadAdminDeliveriesOverviewsResponseDto execute(Integer page, Integer size, String startDate, String endDate,
-                                                    String searchType, String search);
+                                                    String search, String searchType);
 }
