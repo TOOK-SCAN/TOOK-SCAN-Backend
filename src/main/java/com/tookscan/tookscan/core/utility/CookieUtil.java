@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.Optional;
 /**
  * Cookie 관련 유틸리티 클래스
  */
+@Slf4j
 public class CookieUtil {
 
     /**
@@ -87,6 +89,11 @@ public class CookieUtil {
         }
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(name)) {
+                log.info("CookieUtil.deleteCookie - name: {}", name);
+                log.info("CookieUtil.deleteCookie - domain: {}", cookie.getDomain());
+                log.info("CookieUtil.deleteCookie - path: {}", cookie.getPath());
+                log.info("CookieUtil.deleteCookie - httpOnly: {}", cookie.isHttpOnly());
+                log.info("CookieUtil.deleteCookie - secure: {}", cookie.getSecure());
                 ResponseCookie removedCookie = ResponseCookie.from(name, "")
                         .domain(cookie.getDomain())
                         .path("/")
