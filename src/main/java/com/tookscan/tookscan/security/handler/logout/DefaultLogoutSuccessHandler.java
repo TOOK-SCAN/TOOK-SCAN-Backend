@@ -42,9 +42,9 @@ public class DefaultLogoutSuccessHandler
 
         // 브라우저에서 온 요청인 경우 쿠키를 삭제함
         if (userAgent != null && userAgent.contains("Mozilla")) {
-            CookieUtil.deleteCookie(request, response, cookieDomain, Constants.ACCESS_TOKEN);
-            CookieUtil.deleteCookie(request, response, cookieDomain, Constants.REFRESH_TOKEN);
-            CookieUtil.deleteCookie(request, response, cookieDomain, "JSESSIONID");
+            CookieUtil.deleteCookie(request, response, Constants.ACCESS_TOKEN);
+            CookieUtil.deleteCookie(request, response, Constants.REFRESH_TOKEN);
+            CookieUtil.deleteCookie(request, response, "JSESSIONID");
         }
 
         httpServletUtil.onSuccessBodyResponse(response, HttpStatus.OK);
