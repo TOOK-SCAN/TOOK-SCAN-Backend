@@ -172,10 +172,10 @@ public class Order extends BaseEntity {
         }
 
         return documents.stream()
-                .map(doc -> doc.getName() + " : " +
+                .map(doc -> doc.getName() + " :<br />" +
                         "<a href=\"" + doc.getPdf().getPdfUrl() + "\" target=\"_blank\">"
                         + doc.getPdf().getPdfUrl() + "</a>")
-                .reduce((doc1, doc2) -> doc1 + "<br>" + doc2)
+                .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 

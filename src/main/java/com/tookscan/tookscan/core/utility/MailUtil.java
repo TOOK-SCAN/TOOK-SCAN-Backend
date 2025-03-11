@@ -70,7 +70,7 @@ public class MailUtil {
                  \s
                   <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
                     <p>
-                      안녕하세요, 요청하신 ${OrderName} 스캔본을 발송드렸습니다.<br /><br />
+                      안녕하세요, 요청하신 ${orderName} 스캔본을 발송드렸습니다.<br /><br />
                       아래 url을 통해 다운로드 받아주세요!<br />
                       ${PdfUrl}<br /><br />
                       툭스캔과 함께 더 편리한 서비스를 경험하실 수 있도록<br />
@@ -128,13 +128,16 @@ public class MailUtil {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setSubject(orderName + " 스캔본 전송 - TOOKSCAN");
 
-        // 위 HTML을 이용하여 이메일을 작성하고 전송하는 코드
+        // 위 HTML을 이용하여 이메일을 작성하고 전송
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
         mimeMessageHelper.setFrom("TOOK-SCAN");
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
-        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${OrderName}", orderName), true);
-        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${PdfUrl}", pdfUrl), true);
+        String content = PDF_EMAIL_TEMPLATE
+                .replace("${OrderName}", orderName)
+                .replace("${orderName}", orderName)
+                .replace("${PdfUrl}", pdfUrl);
+        mimeMessageHelper.setText(content, true);
 
         javaMailSender.send(mimeMessage);
     }
