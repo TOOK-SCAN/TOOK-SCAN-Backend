@@ -6,6 +6,7 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
+import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
@@ -68,14 +69,6 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
         ESecurityRole role = ESecurityRole.fromString(claims.get(Constants.ACCOUNT_ROLE_CLAIM_NAME, String.class));
 
         CustomUserPrincipal principal = authenticateJsonWebTokenUseCase.execute(accountId);
-
-        // 유저를 찾을 수 없는 경우 쿠키를 삭제하고 메인 페이지로 리다이렉트
-        if (principal == null) {
-            CookieUtil.deleteCookie(request, response, cookieDomain, "refresh_token");
-            CookieUtil.deleteCookie(request, response, cookieDomain, "access_token");
-            response.sendRedirect(clientUrl);
-            return;
-        }
 
         if (!role.equals(principal.getRole())) {
             throw new CommonException(ErrorCode.ACCESS_DENIED);
