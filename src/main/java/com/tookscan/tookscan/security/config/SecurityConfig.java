@@ -17,7 +17,6 @@ import com.tookscan.tookscan.security.handler.login.Oauth2SuccessHandler;
 import com.tookscan.tookscan.security.handler.logout.DefaultLogoutProcessHandler;
 import com.tookscan.tookscan.security.handler.logout.DefaultLogoutSuccessHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,12 +47,6 @@ public class SecurityConfig {
     private final AuthenticateJsonWebTokenUseCase authenticateJsonWebTokenUseCase;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
-
-    @Value("${web-engine.cookie-domain}")
-    private String cookieDomain;
-
-    @Value("${web-engine.client-url}")
-    private String clientUrl;
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -103,9 +96,7 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new JsonWebTokenAuthenticationFilter(
                                 authenticateJsonWebTokenUseCase,
-                                jsonWebTokenUtil,
-                                cookieDomain,
-                                clientUrl
+                                jsonWebTokenUtil
                         ),
                         LogoutFilter.class
                 )
