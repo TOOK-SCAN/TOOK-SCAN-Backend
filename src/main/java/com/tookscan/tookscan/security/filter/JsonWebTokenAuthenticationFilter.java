@@ -6,7 +6,6 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
-import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
@@ -17,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -45,9 +43,6 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     static final String AUTH_BRIEFS_URL = "/v1/auth/briefs";
-
-    @Value("${web-engine.client-url}")
-    private String clientUrl;
 
     @Override
     protected void doFilterInternal(
