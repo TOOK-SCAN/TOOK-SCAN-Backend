@@ -16,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -37,15 +36,13 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
 
+    private final String cookieDomain;
+
+    private final String clientUrl;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     static final String AUTH_BRIEFS_URL = "/v1/auth/briefs";
-
-    @Value("${web-engine.client-url}")
-    private String clientUrl;
-
-    @Value("${web-engine.cookie-domain}")
-    private String cookieDomain;
 
     @Override
     protected void doFilterInternal(
