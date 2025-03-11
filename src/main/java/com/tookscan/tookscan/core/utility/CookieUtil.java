@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 /**
  * Cookie 관련 유틸리티 클래스
  */
+@Slf4j
 public class CookieUtil {
 
     /**
@@ -83,7 +85,11 @@ public class CookieUtil {
 
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(name)) {
-                Cookie removedCookie = new Cookie(name, null);
+                Cookie removedCookie = new Cookie(name, "");
+                log.info("path: {}", cookie.getPath());
+                log.info("domain: {}", cookie.getDomain());
+                log.info("httpOnly: {}", cookie.isHttpOnly());
+                log.info("secure: {}", cookie.getSecure());
                 removedCookie.setDomain(cookie.getDomain());
                 removedCookie.setPath("/");
                 removedCookie.setMaxAge(0);
