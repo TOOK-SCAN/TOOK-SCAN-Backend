@@ -42,5 +42,5 @@ Authorization: Bearer {{access_token}}
 
 ### PDF 전송
 //@no-log
-POST {{host_url}}/v1/admins/orders/7/send-pdfs
+POST {{host_url}}/v1/admins/orders/10/send-pdfs
 Authorization: Bearer {{access_token}}

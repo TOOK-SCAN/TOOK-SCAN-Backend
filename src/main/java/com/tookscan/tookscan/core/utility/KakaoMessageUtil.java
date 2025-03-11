@@ -59,12 +59,14 @@ public class KakaoMessageUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, url);
     }
 
-    public void sendCreateOrderMessage(String userName, String to) {
+    public void sendCreateOrderMessage(String userName, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put("#{userName}", userName);
+        variables.put("#{orderName}", orderName);
+
         kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
