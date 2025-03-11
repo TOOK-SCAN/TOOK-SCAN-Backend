@@ -70,7 +70,7 @@ public class MailUtil {
                  \s
                   <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
                     <p>
-                      안녕하세요, 요청하신 ${OrderName} 스캔본을 발송드렸습니다.<br /><br />
+                      안녕하세요, 요청하신 ${orderName} 스캔본을 발송드렸습니다.<br /><br />
                       아래 url을 통해 다운로드 받아주세요!<br />
                       ${PdfUrl}<br /><br />
                       툭스캔과 함께 더 편리한 서비스를 경험하실 수 있도록<br />
@@ -134,7 +134,7 @@ public class MailUtil {
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
         mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${OrderName}", orderName), true);
-        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${OrderName}", orderName), true);
+        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${orderName}", orderName), true);
         mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${PdfUrl}", pdfUrl), true);
 
         javaMailSender.send(mimeMessage);
