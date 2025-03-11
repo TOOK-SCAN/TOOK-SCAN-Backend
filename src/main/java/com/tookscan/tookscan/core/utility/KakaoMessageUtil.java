@@ -130,7 +130,7 @@ public class KakaoMessageUtil {
             }
             case GUEST -> {
                 variables.put("#{scanPath}", "비회원 주문조회 > 주문 정보 입력 > 스캔하기");
-                variables.put("#{scanUrl}", pathForGuest + "order=" + orderNumber + "$name=" + userName + "$id=" + orderId);
+                variables.put("#{scanUrl}", pathForGuest + "order=" + orderNumber + "&name=" + userName + "&id=" + orderId);
             }
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         }
