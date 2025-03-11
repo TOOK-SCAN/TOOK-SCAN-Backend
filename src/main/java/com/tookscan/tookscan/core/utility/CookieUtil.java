@@ -19,7 +19,7 @@ public class CookieUtil {
      * Request에 있는 Cookie 중 name에 해당하는 값을 찾아 반환한다.
      *
      * @param request HttpServletRequest
-     * @param name 찾을 Cookie 이름
+     * @param name    찾을 Cookie 이름
      * @return Optional<String>
      */
     public static Optional<String> refineCookie(HttpServletRequest request, String name) {
@@ -37,10 +37,10 @@ public class CookieUtil {
     /**
      * Response에 Cookie를 추가한다.
      *
-     * @param response HttpServletResponse
+     * @param response     HttpServletResponse
      * @param cookieDomain Cookie 도메인
-     * @param name Cookie 이름
-     * @param value Cookie 값
+     * @param name         Cookie 이름
+     * @param value        Cookie 값
      */
     public static void addCookie(HttpServletResponse response, String cookieDomain, String name, String value) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
@@ -55,11 +55,11 @@ public class CookieUtil {
     /**
      * Response에 Secure Cookie를 추가한다.
      *
-     * @param response HttpServletResponse
+     * @param response     HttpServletResponse
      * @param cookieDomain Cookie 도메인
-     * @param name Cookie 이름
-     * @param value Cookie 값
-     * @param maxAge Cookie 만료 시간
+     * @param name         Cookie 이름
+     * @param value        Cookie 값
+     * @param maxAge       Cookie 만료 시간
      */
     public static void addSecureCookie(HttpServletResponse response, String cookieDomain, String name, String value, Integer maxAge) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
@@ -76,9 +76,9 @@ public class CookieUtil {
     /**
      * Request에 있는 Cookie 중 name에 해당하는 값을 삭제한다.
      *
-     * @param request HttpServletRequest
+     * @param request  HttpServletRequest
      * @param response HttpServletResponse
-     * @param name 삭제할 Cookie 이름
+     * @param name     삭제할 Cookie 이름
      */
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         Cookie[] cookies = request.getCookies();
