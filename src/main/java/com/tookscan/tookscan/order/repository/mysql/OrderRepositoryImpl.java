@@ -283,7 +283,8 @@ public class OrderRepositoryImpl implements OrderRepository {
             predicate = predicate.and(order.createdAt.goe(LocalDate.parse(startDate).atStartOfDay()));
         }
         if (endDate != null) {
-            predicate = predicate.and(order.createdAt.loe(LocalDate.parse(endDate).atStartOfDay()));
+            predicate = predicate.and(
+                    order.createdAt.loe(LocalDate.parse(endDate).atStartOfDay().plusDays(1).minusNanos(1)));
         }
         return predicate;
     }
