@@ -119,7 +119,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
         // 검색 조건 동적 생성
         BooleanExpression predicate = buildPredicate(order, startDate, endDate, search, searchType);
-        predicate = predicate.and(order.orderStatus.eq(EOrderStatus.COMPANY_ARRIVED));
+        predicate = predicate.and(order.orderStatus.eq(EOrderStatus.APPLY_COMPLETED));
 
         // 데이터 조회
         List<Long> orderIds = jpaQueryFactory.select(order.id)
