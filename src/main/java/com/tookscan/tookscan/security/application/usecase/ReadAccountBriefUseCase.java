@@ -14,5 +14,5 @@ public interface ReadAccountBriefUseCase {
      * @param accountId UUID
      * @return ReadAccountBriefResponseDto
      */
-    ReadAccountBriefResponseDto execute(HttpServletRequest request, HttpServletResponse response, UUID accountId);
+    ReadAccountBriefResponseDto execute(UUID accountId);
 }

@@ -150,15 +150,15 @@ public class Order extends BaseEntity {
 
         Integer amount = getDocumentsTotalAmount();
 
+        if (coupon != null) {
+            amount = coupon.calculatePrice(amount);
+        }
+
         if (documents.stream()
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
            amount += delivery.getDeliveryPrice();
         }
 
-        if (coupon != null) {
-            amount = coupon.calculatePrice(amount);
-        }
-        
         return amount;
     }
 

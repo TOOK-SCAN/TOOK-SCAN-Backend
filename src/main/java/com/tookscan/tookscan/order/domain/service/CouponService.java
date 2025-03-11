@@ -16,7 +16,7 @@ public class CouponService {
 
     public Coupon createCoupon(String name, String code, String description, ECouponType type, Integer discountPrice,
                                Integer discountPercent, LocalDateTime startDateTime, LocalDateTime endDateTime,
-                               boolean isPossibleDuplicatedApply) {
+                               boolean isPossibleDuplicatedApply, boolean isUserOnly) {
         return Coupon.builder()
                 .name(name)
                 .code(code)
@@ -27,6 +27,7 @@ public class CouponService {
                 .startDateTime(startDateTime)
                 .endDateTime(endDateTime)
                 .isPossibleDuplicatedApply(isPossibleDuplicatedApply)
+                .isUserOnly(isUserOnly)
                 .build();
     }
 

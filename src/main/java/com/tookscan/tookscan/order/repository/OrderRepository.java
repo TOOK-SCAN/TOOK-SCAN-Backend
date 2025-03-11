@@ -34,6 +34,7 @@ public interface OrderRepository {
                                   Pageable pageable, EOrderStatus orderStatus);
 
     Page<Long> findDeliveriesSummaries(String startDate, String endDate, String search, String searchType,
+                                       EOrderStatus orderStatus,
                                        Pageable pageable);
 
     void deleteAll(List<Order> orders);
