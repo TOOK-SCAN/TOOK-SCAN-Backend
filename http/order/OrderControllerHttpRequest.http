@@ -36,5 +36,9 @@ GET {{host_url}}/v1/users/orders/overviews?page=1&size=10&sort=createdAt
 Authorization: Bearer {{access_token}}
 
 ### 결제 요청
-PATCH {{host_url}}/v1/admins/orders/1/payment-requests
+PATCH {{host_url}}/v1/admins/orders/15/payment-requests
+Authorization: Bearer {{access_token}}
+
+### PDF 전송
+POST {{host_url}}/v1/admins/orders/15/send-pdfs
 Authorization: Bearer {{access_token}}
