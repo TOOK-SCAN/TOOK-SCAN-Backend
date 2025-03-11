@@ -39,6 +39,9 @@ public class DefaultLogoutSuccessHandler
             return;
         }
 
+        log.info("user agent: {}", request.getHeader("User-Agent"));
+        log.info("user agent is contain Mozilla: {}", request.getHeader("User-Agent").contains("Mozilla"));
+
         // User-Agent 헤더를 통해 요청이 브라우저에서 온 것인지 확인
         String userAgent = request.getHeader("User-Agent");
 
