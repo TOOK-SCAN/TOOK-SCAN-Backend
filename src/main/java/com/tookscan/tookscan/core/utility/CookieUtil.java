@@ -84,13 +84,11 @@ public class CookieUtil {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(name)) {
                 Cookie removedCookie = new Cookie(name, null);
+                removedCookie.setDomain(cookie.getDomain());
                 removedCookie.setPath("/");
                 removedCookie.setMaxAge(0);
-                removedCookie.setHttpOnly(true);
-
-                if (cookie.getSecure()) {
-                    removedCookie.setSecure(true);
-                }
+                removedCookie.setHttpOnly(cookie.isHttpOnly());
+                removedCookie.setSecure(cookie.getSecure());
 
                 response.addCookie(removedCookie);
             }
