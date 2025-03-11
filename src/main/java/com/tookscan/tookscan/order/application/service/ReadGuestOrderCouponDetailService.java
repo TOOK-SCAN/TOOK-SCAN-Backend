@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.application.dto.response.ReadGuestOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadGuestOrderCouponDetailUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
@@ -21,6 +23,9 @@ public class ReadGuestOrderCouponDetailService implements ReadGuestOrderCouponDe
     public ReadGuestOrderCouponDetailResponseDto execute(String couponCode) {
         Coupon coupon = couponRepository.findByCodeOrElseThrow(couponCode);
         couponService.validateCouponExpiration(coupon);
+        if (coupon.isUserOnly()) {
+            throw new CommonException(ErrorCode.USER_ONLY_COUPON);
+        }
         return ReadGuestOrderCouponDetailResponseDto.fromEntity(coupon);
     }
 }

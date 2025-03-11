@@ -10,6 +10,7 @@ import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
+    @Transactional
     public void execute(Long orderId) {
 
         Order order = orderRepository.findByIdWithDocumentsAndPdfsOrElseThrow(orderId);

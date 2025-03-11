@@ -21,16 +21,10 @@ public class ReadAccountBriefService implements ReadAccountBriefUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadAccountBriefResponseDto execute(HttpServletRequest request, HttpServletResponse response, UUID accountId) {
+    public ReadAccountBriefResponseDto execute(UUID accountId) {
 
         // Account 조회
         Account account = accountRepository.findByIdOrElseNull(accountId);
-
-        // 잘못된 쿠키가 있는 경우 삭제
-        if (account == null) {
-            CookieUtil.deleteCookie(request, response, "refresh_token");
-            CookieUtil.deleteCookie(request, response, "access_token");
-        }
 
         // Account 정보를 ReadAccountBriefResponseDto로 변환
         return ReadAccountBriefResponseDto.fromEntity(account);

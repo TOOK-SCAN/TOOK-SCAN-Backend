@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
@@ -15,6 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -38,6 +40,9 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     static final String AUTH_BRIEFS_URL = "/v1/auth/briefs";
+
+    @Value("${web-engine.client-url}")
+    private String clientUrl;
 
     @Override
     protected void doFilterInternal(
@@ -63,6 +68,14 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
         ESecurityRole role = ESecurityRole.fromString(claims.get(Constants.ACCOUNT_ROLE_CLAIM_NAME, String.class));
 
         CustomUserPrincipal principal = authenticateJsonWebTokenUseCase.execute(accountId);
+
+        // 유저를 찾을 수 없는 경우 쿠키를 삭제하고 메인 페이지로 리다이렉트
+        if (principal == null) {
+            CookieUtil.deleteCookie(request, response, "refresh_token");
+            CookieUtil.deleteCookie(request, response, "access_token");
+            response.sendRedirect(clientUrl);
+            return;
+        }
 
         if (!role.equals(principal.getRole())) {
             throw new CommonException(ErrorCode.ACCESS_DENIED);
