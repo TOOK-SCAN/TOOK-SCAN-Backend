@@ -76,7 +76,7 @@ public class CookieUtil {
      * @param response HttpServletResponse
      * @param name 삭제할 Cookie 이름
      */
-    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieDomain, String name) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
@@ -85,16 +85,15 @@ public class CookieUtil {
 
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(name)) {
-                Cookie removedCookie = new Cookie(name, "");
-                log.info("path: {}", cookie.getPath());
-                log.info("domain: {}", cookie.getDomain());
-                log.info("httpOnly: {}", cookie.isHttpOnly());
-                log.info("secure: {}", cookie.getSecure());
-                removedCookie.setDomain(cookie.getDomain());
+                Cookie removedCookie = new Cookie(name, null);
+                removedCookie.setDomain(cookieDomain);
                 removedCookie.setPath("/");
                 removedCookie.setMaxAge(0);
-                removedCookie.setHttpOnly(cookie.isHttpOnly());
-                removedCookie.setSecure(cookie.getSecure());
+
+                if (name.equals("refresh_token")) {
+                    removedCookie.setSecure(true);
+                    removedCookie.setHttpOnly(true);
+                }
 
                 response.addCookie(removedCookie);
             }
