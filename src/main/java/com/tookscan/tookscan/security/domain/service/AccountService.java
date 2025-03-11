@@ -19,10 +19,6 @@ public class AccountService {
     }
 
     public CustomUserPrincipal createCustomUserPrincipalByAccount(Account account) {
-
-        if (account == null)
-            return null;
-
         return CustomUserPrincipal.create(account);
     }
 
