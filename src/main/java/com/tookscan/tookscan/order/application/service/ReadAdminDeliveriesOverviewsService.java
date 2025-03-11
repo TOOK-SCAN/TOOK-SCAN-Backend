@@ -22,7 +22,7 @@ public class ReadAdminDeliveriesOverviewsService implements ReadAdminDeliveriesO
     @Override
     @Transactional(readOnly = true)
     public ReadAdminDeliveriesOverviewsResponseDto execute(Integer page, Integer size, String startDate, String endDate,
-                                                           String searchType, String search) {
+                                                           String search, String searchType) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<Long> orderIdPages = orderRepository.findDeliveriesSummaries(startDate, endDate, search, searchType,
