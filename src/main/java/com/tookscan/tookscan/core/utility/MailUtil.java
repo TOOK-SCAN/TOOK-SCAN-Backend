@@ -128,14 +128,16 @@ public class MailUtil {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setSubject(orderName + " 스캔본 전송 - TOOKSCAN");
 
-        // 위 HTML을 이용하여 이메일을 작성하고 전송하는 코드
+        // 위 HTML을 이용하여 이메일을 작성하고 전송
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
         mimeMessageHelper.setFrom("TOOK-SCAN");
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
-        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${OrderName}", orderName), true);
-        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${orderName}", orderName), true);
-        mimeMessageHelper.setText(PDF_EMAIL_TEMPLATE.replace("${PdfUrl}", pdfUrl), true);
+        String content = PDF_EMAIL_TEMPLATE
+                .replace("${OrderName}", orderName)
+                .replace("${orderName}", orderName)
+                .replace("${PdfUrl}", pdfUrl);
+        mimeMessageHelper.setText(content, true);
 
         javaMailSender.send(mimeMessage);
     }
