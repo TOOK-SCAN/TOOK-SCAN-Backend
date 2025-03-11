@@ -3,12 +3,10 @@ package com.tookscan.tookscan.core.utility;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
-import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.KakaoOption;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
-import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 
 @Component
-@Slf4j
 public class KakaoMessageUtil {
 
     private final DefaultMessageService messageService;
@@ -59,12 +56,14 @@ public class KakaoMessageUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, url);
     }
 
-    public void sendCreateOrderMessage(String userName, String to) {
+    public void sendCreateOrderMessage(String userName, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{userName}", userName);
+        variables.put("#{userName}", "[" + userName + "]");
+        variables.put("#{orderName}", orderName);
+
         kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
@@ -75,9 +74,7 @@ public class KakaoMessageUtil {
         message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
-        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-
-        log.info("Create Order Message Response:\n {}", response);
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
 
     }
 
@@ -94,7 +91,7 @@ public class KakaoMessageUtil {
             }
             case GUEST -> {
                 variables.put("#{paymentPath}", "비회원 주문조회 > 주문 정보 입력 > 결제하기");
-                variables.put("#{paymentUrl}", pathForGuest + "order=" + orderNumber + "$name=" + userName + "$id=" + orderId);
+                variables.put("#{paymentUrl}", pathForGuest + "order=" + orderNumber + "&name=" + userName + "&id=" + orderId);
             }
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         }
@@ -109,9 +106,7 @@ public class KakaoMessageUtil {
         message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
-        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-
-        log.info("Request Payment Message Response:\n {}", response);
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
 
     }
 
@@ -145,10 +140,7 @@ public class KakaoMessageUtil {
         message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
-        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-
-        log.info("Request Scan Message Response:\n {}", response);
-
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
     public void sendAnnounceScanFinishMessage(String userName, String orderName, String to) {
@@ -156,7 +148,7 @@ public class KakaoMessageUtil {
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{userName}", userName);
+        variables.put("#{userName}", "[" + userName + "]");
         variables.put("#{orderName}", orderName);
         kakaoOption.setVariables(variables);
 
@@ -168,10 +160,7 @@ public class KakaoMessageUtil {
         message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
-        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-
-        log.info("Announce Scan Finish Message Response:\n {}", response);
-
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
     public void sendAnnounceDeliveryMessage(String to) {
@@ -186,10 +175,7 @@ public class KakaoMessageUtil {
         message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
-        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-
-        log.info("Announce Delivery Message Response:\n {}", response);
-
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
     public void sendThanksForUsingMessage(String to) {
@@ -204,10 +190,7 @@ public class KakaoMessageUtil {
         message.setFrom(sender);
         message.setKakaoOptions(kakaoOption);
 
-        SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
-
-        log.info("Thanks For Using Message Response:\n {}", response);
-
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
 }

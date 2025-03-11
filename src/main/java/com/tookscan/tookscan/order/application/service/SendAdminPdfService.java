@@ -52,6 +52,10 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             kakaoMessageUtil.sendThanksForUsingMessage(
                     order.getPhoneNumber()
             );
+        } else {
+            order.updateOrderStatus(EOrderStatus.RECOVERY_IN_PROGRESS);
+            orderRepository.save(order);
         }
+
     }
 }
