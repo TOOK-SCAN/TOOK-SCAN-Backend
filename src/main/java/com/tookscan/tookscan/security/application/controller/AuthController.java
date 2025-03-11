@@ -174,10 +174,8 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
     public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
-            HttpServletRequest request,
-            HttpServletResponse response,
             @AccountID UUID accountId
     ) {
-        return ResponseDto.ok(readAccountBriefUseCase.execute(request, response, accountId));
+        return ResponseDto.ok(readAccountBriefUseCase.execute(accountId));
     }
 }
