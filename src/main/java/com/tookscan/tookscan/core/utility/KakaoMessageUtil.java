@@ -61,8 +61,8 @@ public class KakaoMessageUtil {
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{userName}", "[" + userName + "]");
-        variables.put("#{orderName}", orderName);
+        variables.put("#{userName}", userName);
+        variables.put("#{orderName}", "[" + orderName + "]");
 
         kakaoOption.setVariables(variables);
 
@@ -116,7 +116,7 @@ public class KakaoMessageUtil {
 
         HashMap<String, String> variables = new HashMap<>();
 
-        variables.put("#{orderName}", orderName);
+        variables.put("#{orderName}", "[" + orderName + "]");
 
         switch (role) {
             case USER -> {
@@ -148,8 +148,8 @@ public class KakaoMessageUtil {
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{userName}", "[" + userName + "]");
-        variables.put("#{orderName}", orderName);
+        variables.put("#{userName}", userName);
+        variables.put("#{orderName}", "[" + orderName + "]");
         kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
