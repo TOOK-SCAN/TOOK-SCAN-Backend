@@ -44,6 +44,9 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
     @Value("${web-engine.client-url}")
     private String clientUrl;
 
+    @Value("${web-engine.cookie-domain}")
+    private String cookieDomain;
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -71,8 +74,8 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
         // 유저를 찾을 수 없는 경우 쿠키를 삭제하고 메인 페이지로 리다이렉트
         if (principal == null) {
-            CookieUtil.deleteCookie(request, response, "refresh_token");
-            CookieUtil.deleteCookie(request, response, "access_token");
+            CookieUtil.deleteCookie(request, response, cookieDomain, "refresh_token");
+            CookieUtil.deleteCookie(request, response, cookieDomain, "access_token");
             response.sendRedirect(clientUrl);
             return;
         }
