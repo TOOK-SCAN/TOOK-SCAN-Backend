@@ -7,6 +7,7 @@ import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
     private final KakaoMessageUtil kakaoMessageUtil;
 
     @Override
+    @Transactional
     public void execute(Long orderId) {
 
         Order order = orderRepository.findByIdOrElseThrow(orderId);
