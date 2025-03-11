@@ -6,6 +6,7 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
+import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
@@ -36,6 +37,10 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticateJsonWebTokenUseCase authenticateJsonWebTokenUseCase;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
+
+    private final String cookieDomain;
+
+    private final String clientUrl;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
