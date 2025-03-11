@@ -37,10 +37,6 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
 
-    private final String cookieDomain;
-
-    private final String clientUrl;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     static final String AUTH_BRIEFS_URL = "/v1/auth/briefs";

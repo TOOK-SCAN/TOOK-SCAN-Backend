@@ -49,12 +49,6 @@ public class SecurityConfig {
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
 
-    @Value("${web-engine.cookie-domain}")
-    private String cookieDomain;
-
-    @Value("${web-engine.client-url}")
-    private String clientUrl;
-
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -103,9 +97,7 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new JsonWebTokenAuthenticationFilter(
                                 authenticateJsonWebTokenUseCase,
-                                jsonWebTokenUtil,
-                                cookieDomain,
-                                clientUrl
+                                jsonWebTokenUtil
                         ),
                         LogoutFilter.class
                 )
