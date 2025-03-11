@@ -283,7 +283,8 @@ public class OrderRepositoryImpl implements OrderRepository {
             predicate = predicate.and(order.createdAt.goe(LocalDate.parse(startDate).atStartOfDay()));
         }
         if (endDate != null) {
-            predicate = predicate.and(order.createdAt.loe(LocalDate.parse(endDate).atStartOfDay()));
+            predicate = predicate.and(
+                    order.createdAt.loe(LocalDate.parse(endDate).atStartOfDay().plusDays(1).minusNanos(1)));
         }
         return predicate;
     }
@@ -293,13 +294,19 @@ public class OrderRepositoryImpl implements OrderRepository {
         if (search == null || searchType == null) {
             return predicate;
         }
-
+        System.out.println(searchType);
         return switch (searchType) {
             case "order-number" -> predicate.and(order.orderNumber.containsIgnoreCase(search));
             case "name" -> predicate.and(order.user.name.containsIgnoreCase(search)
                     .or(order.delivery.receiverName.containsIgnoreCase(search)));
             case "phone-number" -> predicate.and(order.user.phoneNumber.containsIgnoreCase(search)
                     .or(order.delivery.phoneNumber.containsIgnoreCase(search)));
+            case "address" -> predicate.and(order.delivery.address.addressName.containsIgnoreCase(search)
+                    .or(order.delivery.address.region1DepthName.containsIgnoreCase(search))
+                    .or(order.delivery.address.region2DepthName.containsIgnoreCase(search))
+                    .or(order.delivery.address.region3DepthName.containsIgnoreCase(search))
+                    .or(order.delivery.address.region4DepthName.containsIgnoreCase(search))
+                    .or(order.delivery.address.addressDetail.containsIgnoreCase(search)));
             default -> predicate;
         };
     }
