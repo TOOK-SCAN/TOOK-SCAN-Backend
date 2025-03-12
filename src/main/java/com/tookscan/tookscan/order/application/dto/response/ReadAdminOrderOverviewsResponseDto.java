@@ -10,6 +10,8 @@ import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,8 +33,18 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
     }
 
     public static ReadAdminOrderOverviewsResponseDto of(List<Order> orders, Page<Long> pageInfo) {
+
+        List<Long> orderIds = pageInfo.getContent();
+
+        Map<Long, Order> orderMap = orders.stream()
+                .collect(Collectors.toMap(Order::getId, Function.identity()));
+
+        List<Order> sortedOrders = orderIds.stream()
+                .map(orderMap::get)
+                .toList();
+
         return ReadAdminOrderOverviewsResponseDto.builder()
-                .orders(orders.stream().map(OrderOverviewsDto::fromEntity).toList())
+                .orders(sortedOrders.stream().map(OrderOverviewsDto::fromEntity).toList())
                 .pageInfo(PageInfoDto.fromEntity(pageInfo))
                 .build();
     }
