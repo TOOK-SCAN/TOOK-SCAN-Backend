@@ -9,7 +9,7 @@ import lombok.Builder;
 public class ReadGuestOrderCouponDetailResponseDto extends SelfValidating<ReadGuestOrderCouponDetailResponseDto> {
 
     @JsonProperty("id")
-    private final Long id;
+    private final String id;
 
     @JsonProperty("name")
     private final String name;
@@ -30,7 +30,7 @@ public class ReadGuestOrderCouponDetailResponseDto extends SelfValidating<ReadGu
     private final String expirationDate;
 
     @Builder
-    public ReadGuestOrderCouponDetailResponseDto(Long id, String name, String description, ECouponType type,
+    public ReadGuestOrderCouponDetailResponseDto(String id, String name, String description, ECouponType type,
                                                  Integer discountPrice, Integer discountPercent,
                                                  String expirationDate) {
         this.id = id;
@@ -45,7 +45,7 @@ public class ReadGuestOrderCouponDetailResponseDto extends SelfValidating<ReadGu
 
     public static ReadGuestOrderCouponDetailResponseDto fromEntity(Coupon coupon) {
         return ReadGuestOrderCouponDetailResponseDto.builder()
-                .id(coupon.getId())
+                .id(coupon.getId().toString())
                 .name(coupon.getName())
                 .description(coupon.getDescription())
                 .type(coupon.getType())

@@ -66,7 +66,7 @@ public class ReadAdminOrderDeliveryOverviewResponseDto extends
     public static class DeliveryInfo extends SelfValidating<DeliveryInfo> {
 
         @JsonProperty("id")
-        private final Long id;
+        private final String id;
 
         @JsonProperty("receiver_name")
         private final String receiverName;
@@ -87,7 +87,7 @@ public class ReadAdminOrderDeliveryOverviewResponseDto extends
         private final String email;
 
         @Builder
-        public DeliveryInfo(Long id, String receiverName, String phoneNumber, AddressResponseDto address,
+        public DeliveryInfo(String id, String receiverName, String phoneNumber, AddressResponseDto address,
                             String request,
                             String trackingNumber, String email) {
             this.id = id;
@@ -102,7 +102,7 @@ public class ReadAdminOrderDeliveryOverviewResponseDto extends
 
         public static DeliveryInfo fromEntity(Delivery delivery) {
             return DeliveryInfo.builder()
-                    .id(delivery.getId())
+                    .id(delivery.getId().toString())
                     .receiverName(delivery.getReceiverName())
                     .phoneNumber(delivery.getPhoneNumber())
                     .address(AddressResponseDto.fromEntity(delivery.getAddress()))

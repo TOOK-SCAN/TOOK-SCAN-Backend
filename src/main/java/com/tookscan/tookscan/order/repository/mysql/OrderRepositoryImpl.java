@@ -296,7 +296,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         if (search == null || searchType == null) {
             return predicate;
         }
-        System.out.println(searchType);
+
         return switch (searchType) {
             case "order-number" -> predicate.and(order.orderNumber.containsIgnoreCase(search));
             case "name" -> predicate.and(order.user.name.containsIgnoreCase(search)

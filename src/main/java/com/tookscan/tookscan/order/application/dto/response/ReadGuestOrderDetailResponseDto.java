@@ -20,7 +20,7 @@ import lombok.Getter;
 public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrderDetailResponseDto> {
     @JsonProperty("id")
     @NotNull
-    private final Long orderId;
+    private final String orderId;
 
     @JsonProperty("order_number")
     @NotNull
@@ -131,7 +131,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
 
     @Builder
     public ReadGuestOrderDetailResponseDto(
-            Long orderId,
+            String orderId,
             String orderNumber,
             EOrderStatus orderStatus,
             String orderDate,
@@ -172,7 +172,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
         Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
 
         return ReadGuestOrderDetailResponseDto.builder()
-                .orderId(order.getId())
+                .orderId(order.getId().toString())
                 .orderNumber(order.getOrderNumber())
                 .orderStatus(order.getOrderStatus().toDisplayString())
                 .orderDate(DateTimeUtil.convertLocalDateTimeToKORString(order.getCreatedAt()))
