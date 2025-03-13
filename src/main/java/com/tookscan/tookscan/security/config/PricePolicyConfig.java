@@ -16,6 +16,9 @@ import java.time.LocalDate;
 public class PricePolicyConfig {
 
     private final PricePolicyRepository pricePolicyRepository;
+    private static final int DEFAULT_PRICE = 1000;
+    private static final int PRICE_PER_PAGE = 10;
+    private static final int DELIVERY_PRICE = 0;
 
     @Bean
     public ApplicationRunner createPricePolicy() {
@@ -26,9 +29,9 @@ public class PricePolicyConfig {
                     },
                     () -> {
                         PricePolicy pricePolicy = PricePolicy.builder()
-                                .defaultPrice(1000)
-                                .pricePerPage(10)
-                                .deliveryPrice(0)
+                                .defaultPrice(DEFAULT_PRICE)
+                                .pricePerPage(PRICE_PER_PAGE)
+                                .deliveryPrice(DELIVERY_PRICE)
                                 .startDate(LocalDate.now())
                                 .build();
                         pricePolicyRepository.save(pricePolicy);
