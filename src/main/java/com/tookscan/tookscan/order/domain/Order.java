@@ -19,6 +19,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -49,12 +51,27 @@ public class Order extends BaseEntity {
     @Column(name = "is_by_user", nullable = false)
     private boolean isByUser;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Column(name = "memo", length = 500)
     private String memo;
+
+    @Column(name = "scan_copyright_compliance_agreed", nullable = false)
+    private LocalDateTime scanCopyrightComplianceAgreed;
+
+    @Column(name = "illegal_distribution_prohibition_agreed", nullable = false)
+    private LocalDateTime illegalDistributionProhibitionAgreed;
+
+    @Column(name = "cutting_agreed", nullable = false)
+    private LocalDateTime cuttingAgreed;
+
+    @Column(name = "service_provision_period_acknowledged", nullable = false)
+    private LocalDateTime serviceProvisionPeriodAcknowledged;
+
+    @Column(name = "user_verified")
+    private LocalDateTime userVerified;
+
+    @Column(name = "took_scan_assistance_agreed")
+    private LocalDateTime tookScanAssistanceAgreed;
+
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
@@ -80,6 +97,10 @@ public class Order extends BaseEntity {
     /* Many To One Mapping ------------------------ */
     /* -------------------------------------------- */
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
@@ -87,11 +108,25 @@ public class Order extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Order(String orderNumber, EOrderStatus orderStatus, boolean isByUser, User user, Delivery delivery,
-                 Coupon coupon) {
+    public Order(
+            String orderNumber,
+            EOrderStatus orderStatus,
+            boolean isByUser,
+            LocalDateTime scanCopyrightComplianceAgreed,
+            LocalDateTime illegalDistributionProhibitionAgreed,
+            LocalDateTime cuttingAgreed,
+            LocalDateTime serviceProvisionPeriodAcknowledged,
+            User user,
+            Delivery delivery,
+            Coupon coupon
+    ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
         this.isByUser = isByUser;
+        this.scanCopyrightComplianceAgreed = scanCopyrightComplianceAgreed;
+        this.illegalDistributionProhibitionAgreed = illegalDistributionProhibitionAgreed;
+        this.cuttingAgreed = cuttingAgreed;
+        this.serviceProvisionPeriodAcknowledged = serviceProvisionPeriodAcknowledged;
         this.user = user;
         this.delivery = delivery;
         this.coupon = coupon;
@@ -104,6 +139,11 @@ public class Order extends BaseEntity {
      */
     public void updateOrderStatus(EOrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public void updateScanTermsAgreed() {
+        this.userVerified = LocalDateTime.now();
+        this.tookScanAssistanceAgreed = LocalDateTime.now();
     }
 
     public void finishPayment(Payment payment) {

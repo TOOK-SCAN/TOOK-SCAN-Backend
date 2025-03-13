@@ -9,12 +9,12 @@ import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OrderService {
 
     public Order createOrder(User user, boolean isByUser, Delivery delivery, Coupon coupon) {
@@ -23,6 +23,10 @@ public class OrderService {
                 .orderNumber(orderNumber)
                 .orderStatus(EOrderStatus.APPLY_COMPLETED)
                 .isByUser(isByUser)
+                .scanCopyrightComplianceAgreed(LocalDateTime.now())
+                .illegalDistributionProhibitionAgreed(LocalDateTime.now())
+                .cuttingAgreed(LocalDateTime.now())
+                .serviceProvisionPeriodAcknowledged(LocalDateTime.now())
                 .user(user)
                 .delivery(delivery)
                 .coupon(coupon)
@@ -30,9 +34,7 @@ public class OrderService {
     }
 
     public void updateOrderStatus(Order order, EOrderStatus newOrderStatus) {
-        EOrderStatus oldOrderStatus = order.getOrderStatus();
         order.updateOrderStatus(newOrderStatus);
-        log.info("Order status changed. OrderNumber: {}, oldStatus: {}, newStatus: {}", order.getOrderNumber(), oldOrderStatus, newOrderStatus);
     }
 
     public void validateOrderUser(Order order, User user) {
@@ -51,5 +53,9 @@ public class OrderService {
         if (!order.getOrderStatus().equals(status)) {
             throw new CommonException(errorCode);
         }
+    }
+
+    public void updateScanTermsAgreed(Order order) {
+        order.updateScanTermsAgreed();
     }
 }
