@@ -14,6 +14,8 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -46,8 +48,14 @@ public class User extends Account {
     @Column(name = "email", length = 320)
     private String email;
 
+    @Column(name = "over_14_agreed", nullable = false)
+    private LocalDateTime over14Agreed;
+
+    @Column(name = "service_agreed", nullable = false)
+    private LocalDateTime serviceAgreed;
+
     @Column(name = "marketing_allowed", nullable = false)
-    private Boolean marketingAllowed;
+    private LocalDateTime marketingAllowed;
 
     @Column(name = "memo", length = 500)
     private String memo;
@@ -83,13 +91,17 @@ public class User extends Account {
             String password,
             String name,
             String phoneNumber,
-            Boolean marketingAllowed,
+            LocalDateTime over14Agreed,
+            LocalDateTime serviceAgreed,
+            LocalDateTime marketingAllowed,
             Boolean isReceiveEmail,
             Boolean isReceiveSms
     ) {
         super(provider, serialId, password, phoneNumber);
         this.name = name;
         this.email = null;
+        this.over14Agreed = over14Agreed;
+        this.serviceAgreed = serviceAgreed;
         this.marketingAllowed = marketingAllowed;
         this.memo = null;
         this.address = null;
@@ -116,6 +128,10 @@ public class User extends Account {
 
     public void updatePhone(String phoneNumber) {
         super.updatePhoneNumber(phoneNumber);
+    }
+
+    public void updateMarketingAllowed(LocalDateTime marketingAllowed) {
+        this.marketingAllowed = marketingAllowed;
     }
 
     public void updateIsReceiveEmail(Boolean isReceiveEmail) {

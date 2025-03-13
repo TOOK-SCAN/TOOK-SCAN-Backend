@@ -43,8 +43,14 @@ public class UpdateUserUserService implements UpdateUserUserUseCase {
         }
 
         // User 정보 수정
-        user = userService.updateSelf(user, requestDto.email(), requestDto.phoneNumber(), requestDto.address(),
-                requestDto.isReceiveEmail(), requestDto.isReceiveSms());
+        user = userService.updateSelf(
+                user, requestDto.email(),
+                requestDto.phoneNumber(),
+                requestDto.address(),
+                requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
+                requestDto.isReceiveEmail(),
+                requestDto.isReceiveSms()
+        );
         userRepository.save(user);
 
         // 인증번호 삭제
