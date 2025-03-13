@@ -6,6 +6,10 @@ import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUs
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,10 +34,18 @@ public class ReadAdminOrderSummariesService implements ReadAdminOrderSummariesUs
         Page<Long> orderIdPages = orderRepository.findOrderSummaries(startDate, endDate, search, searchType,
                 sort, direction, pageable);
 
+        List<Long> orderIds = orderIdPages.getContent();
+
         List<Order> orders = orderRepository.findAllWithDocumentsByIdIn(orderIdPages.getContent());
+
+        Map<Long, Order> orderMap = orders.stream()
+                .collect(Collectors.toMap(Order::getId, Function.identity()));
+        List<Order> sortedOrders = orderIds.stream()
+                .map(orderMap::get)
+                .toList();
 
         PageInfoDto pageInfo = PageInfoDto.fromEntity(orderIdPages);
 
-        return ReadAdminOrderSummariesResponseDto.of(orders, pageInfo);
+        return ReadAdminOrderSummariesResponseDto.of(sortedOrders, pageInfo);
     }
 }

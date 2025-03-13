@@ -31,7 +31,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
     public static class OrderInfoDto extends SelfValidating<OrderInfoDto> {
         @JsonProperty("id")
         @NotNull
-        private final Long orderId;
+        private final String orderId;
 
         @JsonProperty("order_status")
         @NotNull
@@ -67,7 +67,9 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         private final Integer paymentTotal;
 
         @Builder
-        public OrderInfoDto(Long orderId, EOrderStatus orderStatus, String documentDescription, String orderNumber, String orderDate, String receiverName, String address, EPaymentMethod paymentMethod, EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal) {
+        public OrderInfoDto(String orderId, EOrderStatus orderStatus, String documentDescription, String orderNumber,
+                            String orderDate, String receiverName, String address, EPaymentMethod paymentMethod,
+                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal) {
             this.orderId = orderId;
             this.orderStatus = orderStatus;
             this.documentDescription = documentDescription;
@@ -89,7 +91,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
 
             return OrderInfoDto.builder()
-                    .orderId(order.getId())
+                    .orderId(order.getId().toString())
                     .orderStatus(order.getOrderStatus().toDisplayString())
                     .documentDescription(order.getDocumentsDescription())
                     .orderNumber(order.getOrderNumber())

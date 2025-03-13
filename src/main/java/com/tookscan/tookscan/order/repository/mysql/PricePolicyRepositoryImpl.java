@@ -5,6 +5,8 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.PricePolicy;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +20,16 @@ public class PricePolicyRepositoryImpl implements PricePolicyRepository {
                                                                                          LocalDate now2) {
         return pricePolicyJpaRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(now1, now2)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_PRICE_POLICY));
+    }
+
+    @Override
+    public Optional<PricePolicy> findByStartDateLessThanEqualAndEndDateGreaterThanEqual(LocalDate now1,
+                                                                                                  LocalDate now2) {
+        return pricePolicyJpaRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(now1, now2);
+    }
+
+    @Override
+    public void save(PricePolicy pricePolicy) {
+        pricePolicyJpaRepository.save(pricePolicy);
     }
 }

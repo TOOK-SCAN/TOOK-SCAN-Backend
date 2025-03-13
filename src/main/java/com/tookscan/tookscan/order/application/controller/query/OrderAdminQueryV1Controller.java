@@ -1,28 +1,8 @@
 package com.tookscan.tookscan.order.application.controller.query;
 
 import com.tookscan.tookscan.core.dto.ResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminDeliveriesOverviewsResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminDeliveriesSummariesResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminDocumentsPdfsResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminDocumentsScanStatusResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderBriefResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderBriefsResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderDeliveryOverviewResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderDocumentsOverviewsResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderOverviewsResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderSummariesResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadStatisticsSummariesResponseDto;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminDeliveriesOverviewsUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminDeliveriesSummariesUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsScanStatusUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDeliveryOverviewUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDocumentsOverviewsUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
+import com.tookscan.tookscan.order.application.dto.response.*;
+import com.tookscan.tookscan.order.application.usecase.*;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,6 +24,7 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminOrderBriefsUseCase readAdminOrderBriefsUseCase;
     private final ReadAdminOrderSummariesUseCase readAdminOrderSummariesUseCase;
     private final ReadAdminOrderDocumentsOverviewsUseCase readAdminOrderDocumentsOverviewsUseCase;
+    private final ReadAdminPaymentOverviewUseCase readAdminPaymentOverviewUseCase;
     private final ReadAdminOrderBriefUseCase readAdminOrderBriefUseCase;
     private final ReadAdminOrderDeliveryOverviewUseCase readAdminOrderDeliveryOverviewUseCase;
     private final ReadAdminOrderOverviewsUseCase readAdminOrderOverviewsUseCase;
@@ -100,6 +81,17 @@ public class OrderAdminQueryV1Controller {
             @PathVariable Long orderId
     ) {
         return ResponseDto.ok(readAdminOrderDocumentsOverviewsUseCase.execute(orderId));
+    }
+
+    /**
+     * 4.2.9 관리자 주문 상세 결제 내역 조회
+     */
+    @Operation(summary = "관리자 주문 상세 결제 내역 조회", description = "관리자가 주문 상세 결제 내역을 조회합니다.")
+    @GetMapping("/orders/{id}/payments/overviews")
+    public ResponseDto<ReadAdminPaymentOverviewResponseDto> readAdminPaymentOverview(
+            @PathVariable Long id
+    ) {
+        return ResponseDto.ok(readAdminPaymentOverviewUseCase.execute(id));
     }
   
     /**

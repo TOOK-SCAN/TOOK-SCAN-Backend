@@ -7,11 +7,11 @@ import lombok.Builder;
 public class CreateAdminTermResponseDto extends SelfValidating<CreateAdminTermResponseDto> {
 
     @JsonProperty("id")
-    private final Long id;
+    private final String id;
 
     @Builder
     public CreateAdminTermResponseDto(
-            Long id
+            String id
     ) {
         this.id = id;
 
@@ -22,7 +22,7 @@ public class CreateAdminTermResponseDto extends SelfValidating<CreateAdminTermRe
             Long id
     ) {
         return CreateAdminTermResponseDto.builder()
-                .id(id)
+                .id(id.toString())
                 .build();
     }
 }

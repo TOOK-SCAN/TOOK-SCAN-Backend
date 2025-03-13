@@ -1,12 +1,14 @@
 package com.tookscan.tookscan.core.infrastructure;
 
 import io.hypersistence.tsid.TSID;
+import io.hypersistence.tsid.TSID.Factory;
 import java.net.NetworkInterface;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Enumeration;
+import java.util.function.Supplier;
 
-public class TsidFactory {
+public class TsidFactory implements Supplier<TSID.Factory> {
 
     public TsidFactory() {
     }
@@ -16,7 +18,7 @@ public class TsidFactory {
         return TSID.Factory.builder()
                 .withNodeBits(10)  // NodeBits = 10 -> 2^10 = 1024 노드 지원
                 .withNode(nodeId)  // 이 서버(노드)의 고유 ID
-                .withClock(Clock.system(ZoneId.of("Asia/Seoul"))) // 나라에 맞는 시스템 시간 使用(사용)
+                .withClock(Clock.system(ZoneId.of("Asia/Seoul")))
                 .build();
     }
 
@@ -51,5 +53,10 @@ public class TsidFactory {
             // 예외 시, 임의의 Node ID
             return (int) (Math.random() * 1024);
         }
+    }
+
+    @Override
+    public Factory get() {
+        return getFactory();
     }
 }

@@ -155,7 +155,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
         @JsonProperty("id")
         @Schema(description = "그룹 ID", example = "1")
         @NotNull
-        private final Long id;
+        private final String id;
 
         @JsonProperty("name")
         @Schema(description = "그룹 이름", example = "관리자")
@@ -163,7 +163,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
         private final String name;
 
         @Builder
-        public GroupInfoDto(Long id, String name) {
+        public GroupInfoDto(String id, String name) {
             this.id = id;
             this.name = name;
             this.validateSelf();
@@ -171,7 +171,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
 
         public static GroupInfoDto fromEntity(UserGroup userGroup) {
             return GroupInfoDto.builder()
-                    .id(userGroup.getGroup().getId())
+                    .id(userGroup.getGroup().getId().toString())
                     .name(userGroup.getGroup().getName())
                     .build();
         }
