@@ -51,7 +51,7 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
 
     public static class OrderOverviewsDto extends SelfValidating<OrderOverviewsDto> {
         @JsonProperty("order_id")
-        private final Long orderId;
+        private final String orderId;
 
         @JsonProperty("order_number")
         private final String orderNumber;
@@ -81,7 +81,7 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
         private final DocumentsDto documents;
 
         @Builder
-        public OrderOverviewsDto(Long orderId, String orderNumber, String name, EOrderStatus orderStatus,
+        public OrderOverviewsDto(String orderId, String orderNumber, String name, EOrderStatus orderStatus,
                                  Integer paymentAmount, EPaymentMethod paymentMethod,
                                  EEasyPaymentProvider easyPaymentProvider,
                                  String orderDate, String paymentDate, DocumentsDto documents) {
@@ -100,7 +100,7 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
 
         public static OrderOverviewsDto fromEntity(Order order) {
             return OrderOverviewsDto.builder()
-                    .orderId(order.getId())
+                    .orderId(order.getId().toString())
                     .orderNumber(order.getOrderNumber())
                     .name(order.isByUser() ? order.getUser().getName() : order.getDelivery().getReceiverName())
                     .orderStatus(order.getOrderStatus())

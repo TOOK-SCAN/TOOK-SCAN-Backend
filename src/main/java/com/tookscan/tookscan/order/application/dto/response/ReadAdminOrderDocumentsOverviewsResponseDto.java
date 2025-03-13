@@ -75,7 +75,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
 
         @JsonProperty("id")
         @NotNull
-        private final Long id;
+        private final String id;
 
         @JsonProperty("name")
         @NotBlank
@@ -94,7 +94,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
         private final Integer price;
 
         @Builder
-        public InitialDocumentDto(Long id, String name, Integer pageCount, ERecoveryOption recoveryOption,
+        public InitialDocumentDto(String id, String name, Integer pageCount, ERecoveryOption recoveryOption,
                                   Integer price) {
             this.id = id;
             this.name = name;
@@ -106,7 +106,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
 
         public static InitialDocumentDto fromEntity(InitialDocument initialDocument) {
             return InitialDocumentDto.builder()
-                    .id(initialDocument.getId())
+                    .id(initialDocument.getId().toString())
                     .name(initialDocument.getName())
                     .pageCount(initialDocument.getPageCount())
                     .recoveryOption(initialDocument.getRecoveryOption())
@@ -120,7 +120,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
 
         @JsonProperty("id")
         @NotNull
-        private final Long id;
+        private final String id;
 
         @JsonProperty("name")
         @NotBlank
@@ -147,7 +147,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
         private final EScanStatus scanStatus;
 
         @Builder
-        public RealDocumentDto(Long id, String name, Integer pageCount, ERecoveryOption recoveryOption,
+        public RealDocumentDto(String id, String name, Integer pageCount, ERecoveryOption recoveryOption,
                                Integer price, Integer additionalPrice, EScanStatus scanStatus) {
             this.id = id;
             this.name = name;
@@ -161,7 +161,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
 
         public static RealDocumentDto of(Document document, EScanStatus scanStatus) {
             return RealDocumentDto.builder()
-                    .id(document.getId())
+                    .id(document.getId().toString())
                     .name(document.getName())
                     .pageCount(document.getPageCount())
                     .recoveryOption(document.getRecoveryOption())

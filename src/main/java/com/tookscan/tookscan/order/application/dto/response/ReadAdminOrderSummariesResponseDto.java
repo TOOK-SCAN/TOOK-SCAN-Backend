@@ -33,7 +33,7 @@ public class ReadAdminOrderSummariesResponseDto extends SelfValidating<ReadAdmin
     public static class OrderSummaryDto extends SelfValidating<OrderSummaryDto> {
 
         @JsonProperty("id")
-        private final Long id;
+        private final String id;
 
         @JsonProperty("order_number")
         private final String orderNumber;
@@ -57,7 +57,8 @@ public class ReadAdminOrderSummariesResponseDto extends SelfValidating<ReadAdmin
         private final DocumentsDto documents;
 
         @Builder
-        public OrderSummaryDto(Long id, String orderNumber, String name, String phoneNumber, EOrderStatus orderStatus, Integer predictedPrice,
+        public OrderSummaryDto(String id, String orderNumber, String name, String phoneNumber, EOrderStatus orderStatus,
+                               Integer predictedPrice,
                                String applyDate, DocumentsDto documents) {
             this.id = id;
             this.orderNumber = orderNumber;
@@ -127,7 +128,7 @@ public class ReadAdminOrderSummariesResponseDto extends SelfValidating<ReadAdmin
 
         public static OrderSummaryDto fromEntity(Order order) {
             return OrderSummaryDto.builder()
-                    .id(order.getId())
+                    .id(order.getId().toString())
                     .orderNumber(order.getOrderNumber())
                     .name(order.isByUser() ? order.getUser().getName() : order.getDelivery().getReceiverName())
                     .phoneNumber(order.isByUser() ? order.getUser().getPhoneNumber() : order.getDelivery().getPhoneNumber())

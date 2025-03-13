@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.term.domain.Term;
 import com.tookscan.tookscan.term.domain.type.ETermType;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class ReadUserTermOverviewResponseDto extends SelfValidating<ReadUserTermOverviewResponseDto> {
@@ -28,8 +26,7 @@ public class ReadUserTermOverviewResponseDto extends SelfValidating<ReadUserTerm
 
         @JsonProperty("id")
         @NotNull(message = "id는 null이 될 수 없습니다.")
-        @Min(value = 1, message = "id는 1 이상이어야 합니다.")
-        private final Long id;
+        private final String id;
 
         @JsonProperty("type")
         @NotNull(message = "type은 null이 될 수 없습니다.")
@@ -52,7 +49,8 @@ public class ReadUserTermOverviewResponseDto extends SelfValidating<ReadUserTerm
         private final Boolean isVisible;
 
         @Builder
-        public TermInfoDto(Long id, ETermType type, String title, String content, Boolean isRequired, Boolean isVisible) {
+        public TermInfoDto(String id, ETermType type, String title, String content, Boolean isRequired,
+                           Boolean isVisible) {
             this.id = id;
             this.type = type;
             this.title = title;
@@ -64,7 +62,7 @@ public class ReadUserTermOverviewResponseDto extends SelfValidating<ReadUserTerm
 
         public static ReadUserTermOverviewResponseDto.TermInfoDto fromEntity(Term term) {
             return ReadUserTermOverviewResponseDto.TermInfoDto.builder()
-                    .id(term.getId())
+                    .id(term.getId().toString())
                     .type(term.getType())
                     .title(term.getTitle())
                     .content(term.getContent())
