@@ -42,5 +42,10 @@ Authorization: Bearer {{access_token}}
 
 ### PDF 전송
 //@no-log
-POST {{host_url}}/v1/admins/orders/10/send-pdfs
+POST {{host_url}}/v1/admins/orders/19/send-pdfs
+Authorization: Bearer {{access_token}}
+
+### 관리자 주문 조회
+//@no-log
+GET {{host_url}}/v1/admins/orders/overviews?page=1&size=10&start-date=2025-02-12&end-date=2025-03-12&sort=order-date&direction=DESC
 Authorization: Bearer {{access_token}}

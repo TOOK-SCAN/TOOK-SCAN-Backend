@@ -2,7 +2,11 @@ package com.tookscan.tookscan.term.domain;
 
 import com.tookscan.tookscan.core.dto.BaseEntity;
 import com.tookscan.tookscan.term.domain.type.ETermType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,14 +21,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE terms SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class Term extends BaseEntity {
-
-    /* -------------------------------------------- */
-    /* Default Column ----------------------------- */
-    /* -------------------------------------------- */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    
     /* -------------------------------------------- */
     /* Information Column ------------------------- */
     /* -------------------------------------------- */

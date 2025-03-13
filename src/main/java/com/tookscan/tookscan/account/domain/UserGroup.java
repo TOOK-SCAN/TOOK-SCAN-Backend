@@ -1,7 +1,11 @@
 package com.tookscan.tookscan.account.domain;
 
 import com.tookscan.tookscan.core.dto.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,13 +20,6 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE user_groups SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class UserGroup extends BaseEntity {
-
-    /* -------------------------------------------- */
-    /* Default Column ----------------------------- */
-    /* -------------------------------------------- */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     /* -------------------------------------------- */
     /* Many to One Column ------------------------- */

@@ -2,13 +2,14 @@ package com.tookscan.tookscan.order.domain;
 
 import com.tookscan.tookscan.core.dto.BaseEntity;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -19,13 +20,6 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE price_policies SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class PricePolicy extends BaseEntity {
-
-    /* -------------------------------------------- */
-    /* Default Column ----------------------------- */
-    /* -------------------------------------------- */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     /* -------------------------------------------- */
     /* Information Column ------------------------- */

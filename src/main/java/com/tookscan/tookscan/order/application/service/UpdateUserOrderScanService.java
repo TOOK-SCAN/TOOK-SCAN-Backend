@@ -36,6 +36,9 @@ public class UpdateUserOrderScanService implements UpdateUserOrderScanUseCase {
         // 결제 상태 확인
         orderService.validateOrderStatus(order, EOrderStatus.PAYMENT_COMPLETED, ErrorCode.PAYMENT_INCOMPLETE);
 
+        // 스캔 약관 업데이트
+        orderService.updateScanTermsAgreed(order);
+
         // 주문 상태 변경
         orderService.updateOrderStatus(order, EOrderStatus.SCAN_WAITING);
     }

@@ -29,7 +29,7 @@ public class ReadAdminDeliveriesOverviewsResponseDto extends SelfValidating<Read
 
     public static class OrderDeliveryResponseDto {
         @JsonProperty("order_id")
-        private final Long orderId;
+        private final String orderId;
 
         @JsonProperty("order_number")
         private final String orderNumber;
@@ -50,7 +50,7 @@ public class ReadAdminDeliveriesOverviewsResponseDto extends SelfValidating<Read
         private final AddressResponseDto address;
 
         @Builder
-        public OrderDeliveryResponseDto(Long orderId, String orderNumber, String name, String phoneNumber,
+        public OrderDeliveryResponseDto(String orderId, String orderNumber, String name, String phoneNumber,
                                         EOrderStatus status, Integer paymentAmount, AddressResponseDto address) {
             this.orderId = orderId;
             this.orderNumber = orderNumber;
@@ -63,7 +63,7 @@ public class ReadAdminDeliveriesOverviewsResponseDto extends SelfValidating<Read
 
         public static OrderDeliveryResponseDto fromEntity(Order order) {
             return OrderDeliveryResponseDto.builder()
-                    .orderId(order.getId())
+                    .orderId(order.getId().toString())
                     .orderNumber(order.getOrderNumber())
                     .name(order.isByUser() ? order.getUser().getName() : order.getDelivery().getReceiverName())
                     .phoneNumber(
