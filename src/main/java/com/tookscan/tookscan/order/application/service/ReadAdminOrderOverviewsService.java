@@ -32,7 +32,7 @@ public class ReadAdminOrderOverviewsService implements ReadAdminOrderOverviewsUs
     public ReadAdminOrderOverviewsResponseDto execute(int page, int size, String startDate, String endDate,
                                                       String search, String searchType, String sort,
                                                       Direction direction, EOrderStatus orderStatus) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.unsorted());
+        Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<Long> orderIdPages = orderRepository.findOrderOverviews(startDate, endDate, search,
                 searchType, sort, direction, pageable, orderStatus);
