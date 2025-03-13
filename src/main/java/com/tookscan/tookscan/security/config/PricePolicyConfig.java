@@ -33,6 +33,7 @@ public class PricePolicyConfig {
                                 .pricePerPage(PRICE_PER_PAGE)
                                 .deliveryPrice(DELIVERY_PRICE)
                                 .startDate(LocalDate.now())
+                                .endDate(LocalDate.now().plusYears(100))
                                 .build();
                         pricePolicyRepository.save(pricePolicy);
                         log.info("가격 정책이 생성되었습니다.");
