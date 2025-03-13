@@ -51,7 +51,7 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-    "phone_number": "{{account.API_3_4_1.phone_number}}",
+    "phone_number": "01056175155",
     "email": "{{account.API_3_4_1.email}}",
     "address": {
       "address_name": "{{account.API_3_4_1.address.address_name}}",
@@ -61,7 +61,9 @@ Content-Type: application/json
       "address_detail": "{{account.API_3_4_1.address.address_detail}}",
       "latitude": {{account.API_3_4_1.address.latitude}},
       "longitude": {{account.API_3_4_1.address.longitude}}
-    }
+    },
+    "is_receive_email": true,
+    "is_receive_sms": true
 }
 
 ### 3.4.2 (관리자) 유저 정보 수정

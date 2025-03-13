@@ -54,7 +54,7 @@ public class User extends Account {
     @Column(name = "service_agreed", nullable = false)
     private LocalDateTime serviceAgreed;
 
-    @Column(name = "marketing_allowed", nullable = false)
+    @Column(name = "marketing_allowed")
     private LocalDateTime marketingAllowed;
 
     @Column(name = "memo", length = 500)
