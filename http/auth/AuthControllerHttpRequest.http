@@ -70,7 +70,7 @@ Content-Type: application/json
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "620498"
+@authentication_code = "308644"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 

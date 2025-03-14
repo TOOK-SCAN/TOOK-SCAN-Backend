@@ -1,5 +1,6 @@
 package com.tookscan.tookscan.security.application.service;
 
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateUserNameUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.domain.service.AccountService;
@@ -19,8 +20,11 @@ public class AuthenticateUserNameService implements AuthenticateUserNameUseCase 
 
     @Override
     public UserDetails loadUserByUsername(String serialId) throws UsernameNotFoundException {
-        Account account = accountRepository.findBySerialIdAndProviderOrElseThrow(serialId, ESecurityProvider.DEFAULT);
-
-        return accountService.createCustomUserPrincipalByAccount(account);
+        try {
+            Account account = accountRepository.findBySerialIdAndProviderOrElseThrow(serialId, ESecurityProvider.DEFAULT);
+            return accountService.createCustomUserPrincipalByAccount(account);
+        } catch (CommonException e) {
+            throw new UsernameNotFoundException(e.getMessage());
+        }
     }
 }
