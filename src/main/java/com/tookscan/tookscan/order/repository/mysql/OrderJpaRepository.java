@@ -64,9 +64,10 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
     List<Order> findAllWithDocumentsAndUserByIdIn(@Param("ids") List<Long> ids);
 
     List<Order> findAllByOrderNumberIn(List<String> orderNumber);
-  
-    @Query("SELECT o.id FROM Order o WHERE o.createdAt < :dateTime")
-    List<Long> findIdsByCreatedAtBefore(@Param("dateTime") LocalDateTime dateTime);
+
+    @Query("SELECT o FROM Order o WHERE o.createdAt < :dateTime AND o.orderStatus = :status")
+    List<Order> findAllByCreatedAtBeforeWithEOrderStatus(@Param("dateTime") LocalDateTime dateTime,
+                                                         @Param("status") EOrderStatus status);
 
     Integer countByCreatedAtBetween(LocalDateTime createdAt, LocalDateTime createdAt2);
 

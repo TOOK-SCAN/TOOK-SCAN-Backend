@@ -13,6 +13,10 @@ public record SignUpDefaultRequestDto(
 
         @JsonProperty("serial_id")
         @NotBlank(message = "아이디를 입력해주세요.")
+        @Pattern(
+                regexp = "^[A-Za-z0-9._-]{1,20}$",
+                message = "아이디는 1글자 이상 20자 이하의 영어 대소문자, 숫자, 특수문자(_-.)로 입력해주세요."
+        )
         String serialId,
 
         @JsonProperty("password")
