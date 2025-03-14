@@ -16,7 +16,7 @@ password={{auth.API_1_1_1_USER.password}}
 POST {{host_url}}/v1/auth/login
 Content-Type: application/x-www-form-urlencoded
 
-serial_id=admin1&
+serial_id={{auth.API_1_1_1_ADMIN.serial_id}}&
 password={{auth.API_1_1_1_ADMIN.password}}
 
 > {%
@@ -70,7 +70,7 @@ Content-Type: application/json
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "620498"
+@authentication_code = "308644"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 

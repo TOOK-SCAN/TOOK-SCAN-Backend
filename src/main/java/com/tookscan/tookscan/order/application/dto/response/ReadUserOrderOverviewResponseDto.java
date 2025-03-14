@@ -66,10 +66,13 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         @JsonProperty("payment_total")
         private final Integer paymentTotal;
 
+        @JsonProperty("is_delivery")
+        private final Boolean isDelivery;
+
         @Builder
         public OrderInfoDto(String orderId, EOrderStatus orderStatus, String documentDescription, String orderNumber,
                             String orderDate, String receiverName, String address, EPaymentMethod paymentMethod,
-                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal) {
+                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal, Boolean isDelivery) {
             this.orderId = orderId;
             this.orderStatus = orderStatus;
             this.documentDescription = documentDescription;
@@ -80,6 +83,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             this.paymentMethod = paymentMethod;
             this.easyPaymentProvider = easyPaymentProvider;
             this.paymentTotal = paymentTotal;
+            this.isDelivery = isDelivery;
             this.validateSelf();
         }
 
@@ -101,6 +105,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
                     .paymentMethod(paymentMethod)
                     .easyPaymentProvider(easyPaymentProvider)
                     .paymentTotal(paymentTotal)
+                    .isDelivery(order.isDelivery())
                     .build();
         }
     }

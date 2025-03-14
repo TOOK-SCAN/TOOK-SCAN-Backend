@@ -242,8 +242,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Long> findIdsByCreatedAtBefore(LocalDateTime dateTime) {
-        return orderJpaRepository.findIdsByCreatedAtBefore(dateTime);
+    public List<Order> findAllByCreatedAtBeforeWithEOrderStatus(LocalDateTime dateTime, EOrderStatus status) {
+        return orderJpaRepository.findAllByCreatedAtBeforeWithEOrderStatus(dateTime, status);
     }
 
     @Override

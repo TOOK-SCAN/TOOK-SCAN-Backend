@@ -19,7 +19,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -219,6 +218,11 @@ public class Order extends BaseEntity {
 
     public ESecurityRole getRole() {
         return user != null ? ESecurityRole.USER : ESecurityRole.GUEST;
+    }
+
+    public boolean isDelivery() {
+        return documents.stream()
+                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
     }
 
 

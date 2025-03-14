@@ -34,15 +34,20 @@ public class ReadGuestOrderSummaryResponseDto extends SelfValidating<ReadGuestOr
     @JsonProperty("address")
     private final String address;
 
+    @JsonProperty("is_delivery")
+    private final boolean isDelivery;
+
     @Builder
     public ReadGuestOrderSummaryResponseDto(String orderNumber, String orderDate, String receiverName,
-                                            String documentDescription, Integer paymentPrediction, String address) {
+                                            String documentDescription, Integer paymentPrediction, String address
+            , boolean isDelivery) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.receiverName = receiverName;
         this.documentDescription = documentDescription;
         this.paymentPrediction = paymentPrediction;
         this.address = address;
+        this.isDelivery = isDelivery;
         this.validateSelf();
     }
 
@@ -54,6 +59,7 @@ public class ReadGuestOrderSummaryResponseDto extends SelfValidating<ReadGuestOr
                 .documentDescription(order.getDocumentsDescription())
                 .paymentPrediction(order.getTotalAmount())
                 .address(order.getDelivery().getAddress().getFullAddress())
+                .isDelivery(order.isDelivery())
                 .build();
     }
 }

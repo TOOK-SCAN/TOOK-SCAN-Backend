@@ -50,8 +50,8 @@ public interface OrderRepository {
     List<Order> findAllWithDocumentsAndUserByIdIn(List<Long> ids);
 
     List<Order> findAllByOrderNumberIn(List<String> orderNumber);
-  
-    List<Long> findIdsByCreatedAtBefore(LocalDateTime dateTime);
+
+    List<Order> findAllByCreatedAtBeforeWithEOrderStatus(LocalDateTime dateTime, EOrderStatus status);
 
     void deleteAllById(List<Long> ids);
 

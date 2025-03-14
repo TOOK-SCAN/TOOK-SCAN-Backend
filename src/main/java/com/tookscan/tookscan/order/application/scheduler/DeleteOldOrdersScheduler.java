@@ -13,7 +13,7 @@ public class DeleteOldOrdersScheduler {
 
     private final DeleteOldOrdersUseCase deleteOldOrdersUseCase;
 
-    @Scheduled(cron = "0 12 18 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Seoul")
     public void cleanupOrders() {
         log.info("Deleting old orders scheduled task started");
         deleteOldOrdersUseCase.execute();
