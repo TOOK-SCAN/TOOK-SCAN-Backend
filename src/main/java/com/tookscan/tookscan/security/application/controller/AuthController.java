@@ -76,14 +76,17 @@ public class AuthController {
     }
 
     /**
-     * 2.3 관리자 회원가입
+     * 2.3 관리자 회원가입 (더 이상 사용되지 않음)
      */
+    @Deprecated
     @PostMapping("/admins/sign-up-default")
-    public ResponseDto<Void> adminSignUpDefault(
+//    public ResponseDto<Void> adminSignUpDefault(
+    public ResponseDto<String> adminSignUpDefault(
             @Valid @RequestBody AdminSignUpDefaultRequestDto requestDto
     ) {
-        adminSignUpDefaultUseCase.execute(requestDto);
-        return ResponseDto.created(null);
+//        adminSignUpDefaultUseCase.execute(requestDto);
+//        return ResponseDto.created(null);
+        return ResponseDto.ok("관리자 회원가입은 더 이상 사용되지 않습니다.");
     }
 
     /**
