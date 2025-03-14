@@ -7,6 +7,7 @@ import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
 import jakarta.validation.constraints.NotNull;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import javax.annotation.Nullable;
 
 @Getter
 public class ResponseDto<T> extends SelfValidating<ResponseDto<T>> {
@@ -143,6 +142,15 @@ public class ResponseDto<T> extends SelfValidating<ResponseDto<T>> {
                 .success(false)
                 .data(null)
                 .error(ExceptionDto.of(e.getErrorCode(), e.getMessage()))
+                .build();
+    }
+
+    public static ResponseDto<Object> fail(final IllegalArgumentException e) {
+        return ResponseDto.<Object>builder()
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .success(false)
+                .data(null)
+                .error(ExceptionDto.of(ErrorCode.INVALID_ARGUMENT))
                 .build();
     }
 }

@@ -113,4 +113,11 @@ public class HttpGlobalExceptionHandler {
         e.printStackTrace();
         return ResponseDto.fail(new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));
     }
+
+    // 타입이 잘못되었을 때 발생하는 예외
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    public ResponseDto<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("ExceptionHandler catch IllegalArgumentException : {}", e.getMessage());
+        return ResponseDto.fail(e);
+    }
 }
