@@ -16,7 +16,7 @@ password={{auth.API_1_1_1_USER.password}}
 POST {{host_url}}/v1/auth/login
 Content-Type: application/x-www-form-urlencoded
 
-serial_id=admin1&
+serial_id={{auth.API_1_1_1_ADMIN.serial_id}}&
 password={{auth.API_1_1_1_ADMIN.password}}
 
 > {%
