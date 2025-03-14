@@ -3,14 +3,13 @@ package com.tookscan.tookscan.security.domain.service;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCodeHistory;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationCodeHistoryService {
 
-    private static final Integer MAX_ISSUING_AUTHENTICATION_CODE = 100; // TODO: 5로 변경
+    private static final Integer MAX_ISSUING_AUTHENTICATION_CODE = 5;
 
     public AuthenticationCodeHistory createAuthenticationCodeHistory(String phoneNumber) {
         return AuthenticationCodeHistory.builder()
@@ -45,7 +44,6 @@ public class AuthenticationCodeHistoryService {
         if (history == null) {
             return false;
         }
-//        return history.getLastSentAt().isAfter(LocalDateTime.now().minusMinutes(1));
-        return false; // TODO: 1분으로 변경
+        return history.getLastSentAt().isAfter(LocalDateTime.now().minusSeconds(10));
     }
 }
