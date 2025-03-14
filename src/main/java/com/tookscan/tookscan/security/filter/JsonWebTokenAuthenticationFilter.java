@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
@@ -11,7 +12,7 @@ import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTok
 import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +66,8 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
                 ReadAccountBriefResponseDto responseDto = readAccountBriefUseCase.execute(accountId);
                 writeAccountBriefResponse(response, responseDto);
                 return;
+            } catch (HttpSecurityException e) {
+                throw e;
             } catch (Exception e) {
                 writeGuestResponse(response);
                 return;
