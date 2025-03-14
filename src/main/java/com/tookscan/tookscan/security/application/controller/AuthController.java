@@ -1,6 +1,5 @@
 package com.tookscan.tookscan.security.application.controller;
 
-import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.dto.ResponseDto;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +40,7 @@ public class AuthController {
     private final ReadAccountBriefUseCase readAccountBriefUseCase;
 
     /**
-     * 1.3 JWT 재발급
+     * 1.2.2 JWT 재발급
      */
     @PostMapping("/reissue/token")
     public ResponseDto<DefaultJsonWebTokenDto> reissueDefaultJsonWebToken(
@@ -55,7 +53,7 @@ public class AuthController {
     }
 
     /**
-     * 2.1 휴대폰 인증번호 발송
+     * 2.1.1 휴대폰 인증번호 발송
      */
     @PostMapping("/authentication-code")
     public ResponseDto<IssueAuthenticationCodeResponseDto> issueAuthenticationCode(
@@ -65,7 +63,7 @@ public class AuthController {
     }
 
     /**
-     * 2.2 유저 회원가입
+     * 2.1.2 유저 회원가입
      */
     @PostMapping("/users/sign-up-default")
     public ResponseDto<Void> signUpDefault(
@@ -76,18 +74,21 @@ public class AuthController {
     }
 
     /**
-     * 2.3 관리자 회원가입
+     * 관리자 회원가입 (더 이상 사용되지 않음)
      */
+    @Deprecated
     @PostMapping("/admins/sign-up-default")
-    public ResponseDto<Void> adminSignUpDefault(
+//    public ResponseDto<Void> adminSignUpDefault(
+    public ResponseDto<String> adminSignUpDefault(
             @Valid @RequestBody AdminSignUpDefaultRequestDto requestDto
     ) {
-        adminSignUpDefaultUseCase.execute(requestDto);
-        return ResponseDto.created(null);
+//        adminSignUpDefaultUseCase.execute(requestDto);
+//        return ResponseDto.created(null);
+        return ResponseDto.ok("관리자 회원가입은 더 이상 사용되지 않습니다.");
     }
 
     /**
-     * 2.4 소셜 회원가입
+     * 2.1.3 소셜로그인 유저 회원가입
      */
     @PostMapping("/users/sign-up-oauth")
     public ResponseDto<Void> signUpOauth(
@@ -101,7 +102,7 @@ public class AuthController {
     }
 
     /**
-     * 2.5 아이디 찾기
+     * 2.1.4 아이디 찾기
      */
     @PostMapping("/verification/serial-id")
     public ResponseDto<ReadSerialIdAndProviderResponseDto> readSerialId(
@@ -111,7 +112,7 @@ public class AuthController {
     }
 
     /**
-     * 2.6 아이디 중복 검사
+     * 2.2.1 아이디 중복 검사
      */
     @GetMapping("/existence/serial-id")
     public ResponseDto<ValidationResponseDto> validateId(
@@ -121,7 +122,24 @@ public class AuthController {
     }
 
     /**
-     * 2.7 인증번호 검사
+     * 2.2.2 계정 간단 정보 조회 (더 이상 사용되지 않음)
+     */
+    @Deprecated
+    @GetMapping("/briefs")
+    @Operation(summary = "계정 간단 정보 조회", description = "계정 유형(ADMIN, USER)과 이름을 포함한 유저의 기본 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
+    })
+//    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
+    public ResponseDto<String> readAccountBrief(
+            @AccountID UUID accountId
+    ) {
+        return ResponseDto.ok("계정 간단 정보 조회는 더 이상 사용되지 않습니다.");
+    }
+
+    /**
+     * 2.3.1 휴대폰 인증번호 검증
      */
     @PatchMapping("/authentication-code")
     public ResponseDto<Void> validateAuthenticationCode(
@@ -132,7 +150,7 @@ public class AuthController {
     }
 
     /**
-     * 2.8 임시 비밀번호 발급
+     * 2.3.2 임시 비밀번호 발급
      */
     @PatchMapping("/reissue/password")
     public ResponseDto<ReissuePasswordResponseDto> reissuePassword(
@@ -142,7 +160,7 @@ public class AuthController {
     }
 
     /**
-     * 2.9 비밀번호 변경
+     * 2.3.3 비밀번호 변경
      */
     @PatchMapping("/password")
     public ResponseDto<Void> changePassword(
@@ -154,7 +172,7 @@ public class AuthController {
     }
 
     /**
-     * 2.10 회원 탈퇴
+     * 2.5.1 회원 탈퇴
      */
     @DeleteMapping("")
     public ResponseDto<Void> deleteAccount(
@@ -162,20 +180,5 @@ public class AuthController {
     ) {
         deleteAccountUseCase.execute(accountId);
         return ResponseDto.ok(null);
-    }
-
-    /**
-     * 2.11 계정 간단 정보 조회
-     */
-    @GetMapping("/briefs")
-    @Operation(summary = "계정 간단 정보 조회", description = "계정 유형(ADMIN, USER)과 이름을 포함한 유저의 기본 정보를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
-    })
-    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
-            @AccountID UUID accountId
-    ) {
-        return ResponseDto.ok(readAccountBriefUseCase.execute(accountId));
     }
 }

@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
+import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
+import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +35,7 @@ import java.util.UUID;
 public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticateJsonWebTokenUseCase authenticateJsonWebTokenUseCase;
+    private final ReadAccountBriefUseCase readAccountBriefUseCase;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
 
@@ -50,9 +54,24 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
         Optional<String> tokenOptional = HeaderUtil.refineHeader(request, Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX);
 
-        if (AUTH_BRIEFS_URL.equals(requestURI) && tokenOptional.isEmpty()) {
-            writeGuestResponse(response);
-            return;
+        if (AUTH_BRIEFS_URL.equals(requestURI)) {
+            if (tokenOptional.isEmpty()) {
+                writeGuestResponse(response);
+                return;
+            }
+
+            try {
+                Claims claims = jsonWebTokenUtil.validateToken(tokenOptional.get());
+                UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
+                ReadAccountBriefResponseDto responseDto = readAccountBriefUseCase.execute(accountId);
+                writeAccountBriefResponse(response, responseDto);
+                return;
+            } catch (HttpSecurityException e) {
+                throw e;
+            } catch (Exception e) {
+                writeGuestResponse(response);
+                return;
+            }
         }
 
         String token = tokenOptional.orElseThrow(() -> new CommonException(ErrorCode.INVALID_HEADER_ERROR));
@@ -105,6 +124,27 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
         guestResponse.put("error", null);
 
         objectMapper.writeValue(response.getWriter(), guestResponse);
+    }
+
+    /**
+     * 헤더가 있는 경우, 계정 정보 간단 조회 응답을 반환
+     */
+    private void writeAccountBriefResponse(HttpServletResponse response, ReadAccountBriefResponseDto responseDto) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpStatus.OK.value());
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("account_type", responseDto.getAccountType());
+        responseData.put("name", responseDto.getName());
+        responseData.put("provider", responseDto.getProvider());
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("success", true);
+        responseMap.put("data", responseData);
+        responseMap.put("error", null);
+
+        objectMapper.writeValue(response.getWriter(), responseMap);
     }
 
     @Override
