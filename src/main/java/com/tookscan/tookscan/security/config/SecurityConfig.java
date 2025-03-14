@@ -4,6 +4,7 @@ import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.service.CustomOauth2UserDetailService;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
+import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
 import com.tookscan.tookscan.security.filter.ExceptionFilter;
 import com.tookscan.tookscan.security.filter.GlobalLoggerFilter;
 import com.tookscan.tookscan.security.filter.JsonWebTokenAuthenticationFilter;
@@ -45,6 +46,7 @@ public class SecurityConfig {
     private final DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint;
 
     private final AuthenticateJsonWebTokenUseCase authenticateJsonWebTokenUseCase;
+    private final ReadAccountBriefUseCase readAccountBriefUseCase;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
 
@@ -96,6 +98,7 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new JsonWebTokenAuthenticationFilter(
                                 authenticateJsonWebTokenUseCase,
+                                readAccountBriefUseCase,
                                 jsonWebTokenUtil
                         ),
                         LogoutFilter.class

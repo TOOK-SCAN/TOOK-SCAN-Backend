@@ -122,18 +122,20 @@ public class AuthController {
     }
 
     /**
-     * 2.2.2 계정 간단 정보 조회
+     * 2.2.2 계정 간단 정보 조회 (더 이상 사용되지 않음)
      */
+    @Deprecated
     @GetMapping("/briefs")
-    @Operation(summary = "계정 간단 정보 조회", description = "계정 유형(ADMIN, USER)과 이름을 포함한 유저의 기본 정보를 조회합니다.")
+    @Operation(summary = "계정 간단 정보 조회 (더 이상 사용되지 않음)", description = "계정 유형(ADMIN, USER)과 이름을 포함한 유저의 기본 정보를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
     })
-    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
+//    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
+    public ResponseDto<String> readAccountBrief(
             @AccountID UUID accountId
     ) {
-        return ResponseDto.ok(readAccountBriefUseCase.execute(accountId));
+        return ResponseDto.ok("계정 간단 정보 조회는 더 이상 사용되지 않습니다.");
     }
 
     /**
