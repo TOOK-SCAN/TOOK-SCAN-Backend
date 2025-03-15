@@ -3,6 +3,7 @@ package com.tookscan.tookscan.mail.application.controller.command;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.mail.application.dto.request.SendTestMailRequestDto;
 import com.tookscan.tookscan.mail.application.usecase.SendTestMailUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Mail", description = "Mail 관련 API 입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")

@@ -3,21 +3,29 @@ package com.tookscan.tookscan.account.application.controller.command;
 import com.tookscan.tookscan.account.application.dto.request.CreateAdminGroupRequestDto;
 import com.tookscan.tookscan.account.application.dto.request.CreateAdminUserGroupRequestDto;
 import com.tookscan.tookscan.account.application.dto.request.DeleteAdminUserRequestDto;
-import com.tookscan.tookscan.account.application.dto.request.UpdateAdminUserRequestDto;
 import com.tookscan.tookscan.account.application.dto.request.UpdateAdminGroupRequestDto;
+import com.tookscan.tookscan.account.application.dto.request.UpdateAdminUserRequestDto;
 import com.tookscan.tookscan.account.application.usecase.CreateAdminGroupUseCase;
 import com.tookscan.tookscan.account.application.usecase.CreateAdminUserGroupUseCase;
-import com.tookscan.tookscan.account.application.usecase.DeleteAdminUserUseCase;
 import com.tookscan.tookscan.account.application.usecase.DeleteAdminGroupUseCase;
-import com.tookscan.tookscan.account.application.usecase.UpdateAdminUserUseCase;
+import com.tookscan.tookscan.account.application.usecase.DeleteAdminUserUseCase;
 import com.tookscan.tookscan.account.application.usecase.UpdateAdminGroupUseCase;
+import com.tookscan.tookscan.account.application.usecase.UpdateAdminUserUseCase;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Account", description = "Account 관련 API 입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admins")
