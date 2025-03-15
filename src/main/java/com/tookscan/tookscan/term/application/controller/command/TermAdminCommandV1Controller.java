@@ -6,10 +6,16 @@ import com.tookscan.tookscan.term.application.dto.request.UpdateAdminTermRequest
 import com.tookscan.tookscan.term.application.dto.response.CreateAdminTermResponseDto;
 import com.tookscan.tookscan.term.application.usecase.CreateAdminTermUseCase;
 import com.tookscan.tookscan.term.application.usecase.UpdateAdminTermUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Term", description = "Term 관련 API 입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admins")
