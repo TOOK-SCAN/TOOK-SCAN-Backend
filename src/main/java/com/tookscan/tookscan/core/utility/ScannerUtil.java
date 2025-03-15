@@ -20,6 +20,9 @@ public class ScannerUtil {
     @Value("${scanner.base-url}")
     private String SCANNER_BASE_URL;
 
+    @Value("${scanner.is-prod}")
+    private Boolean IS_PROD;
+
     private final RestClientUtil restClientUtil;
 
     /**
@@ -34,7 +37,8 @@ public class ScannerUtil {
         String url = SCANNER_BASE_URL
                 + "/api/v1/orders/" + orderId
                 + "/documents/" + documentId
-                + "/scan?filename=" + filename;
+                + "/scan?filename=" + filename
+                + "&is_prod=" + IS_PROD;
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -100,9 +104,7 @@ public class ScannerUtil {
         }
 
         switch (status) {
-            case "PENDING":
-                return EScanStatus.ENABLE;
-            case "STARTED":
+            case "PENDING", "STARTED":
                 return EScanStatus.IN_PROGRESS;
             case "SUCCESS":
                 return EScanStatus.COMPLETED;
