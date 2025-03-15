@@ -3,12 +3,17 @@ package com.tookscan.tookscan.core.utility;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.multipart.MultipartFile;
 
 @Configuration
 @RequiredArgsConstructor
@@ -58,6 +63,10 @@ public class S3Util {
      * @return PDF 객체에 접근 가능한 URL
      */
     public String getPdfUrl(Document document) {
+        // 존재하지 않는 PDF 파일인 경우
+        if (!doesObjectExist(document)) {
+            throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
+        }
         String finalKey =
                 PDF_CONTENT_PREFIX + document.getOrder().getId() + '/' + document.getName() + '_' + document.getId()
                         + ".pdf";
@@ -80,6 +89,11 @@ public class S3Util {
         long now = expiration.getTime();
         expiration.setTime(now + pdfExpirationSeconds * 1000);
 
+        // 존재하지 않는 PDF 파일인 경우
+        if (!doesObjectExist(document)) {
+            throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
+        }
+
         // Presigned URL 요청 생성
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, finalKey)
                 .withMethod(HttpMethod.GET)
@@ -88,5 +102,32 @@ public class S3Util {
         // Presigned URL 생성
         URL presignedUrl = amazonS3Client.generatePresignedUrl(request);
         return presignedUrl.toString();
+    }
+
+    private boolean doesObjectExist(Document doc) {
+        String key = PDF_CONTENT_PREFIX + doc.getOrder().getId() + '/' + doc.getName() + '_' + doc.getId() + ".pdf";
+        return amazonS3Client.doesObjectExist(bucketName, key);
+    }
+
+
+    /**
+     * Document에 해당하는 PDF 파일을 S3에 업로드하는 메서드
+     *
+     * @param document 업로드할 PDF 파일에 대한 정보를 가진 Document 객체
+     * @param file     업로드할 MultipartFile
+     */
+    public void uploadPdf(Document document, MultipartFile file) {
+        String finalKey = PDF_CONTENT_PREFIX
+                + document.getOrder().getId() + '/'
+                + document.getName() + '_' + document.getId() + ".pdf";
+        try {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(file.getSize());
+            metadata.setContentType(file.getContentType());
+
+            amazonS3Client.putObject(bucketName, finalKey, file.getInputStream(), metadata);
+        } catch (IOException e) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 }
