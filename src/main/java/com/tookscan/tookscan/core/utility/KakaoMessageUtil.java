@@ -78,7 +78,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(ESecurityRole role, String userName, String orderNumber, Long orderId, String to) {
+    public void sendRequestPaymentMessage(ESecurityRole role, String userName, String orderName, String orderNumber, Long orderId, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -95,6 +95,8 @@ public class KakaoMessageUtil {
             }
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         }
+        variables.put("#{userName}", userName);
+        variables.put("#{orderName}", "[" + orderName + "]");
 
         kakaoOption.setVariables(variables);
 
