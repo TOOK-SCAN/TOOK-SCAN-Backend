@@ -17,13 +17,14 @@ import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCa
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminOrdersUseCase;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
+import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDocumentsUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
-import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
+import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,6 +65,7 @@ public class OrderAdminCommandV1Controller {
     private final ExportAdminDeliveriesUseCase exportAdminDeliveriesUseCase;
     private final CreateAdminDocumentsPdfUseCase createAdminDocumentsPdfUseCase;
     private final CreateAdminOrderCouponUseCase createAdminOrderCouponUseCase;
+    private final UploadAdminDocumentsPdfUseCase uploadAdminDocumentsPdfUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -111,6 +114,18 @@ public class OrderAdminCommandV1Controller {
         return ResponseDto.created(null);
     }
 
+    /**
+     * 4.1.8 관리자 pdf 파일 업로드
+     */
+    @Operation(summary = "관리자 pdf 파일 업로드", description = "관리자가 pdf 파일을 업로드합니다.")
+    @PostMapping(value = "/documents/{documentId}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseDto<Void> uploadPdf(
+            @PathVariable Long documentId,
+            @RequestPart("file") MultipartFile file
+    ) {
+        uploadAdminDocumentsPdfUseCase.execute(documentId, file);
+        return ResponseDto.ok(null);
+    }
     /**
      * 4.3.2 관리자 주문 상태 일괄 변경
      */
