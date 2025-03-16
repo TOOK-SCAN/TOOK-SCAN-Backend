@@ -4,10 +4,13 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +65,7 @@ public class S3Util {
      * @param document PDF 파일을 가지고 있는 Document 객체
      * @return PDF 객체에 접근 가능한 URL
      */
-    public String getPdfUrl(Document document) {
+    public PdfFileDto downloadPdfFile(Document document) {
         // 존재하지 않는 PDF 파일인 경우
         if (!doesObjectExist(document)) {
             throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
@@ -70,7 +73,16 @@ public class S3Util {
         String finalKey =
                 PDF_CONTENT_PREFIX + document.getOrder().getId() + '/' + document.getName() + '_' + document.getId()
                         + ".pdf";
-        return amazonS3Client.getUrl(bucketName, finalKey).toString();
+
+        S3Object s3Object = amazonS3Client.getObject(bucketName, finalKey);
+
+        try (InputStream inputStream = s3Object.getObjectContent()) {
+            byte[] fileBytes = inputStream.readAllBytes();
+            String fileName = document.getName() + "_" + document.getId() + ".pdf";
+            return new PdfFileDto(fileName, fileBytes, "application/pdf");
+        } catch (IOException e) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

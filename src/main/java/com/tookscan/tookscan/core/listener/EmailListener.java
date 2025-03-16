@@ -37,7 +37,7 @@ public class EmailListener {
             mailUtil.sendPdfEmail(
                     event.getEmail(),
                     event.getOrderName(),
-                    event.getPdfUrl()
+                    event.getPdfFiles()
             );
         } catch (Exception e) {
             e.printStackTrace();

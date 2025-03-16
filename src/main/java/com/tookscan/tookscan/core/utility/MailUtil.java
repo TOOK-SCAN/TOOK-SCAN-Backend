@@ -1,15 +1,25 @@
 package com.tookscan.tookscan.core.utility;
 
+import com.tookscan.tookscan.core.dto.PdfFileDto;
+import jakarta.activation.DataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.util.ByteArrayDataSource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class MailUtil {
+
+    @Value("${cloud.aws.s3.mail-template-images.url}")
+    private String mailTemplateImagesUrl;
+
     private static final String TEST_EMAIL_TEMPLATE = """
         <!doctype html>
         <html lang="ko">
@@ -28,7 +38,7 @@ public class MailUtil {
               </div>
               
               <div class="img" style="text-align: center;">
-                <img src="https://i.ibb.co/HTS5jm9m/testmail.png" alt="testmail" style="max-width: 250px; height: auto;" />
+                <img src=${MailImgUrl} alt="mailimg" style="max-width: 250px; height: auto;" />
               </div>
               
               <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
@@ -65,14 +75,13 @@ public class MailUtil {
                   </div>
                  \s
                   <div class="img" style="text-align: center;">
-                    <img src="https://i.ibb.co/HTS5jm9m/testmail.png" alt="testmail" style="max-width: 250px; height: auto;" />
+                    <img src=${MailImgUrl} alt="mailimg" style="max-width: 250px; height: auto;" />
                   </div>
                  \s
                   <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
                     <p>
                       안녕하세요, 요청하신 ${orderName} 스캔본을 발송드렸습니다.<br /><br />
-                      아래 url을 통해 다운로드 받아주세요!<br />
-                      ${PdfUrl}<br /><br />
+                      첨부파일을 확인해주세요!<br /><br />
                       툭스캔과 함께 더 편리한 서비스를 경험하실 수 있도록<br />
                       항상 노력하겠습니다 :)
                     </p>
@@ -114,8 +123,10 @@ public class MailUtil {
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
         mimeMessageHelper.setFrom("TOOK-SCAN");
         mimeMessageHelper.setTo(receiverAddress);
+
+        String content = TEST_EMAIL_TEMPLATE.replace("${MailImgUrl}", mailTemplateImagesUrl);
         // UTF-8로 인코딩
-        mimeMessageHelper.setText(TEST_EMAIL_TEMPLATE, true);
+        mimeMessageHelper.setText(content, true);
 
         javaMailSender.send(mimeMessage);
     }
@@ -123,7 +134,7 @@ public class MailUtil {
     public void sendPdfEmail(
             String receiverAddress,
             String orderName,
-            String pdfUrl
+            List<PdfFileDto> pdfFiles
     ) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setSubject(orderName + " 스캔본 전송 - TOOKSCAN");
@@ -134,10 +145,16 @@ public class MailUtil {
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
         String content = PDF_EMAIL_TEMPLATE
+                .replace("${MailImgUrl}", mailTemplateImagesUrl)
                 .replace("${OrderName}", orderName)
-                .replace("${orderName}", orderName)
-                .replace("${PdfUrl}", pdfUrl);
+                .replace("${orderName}", orderName);
         mimeMessageHelper.setText(content, true);
+
+        // PdfFile 객체를 순회하면서 첨부파일 추가
+        for (PdfFileDto pdfFile : pdfFiles) {
+            DataSource dataSource = new ByteArrayDataSource(pdfFile.content(), pdfFile.contentType());
+            mimeMessageHelper.addAttachment(pdfFile.fileName(), dataSource);
+        }
 
         javaMailSender.send(mimeMessage);
     }
