@@ -4,16 +4,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -21,30 +21,42 @@ import net.minidev.json.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class RestClientUtil {
 
-    private final RestClient restClient = RestClient.create();
+    private final RestClient restClient;
 
     public Map<String, Object> sendGetMethod(String url, HttpHeaders headers) {
-        return Objects.requireNonNull(
-                restClient.get()
-                        .uri(url)
-                        .headers(httpHeaders -> httpHeaders.addAll(headers))
-                        .retrieve()
-                        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-                        })
-                        .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-                        })
-                        // toEntity(...) 말고 toEntity(Map.class)도 가능
-                        .toEntity(Map.class)
-                        .getBody()
-        );
+        try {
+            return Objects.requireNonNull(
+                    restClient.get()
+                            .uri(url)
+                            .headers(httpHeaders -> httpHeaders.addAll(headers))
+                            .retrieve()
+                            .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                                throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+                            })
+                            .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                                throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+                            })
+                            // toEntity(...) 말고 toEntity(Map.class)도 가능
+                            .toEntity(Map.class)
+                            .getBody()
+            );
+        } catch (ResourceAccessException e) {
+            // 타임아웃의 경우 ResourceAccessException의 원인이 SocketTimeoutException임
+            if (e.getCause() instanceof SocketTimeoutException) {
+                throw new CommonException(ErrorCode.EXTERNAL_SERVER_TIMEOUT);
+            }
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+        } catch (Exception e) {
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+        }
     }
 
     public Map<String, Object> sendPostMethod(String url, HttpHeaders headers, String body) {
@@ -65,8 +77,14 @@ public class RestClientUtil {
                             .toEntity(Map.class)
                             .getBody()
             );
+        } catch (ResourceAccessException e) {
+            // 타임아웃의 경우 ResourceAccessException의 원인이 SocketTimeoutException임
+            if (e.getCause() instanceof SocketTimeoutException) {
+                throw new CommonException(ErrorCode.EXTERNAL_SERVER_TIMEOUT);
+            }
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
         } catch (Exception e) {
-            throw new RuntimeException("Error sending POST request", e);
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
         }
     }
 
@@ -123,13 +141,16 @@ public class RestClientUtil {
                         } catch (IOException | ParseException e) {
                             log.error("Response body를 읽거나 파싱하는 중 오류 발생", e);
                         }
-                        throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+                        throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
                     })
                     .toEntity(JSONObject.class).getBody()));
-        } catch (Exception e) {
-            if (e instanceof CommonException) {
-                throw (CommonException) e;
+        } catch (ResourceAccessException e) {
+            // 타임아웃의 경우 ResourceAccessException의 원인이 SocketTimeoutException임
+            if (e.getCause() instanceof SocketTimeoutException) {
+                throw new CommonException(ErrorCode.EXTERNAL_SERVER_TIMEOUT);
             }
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+        } catch (Exception e) {
             throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
         }
     }
