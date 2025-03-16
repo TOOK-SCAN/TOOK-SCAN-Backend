@@ -43,6 +43,11 @@ public class ReadAdminPaymentOverviewResponseDto extends SelfValidating<ReadAdmi
     }
 
     public static ReadAdminPaymentOverviewResponseDto of(Order order) {
+
+        if (order.getPayment() == null) {
+            return null;
+        }
+
         return ReadAdminPaymentOverviewResponseDto.builder()
                 .documentsPrice(order.getDocumentsTotalAmount())
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
