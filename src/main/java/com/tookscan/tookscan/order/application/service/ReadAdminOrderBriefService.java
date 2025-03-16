@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.utility.S3Util;
 import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderBriefResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefUseCase;
+import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,18 @@ public class ReadAdminOrderBriefService implements ReadAdminOrderBriefUseCase {
 
     private final OrderRepository orderRepository;
 
+    private final S3Util s3Util;
+
     @Override
     @Transactional(readOnly = true)
     public ReadAdminOrderBriefResponseDto execute(Long orderId) {
-        return ReadAdminOrderBriefResponseDto.fromEntity(orderRepository.findByIdOrElseThrow(orderId));
+        Order order = orderRepository.findByIdOrElseThrow(orderId);
+
+        int pdfCount = order.getDocuments().stream()
+                .mapToInt(document -> s3Util.doesObjectExist(document) ? 1 : 0)
+                .sum();
+
+        return ReadAdminOrderBriefResponseDto.fromEntity(order, pdfCount);
     }
 
 }
