@@ -159,103 +159,76 @@ public class RestClientUtil {
      * 모든 외부 API 에러 코드를 여기에 정의합니다.
      */
     private static ErrorCode mapExternalErrorCode(String externalCode) {
-        switch (externalCode) {
-            case "ALREADY_PROCESSED_PAYMENT":
-                return ErrorCode.ALREADY_PROCESSED_PAYMENT;
-            case "PROVIDER_ERROR":
-                return ErrorCode.PROVIDER_ERROR;
-            case "EXCEED_MAX_CARD_INSTALLMENT_PLAN":
-                return ErrorCode.EXCEED_MAX_CARD_INSTALLMENT_PLAN;
-            case "INVALID_REQUEST":
-                return ErrorCode.INVALID_ARGUMENT;
-            case "NOT_ALLOWED_POINT_USE":
-                return ErrorCode.NOT_ALLOWED_POINT_USE;
-            case "INVALID_API_KEY":
-                return ErrorCode.INVALID_API_KEY;
-            case "INVALID_REJECT_CARD":
-                return ErrorCode.INVALID_REJECT_CARD;
-            case "BELOW_MINIMUM_AMOUNT":
-                return ErrorCode.BELOW_MINIMUM_AMOUNT;
-            case "INVALID_CARD_EXPIRATION":
-                return ErrorCode.INVALID_CARD_EXPIRATION;
-            case "INVALID_STOPPED_CARD":
-                return ErrorCode.INVALID_STOPPED_CARD;
-            case "EXCEED_MAX_DAILY_PAYMENT_COUNT":
-                return ErrorCode.EXCEED_MAX_DAILY_PAYMENT_COUNT;
-            case "NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT":
-                return ErrorCode.NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT;
-            case "INVALID_CARD_INSTALLMENT_PLAN":
-                return ErrorCode.INVALID_CARD_INSTALLMENT_PLAN;
-            case "NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN":
-                return ErrorCode.NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN;
-            case "EXCEED_MAX_PAYMENT_AMOUNT":
-                return ErrorCode.EXCEED_MAX_PAYMENT_AMOUNT;
-            case "NOT_FOUND_TERMINAL_ID":
-                return ErrorCode.NOT_FOUND_TERMINAL_ID;
-            case "INVALID_AUTHORIZE_AUTH":
-                return ErrorCode.INVALID_AUTHORIZE_AUTH;
-            case "INVALID_CARD_LOST_OR_STOLEN":
-                return ErrorCode.INVALID_CARD_LOST_OR_STOLEN;
-            case "RESTRICTED_TRANSFER_ACCOUNT":
-                return ErrorCode.RESTRICTED_TRANSFER_ACCOUNT;
-            case "INVALID_CARD_NUMBER":
-                return ErrorCode.INVALID_CARD_NUMBER;
-            case "INVALID_UNREGISTERED_SUBMALL":
-                return ErrorCode.INVALID_UNREGISTERED_SUBMALL;
-            case "NOT_REGISTERED_BUSINESS":
-                return ErrorCode.NOT_REGISTERED_BUSINESS;
-            case "EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT":
-                return ErrorCode.EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT;
-            case "EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT":
-                return ErrorCode.EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT;
-            case "CARD_PROCESSING_ERROR":
-                return ErrorCode.CARD_PROCESSING_ERROR;
-            case "EXCEED_MAX_AMOUNT":
-                return ErrorCode.EXCEED_MAX_AMOUNT;
-            case "INVALID_ACCOUNT_INFO_RE_REGISTER":
-                return ErrorCode.INVALID_ACCOUNT_INFO_RE_REGISTER;
-            case "NOT_AVAILABLE_PAYMENT":
-                return ErrorCode.NOT_AVAILABLE_PAYMENT;
-            case "UNAPPROVED_ORDER_ID":
-                return ErrorCode.UNAPPROVED_ORDER_ID;
-            case "EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT":
-                return ErrorCode.EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT;
-            case "UNAUTHORIZED_KEY":
-                return ErrorCode.UNAUTHORIZED_KEY;
-            case "REJECT_ACCOUNT_PAYMENT":
-                return ErrorCode.REJECT_ACCOUNT_PAYMENT;
-            case "REJECT_CARD_PAYMENT":
-                return ErrorCode.REJECT_CARD_PAYMENT;
-            case "REJECT_CARD_COMPANY":
-                return ErrorCode.REJECT_CARD_COMPANY;
-            case "FORBIDDEN_REQUEST":
-                return ErrorCode.FORBIDDEN_REQUEST;
-            case "REJECT_TOSSPAY_INVALID_ACCOUNT":
-                return ErrorCode.REJECT_TOSSPAY_INVALID_ACCOUNT;
-            case "EXCEED_MAX_AUTH_COUNT":
-                return ErrorCode.EXCEED_MAX_AUTH_COUNT;
-            case "EXCEED_MAX_ONE_DAY_AMOUNT":
-                return ErrorCode.EXCEED_MAX_ONE_DAY_AMOUNT;
-            case "NOT_AVAILABLE_BANK":
-                return ErrorCode.NOT_AVAILABLE_BANK;
-            case "INVALID_PASSWORD":
-                return ErrorCode.INVALID_PASSWORD;
-            case "INCORRECT_BASIC_AUTH_FORMAT":
-                return ErrorCode.INCORRECT_BASIC_AUTH_FORMAT;
-            case "FDS_ERROR":
-                return ErrorCode.FDS_ERROR;
-            case "NOT_FOUND_PAYMENT":
-                return ErrorCode.NOT_FOUND_PAYMENT;
-            case "NOT_FOUND_PAYMENT_SESSION":
-                return ErrorCode.NOT_FOUND_PAYMENT_SESSION;
-            case "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING":
-                return ErrorCode.FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING;
-            case "FAILED_INTERNAL_SYSTEM_PROCESSING":
-                return ErrorCode.FAILED_INTERNAL_SYSTEM_PROCESSING;
-            case "UNKNOWN_PAYMENT_ERROR":
-                return ErrorCode.UNKNOWN_PAYMENT_ERROR;
-            default:
-                return ErrorCode.INVALID_ARGUMENT;
-        }
+        return switch (externalCode) {
+            case "ALREADY_PROCESSED_PAYMENT" -> ErrorCode.ALREADY_PROCESSED_PAYMENT;
+            case "PROVIDER_ERROR" -> ErrorCode.PROVIDER_ERROR;
+            case "EXCEED_MAX_CARD_INSTALLMENT_PLAN" -> ErrorCode.EXCEED_MAX_CARD_INSTALLMENT_PLAN;
+            case "INVALID_REQUEST" -> ErrorCode.INVALID_ARGUMENT;
+            case "NOT_ALLOWED_POINT_USE" -> ErrorCode.NOT_ALLOWED_POINT_USE;
+            case "INVALID_API_KEY" -> ErrorCode.INVALID_API_KEY;
+            case "INVALID_REJECT_CARD" -> ErrorCode.INVALID_REJECT_CARD;
+            case "BELOW_MINIMUM_AMOUNT" -> ErrorCode.BELOW_MINIMUM_AMOUNT;
+            case "INVALID_CARD_EXPIRATION" -> ErrorCode.INVALID_CARD_EXPIRATION;
+            case "INVALID_STOPPED_CARD" -> ErrorCode.INVALID_STOPPED_CARD;
+            case "EXCEED_MAX_DAILY_PAYMENT_COUNT" -> ErrorCode.EXCEED_MAX_DAILY_PAYMENT_COUNT;
+            case "NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT" ->
+                    ErrorCode.NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT;
+            case "INVALID_CARD_INSTALLMENT_PLAN" -> ErrorCode.INVALID_CARD_INSTALLMENT_PLAN;
+            case "NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN" -> ErrorCode.NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN;
+            case "EXCEED_MAX_PAYMENT_AMOUNT" -> ErrorCode.EXCEED_MAX_PAYMENT_AMOUNT;
+            case "NOT_FOUND_TERMINAL_ID" -> ErrorCode.NOT_FOUND_TERMINAL_ID;
+            case "INVALID_AUTHORIZE_AUTH" -> ErrorCode.INVALID_AUTHORIZE_AUTH;
+            case "INVALID_CARD_LOST_OR_STOLEN" -> ErrorCode.INVALID_CARD_LOST_OR_STOLEN;
+            case "RESTRICTED_TRANSFER_ACCOUNT" -> ErrorCode.RESTRICTED_TRANSFER_ACCOUNT;
+            case "INVALID_CARD_NUMBER" -> ErrorCode.INVALID_CARD_NUMBER;
+            case "INVALID_UNREGISTERED_SUBMALL" -> ErrorCode.INVALID_UNREGISTERED_SUBMALL;
+            case "NOT_REGISTERED_BUSINESS" -> ErrorCode.NOT_REGISTERED_BUSINESS;
+            case "EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT" -> ErrorCode.EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT;
+            case "EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT" -> ErrorCode.EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT;
+            case "CARD_PROCESSING_ERROR" -> ErrorCode.CARD_PROCESSING_ERROR;
+            case "EXCEED_MAX_AMOUNT" -> ErrorCode.EXCEED_MAX_AMOUNT;
+            case "INVALID_ACCOUNT_INFO_RE_REGISTER" -> ErrorCode.INVALID_ACCOUNT_INFO_RE_REGISTER;
+            case "NOT_AVAILABLE_PAYMENT" -> ErrorCode.NOT_AVAILABLE_PAYMENT;
+            case "UNAPPROVED_ORDER_ID" -> ErrorCode.UNAPPROVED_ORDER_ID;
+            case "EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT" -> ErrorCode.EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT;
+            case "UNAUTHORIZED_KEY" -> ErrorCode.UNAUTHORIZED_KEY;
+            case "REJECT_ACCOUNT_PAYMENT" -> ErrorCode.REJECT_ACCOUNT_PAYMENT;
+            case "REJECT_CARD_PAYMENT" -> ErrorCode.REJECT_CARD_PAYMENT;
+            case "REJECT_CARD_COMPANY" -> ErrorCode.REJECT_CARD_COMPANY;
+            case "FORBIDDEN_REQUEST" -> ErrorCode.FORBIDDEN_REQUEST;
+            case "REJECT_TOSSPAY_INVALID_ACCOUNT" -> ErrorCode.REJECT_TOSSPAY_INVALID_ACCOUNT;
+            case "EXCEED_MAX_AUTH_COUNT" -> ErrorCode.EXCEED_MAX_AUTH_COUNT;
+            case "EXCEED_MAX_ONE_DAY_AMOUNT" -> ErrorCode.EXCEED_MAX_ONE_DAY_AMOUNT;
+            case "NOT_AVAILABLE_BANK" -> ErrorCode.NOT_AVAILABLE_BANK;
+            case "INVALID_PASSWORD" -> ErrorCode.INVALID_PASSWORD;
+            case "INCORRECT_BASIC_AUTH_FORMAT" -> ErrorCode.INCORRECT_BASIC_AUTH_FORMAT;
+            case "FDS_ERROR" -> ErrorCode.FDS_ERROR;
+            case "NOT_FOUND_PAYMENT" -> ErrorCode.NOT_FOUND_PAYMENT;
+            case "NOT_FOUND_PAYMENT_SESSION" -> ErrorCode.NOT_FOUND_PAYMENT_SESSION;
+            case "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING" -> ErrorCode.FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING;
+            case "FAILED_INTERNAL_SYSTEM_PROCESSING" -> ErrorCode.FAILED_INTERNAL_SYSTEM_PROCESSING;
+            case "UNKNOWN_PAYMENT_ERROR" -> ErrorCode.UNKNOWN_PAYMENT_ERROR;
+            case "ALREADY_CANCELED_PAYMENT" -> ErrorCode.ALREADY_CANCELED_PAYMENT;
+            case "INVALID_REFUND_ACCOUNT_INFO" -> ErrorCode.INVALID_REFUND_ACCOUNT_INFO;
+            case "EXCEED_CANCEL_AMOUNT_DISCOUNT_AMOUNT" -> ErrorCode.EXCEED_CANCEL_AMOUNT_DISCOUNT_AMOUNT;
+            case "INVALID_REFUND_ACCOUNT_NUMBER" -> ErrorCode.INVALID_REFUND_ACCOUNT_NUMBER;
+            case "INVALID_BANK" -> ErrorCode.INVALID_BANK;
+            case "NOT_MATCHES_REFUNDABLE_AMOUNT" -> ErrorCode.NOT_MATCHES_REFUNDABLE_AMOUNT;
+            case "REFUND_REJECTED" -> ErrorCode.REFUND_REJECTED;
+            case "ALREADY_REFUND_PAYMENT" -> ErrorCode.ALREADY_REFUND_PAYMENT;
+            case "FORBIDDEN_BANK_REFUND_REQUEST" -> ErrorCode.FORBIDDEN_BANK_REFUND_REQUEST;
+            case "NOT_CANCELABLE_AMOUNT" -> ErrorCode.NOT_CANCELABLE_AMOUNT;
+            case "FORBIDDEN_CONSECUTIVE_REQUEST" -> ErrorCode.FORBIDDEN_CONSECUTIVE_REQUEST;
+            case "NOT_CANCELABLE_PAYMENT" -> ErrorCode.NOT_CANCELABLE_PAYMENT;
+            case "EXCEED_MAX_REFUND_DUE" -> ErrorCode.EXCEED_MAX_REFUND_DUE;
+            case "NOT_ALLOWED_PARTIAL_REFUND_WAITING_DEPOSIT" -> ErrorCode.NOT_ALLOWED_PARTIAL_REFUND_WAITING_DEPOSIT;
+            case "NOT_ALLOWED_PARTIAL_REFUND" -> ErrorCode.NOT_ALLOWED_PARTIAL_REFUND;
+            case "NOT_CANCELABLE_PAYMENT_FOR_DORMANT_USER" -> ErrorCode.NOT_CANCELABLE_PAYMENT_FOR_DORMANT_USER;
+            case "FAILED_REFUND_PROCESS" -> ErrorCode.FAILED_REFUND_PROCESS;
+            case "FAILED_METHOD_HANDLING_CANCEL" -> ErrorCode.FAILED_METHOD_HANDLING_CANCEL;
+            case "FAILED_PARTIAL_REFUND" -> ErrorCode.FAILED_PARTIAL_REFUND;
+            case "COMMON_ERROR" -> ErrorCode.COMMON_ERROR;
+            default -> ErrorCode.INVALID_ARGUMENT;
+        };
     }
 }
