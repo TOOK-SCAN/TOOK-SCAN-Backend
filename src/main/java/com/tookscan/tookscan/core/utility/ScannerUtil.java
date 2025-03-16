@@ -121,16 +121,35 @@ public class ScannerUtil {
     }
 
     public Map<Long, EScanStatus> getScanStatuses(List<Document> documents) {
+        // 스캔 작업 ID가 있는 문서들 중 첫 번째 문서를 찾습니다.
+        Document firstDocumentWithTask = documents.stream()
+                .filter(doc -> doc.getScanTaskId() != null)
+                .findFirst()
+                .orElse(null);
+
+        // 첫 번째 문서가 있고, 외부 API 호출 결과가 UNABLE이면,
+        // 스캔 작업 ID가 있는 모든 문서는 UNABLE로 처리합니다.
+        if (firstDocumentWithTask != null) {
+            EScanStatus firstStatus = getScanStatus(firstDocumentWithTask.getScanTaskId());
+            if (firstStatus == EScanStatus.UNABLE) {
+                return documents.stream()
+                        .collect(Collectors.toMap(
+                                Document::getId,
+                                doc -> EScanStatus.UNABLE
+                        ));
+            }
+        }
+
+        // 첫 번째 호출이 성공적이었다면, 각 문서에 대해 개별적으로 외부 API 호출을 수행합니다.
         return documents.stream()
-                .collect(Collectors.toMap(Document::getId, document -> {
-                    EScanStatus status = getScanStatus(document.getScanTaskId());
-                    if (status == EScanStatus.UNABLE) {
-                        return EScanStatus.UNABLE;
-                    }
-                    if (document.getScanTaskId() == null) {
-                        return EScanStatus.ENABLE;
-                    }
-                    return getScanStatus(document.getScanTaskId());
-                }));
+                .collect(Collectors.toMap(
+                        Document::getId,
+                        doc -> {
+                            if (doc.getScanTaskId() == null) {
+                                return EScanStatus.ENABLE;
+                            }
+                            return getScanStatus(doc.getScanTaskId());
+                        }
+                ));
     }
 }
