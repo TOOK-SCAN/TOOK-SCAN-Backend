@@ -6,6 +6,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
+import java.net.SocketTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -104,6 +105,20 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleApiException(CommonException e) {
         log.error("ExceptionHandler catch HttpCommonException : {}", e.getMessage());
         return ResponseDto.fail(e);
+    }
+
+    // 타입이 잘못되었을 때 발생하는 예외
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    public ResponseDto<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("ExceptionHandler catch IllegalArgumentException : {}", e.getMessage());
+        return ResponseDto.fail(e);
+    }
+
+    // 외부 서버 연결 타임아웃 예외
+    @ExceptionHandler(value = {SocketTimeoutException.class})
+    public ResponseDto<?> handleSocketTimeoutException(SocketTimeoutException e) {
+        log.error("SocketTimeoutException occurred: {}", e.getMessage());
+        return ResponseDto.fail(new CommonException(ErrorCode.EXTERNAL_SERVER_ERROR, "타임아웃이 발생했습니다."));
     }
 
     // 서버, DB 예외

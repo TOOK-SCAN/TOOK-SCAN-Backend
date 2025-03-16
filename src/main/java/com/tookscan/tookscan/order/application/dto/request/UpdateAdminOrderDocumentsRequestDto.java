@@ -2,7 +2,6 @@ package com.tookscan.tookscan.order.application.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
-import com.tookscan.tookscan.order.domain.type.EScanStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -24,7 +23,6 @@ public record UpdateAdminOrderDocumentsRequestDto(
     public record DocumentDto(
 
             @JsonProperty("id")
-            @NotNull(message = "id를 입력해주세요.")
             Long id,
 
             @JsonProperty("name")
@@ -41,11 +39,7 @@ public record UpdateAdminOrderDocumentsRequestDto(
 
             @JsonProperty("additional_price")
             @NotNull(message = "추가 금액을 입력해주세요.")
-            Integer additionalPrice,
-
-            @JsonProperty("scan_status")
-            @NotNull(message = "스캔 상태를 입력해주세요.")
-            EScanStatus scanStatus
+            Integer additionalPrice
     ) {
     }
 }

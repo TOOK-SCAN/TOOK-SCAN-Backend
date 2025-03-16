@@ -71,6 +71,12 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("is_delivery")
     private final Boolean isDelivery;
 
+    @JsonProperty("coupon_name")
+    private final String couponName;
+
+    @JsonProperty("discount_price")
+    private final Integer discountPrice;
+
     @Getter
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
         @JsonProperty("name")
@@ -148,7 +154,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             Integer paymentTotal,
             Integer deliveryPrice,
             UserInfoDto userInfo,
-            Boolean isDelivery
+            Boolean isDelivery,
+            String couponName,
+            Integer discountPrice
     ) {
         this.orderId = orderId;
         this.orderNumber = orderNumber;
@@ -165,6 +173,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.deliveryPrice = deliveryPrice;
         this.userInfo = userInfo;
         this.isDelivery = isDelivery;
+        this.couponName = couponName;
+        this.discountPrice = discountPrice;
         this.validateSelf();
     }
 
@@ -198,6 +208,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                         .email(order.getDelivery().getEmail())
                         .build())
                 .isDelivery(order.isDelivery())
+                .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
+                .discountPrice(order.getCoupon() != null ? order.getDiscountAmount() : null)
                 .build();
     }
 }

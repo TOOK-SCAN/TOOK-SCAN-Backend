@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.application.dto.request.UpdateAdminOrderDocumentsRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDocumentsUseCase;
 import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -22,20 +23,32 @@ public class UpdateAdminOrderDocumentsService implements UpdateAdminOrderDocumen
 
     private final OrderRepository orderRepository;
     private final DocumentRepository documentRepository;
-
     private final DocumentService documentService;
 
     @Override
     @Transactional
     public void execute(Long orderId, UpdateAdminOrderDocumentsRequestDto requestDto) {
-        Set<Long> orderDocumentIds = orderRepository.findByIdOrElseThrow(orderId).getDocuments()
-                .stream().map(Document::getId).collect(Collectors.toSet());
+        // 주문(Order) 엔티티 조회
+        Order order = orderRepository.findByIdOrElseThrow(orderId);
+        Set<Long> orderDocumentIds = order.getDocuments().stream()
+                .map(Document::getId)
+                .collect(Collectors.toSet());
 
-        List<Long> documentIds = requestDto.documents().stream()
+        // 요청으로 들어온 문서들을 신규 문서(id == null)와 기존 문서(id != null)로 분리
+        List<UpdateAdminOrderDocumentsRequestDto.DocumentDto> newDocuments = requestDto.documents().stream()
+                .filter(doc -> doc.id() == null)
+                .toList();
+
+        List<UpdateAdminOrderDocumentsRequestDto.DocumentDto> existingDocuments = requestDto.documents().stream()
+                .filter(doc -> doc.id() != null)
+                .toList();
+
+        // 기존 문서의 경우, 해당 주문에 속한 문서인지 검증
+        List<Long> existingDocumentIds = existingDocuments.stream()
                 .map(UpdateAdminOrderDocumentsRequestDto.DocumentDto::id)
                 .toList();
 
-        List<Long> invalidDocumentIds = documentIds.stream()
+        List<Long> invalidDocumentIds = existingDocumentIds.stream()
                 .filter(id -> !orderDocumentIds.contains(id))
                 .toList();
 
@@ -44,19 +57,45 @@ public class UpdateAdminOrderDocumentsService implements UpdateAdminOrderDocumen
                     "해당 주문(Order)에 속하지 않는 문서(Document)가 포함되었습니다: " + invalidDocumentIds);
         }
 
-        Map<Long, Document> documentMap = documentRepository.findAllByIdsOrElseThrow(documentIds)
+        // 기존 문서 업데이트
+        Map<Long, Document> documentMap = documentRepository.findAllByIdsOrElseThrow(existingDocumentIds)
                 .stream()
                 .collect(Collectors.toMap(Document::getId, document -> document));
 
-        requestDto.documents().forEach(document -> {
+        existingDocuments.forEach(document -> {
             documentService.updateDocument(
                     documentMap.get(document.id()),
                     document.name(),
                     document.pageCount(),
                     document.recoveryOption(),
-                    document.additionalPrice(),
-                    document.scanStatus()
+                    document.additionalPrice()
             );
         });
+
+        order.getDelivery().updateDeliveryPrice(requestDto.deliveryPrice());
+
+        // 신규 문서 생성
+        newDocuments.forEach(document -> {
+            Document doc = documentService.createDocument(
+                    document.name(),
+                    document.pageCount(),
+                    document.recoveryOption(),
+                    order,
+                    order.getDocuments().get(0).getPricePolicy()
+            );
+            documentRepository.save(doc);
+        });
+
+        // 삭제 처리: DB에 존재하지만 요청에 포함되지 않은 문서는 삭제
+        // 요청에 포함된 기존 문서의 ID 집합
+        Set<Long> requestExistingIds = existingDocumentIds.stream().collect(Collectors.toSet());
+        // 주문에 속한 기존 문서 중 요청에 포함되지 않은 ID 찾기
+        Set<Long> toDeleteIds = orderDocumentIds.stream()
+                .filter(id -> !requestExistingIds.contains(id))
+                .collect(Collectors.toSet());
+        System.out.println("toDeleteIds = " + toDeleteIds);
+        // 삭제 처리 (필요하다면 Order 엔티티에서도 해당 Document를 제거)
+        order.getDocuments().removeIf(doc -> toDeleteIds.contains(doc.getId()));
+        toDeleteIds.forEach(documentRepository::deleteByIdOrElseThrow);
     }
 }
