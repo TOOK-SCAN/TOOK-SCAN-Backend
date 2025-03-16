@@ -108,6 +108,14 @@ public class Coupon extends BaseEntity {
         };
     }
 
+    public int getDiscountPrice(int price) {
+        return switch (type) {
+            case AMOUNT -> discountPrice;
+            case PERCENTAGE -> (price * discountPercent / 100);
+            case DELIVERY_PRICE_FREE -> 0;
+        };
+    }
+
     public String getExpirationDate() {
         return DateTimeUtil.convertLocalDateTimeToString(startDateTime)
                 + " ~ " + DateTimeUtil.convertLocalDateTimeToString(endDateTime);
