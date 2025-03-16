@@ -23,8 +23,13 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public Payment findByOrderNumberOrElseThrow(String orderNumber) {
-        return paymentJpaRepository.findByOrderNumber(orderNumber)
+    public Payment findByIdOrElseThrow(Long id) {
+        return paymentJpaRepository.findById(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE, "Payment not found"));
+    }
+
+    @Override
+    public void save(Payment payment) {
+        paymentJpaRepository.save(payment);
     }
 }
