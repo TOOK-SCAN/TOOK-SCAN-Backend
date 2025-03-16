@@ -86,38 +86,47 @@ public class ScannerUtil {
 
         HttpHeaders headers = new HttpHeaders();
 
-        Map<String, Object> response = restClientUtil.sendGetMethod(url, headers);
-        if (Objects.isNull(response)) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답이 null입니다.");
-        }
+        try {
+            Map<String, Object> response = restClientUtil.sendGetMethod(url, headers);
 
-        // data
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        if (Objects.isNull(data)) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 data가 없습니다.");
-        }
+            if (Objects.isNull(response)) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답이 null입니다.");
+            }
 
-        // status
-        String status = (String) data.get("status");
-        if (Objects.isNull(status)) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 status가 없습니다.");
-        }
+            // data
+            Map<String, Object> data = (Map<String, Object>) response.get("data");
+            if (Objects.isNull(data)) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 data가 없습니다.");
+            }
 
-        switch (status) {
-            case "PENDING", "STARTED":
-                return EScanStatus.IN_PROGRESS;
-            case "SUCCESS":
-                return EScanStatus.COMPLETED;
-            case "FAILURE":
-                return EScanStatus.FAILED;
-            default:
-                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "알 수 없는 스캔 상태: " + status);
+            // status
+            String status = (String) data.get("status");
+            if (Objects.isNull(status)) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 status가 없습니다.");
+            }
+
+            switch (status) {
+                case "STARTED":
+                    return EScanStatus.IN_PROGRESS;
+                case "SUCCESS":
+                    return EScanStatus.COMPLETED;
+                case "FAILURE":
+                    return EScanStatus.FAILED;
+                default:
+                    return EScanStatus.ENABLE;
+            }
+        } catch (CommonException e) {
+            return EScanStatus.UNABLE;
         }
     }
 
     public Map<Long, EScanStatus> getScanStatuses(List<Document> documents) {
         return documents.stream()
                 .collect(Collectors.toMap(Document::getId, document -> {
+                    EScanStatus status = getScanStatus(document.getScanTaskId());
+                    if (status == EScanStatus.UNABLE) {
+                        return EScanStatus.UNABLE;
+                    }
                     if (document.getScanTaskId() == null) {
                         return EScanStatus.ENABLE;
                     }
