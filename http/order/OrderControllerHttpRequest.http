@@ -49,3 +49,8 @@ Authorization: Bearer {{access_token}}
 //@no-log
 GET {{host_url}}/v1/admins/orders/overviews?page=1&size=10&start-date=2025-02-12&end-date=2025-03-12&sort=order-date&direction=DESC
 Authorization: Bearer {{access_token}}
+
+### 관리자 결제 조회
+//@no-log
+GET {{host_url}}/v1/admins/orders/688623424943448498/payments/overviews
+Authorization: Bearer {{access_token}}
