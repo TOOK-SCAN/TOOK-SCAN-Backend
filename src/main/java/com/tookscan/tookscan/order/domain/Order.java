@@ -191,6 +191,13 @@ public class Order extends BaseEntity {
         return amount;
     }
 
+    public int getDiscountAmount() {
+        if (coupon == null) {
+            return 0;
+        }
+        return coupon.getDiscountPrice(getDocumentsTotalAmount());
+    }
+
     public void createMemo(String memo) {
         this.memo = memo;
     }
