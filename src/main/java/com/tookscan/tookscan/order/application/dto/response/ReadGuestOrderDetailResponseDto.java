@@ -71,8 +71,8 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
     @JsonProperty("is_delivery")
     private final Boolean isDelivery;
 
-    @JsonProperty("coupon_discription")
-    private final String couponDiscription;
+    @JsonProperty("coupon_name")
+    private final String couponName;
 
     @JsonProperty("discount_price")
     private final Integer discountPrice;
@@ -155,7 +155,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
             Integer deliveryPrice,
             UserInfoDto userInfo,
             Boolean isDelivery,
-            String couponDiscription,
+            String couponName,
             Integer discountPrice
     ) {
         this.orderId = orderId;
@@ -173,7 +173,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
         this.deliveryPrice = deliveryPrice;
         this.userInfo = userInfo;
         this.isDelivery = isDelivery;
-        this.couponDiscription = couponDiscription;
+        this.couponName = couponName;
         this.discountPrice = discountPrice;
         this.validateSelf();
     }
@@ -208,7 +208,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
                         .email(order.getDelivery().getEmail())
                         .build())
                 .isDelivery(order.isDelivery())
-                .couponDiscription(order.getCoupon() != null ? order.getCoupon().getName() : null)
+                .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
                 .discountPrice(order.getCoupon() != null ? order.getDiscountAmount() : null)
                 .build();
     }
