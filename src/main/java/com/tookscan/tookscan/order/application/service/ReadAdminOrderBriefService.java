@@ -26,7 +26,13 @@ public class ReadAdminOrderBriefService implements ReadAdminOrderBriefUseCase {
                 .mapToInt(document -> s3Util.doesObjectExist(document) ? 1 : 0)
                 .sum();
 
-        return ReadAdminOrderBriefResponseDto.fromEntity(order, pdfCount);
+        String status = order.getDocuments().size() == pdfCount ? "스캔완료" : "스캔중";
+
+        if (pdfCount == 0) {
+            status = "스캔대기";
+        }
+
+        return ReadAdminOrderBriefResponseDto.of(order, pdfCount, status);
     }
 
 }

@@ -26,10 +26,10 @@ public class ReadAdminOrderBriefResponseDto extends SelfValidating<ReadAdminOrde
         this.validateSelf();
     }
 
-    public static ReadAdminOrderBriefResponseDto fromEntity(Order order, int pdfCount) {
+    public static ReadAdminOrderBriefResponseDto of(Order order, int pdfCount, String status) {
         return ReadAdminOrderBriefResponseDto.builder()
                 .filesCount(pdfCount)
-                .status(order.getOrderStatus().toDisplayScanStatusString())
+                .status(status)
                 .email(order.getDelivery().getEmail())
                 .build();
     }
