@@ -1,12 +1,20 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.dto.PdfFileDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
+import com.tookscan.tookscan.core.utility.S3Util;
 import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
+import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -22,6 +30,8 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private final S3Util s3Util;
+
     @Override
     @Transactional
     public void execute(Long orderId) {
@@ -34,11 +44,21 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
                 order.getPhoneNumber()
         );
 
+        List<Document> documents = order.getDocuments();
+
+        if (documents.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
+        }
+
+        List<PdfFileDto> pdfFiles = documents.stream()
+                .map(s3Util::downloadPdfFile)
+                .toList();
+
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(
                         order.getDelivery().getEmail(),
                         order.getDocumentsDescription(),
-                        order.getPdfUrls()
+                        pdfFiles
                 )
         );
 

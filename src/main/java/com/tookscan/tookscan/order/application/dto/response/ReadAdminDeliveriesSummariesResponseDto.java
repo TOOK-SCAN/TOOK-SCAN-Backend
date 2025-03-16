@@ -6,11 +6,12 @@ import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class ReadAdminDeliveriesSummariesResponseDto extends SelfValidating<ReadAdminDeliveriesSummariesResponseDto> {

@@ -20,6 +20,9 @@ public class ScannerUtil {
     @Value("${scanner.base-url}")
     private String SCANNER_BASE_URL;
 
+    @Value("${scanner.is-prod}")
+    private Boolean IS_PROD;
+
     private final RestClientUtil restClientUtil;
 
     /**
@@ -34,7 +37,8 @@ public class ScannerUtil {
         String url = SCANNER_BASE_URL
                 + "/api/v1/orders/" + orderId
                 + "/documents/" + documentId
-                + "/scan?filename=" + filename;
+                + "/scan?filename=" + filename
+                + "&is_prod=" + IS_PROD;
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -82,44 +86,70 @@ public class ScannerUtil {
 
         HttpHeaders headers = new HttpHeaders();
 
-        Map<String, Object> response = restClientUtil.sendGetMethod(url, headers);
-        if (Objects.isNull(response)) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답이 null입니다.");
-        }
+        try {
+            Map<String, Object> response = restClientUtil.sendGetMethod(url, headers);
 
-        // data
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        if (Objects.isNull(data)) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 data가 없습니다.");
-        }
+            if (Objects.isNull(response)) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답이 null입니다.");
+            }
 
-        // status
-        String status = (String) data.get("status");
-        if (Objects.isNull(status)) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 status가 없습니다.");
-        }
+            // data
+            Map<String, Object> data = (Map<String, Object>) response.get("data");
+            if (Objects.isNull(data)) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 data가 없습니다.");
+            }
 
-        switch (status) {
-            case "PENDING":
-                return EScanStatus.ENABLE;
-            case "STARTED":
-                return EScanStatus.IN_PROGRESS;
-            case "SUCCESS":
-                return EScanStatus.COMPLETED;
-            case "FAILURE":
-                return EScanStatus.FAILED;
-            default:
-                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "알 수 없는 스캔 상태: " + status);
+            // status
+            String status = (String) data.get("status");
+            if (Objects.isNull(status)) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "스캐너 서버 응답에 status가 없습니다.");
+            }
+
+            switch (status) {
+                case "STARTED":
+                    return EScanStatus.IN_PROGRESS;
+                case "SUCCESS":
+                    return EScanStatus.COMPLETED;
+                case "FAILURE":
+                    return EScanStatus.FAILED;
+                default:
+                    return EScanStatus.ENABLE;
+            }
+        } catch (CommonException e) {
+            return EScanStatus.UNABLE;
         }
     }
 
     public Map<Long, EScanStatus> getScanStatuses(List<Document> documents) {
+        // 스캔 작업 ID가 있는 문서들 중 첫 번째 문서를 찾습니다.
+        Document firstDocumentWithTask = documents.stream()
+                .filter(doc -> doc.getScanTaskId() != null)
+                .findFirst()
+                .orElse(null);
+
+        // 첫 번째 문서가 있고, 외부 API 호출 결과가 UNABLE이면,
+        // 스캔 작업 ID가 있는 모든 문서는 UNABLE로 처리합니다.
+        if (firstDocumentWithTask != null) {
+            EScanStatus firstStatus = getScanStatus(firstDocumentWithTask.getScanTaskId());
+            if (firstStatus == EScanStatus.UNABLE) {
+                return documents.stream()
+                        .collect(Collectors.toMap(
+                                Document::getId,
+                                doc -> EScanStatus.UNABLE
+                        ));
+            }
+        }
+
+        // 첫 번째 호출이 성공적이었다면, 각 문서에 대해 개별적으로 외부 API 호출을 수행합니다.
         return documents.stream()
-                .collect(Collectors.toMap(Document::getId, document -> {
-                    if (document.getScanTaskId() == null) {
-                        return EScanStatus.ENABLE;
-                    }
-                    return getScanStatus(document.getScanTaskId());
-                }));
+                .collect(Collectors.toMap(
+                        Document::getId,
+                        doc -> {
+                            if (doc.getScanTaskId() == null) {
+                                return EScanStatus.ENABLE;
+                            }
+                            return getScanStatus(doc.getScanTaskId());
+                        }
+                ));
     }
 }
