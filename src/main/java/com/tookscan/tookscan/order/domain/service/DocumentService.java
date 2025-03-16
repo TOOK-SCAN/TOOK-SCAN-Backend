@@ -32,13 +32,11 @@ public class DocumentService {
             String name,
             int pageCount,
             ERecoveryOption recoveryOption,
-            int additionalPrice,
-            EScanStatus scanStatus
+            int additionalPrice
     ) {
         document.updateName(name);
         document.updatePageCount(pageCount);
         document.updateRecoveryOption(recoveryOption);
         document.updateAdditionalPrice(additionalPrice);
-        document.updateScanStatus(scanStatus);
     }
 }
