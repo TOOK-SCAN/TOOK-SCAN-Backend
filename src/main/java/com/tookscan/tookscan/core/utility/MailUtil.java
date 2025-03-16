@@ -38,7 +38,7 @@ public class MailUtil {
               </div>
               
               <div class="img" style="text-align: center;">
-                  <img src="${MailImgUrl}" alt="mailimg" style="max-width: 250px; height: auto;" referrerpolicy="no-referrer" />
+                <img src=${MailImgUrl} alt="mailimg" style="max-width: 250px; height: auto;" />
               </div>
               
               <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
@@ -75,7 +75,7 @@ public class MailUtil {
                   </div>
                  \s
                   <div class="img" style="text-align: center;">
-                      <img src="${MailImgUrl}" alt="mailimg" style="max-width: 250px; height: auto;" referrerpolicy="no-referrer" />
+                    <img src=${MailImgUrl} alt="mailimg" style="max-width: 250px; height: auto;" />
                   </div>
                  \s
                   <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
