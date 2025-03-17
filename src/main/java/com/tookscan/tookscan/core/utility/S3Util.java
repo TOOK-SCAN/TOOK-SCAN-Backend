@@ -11,12 +11,15 @@ import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -158,30 +161,32 @@ public class S3Util {
         }
     }
 
+    /**
+     * CloudFront 서명 URL을 생성합니다. 이 방법은 PEM 키 파일을 jar 내부에서 읽어 PrivateKey 객체로 파싱하여 사용합니다.
+     */
     public String generateSignedUrl(Document document) {
         try {
             String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
                     '/' + document.getName() + '_' + document.getId() + ".pdf";
 
-            // 만료 시간 계산
             Date expiration = new Date();
             long now = expiration.getTime();
             expiration.setTime(now + pdfExpirationSeconds * 1000);
 
-            // 존재하지 않는 PDF 파일인 경우
             if (!doesObjectExist(document)) {
                 throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
             }
 
-            // jar 내부의 private key 파일을 임시 파일로 복사
-            File privateKey = extractResourceToTempFile(privateKeyPath);
+            // PEM 키를 직접 PrivateKey 객체로 로드
+            PrivateKey privateKey = loadPrivateKeyFromResource(privateKeyPath);
+
+            // CloudFront 리소스 경로 생성
+            String resourcePath = SignerUtils.generateResourcePath(SignerUtils.Protocol.https, domain, finalKey);
 
             return CloudFrontUrlSigner.getSignedURLWithCannedPolicy(
-                    SignerUtils.Protocol.https,
-                    domain,
-                    privateKey,
-                    finalKey,
+                    resourcePath,
                     keyId,
+                    privateKey,
                     expiration
             );
         } catch (InvalidKeySpecException | IOException e) {
@@ -189,18 +194,23 @@ public class S3Util {
         }
     }
 
-    private File extractResourceToTempFile(String resourcePath) throws IOException {
+    /**
+     * ClassPathResource에 있는 PEM 파일 내용을 읽어 PrivateKey 객체로 변환합니다.
+     */
+    private PrivateKey loadPrivateKeyFromResource(String resourcePath) throws IOException, InvalidKeySpecException {
         ClassPathResource resource = new ClassPathResource(resourcePath);
-        File tempFile = File.createTempFile("aws_ex_private_key", ".pem");
-        try (InputStream in = resource.getInputStream();
-             FileOutputStream out = new FileOutputStream(tempFile)) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
+        try (InputStream in = resource.getInputStream()) {
+            String keyString = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            // PEM 헤더/푸터 제거 및 공백 제거
+            keyString = keyString.replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] keyBytes = Base64.getDecoder().decode(keyString);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            return kf.generatePrivate(spec);
+        } catch (Exception e) {
+            throw new InvalidKeySpecException("PEM 키 파싱에 실패하였습니다.", e);
         }
-        tempFile.deleteOnExit();
-        return tempFile;
     }
 }
