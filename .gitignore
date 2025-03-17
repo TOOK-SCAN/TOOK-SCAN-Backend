@@ -11,6 +11,9 @@ src/main/resources/aws/cloudfront/*.pem
 build/*
 build.sh
 
+### ignore aws-cloudfront.pem
+aws/aws_ex_private_key.pem
+
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839

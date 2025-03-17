@@ -37,11 +37,6 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_PROD_YML }}" | base64 --decode > ./src/main/resources/application-prod.yml
 
-      ### aws_ex_private_key 설정
-      - name: Set YML
-        run: |
-          echo "${{ secrets.AWS_EX_PRIVATE_KEY }}" > base64 --decode > ./src/main/resources/aws/cloudfront/aws_ex_private_key.pem
-
       ### gradlew 실행 권한 부여
       - name: Grant execute Permission for gradlew
         run: |
@@ -93,7 +88,7 @@ jobs:
             docker stop api-server
             docker rm api-server
             docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
-            docker run -d -p 8080:8080 -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --name api-server --network ${{secrets.DOCKER_NETWORKNAME}} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
+            docker run -d -p 8080:8080 -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --name api-server --network ${{secrets.DOCKER_NETWORKNAME}} -v /home/ubuntu/aws:/app/aws ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
             
             # 사용되지 않는 이미지 정리
             docker image prune -f
