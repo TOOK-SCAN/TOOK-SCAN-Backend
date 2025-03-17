@@ -12,6 +12,7 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -172,7 +173,8 @@ public class S3Util {
                 throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
             }
 
-            File privateKey = new ClassPathResource(privateKeyPath).getFile();
+            // jar 내부의 private key 파일을 임시 파일로 복사
+            File privateKey = extractResourceToTempFile(privateKeyPath);
 
             return CloudFrontUrlSigner.getSignedURLWithCannedPolicy(
                     SignerUtils.Protocol.https,
@@ -185,5 +187,20 @@ public class S3Util {
         } catch (InvalidKeySpecException | IOException e) {
             throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
         }
+    }
+
+    private File extractResourceToTempFile(String resourcePath) throws IOException {
+        ClassPathResource resource = new ClassPathResource(resourcePath);
+        File tempFile = File.createTempFile("aws_ex_private_key", ".pem");
+        try (InputStream in = resource.getInputStream();
+             FileOutputStream out = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+        tempFile.deleteOnExit();
+        return tempFile;
     }
 }
