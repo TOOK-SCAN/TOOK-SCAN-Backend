@@ -40,7 +40,7 @@ jobs:
       ### aws_ex_private_key 설정
       - name: Set YML
         run: |
-          echo "${{ secrets.AWS_EX_PRIVATE_KEY }}" > ./src/main/resources/aws/cloudfront/aws_ex_private_key.pem
+          echo "${{ secrets.AWS_EX_PRIVATE_KEY }}" > base64 --decode > ./src/main/resources/aws/cloudfront/aws_ex_private_key.pem
 
       ### gradlew 실행 권한 부여
       - name: Grant execute Permission for gradlew
