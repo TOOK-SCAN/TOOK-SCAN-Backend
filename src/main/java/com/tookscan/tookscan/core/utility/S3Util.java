@@ -11,8 +11,6 @@ import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
-
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,7 +24,6 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.multipart.MultipartFile;
 
 @Configuration
@@ -199,10 +196,15 @@ public class S3Util {
     /**
      * PEM 키 파일을 읽어 PrivateKey 객체로 파싱합니다.
      */
-    private PrivateKey loadPrivateKeyFromResource(String absolutePath) throws IOException, InvalidKeySpecException {
-        try (InputStream in = new FileInputStream(absolutePath)) {
+    private PrivateKey loadPrivateKeyFromResource(String resourcePath) throws IOException, InvalidKeySpecException {
+        // 리소스 경로 앞에 '/'를 붙여 절대 경로로 지정 (예: "/aws/cloudfront/aws_ex_private_key.pem")
+        try (InputStream in = this.getClass().getClassLoader()
+                .getResourceAsStream(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath)) {
+            if (in == null) {
+                throw new IOException("PEM 키 리소스를 찾을 수 없습니다: " + resourcePath);
+            }
             String keyString = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            // PEM 헤더/푸터 제거 및 공백 제거
+            // PEM 헤더와 푸터, 공백 제거
             keyString = keyString.replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll("\\s", "");

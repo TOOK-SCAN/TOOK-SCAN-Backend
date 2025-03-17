@@ -37,6 +37,10 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_PROD_YML }}" | base64 --decode > ./src/main/resources/application-prod.yml
 
+      - name: Set private_key
+        run: |
+          echo "${{ secrets.AWS_EX_PRIVATE_KEY }}" > ./src/main/resources/aws/aws_ex_private_key.pem
+
       ### gradlew 실행 권한 부여
       - name: Grant execute Permission for gradlew
         run: |
