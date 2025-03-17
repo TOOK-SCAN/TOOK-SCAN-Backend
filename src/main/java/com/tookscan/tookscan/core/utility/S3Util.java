@@ -183,7 +183,7 @@ public class S3Util {
                     expiration
             );
         } catch (InvalidKeySpecException | IOException e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }
