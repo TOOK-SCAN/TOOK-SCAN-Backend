@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.core.utility;
 
 import com.amazonaws.HttpMethod;
+import com.amazonaws.services.cloudfront.CloudFrontUrlSigner;
+import com.amazonaws.services.cloudfront.util.SignerUtils;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -9,13 +11,16 @@ import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.multipart.MultipartFile;
 
 @Configuration
@@ -36,6 +41,15 @@ public class S3Util {
 
     @Value("${cloud.aws.s3.pdf.expiration-seconds}")
     private Long pdfExpirationSeconds;
+
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String domain;
+
+    @Value("${cloud.aws.cloudfront.private-key-path}")
+    private String privateKeyPath;
+
+    @Value("${cloud.aws.cloudfront.key-id}")
+    private String keyId;
 
     /**
      * S3 key를 전달받아 해당 객체의 최종 URL을 반환 (AmazonS3Client가 제공하는 기본 메서드를 사용)
@@ -139,6 +153,36 @@ public class S3Util {
 
             amazonS3Client.putObject(bucketName, finalKey, file.getInputStream(), metadata);
         } catch (IOException e) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public String generateSignedUrl(Document document) {
+        try {
+            String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
+                    '/' + document.getName() + '_' + document.getId() + ".pdf";
+
+            // 만료 시간 계산
+            Date expiration = new Date();
+            long now = expiration.getTime();
+            expiration.setTime(now + pdfExpirationSeconds * 1000);
+
+            // 존재하지 않는 PDF 파일인 경우
+            if (!doesObjectExist(document)) {
+                throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
+            }
+
+            File privateKey = new ClassPathResource(privateKeyPath).getFile();
+
+            return CloudFrontUrlSigner.getSignedURLWithCannedPolicy(
+                    SignerUtils.Protocol.https,
+                    domain,
+                    privateKey,
+                    finalKey,
+                    keyId,
+                    expiration
+            );
+        } catch (InvalidKeySpecException | IOException e) {
             throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }

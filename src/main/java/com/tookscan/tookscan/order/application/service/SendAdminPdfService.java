@@ -49,8 +49,8 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
         String pdfUrls = documents.stream()
                 .map(doc -> doc.getName() + " :<br />" +
-                        "<a href=\"" + s3Util.getPdfPresignedUrl(doc) + "\" target=\"_blank\">"
-                        + s3Util.getPdfPresignedUrl(doc) + "</a>")
+                        "<a href=\"" + s3Util.generateSignedUrl(doc) + "\" target=\"_blank\">"
+                        + s3Util.generateSignedUrl(doc) + "</a>")
                 .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
 
