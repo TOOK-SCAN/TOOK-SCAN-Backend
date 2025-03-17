@@ -238,9 +238,24 @@ public class S3Util {
      * 해당 문자가 URL에서 unreserved 문자(알파벳, 숫자, '-', '_', '.', '~')에 해당하는지 확인합니다.
      */
     private boolean isUnreserved(char c) {
-        return (c >= 'A' && c <= 'Z') ||
+        // ASCII unreserved 문자
+        if ((c >= 'A' && c <= 'Z') ||
                 (c >= 'a' && c <= 'z') ||
                 (c >= '0' && c <= '9') ||
-                c == '-' || c == '_' || c == '.' || c == '~';
+                c == '-' || c == '_' || c == '.' || c == '~') {
+            return true;
+        }
+        // 한글 완성형 (가 ~ 힣)
+        if (c >= '\uAC00' && c <= '\uD7A3') {
+            return true;
+        }
+        // 한글 자모 (초성, 중성, 종성)
+        if (c >= '\u1100' && c <= '\u11FF') {
+            return true;
+        }
+        if (c >= '\u3130' && c <= '\u318F') {
+            return true;
+        }
+        return false;
     }
 }
