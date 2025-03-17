@@ -165,8 +165,10 @@ public class S3Util {
      */
     public String generateSignedUrl(Document document) {
         try {
+            String encodedDocumentName = encodeURIComponent(document.getName());
+
             String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
-                    '/' + document.getName() + '_' + document.getId() + ".pdf";
+                    "/" + encodedDocumentName + "_" + document.getId() + ".pdf";
 
             Date expiration = new Date();
             long now = expiration.getTime();
@@ -215,5 +217,30 @@ public class S3Util {
         } catch (Exception e) {
             throw new InvalidKeySpecException("PEM 키 파싱에 실패하였습니다.", e);
         }
+    }
+
+    /**
+     * 문자열을 RFC 3986 규칙에 따라 인코딩합니다. Unreserved 문자(알파벳, 숫자, '-', '_', '.', '~')는 그대로 두고 나머지는 %HH 형태로 인코딩합니다.
+     */
+    private String encodeURIComponent(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (isUnreserved(c)) {
+                sb.append(c);
+            } else {
+                sb.append(String.format("%%%02X", (int) c));
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 해당 문자가 URL에서 unreserved 문자(알파벳, 숫자, '-', '_', '.', '~')에 해당하는지 확인합니다.
+     */
+    private boolean isUnreserved(char c) {
+        return (c >= 'A' && c <= 'Z') ||
+                (c >= 'a' && c <= 'z') ||
+                (c >= '0' && c <= '9') ||
+                c == '-' || c == '_' || c == '.' || c == '~';
     }
 }
