@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.core.utility;
 
 import com.amazonaws.HttpMethod;
+import com.amazonaws.services.cloudfront.CloudFrontUrlSigner;
+import com.amazonaws.services.cloudfront.util.SignerUtils;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -12,6 +14,12 @@ import com.tookscan.tookscan.order.domain.Document;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +44,15 @@ public class S3Util {
 
     @Value("${cloud.aws.s3.pdf.expiration-seconds}")
     private Long pdfExpirationSeconds;
+
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String domain;
+
+    @Value("${cloud.aws.cloudfront.private-key-path}")
+    private String privateKeyPath;
+
+    @Value("${cloud.aws.cloudfront.key-id}")
+    private String keyId;
 
     /**
      * S3 key를 전달받아 해당 객체의 최종 URL을 반환 (AmazonS3Client가 제공하는 기본 메서드를 사용)
@@ -140,6 +157,63 @@ public class S3Util {
             amazonS3Client.putObject(bucketName, finalKey, file.getInputStream(), metadata);
         } catch (IOException e) {
             throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * CloudFront 서명 URL을 생성합니다. 이 방법은 PEM 키 파일을 jar 내부에서 읽어 PrivateKey 객체로 파싱하여 사용합니다.
+     */
+    public String generateSignedUrl(Document document) {
+        try {
+            String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
+                    '/' + document.getName() + '_' + document.getId() + ".pdf";
+
+            Date expiration = new Date();
+            long now = expiration.getTime();
+            expiration.setTime(now + pdfExpirationSeconds * 1000);
+
+            if (!doesObjectExist(document)) {
+                throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
+            }
+
+            // PEM 키를 직접 PrivateKey 객체로 로드
+            PrivateKey privateKey = loadPrivateKeyFromResource(privateKeyPath);
+
+            // CloudFront 리소스 경로 생성
+            String resourcePath = SignerUtils.generateResourcePath(SignerUtils.Protocol.https, domain, finalKey);
+
+            return CloudFrontUrlSigner.getSignedURLWithCannedPolicy(
+                    resourcePath,
+                    keyId,
+                    privateKey,
+                    expiration
+            );
+        } catch (InvalidKeySpecException | IOException e) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    /**
+     * PEM 키 파일을 읽어 PrivateKey 객체로 파싱합니다.
+     */
+    private PrivateKey loadPrivateKeyFromResource(String resourcePath) throws IOException, InvalidKeySpecException {
+        // 리소스 경로 앞에 '/'를 붙여 절대 경로로 지정 (예: "/aws/cloudfront/aws_ex_private_key.pem")
+        try (InputStream in = this.getClass().getClassLoader()
+                .getResourceAsStream(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath)) {
+            if (in == null) {
+                throw new IOException("PEM 키 리소스를 찾을 수 없습니다: " + resourcePath);
+            }
+            String keyString = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            // PEM 헤더와 푸터, 공백 제거
+            keyString = keyString.replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] keyBytes = Base64.getDecoder().decode(keyString);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            return kf.generatePrivate(spec);
+        } catch (Exception e) {
+            throw new InvalidKeySpecException("PEM 키 파싱에 실패하였습니다.", e);
         }
     }
 }
