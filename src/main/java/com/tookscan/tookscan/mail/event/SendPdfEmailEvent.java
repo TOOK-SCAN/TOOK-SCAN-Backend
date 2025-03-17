@@ -12,13 +12,13 @@ public class SendPdfEmailEvent {
 
     String email;
     String orderName;
-    List<PdfFileDto> pdfFiles;
+    String pdfUrls;
 
-    public static SendPdfEmailEvent of(String email, String orderName, List<PdfFileDto> pdfFiles) {
+    public static SendPdfEmailEvent of(String email, String orderName, String pdfUrls) {
         return SendPdfEmailEvent.builder()
                 .email(email)
                 .orderName(orderName)
-                .pdfFiles(pdfFiles)
+                .pdfUrls(pdfUrls)
                 .build();
     }
 }

@@ -1,6 +1,5 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
@@ -13,8 +12,6 @@ import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -50,15 +47,18 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
         }
 
-        List<PdfFileDto> pdfFiles = documents.stream()
-                .map(s3Util::downloadPdfFile)
-                .toList();
+        String pdfUrls = documents.stream()
+                .map(doc -> doc.getName() + " :<br />" +
+                        "<a href=\"" + s3Util.generateSignedUrl(doc) + "\" target=\"_blank\">"
+                        + s3Util.generateSignedUrl(doc) + "</a>")
+                .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
 
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(
                         order.getDelivery().getEmail(),
                         order.getDocumentsDescription(),
-                        pdfFiles
+                        pdfUrls
                 )
         );
 
