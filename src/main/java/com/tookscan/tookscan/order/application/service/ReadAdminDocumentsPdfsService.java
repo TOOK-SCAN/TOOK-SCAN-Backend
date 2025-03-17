@@ -21,6 +21,6 @@ public class ReadAdminDocumentsPdfsService implements ReadAdminDocumentsPdfsUseC
     @Transactional(readOnly = true)
     public ReadAdminDocumentsPdfsResponseDto execute(Long documentId) {
         Document document = documentRepository.findByIdOrElseThrow(documentId);
-        return ReadAdminDocumentsPdfsResponseDto.of(s3Util.getPdfPresignedUrl(document));
+        return ReadAdminDocumentsPdfsResponseDto.of(s3Util.generateSignedUrl(document));
     }
 }
