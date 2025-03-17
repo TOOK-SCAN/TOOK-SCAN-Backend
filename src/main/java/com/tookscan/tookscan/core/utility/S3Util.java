@@ -11,6 +11,8 @@ import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -195,11 +197,10 @@ public class S3Util {
     }
 
     /**
-     * ClassPathResource에 있는 PEM 파일 내용을 읽어 PrivateKey 객체로 변환합니다.
+     * PEM 키 파일을 읽어 PrivateKey 객체로 파싱합니다.
      */
-    private PrivateKey loadPrivateKeyFromResource(String resourcePath) throws IOException, InvalidKeySpecException {
-        ClassPathResource resource = new ClassPathResource(resourcePath);
-        try (InputStream in = resource.getInputStream()) {
+    private PrivateKey loadPrivateKeyFromResource(String absolutePath) throws IOException, InvalidKeySpecException {
+        try (InputStream in = new FileInputStream(absolutePath)) {
             String keyString = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             // PEM 헤더/푸터 제거 및 공백 제거
             keyString = keyString.replace("-----BEGIN PRIVATE KEY-----", "")
