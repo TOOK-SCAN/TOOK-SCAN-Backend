@@ -133,9 +133,12 @@ public class S3Util {
         return presignedUrl.toString();
     }
 
-    public boolean doesObjectExist(Document doc) {
-        String key = PDF_CONTENT_PREFIX + doc.getOrder().getId() + '/' + doc.getName() + '_' + doc.getId() + ".pdf";
-        return amazonS3Client.doesObjectExist(bucketName, key);
+    public boolean doesObjectExist(Document document) {
+        String encodedDocumentName = encodeURIComponent(document.getName());
+
+        String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
+                "/" + encodedDocumentName + "_" + document.getId() + ".pdf";
+        return amazonS3Client.doesObjectExist(bucketName, finalKey);
     }
 
 
