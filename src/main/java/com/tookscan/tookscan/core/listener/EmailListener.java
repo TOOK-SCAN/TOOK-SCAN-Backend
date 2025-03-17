@@ -4,7 +4,6 @@ import com.tookscan.tookscan.core.utility.MailUtil;
 import com.tookscan.tookscan.mail.event.EmailEvent;
 import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.security.event.ChangePasswordBySystemEvent;
-import com.tookscan.tookscan.security.event.CompleteEmailValidationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -37,7 +36,7 @@ public class EmailListener {
             mailUtil.sendPdfEmail(
                     event.getEmail(),
                     event.getOrderName(),
-                    event.getPdfFiles()
+                    event.getPdfUrl()
             );
         } catch (Exception e) {
             e.printStackTrace();
