@@ -30,7 +30,7 @@ public class Document extends BaseEntity {
     /* -------------------------------------------- */
     /* Information Column ------------------------- */
     /* -------------------------------------------- */
-    @Column(name = "name", length = 30, nullable = false)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
     @Column(name = "page_count", nullable = false)
