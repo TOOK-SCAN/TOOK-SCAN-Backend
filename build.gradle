@@ -87,6 +87,9 @@ dependencies {
 	// Solapi
 	implementation 'net.nurigo:sdk:4.3.2'
 
+	// Slack Webhook
+	implementation 'com.slack.api:slack-api-client:1.30.0'
+
 	// Testing Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
