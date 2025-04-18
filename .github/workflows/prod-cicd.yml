@@ -11,7 +11,7 @@ on:
 
 jobs:
   CI:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -76,7 +76,7 @@ jobs:
   CD:
     if: github.event.pull_request.merged == true
     needs: [CI]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       ### SSH Connect and Docker Image Pull and Container Run
