@@ -3,7 +3,6 @@ package com.tookscan.tookscan.order.application.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.order.domain.Document;
-import com.tookscan.tookscan.order.domain.InitialDocument;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
@@ -60,7 +59,7 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
                 .orderStatus(order.getOrderStatus())
                 .orderNumber(order.getOrderNumber())
                 .orderMemo(order.getMemo())
-                .initialDocumentDtos(order.getInitialDocuments().stream()
+                .initialDocumentDtos(order.getDocuments().stream()
                         .map(InitialDocumentDto::fromEntity)
                         .toList())
                 .realDocumentDtos(order.getDocuments().stream()
@@ -104,13 +103,13 @@ public class ReadAdminOrderDocumentsOverviewsResponseDto extends
             this.validateSelf();
         }
 
-        public static InitialDocumentDto fromEntity(InitialDocument initialDocument) {
+        public static InitialDocumentDto fromEntity(Document document) {
             return InitialDocumentDto.builder()
-                    .id(initialDocument.getId().toString())
-                    .name(initialDocument.getName())
-                    .pageCount(initialDocument.getPageCount())
-                    .recoveryOption(initialDocument.getRecoveryOption())
-                    .price(initialDocument.calculatePrice())
+                    .id(document.getId().toString())
+                    .name(document.getInitialName())
+                    .pageCount(document.getInitialPageCount())
+                    .recoveryOption(document.getInitialRecoveryOption())
+                    .price(document.calculateInitialPrice())
                     .build();
         }
     }

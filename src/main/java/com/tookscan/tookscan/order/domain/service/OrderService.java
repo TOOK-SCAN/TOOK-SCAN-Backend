@@ -8,16 +8,15 @@ import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
-    public Order createOrder(User user, boolean isByUser, Delivery delivery, Coupon coupon) {
+    public Order createOrder(User user, boolean isByUser, Delivery delivery, Coupon coupon, Boolean isOneDayScan) {
         String orderNumber = TsidFactory.getFactory().generate().toString();
         return Order.builder()
                 .orderNumber(orderNumber)
@@ -30,6 +29,7 @@ public class OrderService {
                 .user(user)
                 .delivery(delivery)
                 .coupon(coupon)
+                .isOneDayScan(isOneDayScan)
                 .build();
     }
 

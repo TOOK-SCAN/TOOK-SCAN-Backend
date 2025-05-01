@@ -24,6 +24,9 @@ public class DocumentService {
                 .pricePolicy(pricePolicy)
                 .additionalPrice(0)
                 .scanStatus(EScanStatus.UNABLE)
+                .initialName(name)
+                .initialPageCount(pageCount)
+                .initialRecoveryOption(recoveryOption)
                 .build();
     }
 

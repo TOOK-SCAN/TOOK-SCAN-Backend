@@ -8,16 +8,26 @@ import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.dto.request.CreateUserOrderRequestDto;
 import com.tookscan.tookscan.order.application.dto.response.CreateUserOrderResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
-import com.tookscan.tookscan.order.domain.*;
-import com.tookscan.tookscan.order.domain.service.*;
+import com.tookscan.tookscan.order.domain.Coupon;
+import com.tookscan.tookscan.order.domain.Delivery;
+import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.PricePolicy;
+import com.tookscan.tookscan.order.domain.service.CouponService;
+import com.tookscan.tookscan.order.domain.service.DeliveryService;
+import com.tookscan.tookscan.order.domain.service.DocumentService;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
-import com.tookscan.tookscan.order.repository.*;
+import com.tookscan.tookscan.order.repository.CouponRepository;
+import com.tookscan.tookscan.order.repository.DeliveryRepository;
+import com.tookscan.tookscan.order.repository.DocumentRepository;
+import com.tookscan.tookscan.order.repository.OrderRepository;
+import com.tookscan.tookscan.order.repository.PricePolicyRepository;
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +36,12 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final DocumentRepository documentRepository;
-    private final InitialDocumentRepository initialDocumentRepository;
     private final DeliveryRepository deliveryRepository;
     private final PricePolicyRepository pricePolicyRepository;
     private final CouponRepository couponRepository;
 
     private final OrderService orderService;
     private final DocumentService documentService;
-    private final InitialDocumentService initialDocumentService;
     private final AddressService addressService;
     private final DeliveryService deliveryService;
     private final CouponService couponService;
@@ -83,7 +91,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         deliveryRepository.save(delivery);
 
         // 주문 생성
-        Order order = orderService.createOrder(user, true, delivery, coupon);
+        Order order = orderService.createOrder(user, true, delivery, coupon, requestDto.isOneDayScan());
         orderRepository.save(order);
 
         // 쿠폰 적용
@@ -104,17 +112,6 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                     documentRepository.save(document);
         });
 
-        requestDto.documents().forEach(doc -> {
-            InitialDocument initialDocument = initialDocumentService.createInitialDocument(
-                    doc.name(),
-                    doc.pagePrediction(),
-                    doc.recoveryOption(),
-                    order,
-                    pricePolicy
-            );
-            initialDocumentRepository.save(initialDocument);
-        });
-
         // 주문 접수 문자 발송
         kakaoMessageUtil.sendCreateOrderMessage(
                 user.getName(),
@@ -122,7 +119,8 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                 user.getPhoneNumber()
         );
 
-        return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber()).build();
+        return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber())
+                .orderId(order.getId().toString()).build();
     }
 
 }

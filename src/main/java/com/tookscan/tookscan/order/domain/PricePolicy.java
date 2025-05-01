@@ -31,6 +31,9 @@ public class PricePolicy extends BaseEntity {
     @Column(name = "price_per_page", nullable = false)
     private Integer pricePerPage;
 
+    @Column(name = "price_per_page_for_one_day_scan", nullable = false)
+    private Integer pricePerPageForOneDayScan;
+
     @Column(name = "delivery_price", nullable = false)
     private Integer deliveryPrice;
 
@@ -44,9 +47,11 @@ public class PricePolicy extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public PricePolicy(Integer defaultPrice, Integer pricePerPage, Integer deliveryPrice, LocalDate startDate, LocalDate endDate) {
+    public PricePolicy(Integer defaultPrice, Integer pricePerPage, Integer pricePerPageForOneDayScan,
+                       Integer deliveryPrice, LocalDate startDate, LocalDate endDate) {
         this.defaultPrice = defaultPrice;
         this.pricePerPage = pricePerPage;
+        this.pricePerPageForOneDayScan = pricePerPageForOneDayScan;
         this.deliveryPrice = deliveryPrice;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -56,6 +61,14 @@ public class PricePolicy extends BaseEntity {
         int price = 0;
         price += defaultPrice;
         price += pricePerPage * pageCount;
+        price += recoveryOption.getPrice();
+        return price;
+    }
+
+    public int calculatePriceForOneDayScan(int pageCount, ERecoveryOption recoveryOption) {
+        int price = 0;
+        price += defaultPrice;
+        price += pricePerPageForOneDayScan * pageCount;
         price += recoveryOption.getPrice();
         return price;
     }

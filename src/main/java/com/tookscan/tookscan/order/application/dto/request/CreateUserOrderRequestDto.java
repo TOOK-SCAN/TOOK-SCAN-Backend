@@ -27,7 +27,11 @@ public record CreateUserOrderRequestDto(
         DeliveryInfo deliveryInfo,
 
         @JsonProperty("coupon_id")
-        Long couponId
+        Long couponId,
+
+        @JsonProperty("is_one_day_scan")
+        @NotNull(message = "원데이 스캔 여부를 입력해주세요.")
+        Boolean isOneDayScan
 ) {
     public record RequestDocument(
 
