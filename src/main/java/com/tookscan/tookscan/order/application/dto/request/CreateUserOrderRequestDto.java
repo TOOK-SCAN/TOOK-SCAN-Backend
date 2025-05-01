@@ -2,9 +2,11 @@ package com.tookscan.tookscan.order.application.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
+import com.tookscan.tookscan.core.validator.ByteSize;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,10 +33,16 @@ public record CreateUserOrderRequestDto(
 
             @JsonProperty("name")
             @NotBlank(message = "문서 이름을 입력해주세요.")
+            @ByteSize(min = 2, max = 100, message = "문서 이름의 크기는 최소 2바이트 ~ 최대 100바이트 입니다.")
+            @Pattern(
+                    regexp = "^(?! )[A-Za-z0-9가-힣 ]{2,100}(?<! )$",
+                    message = "문서 이름은 2~100자(한글/영문/숫자/내부공백)이며, 양 끝 공백 및 특수문자는 허용되지 않습니다."
+            )
             String name,
 
             @NotNull(message = "페이지 수를 입력해주세요.")
             @Min(value = 0, message = "페이지 수는 0 이상이어야 합니다.")
+            @Max(value = 10000, message = "페이지 수는 10000 이하이어야 합니다.")
             @JsonProperty("page_prediction")
             Integer pagePrediction,
 
@@ -48,6 +56,10 @@ public record CreateUserOrderRequestDto(
 
             @NotBlank(message = "받는 이를 입력해주세요.")
             @JsonProperty("receiver_name")
+            @Pattern(
+                    regexp = "^(?:(?:[가-힣]{2,10})|(?:[A-Za-z]{2,30}))$",
+                    message = "받는 이의 이름은 한글 2~10자(6~30바이트) 또는 영문 2~30자여야 합니다."
+            )
             String receiverName,
 
             @JsonProperty("phone_number")
@@ -64,7 +76,7 @@ public record CreateUserOrderRequestDto(
             String email,
 
             @JsonProperty("request")
-            @Pattern(regexp = "^[\\s\\S]{0,100}$", message = "요청사항은 100자를 초과할 수 없습니다")
+            @ByteSize(min = 0, max = 150, message = "요청사항은 최대 150바이트 입니다.")
             String request,
 
             @NotNull(message = "주소를 입력해주세요.")
