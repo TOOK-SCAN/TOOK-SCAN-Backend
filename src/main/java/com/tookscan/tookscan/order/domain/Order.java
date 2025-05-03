@@ -71,6 +71,8 @@ public class Order extends BaseEntity {
     @Column(name = "took_scan_assistance_agreed")
     private LocalDateTime tookScanAssistanceAgreed;
 
+    @Column(name = "is_one_day_scan")
+    private Boolean isOneDayScan;
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
@@ -88,9 +90,6 @@ public class Order extends BaseEntity {
     /* -------------------------------------------- */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Document> documents = new ArrayList<>();
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InitialDocument> initialDocuments = new ArrayList<>();
 
     /* -------------------------------------------- */
     /* Many To One Mapping ------------------------ */
@@ -117,7 +116,8 @@ public class Order extends BaseEntity {
             LocalDateTime serviceProvisionPeriodAcknowledged,
             User user,
             Delivery delivery,
-            Coupon coupon
+            Coupon coupon,
+            Boolean isOneDayScan
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
@@ -129,6 +129,7 @@ public class Order extends BaseEntity {
         this.user = user;
         this.delivery = delivery;
         this.coupon = coupon;
+        this.isOneDayScan = isOneDayScan;
     }
 
     /**

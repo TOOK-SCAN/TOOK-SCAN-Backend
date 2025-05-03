@@ -8,12 +8,18 @@ import lombok.Getter;
 
 @Getter
 public class CreateUserOrderResponseDto extends SelfValidating<CreateUserOrderResponseDto> {
+
+    @JsonProperty("order_id")
+    @NotNull
+    private String orderId;
+
     @JsonProperty("order_number")
     @NotNull
     private String orderNumber;
 
     @Builder
-    public CreateUserOrderResponseDto(String orderNumber) {
+    public CreateUserOrderResponseDto(String orderNumber, String orderId) {
+        this.orderId = orderId;
         this.orderNumber = orderNumber;
         this.validateSelf();
     }

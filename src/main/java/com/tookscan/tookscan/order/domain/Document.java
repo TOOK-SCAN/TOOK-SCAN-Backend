@@ -50,6 +50,15 @@ public class Document extends BaseEntity {
     @Column(name = "scan_status", nullable = false)
     private EScanStatus scanStatus;
 
+    @Column(name = "initial_name", nullable = false)
+    private String initialName;
+
+    @Column(name = "initial_page_count", nullable = false)
+    private Integer initialPageCount;
+
+    @Column(name = "initial_recovery_option", nullable = false)
+    private ERecoveryOption initialRecoveryOption;
+
     /* -------------------------------------------- */
     /* Many to One Column ------------------------- */
     /* -------------------------------------------- */
@@ -73,7 +82,8 @@ public class Document extends BaseEntity {
     /* -------------------------------------------- */
     @Builder
     public Document(String name, int pageCount, ERecoveryOption recoveryOption, Order order, PricePolicy pricePolicy,
-                    int additionalPrice, EScanStatus scanStatus) {
+                    int additionalPrice, EScanStatus scanStatus, String initialName, Integer initialPageCount,
+                    ERecoveryOption initialRecoveryOption) {
         this.name = name;
         this.pageCount = pageCount;
         this.recoveryOption = recoveryOption;
@@ -81,6 +91,9 @@ public class Document extends BaseEntity {
         this.pricePolicy = pricePolicy;
         this.additionalPrice = additionalPrice;
         this.scanStatus = scanStatus;
+        this.initialName = initialName;
+        this.initialPageCount = initialPageCount;
+        this.initialRecoveryOption = initialRecoveryOption;
     }
 
     public void updateName(String name) {
@@ -108,7 +121,17 @@ public class Document extends BaseEntity {
     }
 
     public int calculatePrice() {
+        if (order.getIsOneDayScan()) {
+            return pricePolicy.calculatePriceForOneDayScan(pageCount, recoveryOption) + additionalPrice;
+        }
         return pricePolicy.calculatePrice(pageCount, recoveryOption) + additionalPrice;
+    }
+
+    public int calculateInitialPrice() {
+        if (order.getIsOneDayScan()) {
+            return pricePolicy.calculatePriceForOneDayScan(initialPageCount, initialRecoveryOption);
+        }
+        return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption);
     }
 }
 
