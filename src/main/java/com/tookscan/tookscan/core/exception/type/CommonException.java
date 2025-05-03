@@ -14,9 +14,15 @@ public class CommonException extends RuntimeException {
         this.message = errorCode.getMessage();
     }
 
-    public CommonException(ErrorCode errorCode, String customMessage) {
+    public CommonException(ErrorCode errorCode, String customMessage, boolean override) {
+        super(override ? customMessage : errorCode.getMessage() + " " + customMessage);
         this.errorCode = errorCode;
-        this.message = errorCode.getMessage() + " " + customMessage;
+        this.message = override ? customMessage : errorCode.getMessage() + " " + customMessage;
+    }
+
+    // 커스텀 메시지만 전달 시 기본은 override = false
+    public CommonException(ErrorCode errorCode, String customMessage) {
+        this(errorCode, customMessage, false);
     }
 
     @Override

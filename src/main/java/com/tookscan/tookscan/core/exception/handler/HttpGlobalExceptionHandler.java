@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -67,8 +68,15 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("ExceptionHandler catch MethodArgumentNotValidException : {}", e.getMessage());
         sendSlackEvent(e);
-        return ResponseDto.fail(e);
+
+        String message = e.getBindingResult().getAllErrors().stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("요청에 유효하지 않은 인자입니다.");
+
+        return ResponseDto.fail(new CommonException(ErrorCode.INVALID_ARGUMENT, message, true));
     }
+
 
     // Annotation Validation 에서 검증 실패시 발생하는 예외
     @ExceptionHandler(value = {HandlerMethodValidationException.class})
