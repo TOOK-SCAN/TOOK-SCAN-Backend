@@ -119,6 +119,7 @@ public enum ErrorCode {
     // Too Many Requests Error
     TOO_FAST_AUTHENTICATION_CODE_REQUESTS(42900, HttpStatus.TOO_MANY_REQUESTS, "인증코드 발급 속도가 너무 빠릅니다."),
     TOO_MANY_AUTHENTICATION_CODE_REQUESTS(42901, HttpStatus.TOO_MANY_REQUESTS, "인증코드 발급 요청이 너무 많습니다."),
+    TOO_MANY_TEST_MAIL_REQUESTS(42902, HttpStatus.TOO_MANY_REQUESTS, "테스트 메일 발송 요청이 너무 많습니다. 10분 후 다시 시도해주세요."),
 
     // Internal Server Error
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러입니다."),
