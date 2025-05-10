@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 public class IssueAuthenticationCodeResponseDto extends SelfValidating<IssueAuthenticationCodeResponseDto> {
-    @JsonProperty(namespace = "try_cnt")
+    @JsonProperty("try_cnt")
     @Min(0)
     private final Integer tryCnt;
 
