@@ -5,8 +5,6 @@ import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
-import com.tookscan.tookscan.order.presentation.dto.request.CreateUserOrderRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.response.CreateUserOrderResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -18,6 +16,8 @@ import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
+import com.tookscan.tookscan.order.presentation.dto.request.CreateUserOrderRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.response.CreateUserOrderResponseDto;
 import com.tookscan.tookscan.order.repository.CouponRepository;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
@@ -74,6 +74,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                 requestDto.deliveryInfo().address().region3DepthName(),
                 requestDto.deliveryInfo().address().region4DepthName(),
                 requestDto.deliveryInfo().address().addressDetail(),
+                requestDto.deliveryInfo().address().zoneCode(),
                 requestDto.deliveryInfo().address().latitude(),
                 requestDto.deliveryInfo().address().longitude()
         );

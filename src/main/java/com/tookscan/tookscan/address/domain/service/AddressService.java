@@ -12,6 +12,7 @@ public class AddressService {
             String region3DepthName,
             String region4DepthName,
             String addressDetail,
+            String zoneCode,
             Double latitude,
             Double longitude
     ) {
@@ -21,6 +22,7 @@ public class AddressService {
                 .region2DepthName(region2DepthName)
                 .region3DepthName(region3DepthName)
                 .region4DepthName(region4DepthName)
+                .zoneCode(zoneCode)
                 .addressDetail(addressDetail)
                 .latitude(latitude)
                 .longitude(longitude)
@@ -35,6 +37,7 @@ public class AddressService {
             String region3DepthName,
             String region4DepthName,
             String addressDetail,
+            String zoneCode,
             Double latitude,
             Double longitude
             ) {
@@ -44,6 +47,7 @@ public class AddressService {
         address.updateRegion3DepthName(region3DepthName);
         address.updateRegion4DepthName(region4DepthName);
         address.updateAddressDetail(addressDetail);
+        address.updateZoneCode(zoneCode);
         address.updateLongitude(longitude);
         address.updateLatitude(latitude);
 

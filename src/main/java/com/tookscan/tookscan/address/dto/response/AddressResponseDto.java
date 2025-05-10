@@ -40,6 +40,11 @@ public class AddressResponseDto extends SelfValidating<AddressResponseDto> {
     @NotNull(message = "상세 주소는 필수입니다")
     private final String addressDetail;
 
+    @JsonProperty("zone_code")
+    @Schema(description = "우편번호", example = "06210")
+    @NotNull(message = "우편번호는 필수입니다")
+    private final String zoneCode;
+
     @JsonProperty("longitude")
     @Schema(description = "경도", example = "127.123456")
     @NotNull(message = "경도는 필수입니다")
@@ -54,7 +59,8 @@ public class AddressResponseDto extends SelfValidating<AddressResponseDto> {
 
     @Builder
     public AddressResponseDto(String addressName, String region1DepthName, String region2DepthName,
-                              String region3DepthName, String region4DepthName, String addressDetail, Double longitude,
+                              String region3DepthName, String region4DepthName, String zoneCode, String addressDetail,
+                              Double longitude,
                               Double latitude) {
         this.addressName = addressName;
         this.region1DepthName = region1DepthName;
@@ -62,6 +68,7 @@ public class AddressResponseDto extends SelfValidating<AddressResponseDto> {
         this.region3DepthName = region3DepthName;
         this.region4DepthName = region4DepthName;
         this.addressDetail = addressDetail;
+        this.zoneCode = zoneCode;
         this.longitude = longitude;
         this.latitude = latitude;
         this.validateSelf();
