@@ -3,7 +3,11 @@ package com.tookscan.tookscan.address.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.domain.Address;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
@@ -27,6 +31,12 @@ public record AddressRequestDto(
         @Schema(description = "읍/면/동", example = "역삼동")
         @NotBlank(message = "읍/면/동을 입력해주세요.")
         String region3DepthName,
+
+        @JsonProperty("zone_code")
+        @Schema(description = "우편번호", example = "06210")
+        @NotBlank(message = "우편번호를 입력해주세요.")
+        @Size(min = 5, max = 5, message = "우편번호는 5자리여야 합니다.")
+        String zoneCode,
 
         @JsonProperty("region_4depth_name")
         @Schema(description = "리/가", example = "00리")

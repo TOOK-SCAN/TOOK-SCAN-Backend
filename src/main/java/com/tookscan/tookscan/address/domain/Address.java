@@ -29,6 +29,9 @@ public class Address {
     @Column(name = "region_4depth_name", length = 50)
     private String region4DepthName;
 
+    @Column(name = "zone_code", length = 5)
+    private String zoneCode;
+
     @Column(name = "address_detail", length = 100)
     private String addressDetail;
 
@@ -45,6 +48,7 @@ public class Address {
             String region2DepthName,
             String region3DepthName,
             String region4DepthName,
+            String zoneCode,
             String addressDetail,
             Double longitude,
             Double latitude
@@ -54,6 +58,7 @@ public class Address {
         this.region2DepthName = region2DepthName;
         this.region3DepthName = region3DepthName;
         this.region4DepthName = region4DepthName;
+        this.zoneCode = zoneCode;
         this.addressDetail = addressDetail;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -81,6 +86,10 @@ public class Address {
 
     public void updateRegion4DepthName(String region4DepthName) {
         this.region4DepthName = region4DepthName;
+    }
+
+    public void updateZoneCode(String zoneCode) {
+        this.zoneCode = zoneCode;
     }
 
     public void updateLongitude(Double longitude) {
