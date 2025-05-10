@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.term.application.usecase;
 
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
-import com.tookscan.tookscan.term.application.dto.request.CreateAdminTermRequestDto;
-import com.tookscan.tookscan.term.application.dto.response.CreateAdminTermResponseDto;
+import com.tookscan.tookscan.term.presentation.dto.request.CreateAdminTermRequestDto;
+import com.tookscan.tookscan.term.presentation.dto.response.CreateAdminTermResponseDto;
 
 @UseCase
 public interface CreateAdminTermUseCase {

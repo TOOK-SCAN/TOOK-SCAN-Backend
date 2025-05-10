@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.security.application.service;
 
-import com.tookscan.tookscan.security.application.dto.response.DefaultJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.LoginByDefaultUseCase;
 import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;

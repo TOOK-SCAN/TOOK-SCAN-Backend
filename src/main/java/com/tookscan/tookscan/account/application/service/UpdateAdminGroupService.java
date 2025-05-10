@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.application.dto.request.UpdateAdminGroupRequestDto;
+import com.tookscan.tookscan.account.presentation.dto.request.UpdateAdminGroupRequestDto;
 import com.tookscan.tookscan.account.application.usecase.UpdateAdminGroupUseCase;
 import com.tookscan.tookscan.account.domain.Group;
 import com.tookscan.tookscan.account.domain.service.GroupService;

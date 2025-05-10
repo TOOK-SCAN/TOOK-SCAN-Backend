@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.account.application.service;
 
 import com.nimbusds.jose.util.Pair;
-import com.tookscan.tookscan.account.application.dto.request.CreateAdminUserGroupRequestDto;
+import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminUserGroupRequestDto;
 import com.tookscan.tookscan.account.application.usecase.CreateAdminUserGroupUseCase;
 import com.tookscan.tookscan.account.domain.Group;
 import com.tookscan.tookscan.account.domain.User;

@@ -2,8 +2,8 @@ package com.tookscan.tookscan.core.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tookscan.tookscan.core.constant.Constants;
-import com.tookscan.tookscan.security.application.dto.response.DefaultJsonWebTokenDto;
-import com.tookscan.tookscan.security.application.dto.response.OauthJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.dto.OauthJsonWebTokenDto;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor

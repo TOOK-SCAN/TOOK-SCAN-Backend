@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.security.application.service;
 
-import com.tookscan.tookscan.security.application.dto.response.ValidationResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.response.ValidationResponseDto;
 import com.tookscan.tookscan.security.application.usecase.ValidateIdUseCase;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;

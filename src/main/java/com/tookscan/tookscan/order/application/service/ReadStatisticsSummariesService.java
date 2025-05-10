@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.repository.UserRepository;
-import com.tookscan.tookscan.order.application.dto.response.ReadStatisticsSummariesResponseDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadStatisticsSummariesResponseDto.MonthlyStatisticsDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto.MonthlyStatisticsDto;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;

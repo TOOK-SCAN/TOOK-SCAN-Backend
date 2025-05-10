@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.utility.S3Util;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderBriefResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EScanStatus;

@@ -4,7 +4,7 @@ import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.HttpServletUtil;
-import com.tookscan.tookscan.security.application.dto.response.OauthJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.dto.OauthJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.LoginOauthUseCase;
 import com.tookscan.tookscan.security.info.CustomTemporaryUserPrincipal;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;

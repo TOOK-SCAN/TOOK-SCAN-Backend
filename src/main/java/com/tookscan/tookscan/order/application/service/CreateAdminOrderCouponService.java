@@ -2,7 +2,7 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.order.application.dto.request.CreateAdminOrderCouponRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.service.CouponService;

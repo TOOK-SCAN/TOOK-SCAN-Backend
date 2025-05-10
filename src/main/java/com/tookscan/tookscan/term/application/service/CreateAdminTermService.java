@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.term.application.service;
 
-import com.tookscan.tookscan.term.application.dto.request.CreateAdminTermRequestDto;
-import com.tookscan.tookscan.term.application.dto.response.CreateAdminTermResponseDto;
+import com.tookscan.tookscan.term.presentation.dto.request.CreateAdminTermRequestDto;
+import com.tookscan.tookscan.term.presentation.dto.response.CreateAdminTermResponseDto;
 import com.tookscan.tookscan.term.application.usecase.CreateAdminTermUseCase;
 import com.tookscan.tookscan.term.domain.Term;
 import com.tookscan.tookscan.term.domain.service.TermService;

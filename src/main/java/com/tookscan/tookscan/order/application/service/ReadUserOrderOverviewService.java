@@ -2,7 +2,7 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
-import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderOverviewResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderOverviewResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderOverviewUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;

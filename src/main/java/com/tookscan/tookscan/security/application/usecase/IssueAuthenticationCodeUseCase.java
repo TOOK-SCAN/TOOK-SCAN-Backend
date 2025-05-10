@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.security.application.usecase;
 
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
-import com.tookscan.tookscan.security.application.dto.request.IssueAuthenticationCodeRequestDto;
-import com.tookscan.tookscan.security.application.dto.response.IssueAuthenticationCodeResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.request.IssueAuthenticationCodeRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticationCodeResponseDto;
 
 @UseCase
 public interface IssueAuthenticationCodeUseCase {

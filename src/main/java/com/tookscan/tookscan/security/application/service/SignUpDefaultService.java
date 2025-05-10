@@ -3,7 +3,7 @@ package com.tookscan.tookscan.security.application.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
-import com.tookscan.tookscan.security.application.dto.request.SignUpDefaultRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;

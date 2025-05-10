@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.application.dto.response.ReadAdminGroupBriefResponseDto;
+import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminGroupBriefResponseDto;
 import com.tookscan.tookscan.account.application.usecase.ReadAdminGroupBriefUseCase;
 import com.tookscan.tookscan.account.domain.Group;
 import com.tookscan.tookscan.account.repository.GroupRepository;

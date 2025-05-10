@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.term.application.service;
 
-import com.tookscan.tookscan.term.application.dto.response.ReadUserTermOverviewResponseDto;
+import com.tookscan.tookscan.term.presentation.dto.response.ReadUserTermOverviewResponseDto;
 import com.tookscan.tookscan.term.application.usecase.ReadUserTermOverviewUseCase;
 import com.tookscan.tookscan.term.domain.type.ETermType;
 import com.tookscan.tookscan.term.repository.TermRepository;

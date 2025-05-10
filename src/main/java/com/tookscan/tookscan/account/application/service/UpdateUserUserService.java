@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.application.dto.request.UpdateUserUserRequestDto;
+import com.tookscan.tookscan.account.presentation.dto.request.UpdateUserUserRequestDto;
 import com.tookscan.tookscan.account.application.usecase.UpdateUserUserUseCase;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;

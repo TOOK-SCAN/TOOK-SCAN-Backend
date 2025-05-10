@@ -2,7 +2,7 @@ package com.tookscan.tookscan.security.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.security.application.dto.request.ValidateAuthenticationCodeRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.ValidateAuthenticationCodeRequestDto;
 import com.tookscan.tookscan.security.application.usecase.ValidateAuthenticationCodeUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;

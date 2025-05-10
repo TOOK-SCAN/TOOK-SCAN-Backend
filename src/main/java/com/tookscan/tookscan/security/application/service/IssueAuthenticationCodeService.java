@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.security.application.service;
 
 import com.tookscan.tookscan.core.utility.PasswordUtil;
-import com.tookscan.tookscan.security.application.dto.request.IssueAuthenticationCodeRequestDto;
-import com.tookscan.tookscan.security.application.dto.response.IssueAuthenticationCodeResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.request.IssueAuthenticationCodeRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticationCodeResponseDto;
 import com.tookscan.tookscan.security.application.usecase.IssueAuthenticationCodeUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCodeHistory;

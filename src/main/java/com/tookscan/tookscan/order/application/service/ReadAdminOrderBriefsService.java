@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderBriefsResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.dto.PageInfoDto;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderSummariesResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderSummariesResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;

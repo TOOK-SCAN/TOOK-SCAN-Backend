@@ -1,8 +1,0 @@
-### 테스트 메일 발송
-//@no-log
-POST {{host_url}}/v1/test-email
-Content-Type: application/json
-
-{
-  "email": "jangelliot0404@dgu.ac.kr"
-}

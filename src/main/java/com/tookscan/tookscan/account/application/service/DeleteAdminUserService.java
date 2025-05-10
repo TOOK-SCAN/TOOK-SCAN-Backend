@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.application.dto.request.DeleteAdminUserRequestDto;
+import com.tookscan.tookscan.account.presentation.dto.request.DeleteAdminUserRequestDto;
 import com.tookscan.tookscan.account.application.usecase.DeleteAdminUserUseCase;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;

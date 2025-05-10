@@ -5,7 +5,7 @@ import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.DeliveryTrackerUtil;
-import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderDeliveryResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;

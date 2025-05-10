@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.application.dto.request.DeleteAdminOrdersRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminOrdersRequestDto;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminOrdersUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;

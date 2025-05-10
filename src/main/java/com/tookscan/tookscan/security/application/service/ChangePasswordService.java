@@ -2,7 +2,7 @@ package com.tookscan.tookscan.security.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.security.application.dto.request.ChangePasswordRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.ChangePasswordRequestDto;
 import com.tookscan.tookscan.security.application.usecase.ChangePasswordUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.domain.service.AccountService;
