@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.security.application.service;
 
-import com.tookscan.tookscan.security.application.dto.request.ReissuePasswordRequestDto;
-import com.tookscan.tookscan.security.application.dto.response.ReissuePasswordResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.response.ReissuePasswordResponseDto;
 import com.tookscan.tookscan.security.application.usecase.ReissuePasswordUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;

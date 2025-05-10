@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminDeliveriesSummariesResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDeliveriesSummariesResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDeliveriesSummariesUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;

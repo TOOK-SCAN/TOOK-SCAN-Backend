@@ -5,7 +5,7 @@ import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
-import com.tookscan.tookscan.security.application.dto.request.SignUpOauthRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;

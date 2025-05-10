@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.application.dto.request.DeleteAdminDocumentsRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminDocumentsRequestDto;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.order.application.usecase;
 
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminOrderSummariesResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderSummariesResponseDto;
 import org.springframework.data.domain.Sort.Direction;
 
 @UseCase

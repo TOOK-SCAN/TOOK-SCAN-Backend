@@ -7,7 +7,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
-import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
 import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;

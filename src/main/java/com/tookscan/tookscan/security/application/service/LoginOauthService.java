@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.security.application.service;
 
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
-import com.tookscan.tookscan.security.application.dto.response.OauthJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.dto.OauthJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.LoginOauthUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.domain.service.RefreshTokenService;

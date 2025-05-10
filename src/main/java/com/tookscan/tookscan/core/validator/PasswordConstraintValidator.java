@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.core.validator;
 
 import com.tookscan.tookscan.core.annotation.validation.ValidPassword;
-import com.tookscan.tookscan.security.application.dto.request.SignUpDefaultRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

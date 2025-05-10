@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.application.dto.response.ReadUserOrderCouponDetailResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderCouponDetailUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.service.CouponService;

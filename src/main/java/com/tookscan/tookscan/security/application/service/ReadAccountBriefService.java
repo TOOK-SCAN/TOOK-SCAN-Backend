@@ -1,12 +1,9 @@
 package com.tookscan.tookscan.security.application.service;
 
-import com.tookscan.tookscan.core.utility.CookieUtil;
-import com.tookscan.tookscan.security.application.dto.response.ReadAccountBriefResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.repository.AccountRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

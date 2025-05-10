@@ -2,7 +2,7 @@ package com.tookscan.tookscan.term.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.term.application.dto.request.UpdateAdminTermRequestDto;
+import com.tookscan.tookscan.term.presentation.dto.request.UpdateAdminTermRequestDto;
 import com.tookscan.tookscan.term.application.usecase.UpdateAdminTermUseCase;
 import com.tookscan.tookscan.term.domain.Term;
 import com.tookscan.tookscan.term.domain.service.TermService;

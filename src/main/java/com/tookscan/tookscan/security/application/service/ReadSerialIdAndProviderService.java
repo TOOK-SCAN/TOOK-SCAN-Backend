@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.security.application.service;
 
 import com.tookscan.tookscan.account.repository.UserRepository;
-import com.tookscan.tookscan.security.application.dto.request.ReadSerialIdAndProviderRequestDto;
-import com.tookscan.tookscan.security.application.dto.response.ReadSerialIdAndProviderResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.request.ReadSerialIdAndProviderRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.response.ReadSerialIdAndProviderResponseDto;
 import com.tookscan.tookscan.security.application.usecase.ReadSerialIdAndProviderUseCase;
 import com.tookscan.tookscan.security.domain.mysql.Account;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;

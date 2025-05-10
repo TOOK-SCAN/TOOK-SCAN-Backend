@@ -6,7 +6,7 @@ import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-import com.tookscan.tookscan.payment.application.dto.request.ConfirmPaymentRequestDto;
+import com.tookscan.tookscan.payment.presentation.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.application.usecase.ConfirmPaymentUseCase;
 import com.tookscan.tookscan.payment.domain.Payment;
 import com.tookscan.tookscan.payment.domain.service.PaymentService;

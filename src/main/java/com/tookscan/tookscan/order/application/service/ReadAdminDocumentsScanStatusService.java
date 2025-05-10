@@ -3,7 +3,7 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.ScannerUtil;
-import com.tookscan.tookscan.order.application.dto.response.ReadAdminDocumentsScanStatusResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDocumentsScanStatusResponseDto;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsScanStatusUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.type.EScanStatus;

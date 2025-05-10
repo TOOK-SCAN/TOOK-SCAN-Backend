@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.account.application.usecase;
 
-import com.tookscan.tookscan.account.application.dto.request.CreateAdminGroupRequestDto;
+import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminGroupRequestDto;
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
 
 @UseCase

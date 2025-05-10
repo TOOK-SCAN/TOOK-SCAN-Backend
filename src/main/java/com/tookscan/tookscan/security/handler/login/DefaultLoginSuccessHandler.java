@@ -2,7 +2,7 @@ package com.tookscan.tookscan.security.handler.login;
 
 import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
-import com.tookscan.tookscan.security.application.dto.response.DefaultJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.LoginByDefaultUseCase;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;

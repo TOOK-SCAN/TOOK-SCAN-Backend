@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.security.application.usecase;
 
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
-import com.tookscan.tookscan.security.application.dto.request.ChangePasswordRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.ChangePasswordRequestDto;
 
 import java.util.UUID;
 

@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.security.application.usecase;
 
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
-import com.tookscan.tookscan.security.application.dto.request.ReissuePasswordRequestDto;
-import com.tookscan.tookscan.security.application.dto.response.ReissuePasswordResponseDto;
+import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.response.ReissuePasswordResponseDto;
 
 @UseCase
 public interface ReissuePasswordUseCase {

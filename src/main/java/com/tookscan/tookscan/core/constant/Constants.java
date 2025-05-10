@@ -51,6 +51,7 @@ public class Constants {
 
             // Test Email
             "/v1/test-email",
+            "/v1/validation/test-email",
 
             // Payment
             "/v1/payments",

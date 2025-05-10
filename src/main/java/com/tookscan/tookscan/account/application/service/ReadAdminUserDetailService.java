@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.application.dto.response.ReadAdminUserDetailResponseDto;
+import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminUserDetailResponseDto;
 import com.tookscan.tookscan.account.application.usecase.ReadAdminUserDetailUseCase;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
