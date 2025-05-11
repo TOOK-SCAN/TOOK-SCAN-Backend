@@ -69,10 +69,14 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         @JsonProperty("is_delivery")
         private final Boolean isDelivery;
 
+        @JsonProperty("transaction_id")
+        private final String transactionId;
+
         @Builder
         public OrderInfoDto(String orderId, EOrderStatus orderStatus, String documentDescription, String orderNumber,
                             String orderDate, String receiverName, String address, EPaymentMethod paymentMethod,
-                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal, Boolean isDelivery) {
+                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal, Boolean isDelivery,
+                            String transactionId) {
             this.orderId = orderId;
             this.orderStatus = orderStatus;
             this.documentDescription = documentDescription;
@@ -84,6 +88,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             this.easyPaymentProvider = easyPaymentProvider;
             this.paymentTotal = paymentTotal;
             this.isDelivery = isDelivery;
+            this.transactionId = transactionId;
             this.validateSelf();
         }
 
@@ -92,6 +97,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
 
             EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
             EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
+            String transactionId = payment.map(Payment::getTransactionId).orElse(null);
             Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
 
             return OrderInfoDto.builder()
@@ -106,6 +112,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
                     .easyPaymentProvider(easyPaymentProvider)
                     .paymentTotal(paymentTotal)
                     .isDelivery(order.isDelivery())
+                    .transactionId(transactionId)
                     .build();
         }
     }
