@@ -57,6 +57,9 @@ public class Payment extends BaseEntity {
     @Column(name = "easy_payment_provider")
     private EEasyPaymentProvider easyPaymentProvider;
 
+    @Column(name = "transaction_id")
+    private String transactionId;
+
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
     /* -------------------------------------------- */
@@ -67,7 +70,7 @@ public class Payment extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Payment(String paymentKey, String type, EPaymentMethod method, Integer totalAmount, EPaymentStatus status, LocalDateTime requestedAt, LocalDateTime approvedAt, EEasyPaymentProvider easyPaymentProvider, Order order) {
+    public Payment(String paymentKey, String type, EPaymentMethod method, Integer totalAmount, EPaymentStatus status, LocalDateTime requestedAt, LocalDateTime approvedAt, EEasyPaymentProvider easyPaymentProvider, String transactionId, Order order) {
         this.paymentKey = paymentKey;
         this.type = type;
         this.method = method;
@@ -76,6 +79,7 @@ public class Payment extends BaseEntity {
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
         this.easyPaymentProvider = easyPaymentProvider;
+        this.transactionId = transactionId;
         this.order = order;
     }
 

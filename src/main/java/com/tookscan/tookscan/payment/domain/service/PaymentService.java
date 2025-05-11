@@ -20,7 +20,8 @@ public class PaymentService {
             LocalDateTime requestedAt,
             LocalDateTime approvedAt,
             EEasyPaymentProvider easyPaymentProvider,
-            Order order
+            Order order,
+            String transactionId
     ) {
         return Payment.builder()
                 .paymentKey(paymentKey)
@@ -32,6 +33,7 @@ public class PaymentService {
                 .approvedAt(approvedAt)
                 .easyPaymentProvider(easyPaymentProvider)
                 .order(order)
+                .transactionId(transactionId)
                 .build();
     }
 }
