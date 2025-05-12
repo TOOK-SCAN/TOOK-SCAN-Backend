@@ -21,7 +21,7 @@ public class PaymentService {
             LocalDateTime approvedAt,
             EEasyPaymentProvider easyPaymentProvider,
             Order order,
-            String transactionId
+            String receiptUrl
     ) {
         return Payment.builder()
                 .paymentKey(paymentKey)
@@ -33,7 +33,7 @@ public class PaymentService {
                 .approvedAt(approvedAt)
                 .easyPaymentProvider(easyPaymentProvider)
                 .order(order)
-                .transactionId(transactionId)
+                .receiptUrl(receiptUrl)
                 .build();
     }
 }

@@ -61,7 +61,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 response.approvedAt() != null ? OffsetDateTime.parse(response.approvedAt()).toLocalDateTime() : null,
                 response.easyPay() != null ? EEasyPaymentProvider.fromString(response.easyPay().provider()) : null,
                 order,
-                response.lastTransactionKey() != null ? response.lastTransactionKey() : null
+                response.receipt() != null && response.receipt().url() != null ? response.receipt().url() : null
         );
 
         payment = paymentRepository.saveAndReturn(payment);

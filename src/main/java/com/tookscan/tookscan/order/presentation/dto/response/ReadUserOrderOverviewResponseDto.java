@@ -10,11 +10,12 @@ import com.tookscan.tookscan.payment.domain.Payment;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrderOverviewResponseDto> {
@@ -69,14 +70,10 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         @JsonProperty("is_delivery")
         private final Boolean isDelivery;
 
-        @JsonProperty("transaction_id")
-        private final String transactionId;
-
         @Builder
         public OrderInfoDto(String orderId, EOrderStatus orderStatus, String documentDescription, String orderNumber,
                             String orderDate, String receiverName, String address, EPaymentMethod paymentMethod,
-                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal, Boolean isDelivery,
-                            String transactionId) {
+                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal, Boolean isDelivery) {
             this.orderId = orderId;
             this.orderStatus = orderStatus;
             this.documentDescription = documentDescription;
@@ -88,7 +85,6 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             this.easyPaymentProvider = easyPaymentProvider;
             this.paymentTotal = paymentTotal;
             this.isDelivery = isDelivery;
-            this.transactionId = transactionId;
             this.validateSelf();
         }
 
@@ -97,7 +93,6 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
 
             EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
             EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-            String transactionId = payment.map(Payment::getTransactionId).orElse(null);
             Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
 
             return OrderInfoDto.builder()
@@ -112,7 +107,6 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
                     .easyPaymentProvider(easyPaymentProvider)
                     .paymentTotal(paymentTotal)
                     .isDelivery(order.isDelivery())
-                    .transactionId(transactionId)
                     .build();
         }
     }
