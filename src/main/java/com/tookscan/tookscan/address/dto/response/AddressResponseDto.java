@@ -87,6 +87,7 @@ public class AddressResponseDto extends SelfValidating<AddressResponseDto> {
                 .region3DepthName(address.getRegion3DepthName())
                 .region4DepthName(address.getRegion4DepthName() != null ? address.getRegion4DepthName() : null)
                 .addressDetail(address.getAddressDetail())
+                .zoneCode(address.getZoneCode())
                 .longitude(address.getLongitude())
                 .latitude(address.getLatitude())
                 .build();
