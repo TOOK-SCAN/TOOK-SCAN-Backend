@@ -3,6 +3,7 @@ package com.tookscan.tookscan.account.presentation.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -24,6 +25,7 @@ public record UpdateUserUserRequestDto(
 
         @JsonProperty("address")
         @Schema(description = "주소")
+        @Valid
         AddressRequestDto address,
 
         @JsonProperty("is_receive_sms")

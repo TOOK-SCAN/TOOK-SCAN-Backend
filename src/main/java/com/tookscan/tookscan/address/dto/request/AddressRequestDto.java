@@ -83,6 +83,7 @@ public record AddressRequestDto(
                         .region3DepthName(region3DepthName)
                         .region4DepthName(region4DepthName)
                         .addressDetail(addressDetail)
+                        .zoneCode(zoneCode)
                         .latitude(latitude)
                         .longitude(longitude)
                         .build();

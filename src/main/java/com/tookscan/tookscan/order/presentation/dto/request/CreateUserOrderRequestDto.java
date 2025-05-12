@@ -85,6 +85,7 @@ public record CreateUserOrderRequestDto(
 
             @NotNull(message = "주소를 입력해주세요.")
             @JsonProperty("address")
+            @Valid
             AddressRequestDto address
     ) {
     }
