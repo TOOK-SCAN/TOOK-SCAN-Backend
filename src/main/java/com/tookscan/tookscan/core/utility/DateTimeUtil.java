@@ -21,6 +21,7 @@ public class DateTimeUtil {
     public static final DateTimeFormatter KORDateTimeEFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd (E) HH:mm",
             Locale.KOREAN);
     public static final DateTimeFormatter DartDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+    public static final DateTimeFormatter DartDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
     public static final DateTimeFormatter YYMMDD_Formatter = DateTimeFormatter.ofPattern("yyMMdd");
 
     /**
@@ -129,6 +130,16 @@ public class DateTimeUtil {
      */
     public static String convertLocalDateTimeToKOREString(LocalDateTime dateTime) {
         return dateTime.format(KORDateTimeEFormatter);
+    }
+
+    /**
+     * LocalDateTime을 Dart 날짜 형식으로 변환 (yyyy.MM.dd HH:mm:ss)
+     *
+     * @param dateTime LocalDateTime
+     * @return String
+     */
+    public static String convertLocalDateTimeToDartString(LocalDateTime dateTime) {
+        return dateTime.format(DartDateTimeFormatter);
     }
 
     /**

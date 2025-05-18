@@ -2,6 +2,7 @@ package com.tookscan.tookscan.order.domain.type;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -56,6 +57,19 @@ public enum EOrderStatus {
         };
     }
 
+    public List<EOrderStatus> getDisplayList() {
+        return switch (this) {
+            case APPLY_COMPLETED -> List.of(APPLY_COMPLETED, COMPANY_ARRIVED);
+            case PAYMENT_WAITING -> List.of(PAYMENT_WAITING);
+            case PAYMENT_COMPLETED -> List.of(PAYMENT_COMPLETED, SCAN_WAITING, SCAN_IN_PROGRESS);
+            case ALL_COMPLETED -> List.of(RECOVERY_IN_PROGRESS, POST_WAITING,
+                    ALL_COMPLETED);
+            case CANCEL -> List.of(CANCEL);
+            case AS -> List.of(AS);
+            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
+        };
+    }
+
     public String toDisplayScanStatusString() {
         return switch (this) {
             case APPLY_COMPLETED, COMPANY_ARRIVED, PAYMENT_WAITING, PAYMENT_COMPLETED, SCAN_WAITING -> "스캔대기";
@@ -63,6 +77,15 @@ public enum EOrderStatus {
             case RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED -> "스캔완료";
             case CANCEL -> "취소";
             case AS -> "A/S";
+        };
+    }
+
+    public static List<EOrderStatus> getScanStatusList(EScanStatus scanStatus) {
+        return switch (scanStatus) {
+            case WAITING -> List.of(APPLY_COMPLETED, COMPANY_ARRIVED, PAYMENT_WAITING);
+            case IN_PROGRESS -> List.of(SCAN_WAITING, SCAN_IN_PROGRESS, PAYMENT_COMPLETED);
+            case COMPLETED -> List.of(RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED);
+            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
 }

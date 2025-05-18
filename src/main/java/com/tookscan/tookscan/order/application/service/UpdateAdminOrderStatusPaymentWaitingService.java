@@ -3,6 +3,7 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
 
     private final OrderRepository orderRepository;
 
+    private final OrderService orderService;
+
     private final KakaoMessageUtil kakaoMessageUtil;
 
     @Override
@@ -24,6 +27,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
         Order order = orderRepository.findByIdOrElseThrow(orderId);
 
         order.updateOrderStatus(EOrderStatus.PAYMENT_WAITING);
+        orderService.updatePaymentExpirationDate(order);
 
         kakaoMessageUtil.sendRequestPaymentMessage(
                 order.getRole(),

@@ -6,19 +6,21 @@ import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
-import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
-import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-import java.util.Optional;
-
 @Getter
 public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrderOverviewResponseDto> {
+
+    @JsonProperty("status_count")
+    @NotNull
+    private final StatusCountDto statusCount;
 
     @JsonProperty("orders")
     @NotNull
@@ -29,110 +31,163 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
     private final PageInfoDto pageInfo;
 
     @Getter
+    public static class StatusCountDto {
+        @JsonProperty("scan_waiting")
+        private final long scanWaiting;
+
+        @JsonProperty("scan_in_progress")
+        private final long scanInProgress;
+
+        @JsonProperty("scan_completed")
+        private final long scanCompleted;
+
+        @Builder
+        public StatusCountDto(long scanWaiting, long scanInProgress, long scanCompleted) {
+            this.scanWaiting = scanWaiting;
+            this.scanInProgress = scanInProgress;
+            this.scanCompleted = scanCompleted;
+        }
+    }
+
+    @Getter
+    public static class DocumentDto {
+        @JsonProperty("name")
+        private final String name;
+
+        @JsonProperty("page_count")
+        private final Integer pageCount;
+
+        @JsonProperty("recovery_option")
+        private final ERecoveryOption recoveryOption;
+
+        @Builder
+        public DocumentDto(String name, Integer pageCount, ERecoveryOption recoveryOption) {
+            this.name = name;
+            this.pageCount = pageCount;
+            this.recoveryOption = recoveryOption;
+        }
+    }
+
+    @Getter
     public static class OrderInfoDto extends SelfValidating<OrderInfoDto> {
         @JsonProperty("id")
         @NotNull
-        private final String orderId;
-
-        @JsonProperty("order_status")
-        @NotNull
-        private final EOrderStatus orderStatus;
-
-        @JsonProperty("document_description")
-        @NotNull
-        private final String documentDescription;
-
-        @JsonProperty("order_number")
-        @NotNull
-        private final String orderNumber;
+        private final Long id;
 
         @JsonProperty("order_date")
         @NotNull
         private final String orderDate;
 
-        @JsonProperty("receiver_name")
+        @JsonProperty("status")
         @NotNull
-        private final String receiverName;
+        private final EOrderStatus status;
 
-        @JsonProperty("address")
+        @JsonProperty("order_number")
         @NotNull
-        private final String address;
+        private final String orderNumber;
 
-        @JsonProperty("payment_method")
-        private final EPaymentMethod paymentMethod;
-
-        @JsonProperty("easy_payment_provider")
-        private final EEasyPaymentProvider easyPaymentProvider;
+        @JsonProperty("documents")
+        @NotNull
+        private final List<DocumentDto> documents;
 
         @JsonProperty("payment_total")
         private final Integer paymentTotal;
 
+        @JsonProperty("delivery_expiration_date")
+        @NotNull
+        private final String deliveryExpirationDate;
+
+        @JsonProperty("payment_expiration_date")
+        private final String paymentExpirationDate;
+
         @JsonProperty("is_delivery")
+        @NotNull
         private final Boolean isDelivery;
 
         @Builder
-        public OrderInfoDto(String orderId, EOrderStatus orderStatus, String documentDescription, String orderNumber,
-                            String orderDate, String receiverName, String address, EPaymentMethod paymentMethod,
-                            EEasyPaymentProvider easyPaymentProvider, Integer paymentTotal, Boolean isDelivery) {
-            this.orderId = orderId;
-            this.orderStatus = orderStatus;
-            this.documentDescription = documentDescription;
-            this.orderNumber = orderNumber;
+        public OrderInfoDto(Long id,
+                            String orderDate,
+                            EOrderStatus status,
+                            String orderNumber,
+                            List<DocumentDto> documents,
+                            Integer paymentTotal,
+                            String deliveryExpirationDate,
+                            String paymentExpirationDate,
+                            Boolean isDelivery) {
+            this.id = id;
             this.orderDate = orderDate;
-            this.receiverName = receiverName;
-            this.address = address;
-            this.paymentMethod = paymentMethod;
-            this.easyPaymentProvider = easyPaymentProvider;
+            this.status = status;
+            this.orderNumber = orderNumber;
+            this.documents = documents;
             this.paymentTotal = paymentTotal;
+            this.deliveryExpirationDate = deliveryExpirationDate;
+            this.paymentExpirationDate = paymentExpirationDate;
             this.isDelivery = isDelivery;
             this.validateSelf();
         }
 
         public static OrderInfoDto fromEntity(Order order) {
-            Optional<Payment> payment = Optional.ofNullable(order.getPayment());
+            Optional<Payment> paymentOpt = Optional.ofNullable(order.getPayment());
 
-            EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
-            EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-            Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
+            Integer paymentTotal = paymentOpt.map(Payment::getTotalAmount)
+                    .orElse(order.getTotalAmount());
+
+            String deliveryExpirationDate = DateTimeUtil.convertLocalDateTimeToDartString(
+                    order.getDeliveryExpirationDate());
+
+            String paymentExpiration = Optional.ofNullable(order.getPaymentExpirationDate())
+                    .map(DateTimeUtil::convertLocalDateTimeToDartString)
+                    .orElse(null);
+
+            List<DocumentDto> docs = order.getDocuments().stream()
+                    .map(doc -> DocumentDto.builder()
+                            .name(doc.getName())
+                            .pageCount(doc.getPageCount())
+                            .recoveryOption(doc.getRecoveryOption())
+                            .build())
+                    .toList();
 
             return OrderInfoDto.builder()
-                    .orderId(order.getId().toString())
-                    .orderStatus(order.getOrderStatus().toDisplayString())
-                    .documentDescription(order.getDocumentsDescription())
+                    .id(order.getId())
+                    .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
+                    .status(order.getOrderStatus().toDisplayString())
                     .orderNumber(order.getOrderNumber())
-                    .orderDate(DateTimeUtil.convertLocalDateTimeToKORString(order.getCreatedAt()))
-                    .receiverName(order.getDelivery().getReceiverName())
-                    .address(order.getDelivery().getAddress().getFullAddress())
-                    .paymentMethod(paymentMethod)
-                    .easyPaymentProvider(easyPaymentProvider)
+                    .documents(docs)
                     .paymentTotal(paymentTotal)
+                    .deliveryExpirationDate(deliveryExpirationDate)
+                    .paymentExpirationDate(paymentExpiration)
                     .isDelivery(order.isDelivery())
                     .build();
         }
     }
 
     @Builder
-    public ReadUserOrderOverviewResponseDto(List<OrderInfoDto> orders, PageInfoDto pageInfo) {
+    public ReadUserOrderOverviewResponseDto(StatusCountDto statusCount,
+                                            List<OrderInfoDto> orders,
+                                            PageInfoDto pageInfo) {
+        this.statusCount = statusCount;
         this.orders = orders;
         this.pageInfo = pageInfo;
         this.validateSelf();
     }
 
-    public static ReadUserOrderOverviewResponseDto fromEntity(Page<Order> orders) {
+    public static ReadUserOrderOverviewResponseDto of(Page<Order> orders, Integer scanWaitingCount,
+                                                      Integer scanInProgressCount, Integer scanCompletedCount) {
 
-        if (orders.isEmpty()) {
-            return ReadUserOrderOverviewResponseDto.builder()
-                    .orders(List.of())
-                    .pageInfo(PageInfoDto.fromEntity(orders))
-                    .build();
-        }
+        StatusCountDto statusCount = StatusCountDto.builder()
+                .scanWaiting(scanWaitingCount)
+                .scanInProgress(scanInProgressCount)
+                .scanCompleted(scanCompletedCount)
+                .build();
+
+        List<OrderInfoDto> orderDtos = orders.stream()
+                .map(OrderInfoDto::fromEntity)
+                .toList();
 
         return ReadUserOrderOverviewResponseDto.builder()
-                .orders(orders.stream()
-                        .map(OrderInfoDto::fromEntity)
-                        .toList())
+                .statusCount(statusCount)
+                .orders(orderDtos)
                 .pageInfo(PageInfoDto.fromEntity(orders))
                 .build();
     }
-
 }

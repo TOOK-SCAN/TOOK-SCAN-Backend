@@ -10,22 +10,23 @@ import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
@@ -222,6 +223,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Integer countByUserAndOrderStatusIn(User user, List<EOrderStatus> orderStatuses) {
+        return orderJpaRepository.countByUserAndOrderStatusIn(user, orderStatuses);
+    }
+
+    @Override
     public List<Order> findAllWithDocumentsByIdIn(List<Long> ids) {
         return orderJpaRepository.findAllWithDocumentsByIdIn(ids);
     }
@@ -232,14 +238,64 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable) {
-        if (search == null) {
+    public Page<Order> findAllByUserAndSearchAndOrderStatusInOrElseNull(
+            User user,
+            String search,
+            Pageable pageable,
+            String startDate,
+            String endDate,
+            List<EOrderStatus> orderStatuses
+    ) {
+        QOrder o = QOrder.order;
 
-            return orderJpaRepository.findAllByUser(user, pageable);
+        // 1) Base predicate: only this user
+        BooleanExpression predicate = o.user.eq(user);
+
+        // 2) Search filter
+        if (StringUtils.hasText(search)) {
+            predicate = predicate.and(
+                    o.orderNumber.containsIgnoreCase(search)
+                            .or(o.delivery.receiverName.containsIgnoreCase(search))
+            );
         }
 
-        return orderJpaRepository.findAllByUserAndSearch(user, search, pageable);
+        // 3) Date range filter
+        if (startDate != null) {
+            predicate = predicate.and(
+                    o.createdAt.goe(LocalDate.parse(startDate).atStartOfDay())
+            );
+        }
+        if (endDate != null) {
+            predicate = predicate.and(
+                    o.createdAt.loe(LocalDate.parse(endDate).atTime(LocalTime.MAX))
+            );
+        }
+
+        // 4) Status filter (IN clause)
+        if (orderStatuses != null && !orderStatuses.isEmpty()) {
+            predicate = predicate.and(o.orderStatus.in(orderStatuses));
+        }
+
+        // 5) Fetch paged content sorted by newest first
+        List<Order> content = jpaQueryFactory
+                .selectFrom(o)
+                .where(predicate)
+                .orderBy(o.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 6) Count total
+        long total = Optional.ofNullable(
+                jpaQueryFactory.select(o.count())
+                        .from(o)
+                        .where(predicate)
+                        .fetchOne()
+        ).orElse(0L);
+
+        return new PageImpl<>(content, pageable, total);
     }
+
 
     @Override
     public List<Order> findAllByOrderNumberIn(List<String> orderNumber) {

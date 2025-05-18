@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum EScanStatus {
+    WAITING("스캔대기"),
     UNABLE("스캔불가"),
     ENABLE("스캔가능"),
     IN_PROGRESS("스캔중"),
@@ -18,6 +19,7 @@ public enum EScanStatus {
 
     public static EScanStatus fromString(String value) {
         return switch (value.toUpperCase()) {
+            case "WAITING" -> WAITING;
             case "UNABLE" -> UNABLE;
             case "ENABLE" -> ENABLE;
             case "IN_PROGRESS" -> IN_PROGRESS;
