@@ -28,15 +28,16 @@ public class ReadUserOrderOverviewService implements ReadUserOrderOverviewUseCas
     @Transactional(readOnly = true)
     public ReadUserOrderOverviewResponseDto execute(UUID accountId, Integer page, Integer size, String sort,
                                                     String search, String direction,
-                                                    String startDate, String endDate) {
+                                                    String startDate, String endDate, EOrderStatus orderStatus) {
         // 사용자 조회
         User user = userRepository.findByIdOrElseThrow(accountId);
 
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Direction.fromString(direction), sort));
 
         // 주문 조회
-        Page<Order> orders = orderRepository.findAllByUserAndSearchOrElseNull(user, search, pageRequest, startDate,
-                endDate);
+        Page<Order> orders = orderRepository.findAllByUserAndSearchAndOrderStatusInOrElseNull(user, search, pageRequest,
+                startDate,
+                endDate, orderStatus.getDisplayList());
 
         // 주문 상태 카운트
         Integer scanWaitingCount = orderRepository.countByUserAndOrderStatusIn(user, EOrderStatus.getScanStatusList(

@@ -150,7 +150,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             return OrderInfoDto.builder()
                     .id(order.getId())
                     .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
-                    .status(order.getOrderStatus())
+                    .status(order.getOrderStatus().toDisplayString())
                     .orderNumber(order.getOrderNumber())
                     .documents(docs)
                     .paymentTotal(paymentTotal)

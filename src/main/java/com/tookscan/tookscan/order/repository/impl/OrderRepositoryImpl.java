@@ -238,36 +238,64 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable,
-                                                        String startDate, String endDate) {
-        boolean hasSearch = StringUtils.hasText(search);
-        boolean hasDateRange = startDate != null && endDate != null;
+    public Page<Order> findAllByUserAndSearchAndOrderStatusInOrElseNull(
+            User user,
+            String search,
+            Pageable pageable,
+            String startDate,
+            String endDate,
+            List<EOrderStatus> orderStatuses
+    ) {
+        QOrder o = QOrder.order;
 
-        LocalDateTime startDateTime = null;
-        LocalDateTime endDateTime = null;
-        if (hasDateRange) {
-            startDateTime = LocalDate.parse(startDate).atStartOfDay();
-            endDateTime = LocalDate
-                    .parse(endDate)
-                    .atTime(LocalTime.MAX);  // 23:59:59.999999999
+        // 1) Base predicate: only this user
+        BooleanExpression predicate = o.user.eq(user);
+
+        // 2) Search filter
+        if (StringUtils.hasText(search)) {
+            predicate = predicate.and(
+                    o.orderNumber.containsIgnoreCase(search)
+                            .or(o.delivery.receiverName.containsIgnoreCase(search))
+            );
         }
 
-        if (!hasDateRange) {
-            // 날짜 범위 없을 때
-            return hasSearch
-                    ? orderJpaRepository.findAllByUserAndSearch(user, search, pageable)
-                    : orderJpaRepository.findAllByUser(user, pageable);
+        // 3) Date range filter
+        if (startDate != null) {
+            predicate = predicate.and(
+                    o.createdAt.goe(LocalDate.parse(startDate).atStartOfDay())
+            );
+        }
+        if (endDate != null) {
+            predicate = predicate.and(
+                    o.createdAt.loe(LocalDate.parse(endDate).atTime(LocalTime.MAX))
+            );
         }
 
-        // 날짜 범위 있을 때
-        return hasSearch
-                ? orderJpaRepository.findAllByUserAndSearchAndCreatedAtBetween(
-                user, search, pageable, startDateTime, endDateTime
-        )
-                : orderJpaRepository.findAllByUserAndCreatedAtBetween(
-                        user, startDateTime, endDateTime, pageable
-                );
+        // 4) Status filter (IN clause)
+        if (orderStatuses != null && !orderStatuses.isEmpty()) {
+            predicate = predicate.and(o.orderStatus.in(orderStatuses));
+        }
+
+        // 5) Fetch paged content sorted by newest first
+        List<Order> content = jpaQueryFactory
+                .selectFrom(o)
+                .where(predicate)
+                .orderBy(o.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // 6) Count total
+        long total = Optional.ofNullable(
+                jpaQueryFactory.select(o.count())
+                        .from(o)
+                        .where(predicate)
+                        .fetchOne()
+        ).orElse(0L);
+
+        return new PageImpl<>(content, pageable, total);
     }
+
 
     @Override
     public List<Order> findAllByOrderNumberIn(List<String> orderNumber) {

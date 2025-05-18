@@ -41,8 +41,9 @@ public interface OrderRepository {
 
     void deleteAll(List<Order> orders);
 
-    Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable,
-                                                 String startDate, String endDate);
+    Page<Order> findAllByUserAndSearchAndOrderStatusInOrElseNull(User user, String search, Pageable pageable,
+                                                                 String startDate, String endDate,
+                                                                 List<EOrderStatus> orderStatuses);
 
     Order findByOrderNumberOrElseThrow(String orderNumber);
 

@@ -7,6 +7,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDeliveryUseC
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderSummaryUseCase;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDetailResponseDto;
@@ -46,6 +47,7 @@ public class OrderUserQueryV1Controller {
             @Min(0) @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "start-date", required = false) String startDate,
             @RequestParam(value = "end-date", required = false) String endDate,
+            @RequestParam(value = "order-status", required = false) EOrderStatus orderStatus,
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction
@@ -53,7 +55,7 @@ public class OrderUserQueryV1Controller {
     ) {
         return ResponseDto.ok(
                 readUserOrderOverviewUseCase.execute(accountId, page, size, sort, search, direction, startDate,
-                        endDate));
+                        endDate, orderStatus));
     }
 
     /**

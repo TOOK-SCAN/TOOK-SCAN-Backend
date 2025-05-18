@@ -57,6 +57,19 @@ public enum EOrderStatus {
         };
     }
 
+    public List<EOrderStatus> getDisplayList() {
+        return switch (this) {
+            case APPLY_COMPLETED -> List.of(APPLY_COMPLETED, COMPANY_ARRIVED);
+            case PAYMENT_WAITING -> List.of(PAYMENT_WAITING);
+            case PAYMENT_COMPLETED -> List.of(PAYMENT_COMPLETED, SCAN_WAITING, SCAN_IN_PROGRESS);
+            case ALL_COMPLETED -> List.of(RECOVERY_IN_PROGRESS, POST_WAITING,
+                    ALL_COMPLETED);
+            case CANCEL -> List.of(CANCEL);
+            case AS -> List.of(AS);
+            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
+        };
+    }
+
     public String toDisplayScanStatusString() {
         return switch (this) {
             case APPLY_COMPLETED, COMPANY_ARRIVED, PAYMENT_WAITING, PAYMENT_COMPLETED, SCAN_WAITING -> "스캔대기";
