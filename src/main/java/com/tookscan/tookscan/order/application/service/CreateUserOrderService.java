@@ -24,6 +24,7 @@ import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -66,18 +67,19 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
             couponService.validateCouponExpiration(coupon);
         }
 
-        // 주소 정보 생성
-        Address address = addressService.createAddress(
-                requestDto.deliveryInfo().address().addressName(),
-                requestDto.deliveryInfo().address().region1DepthName(),
-                requestDto.deliveryInfo().address().region2DepthName(),
-                requestDto.deliveryInfo().address().region3DepthName(),
-                requestDto.deliveryInfo().address().region4DepthName(),
-                requestDto.deliveryInfo().address().addressDetail(),
-                requestDto.deliveryInfo().address().zoneCode(),
-                requestDto.deliveryInfo().address().latitude(),
-                requestDto.deliveryInfo().address().longitude()
-        );
+        Address address = Optional.ofNullable(requestDto.deliveryInfo().address())
+                .map(addr -> addressService.createAddress(
+                        addr.addressName(),
+                        addr.region1DepthName(),
+                        addr.region2DepthName(),
+                        addr.region3DepthName(),
+                        addr.region4DepthName(),
+                        addr.addressDetail(),
+                        addr.zoneCode(),
+                        addr.latitude(),
+                        addr.longitude()
+                ))
+                .orElse(null);
 
         // 배송 정보 생성
         Delivery delivery = deliveryService.createDelivery(

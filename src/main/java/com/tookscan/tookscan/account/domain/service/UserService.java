@@ -3,9 +3,8 @@ package com.tookscan.tookscan.account.domain.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -58,7 +57,7 @@ public class UserService {
 
         user.updateEmail(email);
         user.updatePhone(phoneNumber);
-        user.updateAddress(addressDto.toEntity());
+        user.updateAddress(addressDto != null ? addressDto.toEntity() : null);
         user.updateIsReceiveEmail(isReceiveEmail);
         user.updateIsReceiveSms(isReceiveSms);
         return user;
