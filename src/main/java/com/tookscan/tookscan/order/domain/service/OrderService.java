@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+    private static final Integer DELIVERY_EXPIRATION_PERIOD = 14;
+    private static final Integer PAYMENT_EXPIRATION_PERIOD = 14;
 
     public Order createOrder(User user, boolean isByUser, Delivery delivery, Coupon coupon, Boolean isOneDayScan) {
         String orderNumber = TsidFactory.getFactory().generate().toString();
@@ -22,6 +24,7 @@ public class OrderService {
                 .orderNumber(orderNumber)
                 .orderStatus(EOrderStatus.APPLY_COMPLETED)
                 .isByUser(isByUser)
+                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD))
                 .scanCopyrightComplianceAgreed(LocalDateTime.now())
                 .illegalDistributionProhibitionAgreed(LocalDateTime.now())
                 .cuttingAgreed(LocalDateTime.now())
@@ -57,5 +60,9 @@ public class OrderService {
 
     public void updateScanTermsAgreed(Order order) {
         order.updateScanTermsAgreed();
+    }
+
+    public void updatePaymentExpirationDate(Order order) {
+        order.updatePaymentExpirationDate(LocalDateTime.now().plusDays(PAYMENT_EXPIRATION_PERIOD));
     }
 }

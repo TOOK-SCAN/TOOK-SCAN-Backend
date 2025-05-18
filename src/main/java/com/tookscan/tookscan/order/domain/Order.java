@@ -53,6 +53,12 @@ public class Order extends BaseEntity {
     @Column(name = "memo", length = 500)
     private String memo;
 
+    @Column(name = "delivery_expiration_date", nullable = false)
+    private LocalDateTime deliveryExpirationDate;
+
+    @Column(name = "payment_expiration_date")
+    private LocalDateTime paymentExpirationDate;
+
     @Column(name = "scan_copyright_compliance_agreed", nullable = false)
     private LocalDateTime scanCopyrightComplianceAgreed;
 
@@ -110,6 +116,7 @@ public class Order extends BaseEntity {
             String orderNumber,
             EOrderStatus orderStatus,
             boolean isByUser,
+            LocalDateTime deliveryExpirationDate,
             LocalDateTime scanCopyrightComplianceAgreed,
             LocalDateTime illegalDistributionProhibitionAgreed,
             LocalDateTime cuttingAgreed,
@@ -122,6 +129,7 @@ public class Order extends BaseEntity {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
         this.isByUser = isByUser;
+        this.deliveryExpirationDate = deliveryExpirationDate;
         this.scanCopyrightComplianceAgreed = scanCopyrightComplianceAgreed;
         this.illegalDistributionProhibitionAgreed = illegalDistributionProhibitionAgreed;
         this.cuttingAgreed = cuttingAgreed;
@@ -144,6 +152,10 @@ public class Order extends BaseEntity {
     public void updateScanTermsAgreed() {
         this.userVerified = LocalDateTime.now();
         this.tookScanAssistanceAgreed = LocalDateTime.now();
+    }
+
+    public void updatePaymentExpirationDate(LocalDateTime paymentExpirationDate) {
+        this.paymentExpirationDate = paymentExpirationDate;
     }
 
     public void finishPayment(Payment payment) {

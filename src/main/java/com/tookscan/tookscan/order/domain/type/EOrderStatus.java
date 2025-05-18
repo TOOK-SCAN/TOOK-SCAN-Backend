@@ -2,6 +2,7 @@ package com.tookscan.tookscan.order.domain.type;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -63,6 +64,15 @@ public enum EOrderStatus {
             case RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED -> "스캔완료";
             case CANCEL -> "취소";
             case AS -> "A/S";
+        };
+    }
+
+    public static List<EOrderStatus> getScanStatusList(EScanStatus scanStatus) {
+        return switch (scanStatus) {
+            case WAITING -> List.of(APPLY_COMPLETED, COMPANY_ARRIVED, PAYMENT_WAITING);
+            case IN_PROGRESS -> List.of(SCAN_WAITING, SCAN_IN_PROGRESS, PAYMENT_COMPLETED);
+            case COMPLETED -> List.of(RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED);
+            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
 }

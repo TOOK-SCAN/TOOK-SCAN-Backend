@@ -6,5 +6,7 @@ import java.util.UUID;
 
 @UseCase
 public interface ReadUserOrderOverviewUseCase {
-    ReadUserOrderOverviewResponseDto execute(UUID accountId, Integer page, Integer size, String sort, String search, String direction);
+    ReadUserOrderOverviewResponseDto execute(UUID accountId, Integer page, Integer size, String sort, String search,
+                                             String direction,
+                                             String startDate, String endDate);
 }

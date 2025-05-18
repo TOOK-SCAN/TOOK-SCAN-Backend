@@ -24,6 +24,8 @@ public interface OrderRepository {
     List<Order> findAllByOrderStatusDateBetweenOrElseThrow(LocalDateTime startDate, LocalDateTime endDate,
                                                            EOrderStatus orderStatus);
 
+    Integer countByUserAndOrderStatusIn(User user, List<EOrderStatus> orderStatuses);
+
     Map<EOrderStatus, Integer> findOrderStatusCounts();
 
     Page<Long> findOrderSummaries(String startDate, String endDate, String search, String searchType, String sort,
@@ -39,7 +41,8 @@ public interface OrderRepository {
 
     void deleteAll(List<Order> orders);
 
-    Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable);
+    Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable,
+                                                 String startDate, String endDate);
 
     Order findByOrderNumberOrElseThrow(String orderNumber);
 

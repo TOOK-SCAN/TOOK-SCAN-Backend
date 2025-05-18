@@ -2,7 +2,11 @@ package com.tookscan.tookscan.order.presentation.controller.query;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.dto.ResponseDto;
-import com.tookscan.tookscan.order.application.usecase.*;
+import com.tookscan.tookscan.order.application.usecase.ReadUserOrderCouponDetailUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDeliveryUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDetailUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadUserOrderOverviewUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadUserOrderSummaryUseCase;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDetailResponseDto;
@@ -12,10 +16,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Order", description = "Order 관련 API 입니다.")
 @RestController
@@ -35,14 +42,18 @@ public class OrderUserQueryV1Controller {
     @GetMapping(value = "/overviews")
     public ResponseDto<ReadUserOrderOverviewResponseDto> getOrderOverview(
             @Parameter(hidden = true) @AccountID UUID accountId,
-            @Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
+            @Min(0) @RequestParam(value = "page", defaultValue = "1") int page,
             @Min(0) @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "start-date", required = false) String startDate,
+            @RequestParam(value = "end-date", required = false) String endDate,
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction
 
     ) {
-        return ResponseDto.ok(readUserOrderOverviewUseCase.execute(accountId, page, size, sort, search, direction));
+        return ResponseDto.ok(
+                readUserOrderOverviewUseCase.execute(accountId, page, size, sort, search, direction, startDate,
+                        endDate));
     }
 
     /**

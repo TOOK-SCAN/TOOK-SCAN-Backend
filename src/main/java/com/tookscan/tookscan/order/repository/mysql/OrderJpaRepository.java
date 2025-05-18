@@ -22,12 +22,26 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
             "JOIN o.documents d " +
             "WHERE o.user = :user " +
             "AND (o.orderNumber LIKE %:search% " +
+            "OR d.name LIKE %:search%)" +
+            "AND o.createdAt BETWEEN :startDate AND :endDate")
+    Page<Order> findAllByUserAndSearchAndCreatedAtBetween(@Param("user") User user, @Param("search") String search,
+                                                          Pageable pageable,
+                                                          @Param("startDate") LocalDateTime startDate,
+                                                          @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT o FROM Order o " +
+            "JOIN o.documents d " +
+            "WHERE o.user = :user " +
+            "AND (o.orderNumber LIKE %:search% " +
             "OR d.name LIKE %:search%)")
-    Page<Order> findAllByUserAndSearch(@Param("user") User user, @Param("search") String search, Pageable pageable);
+    Page<Order> findAllByUserAndSearch(@Param("user") User user, @Param("search") String search,
+                                       Pageable pageable);
 
     @Query("SELECT o FROM Order o " +
             "WHERE o.user = :user")
     Page<Order> findAllByUser(User user, Pageable pageable);
+
+    Integer countByUserAndOrderStatusIn(User user, List<EOrderStatus> orderStatuses);
 
     Optional<Order> findByOrderNumber(String orderNumber);
 
@@ -78,4 +92,7 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"delivery","documents", "documents.pdf"})
     @Query("SELECT o FROM Order o WHERE o.id = :id")
     Optional<Order> findByIdWithDocumentsAndPdf(@Param("id") Long id);
+
+    Page<Order> findAllByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
+                                                 Pageable pageable);
 }

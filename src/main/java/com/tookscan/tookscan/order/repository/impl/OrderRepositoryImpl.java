@@ -10,22 +10,23 @@ import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
@@ -222,6 +223,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Integer countByUserAndOrderStatusIn(User user, List<EOrderStatus> orderStatuses) {
+        return orderJpaRepository.countByUserAndOrderStatusIn(user, orderStatuses);
+    }
+
+    @Override
     public List<Order> findAllWithDocumentsByIdIn(List<Long> ids) {
         return orderJpaRepository.findAllWithDocumentsByIdIn(ids);
     }
@@ -232,13 +238,35 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable) {
-        if (search == null) {
+    public Page<Order> findAllByUserAndSearchOrElseNull(User user, String search, Pageable pageable,
+                                                        String startDate, String endDate) {
+        boolean hasSearch = StringUtils.hasText(search);
+        boolean hasDateRange = startDate != null && endDate != null;
 
-            return orderJpaRepository.findAllByUser(user, pageable);
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+        if (hasDateRange) {
+            startDateTime = LocalDate.parse(startDate).atStartOfDay();
+            endDateTime = LocalDate
+                    .parse(endDate)
+                    .atTime(LocalTime.MAX);  // 23:59:59.999999999
         }
 
-        return orderJpaRepository.findAllByUserAndSearch(user, search, pageable);
+        if (!hasDateRange) {
+            // 날짜 범위 없을 때
+            return hasSearch
+                    ? orderJpaRepository.findAllByUserAndSearch(user, search, pageable)
+                    : orderJpaRepository.findAllByUser(user, pageable);
+        }
+
+        // 날짜 범위 있을 때
+        return hasSearch
+                ? orderJpaRepository.findAllByUserAndSearchAndCreatedAtBetween(
+                user, search, pageable, startDateTime, endDateTime
+        )
+                : orderJpaRepository.findAllByUserAndCreatedAtBetween(
+                        user, startDateTime, endDateTime, pageable
+                );
     }
 
     @Override
