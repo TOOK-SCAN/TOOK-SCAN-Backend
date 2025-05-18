@@ -43,7 +43,8 @@ public interface OrderRepository {
 
     Page<Order> findAllByUserAndSearchAndOrderStatusInOrElseNull(User user, String search, Pageable pageable,
                                                                  String startDate, String endDate,
-                                                                 List<EOrderStatus> orderStatuses);
+                                                                 List<EOrderStatus> orderStatuses, String sort,
+                                                                 Direction direction);
 
     Order findByOrderNumberOrElseThrow(String orderNumber);
 

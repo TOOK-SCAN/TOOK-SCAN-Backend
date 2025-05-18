@@ -8,6 +8,8 @@ import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.EScanStatus;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderOverviewResponseDto;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,9 +37,13 @@ public class ReadUserOrderOverviewService implements ReadUserOrderOverviewUseCas
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Direction.fromString(direction), sort));
 
         // 주문 조회
+        List<EOrderStatus> orderStatusList = Optional.ofNullable(orderStatus)
+                .map(EOrderStatus::getDisplayList)
+                .orElse(null);
+
         Page<Order> orders = orderRepository.findAllByUserAndSearchAndOrderStatusInOrElseNull(user, search, pageRequest,
                 startDate,
-                endDate, orderStatus.getDisplayList());
+                endDate, orderStatusList, sort, Direction.fromString(direction));
 
         // 주문 상태 카운트
         Integer scanWaitingCount = orderRepository.countByUserAndOrderStatusIn(user, EOrderStatus.getScanStatusList(
