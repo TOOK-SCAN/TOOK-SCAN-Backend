@@ -2,10 +2,11 @@ package com.tookscan.tookscan.order.presentation.controller.command;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderCancelUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderScanUseCase;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateUserOrderRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.response.CreateUserOrderResponseDto;
-import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderScanUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderUserCommandV1Controller {
     private final CreateUserOrderUseCase createUserOrderUseCase;
     private final UpdateUserOrderScanUseCase updateUserOrderScanUseCase;
+    private final UpdateUserOrderCancelUseCase updateUserOrderCancelUseCase;
 
     /**
      * 4.1 회원 스캔 주문
@@ -49,6 +51,19 @@ public class OrderUserCommandV1Controller {
             @PathVariable Long orderId
     ) {
         updateUserOrderScanUseCase.execute(accountId, orderId);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 4.3.9 회원 주문 취소하기
+     */
+    @Operation(summary = "회원 주문 취소하기", description = "회원이 주문을 취소합니다.")
+    @PatchMapping(value = "/{orderId}/cancel")
+    public ResponseDto<Void> updateOrderCancel(
+            @Parameter(hidden = true) @AccountID UUID accountId,
+            @PathVariable Long orderId
+    ) {
+        updateUserOrderCancelUseCase.execute(accountId, orderId);
         return ResponseDto.ok(null);
     }
 }

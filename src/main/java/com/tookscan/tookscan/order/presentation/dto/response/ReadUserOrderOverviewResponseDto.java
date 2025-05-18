@@ -72,7 +72,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
     public static class OrderInfoDto extends SelfValidating<OrderInfoDto> {
         @JsonProperty("id")
         @NotNull
-        private final Long id;
+        private final String id;
 
         @JsonProperty("order_date")
         @NotNull
@@ -105,7 +105,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         private final Boolean isDelivery;
 
         @Builder
-        public OrderInfoDto(Long id,
+        public OrderInfoDto(String id,
                             String orderDate,
                             EOrderStatus status,
                             String orderNumber,
@@ -148,7 +148,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
                     .toList();
 
             return OrderInfoDto.builder()
-                    .id(order.getId())
+                    .id(order.getId().toString())
                     .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
                     .status(order.getOrderStatus().toDisplayString())
                     .orderNumber(order.getOrderNumber())
