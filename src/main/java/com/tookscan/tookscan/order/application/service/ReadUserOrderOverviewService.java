@@ -37,7 +37,7 @@ public class ReadUserOrderOverviewService implements ReadUserOrderOverviewUseCas
         // 주문 조회
         Page<Order> orders = orderRepository.findAllByUserAndSearchAndOrderStatusInOrElseNull(user, search, pageRequest,
                 startDate,
-                endDate, orderStatus.getDisplayList());
+                endDate, orderStatus.getDisplayList(), sort, Direction.fromString(direction));
 
         // 주문 상태 카운트
         Integer scanWaitingCount = orderRepository.countByUserAndOrderStatusIn(user, EOrderStatus.getScanStatusList(

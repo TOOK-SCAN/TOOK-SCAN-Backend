@@ -244,7 +244,9 @@ public class OrderRepositoryImpl implements OrderRepository {
             Pageable pageable,
             String startDate,
             String endDate,
-            List<EOrderStatus> orderStatuses
+            List<EOrderStatus> orderStatuses,
+            String sort,
+            Direction direction
     ) {
         QOrder o = QOrder.order;
 
@@ -280,7 +282,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         List<Order> content = jpaQueryFactory
                 .selectFrom(o)
                 .where(predicate)
-                .orderBy(o.createdAt.desc())
+                .orderBy(resolveSort(o, sort, direction))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
