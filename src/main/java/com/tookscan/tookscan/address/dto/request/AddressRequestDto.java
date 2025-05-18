@@ -24,12 +24,10 @@ public record AddressRequestDto(
 
         @JsonProperty("region_2depth_name")
         @Schema(description = "군/구", example = "강남구")
-        @NotBlank(message = "군/구를 입력해주세요.")
         String region2DepthName,
 
         @JsonProperty("region_3depth_name")
         @Schema(description = "읍/면/동", example = "역삼동")
-        @NotBlank(message = "읍/면/동을 입력해주세요.")
         String region3DepthName,
 
         @JsonProperty("zone_code")
@@ -44,7 +42,6 @@ public record AddressRequestDto(
 
         @JsonProperty("address_detail")
         @Schema(description = "상세 주소", example = "테헤란로 427")
-        @NotBlank(message = "상세 주소를 입력해주세요.")
         @Size(max = 50, message = "상세 주소는 50자 이내로 입력해주세요.")
         String addressDetail,
 

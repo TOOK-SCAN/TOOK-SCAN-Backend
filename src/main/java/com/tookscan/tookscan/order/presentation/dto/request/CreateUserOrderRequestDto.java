@@ -83,7 +83,6 @@ public record CreateUserOrderRequestDto(
             @ByteSize(min = 0, max = 150, message = "요청사항은 최대 150바이트 입니다.")
             String request,
 
-            @NotNull(message = "주소를 입력해주세요.")
             @JsonProperty("address")
             @Valid
             AddressRequestDto address
