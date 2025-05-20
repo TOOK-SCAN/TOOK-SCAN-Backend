@@ -65,11 +65,23 @@ public class PricePolicy extends BaseEntity {
         return price;
     }
 
+    public int calculateDocumentPrice(int pageCount) {
+        int price = 0;
+        price += pricePerPage * pageCount;
+        return price;
+    }
+
     public int calculatePriceForOneDayScan(int pageCount, ERecoveryOption recoveryOption) {
         int price = 0;
         price += defaultPrice;
         price += pricePerPageForOneDayScan * pageCount;
         price += recoveryOption.getPrice();
+        return price;
+    }
+
+    public int calculatePriceForOneDayScan(int pageCount) {
+        int price = 0;
+        price += pricePerPageForOneDayScan * pageCount;
         return price;
     }
 }

@@ -8,8 +8,6 @@ import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
-import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
-import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +18,7 @@ import lombok.Getter;
 public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrderDetailResponseDto> {
     @JsonProperty("id")
     @NotNull
-    private final String orderId;
+    private final Long id;
 
     @JsonProperty("order_number")
     @NotNull
@@ -34,48 +32,52 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @NotNull
     private final String orderDate;
 
-    @JsonProperty("receiver_name")
+    @JsonProperty("payment_expiration_date")
+    private final String paymentExpirationDate;
+
+    @JsonProperty("payment_date")
+    private final String paymentDate;
+
+    @JsonProperty("phone_number")
     @NotNull
-    private final String receiverName;
+    private final String phoneNumber;
 
-    @JsonProperty("tracking_number")
-    private final String trackingNumber;
+    @JsonProperty("email")
+    @NotNull
+    private final String email;
 
-    @JsonProperty("delivery_price")
-    private final Integer deliveryPrice;
+    @JsonProperty("zone_code")
+    @NotNull
+    private final String zoneCode;
 
     @JsonProperty("address")
     @NotNull
     private final String address;
 
-    @JsonProperty("document_description")
-    @NotNull
-    private final String documentDescription;
+    @JsonProperty("delivery_request")
+    private final String deliveryRequest;
 
     @JsonProperty("documents")
     @NotNull
     private final List<DocumentInfoDto> documents;
 
-    @JsonProperty("payment_method")
-    private final EPaymentMethod paymentMethod;
+    @JsonProperty("documents_price")
+    private final Integer documentsPrice;
 
-    @JsonProperty("easy_payment_provider")
-    private final EEasyPaymentProvider easyPaymentProvider;
+    @JsonProperty("one_day_scan_price")
+    private final Integer oneDayScanPrice;
+
+    @JsonProperty("delivery_price")
+    private final Integer deliveryPrice;
+
+    @JsonProperty("cutting_price")
+    private final Integer cuttingPrice;
+
+    @JsonProperty("coupon_price")
+    private final Integer couponPrice;
 
     @JsonProperty("payment_total")
     private final Integer paymentTotal;
-
-    @JsonProperty("user_info")
-    private final UserInfoDto userInfo;
-
-    @JsonProperty("is_delivery")
-    private final Boolean isDelivery;
-
-    @JsonProperty("coupon_name")
-    private final String couponName;
-
-    @JsonProperty("discount_price")
-    private final Integer discountPrice;
 
     @JsonProperty("receipt_url")
     private final String receiptUrl;
@@ -90,20 +92,41 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         @NotNull
         private final Integer page;
 
-        @JsonProperty("price")
+        @JsonProperty("document_price")
         @NotNull
-        private final Integer price;
+        private final Integer documentPrice;
 
         @JsonProperty("recovery_option")
         @NotNull
         private final ERecoveryOption recoveryOption;
 
+        @JsonProperty("recovery_price")
+        @NotNull
+        private final Integer recoveryPrice;
+
+        @JsonProperty("one_day_scan_price")
+        @NotNull
+        private final Integer oneDayScanPrice;
+
+        @JsonProperty("cutting_price")
+        @NotNull
+        private final Integer cuttingPrice;
+
         @Builder
-        public DocumentInfoDto(String name, Integer page, Integer price, ERecoveryOption recoveryOption) {
+        public DocumentInfoDto(String name,
+                               Integer page,
+                               Integer documentPrice,
+                               ERecoveryOption recoveryOption,
+                               Integer recoveryPrice,
+                               Integer oneDayScanPrice,
+                               Integer cuttingPrice) {
             this.name = name;
             this.page = page;
-            this.price = price;
+            this.documentPrice = documentPrice;
             this.recoveryOption = recoveryOption;
+            this.recoveryPrice = recoveryPrice;
+            this.oneDayScanPrice = oneDayScanPrice;
+            this.cuttingPrice = cuttingPrice;
             this.validateSelf();
         }
 
@@ -111,112 +134,106 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .page(document.getPageCount())
-                    .price(document.calculatePrice())
+                    .documentPrice(document.calculateDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
+                    .recoveryPrice(document.getRecoveryOption().getPrice())
+                    .oneDayScanPrice(document.calculateOneDayScanPrice())
+                    .cuttingPrice(document.getPricePolicy().getDefaultPrice())
                     .build();
-        }
-    }
-
-    @Getter
-    public static class UserInfoDto extends SelfValidating<UserInfoDto> {
-
-        @JsonProperty("name")
-        @NotNull
-        private final String name;
-
-        @JsonProperty("email")
-        @NotNull
-        private final String email;
-
-        @JsonProperty("phone_number")
-        @NotNull
-        private final String phoneNumber;
-
-        @Builder
-        public UserInfoDto(String name, String phoneNumber, String email) {
-            this.name = name;
-            this.phoneNumber = phoneNumber;
-            this.email = email;
-            this.validateSelf();
         }
     }
 
     @Builder
     public ReadUserOrderDetailResponseDto(
-            String orderId,
+            Long id,
             String orderNumber,
             EOrderStatus orderStatus,
             String orderDate,
-            String receiverName,
-            String trackingNumber,
+            String paymentExpirationDate,
+            String paymentDate,
+            String phoneNumber,
+            String email,
+            String zoneCode,
             String address,
-            String documentDescription,
+            String deliveryRequest,
             List<DocumentInfoDto> documents,
-            EPaymentMethod paymentMethod,
-            EEasyPaymentProvider easyPaymentProvider,
-            Integer paymentTotal,
+            Integer documentsPrice,
+            Integer oneDayScanPrice,
             Integer deliveryPrice,
-            UserInfoDto userInfo,
-            Boolean isDelivery,
-            String couponName,
-            Integer discountPrice,
+            Integer cuttingPrice,
+            Integer couponPrice,
+            Integer paymentTotal,
             String receiptUrl
     ) {
-        this.orderId = orderId;
+        this.id = id;
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
         this.orderDate = orderDate;
-        this.receiverName = receiverName;
-        this.trackingNumber = trackingNumber;
+        this.paymentExpirationDate = paymentExpirationDate;
+        this.paymentDate = paymentDate;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.zoneCode = zoneCode;
         this.address = address;
-        this.documentDescription = documentDescription;
+        this.deliveryRequest = deliveryRequest;
         this.documents = documents;
-        this.paymentMethod = paymentMethod;
-        this.easyPaymentProvider = easyPaymentProvider;
-        this.paymentTotal = paymentTotal;
+        this.documentsPrice = documentsPrice;
+        this.oneDayScanPrice = oneDayScanPrice;
         this.deliveryPrice = deliveryPrice;
-        this.userInfo = userInfo;
-        this.isDelivery = isDelivery;
-        this.couponName = couponName;
-        this.discountPrice = discountPrice;
+        this.cuttingPrice = cuttingPrice;
+        this.couponPrice = couponPrice;
+        this.paymentTotal = paymentTotal;
         this.receiptUrl = receiptUrl;
         this.validateSelf();
     }
 
     public static ReadUserOrderDetailResponseDto fromEntity(Order order) {
+        Optional<Payment> paymentOpt = Optional.ofNullable(order.getPayment());
 
-        Optional<Payment> payment = Optional.ofNullable(order.getPayment());
+        String paymentDate = paymentOpt
+                .map(Payment::getCreatedAt)
+                .map(DateTimeUtil::convertLocalDateTimeToDartString)
+                .orElse(null);
 
-        EPaymentMethod paymentMethod = payment.map(Payment::getMethod).orElse(null);
-        EEasyPaymentProvider easyPaymentProvider = payment.map(Payment::getEasyPaymentProvider).orElse(null);
-        String receiptUrl = payment.map(Payment::getReceiptUrl).orElse(null);
-        Integer paymentTotal = payment.map(Payment::getTotalAmount).orElse(order.getTotalAmount());
+        List<DocumentInfoDto> docs = order.getDocuments().stream()
+                .map(DocumentInfoDto::fromEntity)
+                .toList();
+
+        int docsPriceSum = docs.stream()
+                .mapToInt(DocumentInfoDto::getDocumentPrice)
+                .sum();
+
+        int oneDayScanPriceSum = docs.stream()
+                .mapToInt(DocumentInfoDto::getOneDayScanPrice)
+                .sum();
+
+        int cuttingPriceSum = docs.stream()
+                .mapToInt(DocumentInfoDto::getCuttingPrice)
+                .sum();
 
         return ReadUserOrderDetailResponseDto.builder()
-                .orderId(order.getId().toString())
+                .id(order.getId())
                 .orderNumber(order.getOrderNumber())
-                .orderStatus(order.getOrderStatus().toDisplayString())
-                .orderDate(DateTimeUtil.convertLocalDateTimeToKORString(order.getCreatedAt()))
-                .receiverName(order.getDelivery().getReceiverName())
-                .trackingNumber(order.getDelivery().getTrackingNumber())
+                .orderStatus(order.getOrderStatus())
+                .orderDate(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
+                .paymentExpirationDate(
+                        order.getPaymentExpirationDate() != null
+                                ? DateTimeUtil.convertLocalDateTimeToDartString(order.getPaymentExpirationDate())
+                                : null)
+                .paymentDate(paymentDate)
+                .phoneNumber(order.getDelivery().getPhoneNumber())
+                .email(order.getDelivery().getEmail())
+                .zoneCode(order.getDelivery().getAddress().getZoneCode())
                 .address(order.getDelivery().getAddress().getFullAddress())
-                .documentDescription(order.getDocumentsDescription())
-                .documents(order.getDocuments().stream()
-                        .map(DocumentInfoDto::fromEntity)
-                        .toList())
-                .paymentMethod(paymentMethod)
-                .easyPaymentProvider(easyPaymentProvider)
-                .paymentTotal(paymentTotal)
+                .deliveryRequest(order.getDelivery().getRequest())
+                .documents(docs)
+                .documentsPrice(docsPriceSum)
+                .oneDayScanPrice(oneDayScanPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
-                .userInfo(UserInfoDto.builder()
-                        .name(order.getDelivery().getReceiverName())
-                        .phoneNumber(order.getDelivery().getPhoneNumber())
-                        .email(order.getDelivery().getEmail())
-                        .build())
-                .isDelivery(order.isDelivery())
-                .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
-                .discountPrice(order.getCoupon() != null ? order.getDiscountAmount() : null)
-                .receiptUrl(receiptUrl)
+                .cuttingPrice(cuttingPriceSum)
+                .couponPrice(order.getCoupon() != null ? order.getDiscountAmount() : null)
+                .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
+                .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
                 .build();
     }
 }
