@@ -120,6 +120,14 @@ public class Document extends BaseEntity {
         this.scanTaskId = scanTaskId;
     }
 
+    public int calculateDocumentPrice() {
+        return pricePolicy.calculateDocumentPrice(pageCount);
+    }
+
+    public int calculateOneDayScanPrice() {
+        return pricePolicy.calculatePriceForOneDayScan(pageCount);
+    }
+
     public int calculatePrice() {
         if (order.getIsOneDayScan()) {
             return pricePolicy.calculatePriceForOneDayScan(pageCount, recoveryOption) + additionalPrice;
