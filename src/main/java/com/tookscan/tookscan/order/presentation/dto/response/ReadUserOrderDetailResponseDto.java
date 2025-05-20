@@ -54,6 +54,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @NotNull
     private final String address;
 
+    @JsonProperty("address_detail")
+    private final String addressDetail;
+
     @JsonProperty("delivery_request")
     private final String deliveryRequest;
 
@@ -155,6 +158,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             String email,
             String zoneCode,
             String address,
+            String addressDetail,
             String deliveryRequest,
             List<DocumentInfoDto> documents,
             Integer documentsPrice,
@@ -175,6 +179,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.email = email;
         this.zoneCode = zoneCode;
         this.address = address;
+        this.addressDetail = addressDetail;
         this.deliveryRequest = deliveryRequest;
         this.documents = documents;
         this.documentsPrice = documentsPrice;
@@ -225,6 +230,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .email(order.getDelivery().getEmail())
                 .zoneCode(order.getDelivery().getAddress().getZoneCode())
                 .address(order.getDelivery().getAddress().getFullAddress())
+                .addressDetail(order.getDelivery().getAddress().getAddressDetail())
                 .deliveryRequest(order.getDelivery().getRequest())
                 .documents(docs)
                 .documentsPrice(docsPriceSum)
