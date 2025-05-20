@@ -11,4 +11,6 @@ public interface DocumentRepository {
     Document findByIdOrElseThrow(Long id);
 
     List<Document> findAllByIdsOrElseThrow(List<Long> ids);
+
+    void delete(Document document);
 }

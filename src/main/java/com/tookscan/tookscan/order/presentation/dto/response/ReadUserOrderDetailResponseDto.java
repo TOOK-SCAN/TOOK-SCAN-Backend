@@ -64,6 +64,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @NotNull
     private final List<DocumentInfoDto> documents;
 
+    @JsonProperty("coupon_name")
+    private final String couponName;
+
     @JsonProperty("documents_price")
     private final Integer documentsPrice;
 
@@ -167,7 +170,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             Integer cuttingPrice,
             Integer couponPrice,
             Integer paymentTotal,
-            String receiptUrl
+            String receiptUrl,
+            String couponName
     ) {
         this.id = id;
         this.orderNumber = orderNumber;
@@ -189,6 +193,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.couponPrice = couponPrice;
         this.paymentTotal = paymentTotal;
         this.receiptUrl = receiptUrl;
+        this.couponName = couponName;
         this.validateSelf();
     }
 
@@ -216,6 +221,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .mapToInt(DocumentInfoDto::getCuttingPrice)
                 .sum();
 
+        String couponName = order.getCoupon() != null
+                ? order.getCoupon().getName()
+                : null;
+
         return ReadUserOrderDetailResponseDto.builder()
                 .id(order.getId())
                 .orderNumber(order.getOrderNumber())
@@ -233,6 +242,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .addressDetail(order.getDelivery().getAddress().getAddressDetail())
                 .deliveryRequest(order.getDelivery().getRequest())
                 .documents(docs)
+                .couponName(couponName)
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())

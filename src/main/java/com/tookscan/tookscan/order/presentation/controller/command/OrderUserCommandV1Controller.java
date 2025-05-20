@@ -4,9 +4,11 @@ import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderCancelUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderHistoryUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderInfoUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderScanUseCase;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateUserOrderRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderInfoRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.response.CreateUserOrderResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,7 @@ public class OrderUserCommandV1Controller {
     private final UpdateUserOrderScanUseCase updateUserOrderScanUseCase;
     private final UpdateUserOrderCancelUseCase updateUserOrderCancelUseCase;
     private final UpdateUserOrderInfoUseCase updateUserOrderInfoUseCase;
+    private final UpdateUserOrderHistoryUseCase updateUserOrderHistoryUseCase;
 
     /**
      * 4.1 회원 스캔 주문
@@ -83,4 +86,19 @@ public class OrderUserCommandV1Controller {
         updateUserOrderInfoUseCase.execute(accountId, orderId, requestDto);
         return ResponseDto.ok(null);
     }
+
+    /**
+     * 4.3.11 회원 주문 내역 수정하기
+     */
+    @Operation(summary = "회원 주문 내역 수정하기", description = "회원이 주문 내역을 수정합니다.")
+    @PatchMapping(value = "/{orderId}/history")
+    public ResponseDto<Void> updateOrderHistory(
+            @Parameter(hidden = true) @AccountID UUID accountId,
+            @PathVariable Long orderId,
+            @RequestBody @Valid UpdateUserOrderHistoryRequestDto requestDto
+    ) {
+        updateUserOrderHistoryUseCase.execute(accountId, orderId, requestDto);
+        return ResponseDto.ok(null);
+    }
+
 }

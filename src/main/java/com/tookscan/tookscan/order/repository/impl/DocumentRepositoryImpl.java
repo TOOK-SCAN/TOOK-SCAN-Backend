@@ -4,11 +4,10 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
+import com.tookscan.tookscan.order.repository.mysql.DocumentJpaRepository;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.tookscan.tookscan.order.repository.mysql.DocumentJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -53,5 +52,10 @@ public class DocumentRepositoryImpl implements DocumentRepository {
         }
 
         return documents;
+    }
+
+    @Override
+    public void delete(Document document) {
+        documentJpaRepository.delete(document);
     }
 }

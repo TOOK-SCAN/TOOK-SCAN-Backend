@@ -158,6 +158,10 @@ public class Order extends BaseEntity {
         this.paymentExpirationDate = paymentExpirationDate;
     }
 
+    public void updateIsOneDayScan(Boolean isOneDayScan) {
+        this.isOneDayScan = isOneDayScan;
+    }
+
     public void finishPayment(Payment payment) {
         this.orderStatus = EOrderStatus.PAYMENT_COMPLETED;
         this.payment = payment;
