@@ -17,6 +17,7 @@ import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.application.usecase.ValidateAuthenticationCodeUseCase;
 import com.tookscan.tookscan.security.application.usecase.ValidateIdUseCase;
+import com.tookscan.tookscan.security.application.usecase.VerifyUserUseCase;
 import com.tookscan.tookscan.security.presentation.dto.request.AdminSignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ChangePasswordRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.IssueAuthenticationCodeRequestDto;
@@ -25,6 +26,7 @@ import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRe
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ValidateAuthenticationCodeRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.VerifyUserRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticationCodeResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReadSerialIdAndProviderResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReissuePasswordResponseDto;
@@ -63,6 +65,7 @@ public class AuthController {
     private final ReissuePasswordUseCase reissuePasswordUseCase;
     private final ChangePasswordUseCase changePasswordUseCase;
     private final DeleteAccountUseCase deleteAccountUseCase;
+    private final VerifyUserUseCase verifyUserUseCase;
 
     /**
      * 1.2.2 JWT 재발급
@@ -132,6 +135,16 @@ public class AuthController {
             @Valid @RequestBody ReadSerialIdAndProviderRequestDto requestDto
     ) {
         return ResponseDto.ok(readSerialIdAndProviderUseCase.execute(requestDto));
+    }
+
+    /**
+     * 2.1.5 유저 정보 검증
+     */
+    @PostMapping("/verification/user")
+    public ResponseDto<DefaultJsonWebTokenDto> verifyUser(
+            @Valid @RequestBody VerifyUserRequestDto requestDto
+    ) {
+        return ResponseDto.ok(verifyUserUseCase.execute(requestDto));
     }
 
     /**

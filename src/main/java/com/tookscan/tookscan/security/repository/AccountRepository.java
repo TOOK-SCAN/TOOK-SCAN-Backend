@@ -22,11 +22,15 @@ public interface AccountRepository {
 
     Account findBySerialIdOrProviderOrElseNull(String serialId, ESecurityProvider provider);
 
+    Account findByPhoneNumberAndSerialIdOrElseThrow(String phoneNumber, String serialId);
+
+    Account findByPhoneNumberAndSerialIdAndNameOrElseThrow(String phoneNumber, String serialId, String name);
+
     void existsBySerialIdAndProviderThenThrow(String serialId, ESecurityProvider provider);
 
     void existsByPhoneNumberThenThrow(String phoneNumber);
 
-    boolean existsBySerialId(String serialId);
+    void existsByPhoneNumberAndProvidersThenThrow(String phoneNumber, List<ESecurityProvider> provider);
 
-    Account findByPhoneNumberAndSerialIdOrElseThrow(String phoneNumber, String serialId);
+    boolean existsBySerialId(String serialId);
 }

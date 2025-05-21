@@ -20,5 +20,7 @@ public interface AccountJpaRepository extends JpaRepository<Account, UUID> {
 
     Optional<Account> findByPhoneNumberAndSerialId(String phoneNumber, String serialId);
 
+    Optional<Account> findByPhoneNumberAndSerialIdAndName(String phoneNumber, String serialId, String name);
+
     void deleteByIdIn(List<UUID> ids);
 }

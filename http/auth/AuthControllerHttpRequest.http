@@ -58,19 +58,20 @@ Content-Type: application/json
     "is_receive_sms" : true
 }
 
-### 2.1.5 관리자 회원가입
+### 2.1.5 회원 정보 검증
 // @no-log
-POST {{host_url}}/v1/auth/admins/sign-up-default
+POST {{host_url}}/v1/auth/verification/user
 Content-Type: application/json
 
 {
-    "serial_id": "admin1",
-    "password": "{{auth.API_2_1_5.password}}"
+    "serial_id": "{{auth.API_2_1_2.serial_id}}",
+    "phone_number": "{{auth.API_2_1_2.phone_number}}",
+    "name": "{{auth.API_2_1_2.name}}"
 }
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "860914"
+@authentication_code = "378322"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 

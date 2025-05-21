@@ -81,6 +81,9 @@ public enum ErrorCode {
     NOT_AVAILABLE_COUPON(40046, HttpStatus.BAD_REQUEST, "사용할 수 없는 쿠폰입니다."),
     USED_COUPON(40047, HttpStatus.BAD_REQUEST, "이미 사용된 쿠폰입니다."),
     USER_ONLY_COUPON(40048, HttpStatus.BAD_REQUEST, "회원 전용 쿠폰입니다."),
+    KAKAO_SIGN_IN_USE(40049, HttpStatus.BAD_REQUEST, "카카오 로그인 사용 중인 휴대폰 번호입니다."),
+    GOOGLE_SIGN_IN_USE(40050, HttpStatus.BAD_REQUEST, "구글 로그인 사용 중인 휴대폰 번호입니다."),
+    NAVER_SIGN_IN_USE(40051, HttpStatus.BAD_REQUEST, "네이버 로그인 사용 중인 휴대폰 번호입니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
