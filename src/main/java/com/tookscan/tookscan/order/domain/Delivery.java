@@ -104,8 +104,4 @@ public class Delivery extends BaseEntity {
     public void updateDeliveryPrice(Integer deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
     }
-
-    public String getPhoneNumber() {
-        return order.getUser() != null ? order.getUser().getPhoneNumber() : phoneNumber;
-    }
 }

@@ -78,9 +78,9 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         @NotNull
         private final String orderDate;
 
-        @JsonProperty("status")
+        @JsonProperty("order_status")
         @NotNull
-        private final EOrderStatus status;
+        private final EOrderStatus orderStatus;
 
         @JsonProperty("order_number")
         @NotNull
@@ -104,19 +104,44 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         @NotNull
         private final Boolean isDelivery;
 
+        @JsonProperty("delivery_info")
+        @NotNull
+        private final DeliveryInfoDto deliveryInfo;
+
+        @Getter
+        public static class DeliveryInfoDto {
+            @JsonProperty("receiver_name")
+            private final String receiverName;
+
+            @JsonProperty("phone_number")
+            private final String phoneNumber;
+
+            @JsonProperty("email")
+            private final String email;
+
+            @Builder
+            public DeliveryInfoDto(String receiverName, String phoneNumber, String email) {
+                this.receiverName = receiverName;
+                this.phoneNumber = phoneNumber;
+                this.email = email;
+            }
+        }
+
         @Builder
         public OrderInfoDto(String id,
                             String orderDate,
-                            EOrderStatus status,
+                            EOrderStatus orderStatus,
                             String orderNumber,
                             List<DocumentDto> documents,
                             Integer paymentTotal,
                             String deliveryExpirationDate,
                             String paymentExpirationDate,
-                            Boolean isDelivery) {
+                            Boolean isDelivery,
+                            DeliveryInfoDto deliveryInfo) {
             this.id = id;
+            this.deliveryInfo = deliveryInfo;
             this.orderDate = orderDate;
-            this.status = status;
+            this.orderStatus = orderStatus;
             this.orderNumber = orderNumber;
             this.documents = documents;
             this.paymentTotal = paymentTotal;
@@ -149,8 +174,13 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
 
             return OrderInfoDto.builder()
                     .id(order.getId().toString())
+                    .deliveryInfo(DeliveryInfoDto.builder()
+                            .receiverName(order.getDelivery().getReceiverName())
+                            .phoneNumber(order.getDelivery().getPhoneNumber())
+                            .email(order.getDelivery().getEmail())
+                            .build())
                     .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
-                    .status(order.getOrderStatus().toDisplayString())
+                    .orderStatus(order.getOrderStatus())
                     .orderNumber(order.getOrderNumber())
                     .documents(docs)
                     .paymentTotal(paymentTotal)

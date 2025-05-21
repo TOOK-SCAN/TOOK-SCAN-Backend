@@ -94,9 +94,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         @NotNull
         private final String name;
 
-        @JsonProperty("page")
+        @JsonProperty("page_count")
         @NotNull
-        private final Integer page;
+        private final Integer pageCount;
 
         @JsonProperty("document_price")
         @NotNull
@@ -120,14 +120,14 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
         @Builder
         public DocumentInfoDto(String name,
-                               Integer page,
+                               Integer pageCount,
                                Integer documentPrice,
                                ERecoveryOption recoveryOption,
                                Integer recoveryPrice,
                                Integer oneDayScanPrice,
                                Integer cuttingPrice) {
             this.name = name;
-            this.page = page;
+            this.pageCount = pageCount;
             this.documentPrice = documentPrice;
             this.recoveryOption = recoveryOption;
             this.recoveryPrice = recoveryPrice;
@@ -139,7 +139,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         public static DocumentInfoDto fromEntity(Document document) {
             return DocumentInfoDto.builder()
                     .name(document.getName())
-                    .page(document.getPageCount())
+                    .pageCount(document.getPageCount())
                     .documentPrice(document.calculateDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .recoveryPrice(document.getRecoveryOption().getPrice())
