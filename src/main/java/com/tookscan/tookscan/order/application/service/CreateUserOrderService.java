@@ -106,7 +106,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         requestDto.documents().forEach(doc -> {
                     Document document = documentService.createDocument(
                             doc.name(),
-                            doc.pagePrediction(),
+                            doc.pageCount(),
                             doc.recoveryOption(),
                             order,
                             pricePolicy

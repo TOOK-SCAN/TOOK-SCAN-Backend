@@ -47,8 +47,8 @@ public record CreateUserOrderRequestDto(
             @NotNull(message = "페이지 수를 입력해주세요.")
             @Min(value = 0, message = "페이지 수는 0 이상이어야 합니다.")
             @Max(value = 10000, message = "페이지 수는 10000 이하이어야 합니다.")
-            @JsonProperty("page_prediction")
-            Integer pagePrediction,
+            @JsonProperty("page_count")
+            Integer pageCount,
 
             @NotNull(message = "복원 옵션을 입력해주세요.")
             @JsonProperty("recovery_option")
