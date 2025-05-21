@@ -6,7 +6,18 @@ import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
-import com.tookscan.tookscan.security.application.usecase.*;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
+import com.tookscan.tookscan.security.application.usecase.AdminSignUpDefaultUseCase;
+import com.tookscan.tookscan.security.application.usecase.ChangePasswordUseCase;
+import com.tookscan.tookscan.security.application.usecase.DeleteAccountUseCase;
+import com.tookscan.tookscan.security.application.usecase.IssueAuthenticationCodeUseCase;
+import com.tookscan.tookscan.security.application.usecase.ReadSerialIdAndProviderUseCase;
+import com.tookscan.tookscan.security.application.usecase.ReissueJsonWebTokenUseCase;
+import com.tookscan.tookscan.security.application.usecase.ReissuePasswordUseCase;
+import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
+import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
+import com.tookscan.tookscan.security.application.usecase.ValidateAuthenticationCodeUseCase;
+import com.tookscan.tookscan.security.application.usecase.ValidateIdUseCase;
 import com.tookscan.tookscan.security.presentation.dto.request.AdminSignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ChangePasswordRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.IssueAuthenticationCodeRequestDto;
@@ -15,7 +26,6 @@ import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRe
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ValidateAuthenticationCodeRequestDto;
-import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticationCodeResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReadSerialIdAndProviderResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReissuePasswordResponseDto;
@@ -27,7 +37,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -48,7 +65,6 @@ public class AuthController {
     private final ReissuePasswordUseCase reissuePasswordUseCase;
     private final ChangePasswordUseCase changePasswordUseCase;
     private final DeleteAccountUseCase deleteAccountUseCase;
-    private final ReadAccountBriefUseCase readAccountBriefUseCase;
 
     /**
      * 1.2.2 JWT 재발급

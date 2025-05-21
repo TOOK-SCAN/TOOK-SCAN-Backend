@@ -9,7 +9,8 @@ public enum ESecurityProvider {
 
     DEFAULT("기본", "Default"),
     KAKAO("카카오", "Kakao"),
-    GOOGLE("구글", "Google")
+    GOOGLE("구글", "Google"),
+    NAVER("네이버", "Naver")
 
     ;
 
@@ -21,6 +22,7 @@ public enum ESecurityProvider {
             case "DEFAULT" -> DEFAULT;
             case "KAKAO" -> KAKAO;
             case "GOOGLE" -> GOOGLE;
+            case "NAVER" -> NAVER;
             default -> throw new IllegalArgumentException("Security Provider가 잘못되었습니다.");
         };
     }
