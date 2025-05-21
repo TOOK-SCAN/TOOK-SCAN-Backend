@@ -3,6 +3,8 @@ package com.tookscan.tookscan.security.application.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
@@ -29,10 +31,11 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
     private final UserService userService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JsonWebTokenUtil jsonWebTokenUtil;
 
     @Override
     @Transactional
-    public void execute(SignUpDefaultRequestDto requestDto) {
+    public DefaultJsonWebTokenDto execute(SignUpDefaultRequestDto requestDto) {
 
         // 중복된 아이디인지 확인
         accountRepository.existsBySerialIdAndProviderThenThrow(requestDto.serialId(), ESecurityProvider.DEFAULT);
@@ -57,12 +60,15 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
                 requestDto.isReceiveEmail(),
                 requestDto.isReceiveSms()
         );
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         // 인증번호 삭제
         authenticationCodeRepository.deleteById(requestDto.phoneNumber());
 
         // 인증번호 발급 이력 삭제
         authenticationCodeHistoryRepository.deleteById(requestDto.phoneNumber());
+
+        // JWT 발급
+        return jsonWebTokenUtil.generateDefaultJsonWebTokens(savedUser.getId(), savedUser.getRole());
     }
 }

@@ -14,7 +14,7 @@ public interface UserRepository {
 
     List<User> findByIds(List<UUID> userIds);
 
-    void save(User user);
+    User save(User user);
 
     User findByPhoneNumberAndNameOrElseThrow(String phoneNumber, String name);
 

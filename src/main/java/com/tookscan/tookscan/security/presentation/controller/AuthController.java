@@ -7,7 +7,6 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
-import com.tookscan.tookscan.security.application.usecase.AdminSignUpDefaultUseCase;
 import com.tookscan.tookscan.security.application.usecase.ChangePasswordUseCase;
 import com.tookscan.tookscan.security.application.usecase.DeleteAccountUseCase;
 import com.tookscan.tookscan.security.application.usecase.IssueAuthenticationCodeUseCase;
@@ -57,7 +56,6 @@ public class AuthController {
     private final ReissueJsonWebTokenUseCase reissueJsonWebTokenUseCase;
     private final IssueAuthenticationCodeUseCase issueAuthenticationCodeUseCase;
     private final SignUpDefaultUseCase signUpDefaultUseCase;
-    private final AdminSignUpDefaultUseCase adminSignUpDefaultUseCase;
     private final SignUpOauthUseCase signUpOauthUseCase;
     private final ReadSerialIdAndProviderUseCase readSerialIdAndProviderUseCase;
     private final ValidateIdUseCase validateIdUseCase;
@@ -93,11 +91,10 @@ public class AuthController {
      * 2.1.2 유저 회원가입
      */
     @PostMapping("/users/sign-up-default")
-    public ResponseDto<Void> signUpDefault(
+    public ResponseDto<DefaultJsonWebTokenDto> signUpDefault(
             @Valid @RequestBody SignUpDefaultRequestDto requestDto
     ) {
-        signUpDefaultUseCase.execute(requestDto);
-        return ResponseDto.created(null);
+        return ResponseDto.created(signUpDefaultUseCase.execute(requestDto));
     }
 
     /**
@@ -118,14 +115,13 @@ public class AuthController {
      * 2.1.3 소셜로그인 유저 회원가입
      */
     @PostMapping("/users/sign-up-oauth")
-    public ResponseDto<Void> signUpOauth(
+    public ResponseDto<DefaultJsonWebTokenDto> signUpOauth(
             @Valid @RequestBody SignUpOauthRequestDto requestDto,
             HttpServletRequest request
     ) {
         String temporaryToken = HeaderUtil.refineHeader(request, Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX)
                 .orElseThrow(() -> new CommonException(ErrorCode.INVALID_HEADER_ERROR));
-        signUpOauthUseCase.execute(temporaryToken, requestDto);
-        return ResponseDto.created(null);
+        return ResponseDto.created(signUpOauthUseCase.execute(temporaryToken, requestDto));
     }
 
     /**
