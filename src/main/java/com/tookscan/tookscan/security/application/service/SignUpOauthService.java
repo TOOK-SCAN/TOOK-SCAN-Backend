@@ -5,20 +5,22 @@ import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
-import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
+import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
 import io.jsonwebtoken.Claims;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +35,11 @@ public class SignUpOauthService implements SignUpOauthUseCase {
     private final UserService userService;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
-
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     @Transactional
-    public void execute(String temporaryToken, SignUpOauthRequestDto requestDto) {
+    public DefaultJsonWebTokenDto execute(String temporaryToken, SignUpOauthRequestDto requestDto) {
 
         // temporary Token 파싱
         Claims claims = jsonWebTokenUtil.validateToken(temporaryToken);
@@ -71,12 +72,15 @@ public class SignUpOauthService implements SignUpOauthUseCase {
                 requestDto.isReceiveEmail(),
                 requestDto.isReceiveSms()
         );
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         // 인증번호 삭제
         authenticationCodeRepository.deleteById(requestDto.phoneNumber());
 
         // 인증번호 발급 이력 삭제
         authenticationCodeHistoryRepository.deleteById(requestDto.phoneNumber());
+
+        // JWT 발급
+        return jsonWebTokenUtil.generateDefaultJsonWebTokens(savedUser.getId(), savedUser.getRole());
     }
 }

@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.security.application.usecase;
 
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
+import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 
 @UseCase
@@ -10,5 +11,5 @@ public interface SignUpOauthUseCase {
      * @param temporaryToken 임시 토큰
      * @param requestDto 소셜 로그인 회원가입 요청 DTO
      */
-    void execute(String temporaryToken, SignUpOauthRequestDto requestDto);
+    DefaultJsonWebTokenDto execute(String temporaryToken, SignUpOauthRequestDto requestDto);
 }
