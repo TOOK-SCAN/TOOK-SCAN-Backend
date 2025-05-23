@@ -14,6 +14,9 @@ public record UpdateUserOrderInfoRequestDto(
         @JsonProperty("address")
         @NotNull(message = "주소를 입력해주세요.")
         @Valid
-        AddressRequestDto address
+        AddressRequestDto address,
+
+        @JsonProperty("delivery_request")
+        String deliveryRequest
 ) {
 }

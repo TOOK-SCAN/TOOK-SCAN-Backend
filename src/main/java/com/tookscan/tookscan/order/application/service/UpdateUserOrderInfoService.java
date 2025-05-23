@@ -43,6 +43,7 @@ public class UpdateUserOrderInfoService implements UpdateUserOrderInfoUseCase {
                 requestDto.address().longitude()
         );
         order.getDelivery().updateAddress(address);
+        order.getDelivery().updateRequest(requestDto.deliveryRequest());
         orderRepository.save(order);
     }
 }

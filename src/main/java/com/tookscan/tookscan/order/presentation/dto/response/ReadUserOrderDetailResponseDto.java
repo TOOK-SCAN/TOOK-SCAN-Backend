@@ -1,10 +1,12 @@
 package com.tookscan.tookscan.order.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.type.ECouponType;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
@@ -52,7 +54,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
     @JsonProperty("address")
     @NotNull
-    private final String address;
+    private final AddressResponseDto address;
 
     @JsonProperty("address_detail")
     private final String addressDetail;
@@ -79,8 +81,14 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("cutting_price")
     private final Integer cuttingPrice;
 
+    @JsonProperty("coupon_type")
+    private final ECouponType couponType;
+
     @JsonProperty("coupon_price")
     private final Integer couponPrice;
+
+    @JsonProperty("coupon_percentage")
+    private final Integer couponPercentage;
 
     @JsonProperty("payment_total")
     private final Integer paymentTotal;
@@ -160,15 +168,16 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             String phoneNumber,
             String email,
             String zoneCode,
-            String address,
-            String addressDetail,
+            AddressResponseDto address,
             String deliveryRequest,
             List<DocumentInfoDto> documents,
             Integer documentsPrice,
             Integer oneDayScanPrice,
             Integer deliveryPrice,
             Integer cuttingPrice,
+            ECouponType couponType,
             Integer couponPrice,
+            Integer couponPercentage,
             Integer paymentTotal,
             String receiptUrl,
             String couponName
@@ -183,14 +192,15 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.email = email;
         this.zoneCode = zoneCode;
         this.address = address;
-        this.addressDetail = addressDetail;
         this.deliveryRequest = deliveryRequest;
         this.documents = documents;
         this.documentsPrice = documentsPrice;
         this.oneDayScanPrice = oneDayScanPrice;
         this.deliveryPrice = deliveryPrice;
         this.cuttingPrice = cuttingPrice;
+        this.couponType = couponType;
         this.couponPrice = couponPrice;
+        this.couponPercentage = couponPercentage;
         this.paymentTotal = paymentTotal;
         this.receiptUrl = receiptUrl;
         this.couponName = couponName;
@@ -238,16 +248,17 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .phoneNumber(order.getDelivery().getPhoneNumber())
                 .email(order.getDelivery().getEmail())
                 .zoneCode(order.getDelivery().getAddress().getZoneCode())
-                .address(order.getDelivery().getAddress().getFullAddress())
-                .addressDetail(order.getDelivery().getAddress().getAddressDetail())
+                .address(AddressResponseDto.fromEntity(order.getDelivery().getAddress()))
                 .deliveryRequest(order.getDelivery().getRequest())
                 .documents(docs)
                 .couponName(couponName)
+                .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
+                .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .cuttingPrice(cuttingPriceSum)
-                .couponPrice(order.getCoupon() != null ? order.getDiscountAmount() : null)
+                .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : null)
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
                 .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
                 .build();
