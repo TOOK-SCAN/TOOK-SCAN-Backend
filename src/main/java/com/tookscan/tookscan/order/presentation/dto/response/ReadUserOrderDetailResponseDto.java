@@ -56,9 +56,6 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @NotNull
     private final AddressResponseDto address;
 
-    @JsonProperty("address_detail")
-    private final String addressDetail;
-
     @JsonProperty("delivery_request")
     private final String deliveryRequest;
 
