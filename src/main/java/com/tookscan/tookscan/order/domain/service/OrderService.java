@@ -58,6 +58,12 @@ public class OrderService {
         }
     }
 
+    public void validateUpdatableOrder(Order order) {
+        if (!order.getOrderStatus().equals(EOrderStatus.APPLY_COMPLETED)) {
+            throw new CommonException(ErrorCode.NOT_UPDATABLE_ORDER);
+        }
+    }
+
     public void updateScanTermsAgreed(Order order) {
         order.updateScanTermsAgreed();
     }

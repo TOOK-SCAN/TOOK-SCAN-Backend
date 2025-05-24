@@ -26,6 +26,7 @@ public class UpdateUserOrderCancelService implements UpdateUserOrderCancelUseCas
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
         orderService.validateOrderUser(order, user);
+        orderService.validateUpdatableOrder(order);
 
         order.updateOrderStatus(EOrderStatus.CANCEL);
         orderRepository.save(order);

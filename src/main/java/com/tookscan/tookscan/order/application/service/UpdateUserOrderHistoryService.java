@@ -36,6 +36,7 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
         orderService.validateOrderUser(order, user);
+        orderService.validateUpdatableOrder(order);
 
         // 가격 정책 조회
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
