@@ -34,6 +34,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @NotNull
     private final String orderDate;
 
+    @JsonProperty("delivery_expiration_date")
+    @NotNull
+    private final String deliveryExpirationDate;
+
     @JsonProperty("payment_expiration_date")
     private final String paymentExpirationDate;
 
@@ -43,6 +47,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("phone_number")
     @NotNull
     private final String phoneNumber;
+
+    @JsonProperty("receiver_name")
+    @NotNull
+    private final String receiverName;
 
     @JsonProperty("email")
     @NotNull
@@ -160,9 +168,11 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             String orderNumber,
             EOrderStatus orderStatus,
             String orderDate,
+            String deliveryExpirationDate,
             String paymentExpirationDate,
             String paymentDate,
             String phoneNumber,
+            String receiverName,
             String email,
             String zoneCode,
             AddressResponseDto address,
@@ -183,9 +193,11 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
         this.orderDate = orderDate;
+        this.deliveryExpirationDate = deliveryExpirationDate;
         this.paymentExpirationDate = paymentExpirationDate;
         this.paymentDate = paymentDate;
         this.phoneNumber = phoneNumber;
+        this.receiverName = receiverName;
         this.email = email;
         this.zoneCode = zoneCode;
         this.address = address;
@@ -237,12 +249,15 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .orderNumber(order.getOrderNumber())
                 .orderStatus(order.getOrderStatus())
                 .orderDate(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
+                .deliveryExpirationDate(
+                        DateTimeUtil.convertLocalDateTimeToDartString(order.getDeliveryExpirationDate()))
                 .paymentExpirationDate(
                         order.getPaymentExpirationDate() != null
                                 ? DateTimeUtil.convertLocalDateTimeToDartString(order.getPaymentExpirationDate())
                                 : null)
                 .paymentDate(paymentDate)
                 .phoneNumber(order.getDelivery().getPhoneNumber())
+                .receiverName(order.getDelivery().getReceiverName())
                 .email(order.getDelivery().getEmail())
                 .zoneCode(order.getDelivery().getAddress().getZoneCode())
                 .address(AddressResponseDto.fromEntity(order.getDelivery().getAddress()))
