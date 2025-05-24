@@ -84,6 +84,7 @@ public enum ErrorCode {
     KAKAO_SIGN_IN_USE(40049, HttpStatus.BAD_REQUEST, "카카오 로그인 사용 중인 휴대폰 번호입니다."),
     GOOGLE_SIGN_IN_USE(40050, HttpStatus.BAD_REQUEST, "구글 로그인 사용 중인 휴대폰 번호입니다."),
     NAVER_SIGN_IN_USE(40051, HttpStatus.BAD_REQUEST, "네이버 로그인 사용 중인 휴대폰 번호입니다."),
+    NOT_UPDATABLE_ORDER(40052, HttpStatus.BAD_REQUEST, "주문 상태가 변경되어 더 이상 수정할 수 없습니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
