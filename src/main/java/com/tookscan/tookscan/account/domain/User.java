@@ -48,6 +48,9 @@ public class User extends Account {
     @Column(name = "email", length = 320)
     private String email;
 
+    @Column(name = "delievery_request", length = 100)
+    private String deliveryRequest;
+
     @Column(name = "over_14_agreed", nullable = false)
     private LocalDateTime over14Agreed;
 
@@ -120,6 +123,10 @@ public class User extends Account {
 
     public void updateAddress(Address address) {
         this.address = address;
+    }
+
+    public void updateDeliveryRequest(String deliveryRequest) {
+        this.deliveryRequest = deliveryRequest;
     }
 
     public void updateEmail(String email) {

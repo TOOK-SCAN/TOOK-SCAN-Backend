@@ -45,6 +45,7 @@ public class UserService {
             String email,
             String phoneNumber,
             AddressRequestDto addressDto,
+            String deliveryRequest,
             Boolean marketingAllowed,
             Boolean isReceiveEmail,
             Boolean isReceiveSms
@@ -58,6 +59,7 @@ public class UserService {
         user.updateEmail(email);
         user.updatePhone(phoneNumber);
         user.updateAddress(addressDto != null ? addressDto.toEntity() : null);
+        user.updateDeliveryRequest(deliveryRequest);
         user.updateIsReceiveEmail(isReceiveEmail);
         user.updateIsReceiveSms(isReceiveSms);
         return user;
@@ -69,12 +71,14 @@ public class UserService {
             String phoneNumber,
             String email,
             AddressRequestDto address,
+            String deliveryRequest,
             String memo
     ) {
         user.updateName(name);
         user.updatePhone(phoneNumber);
         user.updateEmail(email);
         user.updateAddress(address!=null ? address.toEntity() : null);
+        user.updateDeliveryRequest(deliveryRequest);
         user.updateMemo(memo);
         return user;
     }

@@ -28,6 +28,10 @@ public record UpdateUserUserRequestDto(
         @Valid
         AddressRequestDto address,
 
+        @JsonProperty("delivery_request")
+        @Schema(description = "배송 요청사항", example = "문 앞에 두고 가주세요.")
+        String deliveryRequest,
+
         @JsonProperty("is_receive_sms")
         @NotNull(message = "SMS 수신 여부를 선택해주세요.")
         @Schema(description = "SMS 수신 여부", example = "true")

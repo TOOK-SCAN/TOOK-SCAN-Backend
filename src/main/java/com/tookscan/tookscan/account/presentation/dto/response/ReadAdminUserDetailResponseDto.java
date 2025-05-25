@@ -40,19 +40,24 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
     @Schema(description = "주소")
     private final AddressResponseDto address;
 
+    @JsonProperty("delivery_request")
+    @Schema(description = "배송 요청사항", example = "문 앞에 두고 가주세요.")
+    private final String deliveryRequest;
+
     @JsonProperty("memo")
     @Schema(description = "메모", example = "VIP 고객")
     private final String memo;
 
     @Builder
     public ReadAdminUserDetailResponseDto(String serialId, String name, ESecurityProvider provider, String phoneNumber,
-                                          String email, AddressResponseDto address, String memo) {
+                                          String email, AddressResponseDto address, String deliveryRequest, String memo) {
         this.serialId = serialId;
         this.name = name;
         this.provider = provider;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
+        this.deliveryRequest = deliveryRequest;
         this.memo = memo;
         this.validateSelf();
     }
@@ -64,7 +69,8 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                 .provider(user.getProvider())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail() != null ? user.getEmail() : null)
-                .address(AddressResponseDto.fromEntity(user.getAddress()))
+                .address(user.getAddress() != null ? AddressResponseDto.fromEntity(user.getAddress()) : null)
+                .deliveryRequest(user.getDeliveryRequest() != null ? user.getDeliveryRequest() : null)
                 .memo(user.getMemo() != null ? user.getMemo() : null)
                 .build();
     }

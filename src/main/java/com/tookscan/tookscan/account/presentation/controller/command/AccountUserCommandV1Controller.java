@@ -25,7 +25,7 @@ public class AccountUserCommandV1Controller {
     private final UpdateUserUserUseCase updateUserUserUseCase;
 
     /**
-     * 3.12 유저 정보 수정
+     * 3.4.1 유저 정보 수정
      */
     @PutMapping("/v1/users")
     @Operation(summary = "유저 정보 수정", description = "유저의 정보를 수정합니다.")

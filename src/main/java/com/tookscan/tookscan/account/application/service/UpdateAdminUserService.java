@@ -31,6 +31,7 @@ public class UpdateAdminUserService implements UpdateAdminUserUseCase {
                 requestDto.phoneNumber(),
                 requestDto.email(),
                 requestDto.address(),
+                requestDto.deliveryRequest(),
                 requestDto.memo()
         );
         userRepository.save(user);

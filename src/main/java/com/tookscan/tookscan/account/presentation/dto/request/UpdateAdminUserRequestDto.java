@@ -2,6 +2,7 @@ package com.tookscan.tookscan.account.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -27,6 +28,10 @@ public record UpdateAdminUserRequestDto(
         @JsonProperty("address")
         @Valid
         AddressRequestDto address,
+
+        @JsonProperty("delivery_request")
+        @Schema(description = "배송 요청사항", example = "문 앞에 두고 가주세요.")
+        String deliveryRequest,
 
         @JsonProperty("memo")
         String memo
