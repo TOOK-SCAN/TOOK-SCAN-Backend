@@ -2,6 +2,8 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.address.domain.Address;
+import com.tookscan.tookscan.address.domain.service.AddressService;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderHistoryUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
@@ -29,6 +31,7 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
 
     private final OrderService orderService;
     private final DocumentService documentService;
+    private final AddressService addressService;
 
     @Override
     @Transactional
@@ -48,7 +51,7 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
         requestDto.documents().forEach(doc -> {
             Document document = documentService.createDocument(
                     doc.name(),
-                    doc.pagePrediction(),
+                    doc.pageCount(),
                     doc.recoveryOption(),
                     order,
                     pricePolicy
@@ -58,6 +61,22 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
         });
 
         order.updateIsOneDayScan(requestDto.isOneDayScan());
+        if (requestDto.address() != null) {
+            Address address = addressService.createAddress(
+                    requestDto.address().addressName(),
+                    requestDto.address().region1DepthName(),
+                    requestDto.address().region2DepthName(),
+                    requestDto.address().region3DepthName(),
+                    requestDto.address().region4DepthName(),
+                    requestDto.address().addressDetail(),
+                    requestDto.address().zoneCode(),
+                    requestDto.address().latitude(),
+                    requestDto.address().longitude()
+            );
+            order.getDelivery().updateAddress(address);
+            order.getDelivery().updateRequest(requestDto.deliveryRequest());
+        }
+
         orderRepository.save(order);
     }
 }
