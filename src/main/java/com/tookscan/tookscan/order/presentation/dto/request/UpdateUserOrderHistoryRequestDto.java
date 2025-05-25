@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.order.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
 import com.tookscan.tookscan.core.validator.ByteSize;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import jakarta.validation.Valid;
@@ -20,7 +21,14 @@ public record UpdateUserOrderHistoryRequestDto(
 
         @JsonProperty("is_one_day_scan")
         @NotNull(message = "원데이 스캔 여부를 입력해주세요.")
-        Boolean isOneDayScan
+        Boolean isOneDayScan,
+
+        @JsonProperty("address")
+        @Valid
+        AddressRequestDto address,
+
+        @JsonProperty("delivery_request")
+        String deliveryRequest
 ) {
     public record RequestDocument(
 
@@ -36,8 +44,8 @@ public record UpdateUserOrderHistoryRequestDto(
             @NotNull(message = "페이지 수를 입력해주세요.")
             @Min(value = 0, message = "페이지 수는 0 이상이어야 합니다.")
             @Max(value = 10000, message = "페이지 수는 10000 이하이어야 합니다.")
-            @JsonProperty("page_prediction")
-            Integer pagePrediction,
+            @JsonProperty("page_count")
+            Integer pageCount,
 
             @NotNull(message = "복원 옵션을 입력해주세요.")
             @JsonProperty("recovery_option")
