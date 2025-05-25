@@ -47,6 +47,7 @@ public class UpdateUserUserService implements UpdateUserUserUseCase {
                 user, requestDto.email(),
                 requestDto.phoneNumber(),
                 requestDto.address(),
+                requestDto.deliveryRequest(),
                 requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
                 requestDto.isReceiveEmail(),
                 requestDto.isReceiveSms()

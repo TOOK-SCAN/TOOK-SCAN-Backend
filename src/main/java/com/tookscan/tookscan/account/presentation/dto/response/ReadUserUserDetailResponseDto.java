@@ -40,6 +40,10 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
     @Schema(description = "주소")
     private AddressResponseDto address;
 
+    @JsonProperty("delivery_request")
+    @Schema(description = "배송 요청사항", example = "문 앞에 두고 가주세요.")
+    private final String deliveryRequest;
+
     @JsonProperty("is_receive_email")
     @NotNull(message = "이메일 수신 여부는 null일 수 없습니다.")
     @Schema(description = "이메일 수신 여부", example = "true")
@@ -52,13 +56,14 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
 
     @Builder
     public ReadUserUserDetailResponseDto(String name, ESecurityProvider provider, String serialId, String phoneNumber,
-                                         String email, AddressResponseDto address, Boolean isReceiveEmail, Boolean isReceiveSms) {
+                                         String email, AddressResponseDto address, String deliveryRequest, Boolean isReceiveEmail, Boolean isReceiveSms) {
         this.name = name;
         this.provider = provider;
         this.serialId = serialId;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
+        this.deliveryRequest = deliveryRequest;
         this.isReceiveEmail = isReceiveEmail;
         this.isReceiveSms = isReceiveSms;
         this.validateSelf();
@@ -71,7 +76,8 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
                 .serialId(user.getSerialId())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail() != null ? user.getEmail() : null)
-                .address(AddressResponseDto.fromEntity(user.getAddress()))
+                .address(user.getAddress() != null ? AddressResponseDto.fromEntity(user.getAddress()) : null)
+                .deliveryRequest(user.getDeliveryRequest() != null ? user.getDeliveryRequest() : null)
                 .isReceiveEmail(user.getIsReceiveEmail())
                 .isReceiveSms(user.getIsReceiveSms())
                 .build();

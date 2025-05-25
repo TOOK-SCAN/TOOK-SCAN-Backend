@@ -59,9 +59,11 @@ Content-Type: application/json
       "region_2depth_name": "{{account.API_3_4_1.address.region_2depth_name}}",
       "region_3depth_name": "{{account.API_3_4_1.address.region_3depth_name}}",
       "address_detail": "{{account.API_3_4_1.address.address_detail}}",
+      "zone_code": "55231",
       "latitude": {{account.API_3_4_1.address.latitude}},
       "longitude": {{account.API_3_4_1.address.longitude}}
     },
+    "delivery_request": "문 앞에 놓고 가주세요",
     "is_receive_email": true,
     "is_receive_sms": true
 }

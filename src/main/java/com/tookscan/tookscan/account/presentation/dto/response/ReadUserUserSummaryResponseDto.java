@@ -30,12 +30,17 @@ public class ReadUserUserSummaryResponseDto extends SelfValidating<ReadUserUserS
     @Schema(description = "주소")
     private final AddressResponseDto address;
 
+    @JsonProperty("delivery_request")
+    @Schema(description = "배송 요청사항", example = "문 앞에 두고 가주세요.")
+    private final String deliveryRequest;
+
     @Builder
-    public ReadUserUserSummaryResponseDto(String name, String phoneNumber, String email, AddressResponseDto address) {
+    public ReadUserUserSummaryResponseDto(String name, String phoneNumber, String email, AddressResponseDto address, String deliveryRequest) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
+        this.deliveryRequest = deliveryRequest;
         this.validateSelf();
     }
 
@@ -45,6 +50,7 @@ public class ReadUserUserSummaryResponseDto extends SelfValidating<ReadUserUserS
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail() != null ? user.getEmail() : null)
                 .address(user.getAddress() != null ? AddressResponseDto.fromEntity(user.getAddress()) : null)
+                .deliveryRequest(user.getDeliveryRequest())
                 .build();
     }
 }
