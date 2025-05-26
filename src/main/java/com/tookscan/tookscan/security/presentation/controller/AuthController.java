@@ -17,6 +17,7 @@ import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.application.usecase.ValidateAuthenticationCodeUseCase;
 import com.tookscan.tookscan.security.application.usecase.ValidateIdUseCase;
+import com.tookscan.tookscan.security.application.usecase.VerifyPasswordUseCase;
 import com.tookscan.tookscan.security.application.usecase.VerifyUserUseCase;
 import com.tookscan.tookscan.security.presentation.dto.request.AdminSignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ChangePasswordRequestDto;
@@ -26,6 +27,7 @@ import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRe
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ValidateAuthenticationCodeRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.VerifyPasswordRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.VerifyUserRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticationCodeResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReadSerialIdAndProviderResponseDto;
@@ -66,6 +68,7 @@ public class AuthController {
     private final ChangePasswordUseCase changePasswordUseCase;
     private final DeleteAccountUseCase deleteAccountUseCase;
     private final VerifyUserUseCase verifyUserUseCase;
+    private final VerifyPasswordUseCase verifyPasswordUseCase;
 
     /**
      * 1.2.2 JWT 재발급
@@ -145,6 +148,17 @@ public class AuthController {
             @Valid @RequestBody VerifyUserRequestDto requestDto
     ) {
         return ResponseDto.ok(verifyUserUseCase.execute(requestDto));
+    }
+
+    /**
+     * 2.1.6 비밀번호 검증
+     */
+    @PostMapping("/verification/password")
+    public ResponseDto<ValidationResponseDto> verifyPassword(
+            @AccountID UUID accountId,
+            @Valid @RequestBody VerifyPasswordRequestDto requestDto
+    ) {
+        return ResponseDto.ok(verifyPasswordUseCase.execute(accountId, requestDto));
     }
 
     /**
