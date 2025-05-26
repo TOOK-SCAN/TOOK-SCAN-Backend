@@ -69,6 +69,16 @@ Content-Type: application/json
     "name": "{{auth.API_2_1_2.name}}"
 }
 
+### 2.1.6 비밀번호 검증
+// @no-log
+POST {{host_url}}/v1/auth/verification/password
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+    "password": "none"
+}
+
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
 @authentication_code = "378322"
