@@ -56,10 +56,6 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @NotNull
     private final String email;
 
-    @JsonProperty("zone_code")
-    @NotNull
-    private final String zoneCode;
-
     @JsonProperty("address")
     @NotNull
     private final AddressResponseDto address;
@@ -70,6 +66,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("documents")
     @NotNull
     private final List<DocumentInfoDto> documents;
+
+    @JsonProperty("is_one_day_scan")
+    @NotNull
+    private final Boolean isOneDayScan;
 
     @JsonProperty("coupon_name")
     private final String couponName;
@@ -177,10 +177,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             String phoneNumber,
             String receiverName,
             String email,
-            String zoneCode,
             AddressResponseDto address,
             String deliveryRequest,
             List<DocumentInfoDto> documents,
+            Boolean isOneDayScan,
             Integer documentsPrice,
             Integer oneDayScanPrice,
             Integer deliveryPrice,
@@ -203,10 +203,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.phoneNumber = phoneNumber;
         this.receiverName = receiverName;
         this.email = email;
-        this.zoneCode = zoneCode;
         this.address = address;
         this.deliveryRequest = deliveryRequest;
         this.documents = documents;
+        this.isOneDayScan = isOneDayScan;
         this.documentsPrice = documentsPrice;
         this.oneDayScanPrice = oneDayScanPrice;
         this.deliveryPrice = deliveryPrice;
@@ -268,10 +268,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .phoneNumber(order.getDelivery().getPhoneNumber())
                 .receiverName(order.getDelivery().getReceiverName())
                 .email(order.getDelivery().getEmail())
-                .zoneCode(order.getDelivery().getAddress().getZoneCode())
                 .address(AddressResponseDto.fromEntity(order.getDelivery().getAddress()))
                 .deliveryRequest(order.getDelivery().getRequest())
                 .documents(docs)
+                .isOneDayScan(order.getIsOneDayScan())
                 .couponName(couponName)
                 .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
                 .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
