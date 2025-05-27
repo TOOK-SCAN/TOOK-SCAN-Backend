@@ -18,7 +18,6 @@ public record AddressRequestDto(
 
         @JsonProperty("region_1depth_name")
         @Schema(description = "시/도", example = "서울특별시")
-        @NotBlank(message = "시/도를 입력해주세요.")
         String region1DepthName,
 
         @JsonProperty("region_2depth_name")
@@ -31,7 +30,6 @@ public record AddressRequestDto(
 
         @JsonProperty("zone_code")
         @Schema(description = "우편번호", example = "06210")
-        @Size(min = 5, max = 5, message = "우편번호는 5자리여야 합니다.")
         String zoneCode,
 
         @JsonProperty("region_4depth_name")
