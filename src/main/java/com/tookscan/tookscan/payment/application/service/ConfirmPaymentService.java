@@ -15,6 +15,7 @@ import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import com.tookscan.tookscan.payment.domain.type.EPaymentStatus;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ConfirmPaymentService implements ConfirmPaymentUseCase {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
@@ -64,6 +66,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 response.receipt() != null && response.receipt().url() != null ? response.receipt().url() : null
         );
 
+        log.info("결제 주문 상태: {}", payment.getStatus());
         payment = paymentRepository.saveAndReturn(payment);
 
         // 결제 완료 시 주문 상태 변경
