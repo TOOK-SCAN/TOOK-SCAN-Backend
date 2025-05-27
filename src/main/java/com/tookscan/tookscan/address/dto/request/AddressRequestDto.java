@@ -32,7 +32,6 @@ public record AddressRequestDto(
 
         @JsonProperty("zone_code")
         @Schema(description = "우편번호", example = "06210")
-        @NotBlank(message = "우편번호를 입력해주세요.")
         @Size(min = 5, max = 5, message = "우편번호는 5자리여야 합니다.")
         String zoneCode,
 
