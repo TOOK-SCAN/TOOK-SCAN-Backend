@@ -2,12 +2,15 @@ package com.tookscan.tookscan.order.presentation.controller.query;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.order.application.usecase.EstimateUserOrderPriceUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderCouponDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderSummaryUseCase;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.presentation.dto.request.EstimateUserOrderPriceRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.response.EstimateUserOrderPriceResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDetailResponseDto;
@@ -16,11 +19,14 @@ import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderSummar
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +41,19 @@ public class OrderUserQueryV1Controller {
     private final ReadUserOrderSummaryUseCase readUserOrderSummaryUseCase;
     private final ReadUserOrderDeliveryUseCase readUserOrderDeliveryUseCase;
     private final ReadUserOrderCouponDetailUseCase readUserOrderCouponDetailUseCase;
+    private final EstimateUserOrderPriceUseCase estimateUserOrderPriceUseCase;
+
+    /**
+     * 4.1.9 회원 스캔 가격 계산
+     */
+    @Operation(summary = "회원 스캔 가격 계산", description = "회원이 스캔 가격을 계산합니다.")
+    @PostMapping(value = "/estimate")
+    public ResponseDto<EstimateUserOrderPriceResponseDto> estimateOrderPrice(
+            @Parameter(hidden = true) @AccountID UUID accountId,
+            @RequestBody @Valid EstimateUserOrderPriceRequestDto requestDto
+    ) {
+        return ResponseDto.ok(estimateUserOrderPriceUseCase.execute(requestDto));
+    }
 
     /**
      * 4.2.2 회원 주문 내역 조회

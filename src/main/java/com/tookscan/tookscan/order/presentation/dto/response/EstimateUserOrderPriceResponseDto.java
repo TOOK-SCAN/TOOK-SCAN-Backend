@@ -1,78 +1,22 @@
 package com.tookscan.tookscan.order.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
-import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
-import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
-import com.tookscan.tookscan.payment.domain.Payment;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrderDetailResponseDto> {
-    @JsonProperty("id")
-    @NotNull
-    private final String id;
-
-    @JsonProperty("order_number")
-    @NotNull
-    private final String orderNumber;
-
-    @JsonProperty("order_status")
-    @NotNull
-    private final EOrderStatus orderStatus;
-
-    @JsonProperty("order_date")
-    @NotNull
-    private final String orderDate;
-
-    @JsonProperty("delivery_expiration_date")
-    @NotNull
-    private final String deliveryExpirationDate;
-
-    @JsonProperty("payment_expiration_date")
-    private final String paymentExpirationDate;
-
-    @JsonProperty("payment_date")
-    private final String paymentDate;
-
-    @JsonProperty("phone_number")
-    @NotNull
-    private final String phoneNumber;
-
-    @JsonProperty("receiver_name")
-    @NotNull
-    private final String receiverName;
-
-    @JsonProperty("email")
-    @NotNull
-    private final String email;
-
-    @JsonProperty("address")
-    @NotNull
-    private final AddressResponseDto address;
-
-    @JsonProperty("delivery_request")
-    private final String deliveryRequest;
-
+public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUserOrderPriceResponseDto> {
     @JsonProperty("documents")
     @NotNull
     private final List<DocumentInfoDto> documents;
-
-    @JsonProperty("is_one_day_scan")
-    @NotNull
-    private final Boolean isOneDayScan;
-
-    @JsonProperty("coupon_name")
-    private final String couponName;
 
     @JsonProperty("documents_price")
     private final Integer documentsPrice;
@@ -101,10 +45,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("payment_total")
     private final Integer paymentTotal;
 
-    @JsonProperty("receipt_url")
-    private final String receiptUrl;
-
     @Getter
+    @Valid
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
         @JsonProperty("name")
         @NotNull
@@ -166,21 +108,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     }
 
     @Builder
-    public ReadUserOrderDetailResponseDto(
-            String id,
-            String orderNumber,
-            EOrderStatus orderStatus,
-            String orderDate,
-            String deliveryExpirationDate,
-            String paymentExpirationDate,
-            String paymentDate,
-            String phoneNumber,
-            String receiverName,
-            String email,
-            AddressResponseDto address,
-            String deliveryRequest,
+    public EstimateUserOrderPriceResponseDto(
             List<DocumentInfoDto> documents,
-            Boolean isOneDayScan,
             Integer documentsPrice,
             Integer oneDayScanPrice,
             Integer deliveryPrice,
@@ -189,24 +118,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             ECouponType couponType,
             Integer couponPrice,
             Integer couponPercentage,
-            Integer paymentTotal,
-            String receiptUrl,
-            String couponName
+            Integer paymentTotal
     ) {
-        this.id = id;
-        this.orderNumber = orderNumber;
-        this.orderStatus = orderStatus;
-        this.orderDate = orderDate;
-        this.deliveryExpirationDate = deliveryExpirationDate;
-        this.paymentExpirationDate = paymentExpirationDate;
-        this.paymentDate = paymentDate;
-        this.phoneNumber = phoneNumber;
-        this.receiverName = receiverName;
-        this.email = email;
-        this.address = address;
-        this.deliveryRequest = deliveryRequest;
         this.documents = documents;
-        this.isOneDayScan = isOneDayScan;
         this.documentsPrice = documentsPrice;
         this.oneDayScanPrice = oneDayScanPrice;
         this.deliveryPrice = deliveryPrice;
@@ -216,19 +130,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.couponPrice = couponPrice;
         this.couponPercentage = couponPercentage;
         this.paymentTotal = paymentTotal;
-        this.receiptUrl = receiptUrl;
-        this.couponName = couponName;
         this.validateSelf();
     }
 
-    public static ReadUserOrderDetailResponseDto fromEntity(Order order) {
-        Optional<Payment> paymentOpt = Optional.ofNullable(order.getPayment());
-
-        String paymentDate = paymentOpt
-                .map(Payment::getCreatedAt)
-                .map(DateTimeUtil::convertLocalDateTimeToDartString)
-                .orElse(null);
-
+    public static EstimateUserOrderPriceResponseDto fromEntity(Order order) {
         List<DocumentInfoDto> docs = order.getDocuments().stream()
                 .map(DocumentInfoDto::fromEntity)
                 .toList();
@@ -249,30 +154,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .mapToInt(DocumentInfoDto::getRecoveryPrice)
                 .sum();
 
-        String couponName = order.getCoupon() != null
-                ? order.getCoupon().getName()
-                : null;
-
-        return ReadUserOrderDetailResponseDto.builder()
-                .id(order.getId().toString())
-                .orderNumber(order.getOrderNumber())
-                .orderStatus(order.getOrderStatus())
-                .orderDate(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
-                .deliveryExpirationDate(
-                        DateTimeUtil.convertLocalDateTimeToDartString(order.getDeliveryExpirationDate()))
-                .paymentExpirationDate(
-                        order.getPaymentExpirationDate() != null
-                                ? DateTimeUtil.convertLocalDateTimeToDartString(order.getPaymentExpirationDate())
-                                : null)
-                .paymentDate(paymentDate)
-                .phoneNumber(order.getDelivery().getPhoneNumber())
-                .receiverName(order.getDelivery().getReceiverName())
-                .email(order.getDelivery().getEmail())
-                .address(AddressResponseDto.fromEntity(order.getDelivery().getAddress()))
-                .deliveryRequest(order.getDelivery().getRequest())
+        return EstimateUserOrderPriceResponseDto.builder()
                 .documents(docs)
-                .isOneDayScan(order.getIsOneDayScan())
-                .couponName(couponName)
                 .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
                 .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
@@ -281,8 +164,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
                 .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : null)
-                .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
-                .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
+                .paymentTotal(order.getTotalAmount())
                 .build();
     }
 }
