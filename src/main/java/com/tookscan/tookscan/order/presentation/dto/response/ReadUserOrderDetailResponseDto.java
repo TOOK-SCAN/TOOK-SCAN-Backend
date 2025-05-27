@@ -83,6 +83,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("delivery_price")
     private final Integer deliveryPrice;
 
+    @JsonProperty("recovery_price")
+    private final Integer recoveryPrice;
+
     @JsonProperty("cutting_price")
     private final Integer cuttingPrice;
 
@@ -156,7 +159,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                     .documentPrice(document.calculateDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .recoveryPrice(document.getRecoveryOption().getPrice())
-                    .oneDayScanPrice(document.calculateOneDayScanPrice())
+                    .oneDayScanPrice(document.calculateOneDayScanPrice() - document.calculateDocumentPrice())
                     .cuttingPrice(document.getPricePolicy().getDefaultPrice())
                     .build();
         }
@@ -181,6 +184,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             Integer documentsPrice,
             Integer oneDayScanPrice,
             Integer deliveryPrice,
+            Integer recoveryPrice,
             Integer cuttingPrice,
             ECouponType couponType,
             Integer couponPrice,
@@ -206,6 +210,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.documentsPrice = documentsPrice;
         this.oneDayScanPrice = oneDayScanPrice;
         this.deliveryPrice = deliveryPrice;
+        this.recoveryPrice = recoveryPrice;
         this.cuttingPrice = cuttingPrice;
         this.couponType = couponType;
         this.couponPrice = couponPrice;
@@ -240,6 +245,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .mapToInt(DocumentInfoDto::getCuttingPrice)
                 .sum();
 
+        int recoveryPriceSum = docs.stream()
+                .mapToInt(DocumentInfoDto::getRecoveryPrice)
+                .sum();
+
         String couponName = order.getCoupon() != null
                 ? order.getCoupon().getName()
                 : null;
@@ -269,6 +278,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
+                .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
                 .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : null)
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
