@@ -3,7 +3,6 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
-import com.tookscan.tookscan.core.utility.S3Util;
 import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
@@ -11,11 +10,12 @@ import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +26,6 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
     private final KakaoMessageUtil kakaoMessageUtil;
 
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    private final S3Util s3Util;
 
     @Override
     @Transactional
@@ -47,12 +45,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
         }
 
-        String pdfUrls = documents.stream()
-                .map(doc -> doc.getName() + " :<br />" +
-                        "<a href=\"" + s3Util.generateSignedUrl(doc) + "\" target=\"_blank\">"
-                        + s3Util.generateSignedUrl(doc) + "</a>")
-                .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+        String pdfUrls = order.getPdfUrls();
 
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(

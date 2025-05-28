@@ -10,6 +10,8 @@ public interface DocumentRepository {
 
     Document findByIdOrElseThrow(Long id);
 
+    Document findByIdWithPdfsOrElseThrow(Long id);
+
     List<Document> findAllByIdsOrElseThrow(List<Long> ids);
 
     void delete(Document document);

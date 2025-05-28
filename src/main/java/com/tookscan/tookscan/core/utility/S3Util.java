@@ -145,7 +145,7 @@ public class S3Util {
      * @param document 업로드할 PDF 파일에 대한 정보를 가진 Document 객체
      * @param file     업로드할 MultipartFile
      */
-    public void uploadPdf(Document document, MultipartFile file) {
+    public String uploadPdf(Document document, MultipartFile file) {
         String finalKey = PDF_CONTENT_PREFIX
                 + document.getOrder().getId() + '/'
                 + document.getName() + '_' + document.getId() + ".pdf";
@@ -155,6 +155,8 @@ public class S3Util {
             metadata.setContentType(file.getContentType());
 
             amazonS3Client.putObject(bucketName, finalKey, file.getInputStream(), metadata);
+
+            return amazonS3Client.getUrl(bucketName, finalKey).toString();
         } catch (IOException e) {
             throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
         }

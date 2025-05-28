@@ -36,6 +36,12 @@ public class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     @Override
+    public Document findByIdWithPdfsOrElseThrow(Long id) {
+        return documentJpaRepository.findByIdWithPdfs(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT, "문서 ID: " + id));
+    }
+
+    @Override
     public List<Document> findAllByIdsOrElseThrow(List<Long> ids) {
         List<Document> documents = documentJpaRepository.findAllByIdIn(ids);
 

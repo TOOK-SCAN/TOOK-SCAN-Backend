@@ -4,6 +4,9 @@ import com.tookscan.tookscan.core.dto.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -37,16 +40,18 @@ public class Pdf extends BaseEntity {
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------ */
     /* -------------------------------------------- */
-    @OneToOne(mappedBy = "pdf", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Pdf(String pdfUrl, LocalDateTime pdfCreatedAt, boolean isChecked) {
+    public Pdf(String pdfUrl, LocalDateTime pdfCreatedAt, boolean isChecked, Document document) {
         this.pdfUrl = pdfUrl;
         this.pdfCreatedAt = pdfCreatedAt;
         this.isChecked = isChecked;
+        this.document = document;
     }
 }
