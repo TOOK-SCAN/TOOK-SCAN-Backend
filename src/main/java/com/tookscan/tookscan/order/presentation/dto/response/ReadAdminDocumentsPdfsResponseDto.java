@@ -2,22 +2,32 @@ package com.tookscan.tookscan.order.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.SelfValidating;
+import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.Pdf;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class ReadAdminDocumentsPdfsResponseDto extends SelfValidating<ReadAdminDocumentsPdfsResponseDto> {
 
-    @JsonProperty("pdf_url")
-    private final String pdfUrl;
+    @JsonProperty("pdf_urls")
+    private final List<String> pdfUrls;
 
     @Builder
-    public ReadAdminDocumentsPdfsResponseDto(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
+    public ReadAdminDocumentsPdfsResponseDto(List<String> pdfUrls) {
+        this.pdfUrls = pdfUrls;
         this.validateSelf();
     }
 
-    public static ReadAdminDocumentsPdfsResponseDto of(String pdfUrl) {
-        return new ReadAdminDocumentsPdfsResponseDto(pdfUrl);
+    public static ReadAdminDocumentsPdfsResponseDto fromEntity(Document document) {
+        List<String> pdfUrls = document.getPdfs().stream()
+                .map(Pdf::getPdfUrl)
+                .toList();
+
+        return ReadAdminDocumentsPdfsResponseDto.builder()
+                .pdfUrls(pdfUrls)
+                .build();
     }
 }

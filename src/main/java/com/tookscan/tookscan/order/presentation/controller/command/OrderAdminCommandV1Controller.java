@@ -2,16 +2,6 @@ package com.tookscan.tookscan.order.presentation.controller.command;
 
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
-import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminDocumentsRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminOrdersRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.ExportAdminDeliveriesRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDocumentsRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
-import com.tookscan.tookscan.order.application.usecase.CreateAdminDocumentsPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
@@ -25,6 +15,15 @@ import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPay
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
+import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminDocumentsRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminOrdersRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.ExportAdminDeliveriesRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDocumentsRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -63,7 +62,6 @@ public class OrderAdminCommandV1Controller {
     private final DeleteAdminDocumentsUseCase deleteAdminDocumentsUseCase;
     private final UpdateAdminOrderDocumentsUseCase updateAdminOrderDocumentsUseCase;
     private final ExportAdminDeliveriesUseCase exportAdminDeliveriesUseCase;
-    private final CreateAdminDocumentsPdfUseCase createAdminDocumentsPdfUseCase;
     private final CreateAdminOrderCouponUseCase createAdminOrderCouponUseCase;
     private final UploadAdminDocumentsPdfUseCase uploadAdminDocumentsPdfUseCase;
 
@@ -91,19 +89,7 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
-     * 4.1.6 관리자 스캔 시작
-     */
-    @Operation(summary = "관리자 스캔 시작", description = "관리자가 주문에 대해 스캔을 시작합니다.")
-    @PostMapping(value = "/documents/{documentId}/scan")
-    public ResponseDto<Void> startScan(
-            @PathVariable Long documentId
-    ) {
-        createAdminDocumentsPdfUseCase.execute(documentId);
-        return ResponseDto.ok(null);
-    }
-
-    /**
-     * 4.1.7 관리자 쿠폰 등록
+     * 4.1.5 관리자 쿠폰 등록
      */
     @Operation(summary = "관리자 쿠폰 등록", description = "관리자가 쿠폰을 등록합니다.")
     @PostMapping(value = "/orders/coupons")
@@ -115,7 +101,7 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
-     * 4.1.8 관리자 pdf 파일 업로드
+     * 4.1.6 관리자 pdf 파일 업로드
      */
     @Operation(summary = "관리자 pdf 파일 업로드", description = "관리자가 pdf 파일을 업로드합니다.")
     @PostMapping(value = "/documents/{documentId}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -3,6 +3,7 @@ package com.tookscan.tookscan.order.domain;
 import com.tookscan.tookscan.core.dto.BaseEntity;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.domain.type.EScanStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -18,6 +20,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -71,11 +75,10 @@ public class Document extends BaseEntity {
     private PricePolicy pricePolicy;
 
     /* -------------------------------------------- */
-    /* One to One Column -------------------------- */
+    /* One to Many Column ------------------------- */
     /* -------------------------------------------- */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pdf_id")
-    private Pdf pdf;
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Pdf> pdfs;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
