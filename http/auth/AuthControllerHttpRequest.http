@@ -81,7 +81,7 @@ Content-Type: application/json
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "378322"
+@authentication_code = "295013"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 

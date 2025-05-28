@@ -13,10 +13,14 @@ public class ReadSerialIdAndProviderResponseDto extends SelfValidating<ReadSeria
     @JsonProperty("provider")
     private final String provider;
 
+    @JsonProperty("name")
+    private final String name;
+
     @Builder
-    public ReadSerialIdAndProviderResponseDto(String serialId, String provider) {
+    public ReadSerialIdAndProviderResponseDto(String serialId, String provider, String name) {
         this.serialId = serialId;
         this.provider = provider;
+        this.name = name;
 
         validateSelf();
     }
@@ -25,6 +29,7 @@ public class ReadSerialIdAndProviderResponseDto extends SelfValidating<ReadSeria
         return ReadSerialIdAndProviderResponseDto.builder()
                 .serialId(account.getSerialId())
                 .provider(account.getProvider().toString())
+                .name(account.getName())
                 .build();
     }
 }
