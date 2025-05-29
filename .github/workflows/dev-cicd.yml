@@ -77,10 +77,24 @@ jobs:
     if: github.event.pull_request.merged == true
     needs: [CI]
     runs-on: ubuntu-22.04
-
     steps:
-      ### SSH Connect and Docker Image Pull and Container Run
-      - name: Docker Image Pull and Container Run
+      - name: Determine Active Slot on Gateway
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_GATEWAY_SSH_HOST }}
+          username: ${{ secrets.DEV_GATEWAY_SSH_USERNAME }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.DEV_SSH_PORT }}
+          script: |
+            ACTIVE=$(readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green')
+            echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
+            if [ "$ACTIVE" = "blue" ]; then
+              echo "NEXT=green" >> $GITHUB_ENV
+            else
+              echo "NEXT=blue"  >> $GITHUB_ENV
+            fi
+
+      - name: Deploy to Backend Host
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.DEV_SSH_HOST }}
@@ -88,11 +102,50 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
+            # determine port
+            if [ "$NEXT" = "blue" ]; then
+            PORT=8080
+            else
+            PORT=8081
+            fi
+
+            # pull & run new container
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            docker stop api-server
-            docker rm api-server
-            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
-            docker run -d -p 8080:8080 -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --name api-server --network ${{secrets.DOCKER_NETWORKNAME}} -v /home/ubuntu/aws:/app/aws ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
+            docker run -d \
+            --name api-$NEXT \
+            -p $PORT:8080 \
+            -v /etc/localtime:/etc/localtime:ro \
+            -v /etc/timezone:/etc/timezone:ro \
+            --network ${{ secrets.DOCKER_NETWORKNAME }} \
+            -v /home/ubuntu/aws:/app/aws \
+            --stop-timeout 60 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
             
-            # 사용되지 않는 이미지 정리
+            # health check & grace
+            until curl -sf http://localhost:$PORT/actuator/health; do sleep 2; done
+            sleep 180
+
+
+      - name: Update Nginx on Gateway Host
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_GATEWAY_SSH_HOST }}
+          username: ${{ secrets.DEV_GATEWAY_SSH_USERNAME }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.DEV_SSH_PORT }}
+          script: |
+            ln -sf /etc/nginx/sites-available/api-$NEXT.conf /etc/nginx/sites-enabled/default
+            nginx -t && nginx -s reload
+
+      - name: Cleanup old container
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USERNAME }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.DEV_SSH_PORT }}
+          script: |
+            docker stop -t 60 api-$ACTIVE
+            docker rm api-$ACTIVE
             docker image prune -f
