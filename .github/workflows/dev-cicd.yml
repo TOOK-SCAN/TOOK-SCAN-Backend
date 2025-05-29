@@ -154,11 +154,11 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: |
             NEXT=${{ env.NEXT }}
-        script: |
-          sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
-                      /etc/nginx/sites-enabled/default
-          sudo nginx -t
-          sudo systemctl reload nginx
+          script: |
+            sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
+                        /etc/nginx/sites-enabled/default
+            sudo nginx -t
+            sudo systemctl reload nginx
 
       - name: Cleanup old container
         uses: appleboy/ssh-action@v1.0.0
@@ -169,7 +169,7 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: |
             ACTIVE=${{ env.ACTIVE }}
-        script: |
-          docker stop -t 10 api-$ACTIVE || true
-          docker rm      api-$ACTIVE || true
-          docker image prune -f
+          script: |
+            docker stop -t 10 api-$ACTIVE || true
+            docker rm      api-$ACTIVE || true
+            docker image prune -f
