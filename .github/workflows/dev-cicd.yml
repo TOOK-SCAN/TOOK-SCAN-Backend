@@ -135,9 +135,10 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
-            ln -sf /etc/nginx/sites-available/api-${{ env.NEXT }}.conf \
+            sudo ln -sf /etc/nginx/sites-available/api-${{ env.NEXT }}.conf \
             /etc/nginx/sites-enabled/default
-            nginx -t && nginx -s reload
+            sudo nginx -t
+            sudo systemctl reload nginx
 
       - name: Cleanup old container
         uses: appleboy/ssh-action@v1.0.0
