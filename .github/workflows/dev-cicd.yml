@@ -82,22 +82,20 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEV_SSH_KEY }}
 
-      - name: Determine Active Slot on Gateway
+      - name: Determine and set slots
         run: |
           ACTIVE=$(ssh -o StrictHostKeyChecking=no \
             -p ${{ secrets.DEV_SSH_PORT }} \
             ${{ secrets.DEV_GATEWAY_SSH_USERNAME }}@${{ secrets.DEV_GATEWAY_SSH_HOST }} \
             "readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green'")
-          echo "Active slot: $ACTIVE"
-          echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
-
-      - name: Calculate NEXT slot
-        run: |
-          if [ "$ACTIVE" = "blue" ]; then
-            echo "NEXT=green" >> $GITHUB_ENV
-          else
-            echo "NEXT=blue" >> $GITHUB_ENV
+          if [ -z "$ACTIVE" ]; then
+            echo "❌ Failed to detect active slot" >&2
+            exit 1
           fi
+          NEXT=$(if [ "$ACTIVE" = "blue" ]; then echo green; else echo blue; fi)
+          echo "Detected ACTIVE=$ACTIVE, NEXT=$NEXT"
+          echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
+          echo "NEXT=$NEXT"   >> $GITHUB_ENV
 
       - name: Deploy to Backend Host
         uses: appleboy/ssh-action@v1.0.0
@@ -116,7 +114,10 @@ jobs:
               PORT=8081
             fi
             echo "Deploying $NEXT on port $PORT"
-
+            
+            docker rm -f api-$NEXT  || true
+            docker rm -f api-server || true
+            
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
             docker run -d \
@@ -126,9 +127,9 @@ jobs:
               -v /etc/timezone:/etc/timezone:ro \
               --network ${{ secrets.DOCKER_NETWORKNAME }} \
               -v /home/ubuntu/aws:/app/aws \
-              --stop-timeout 5 \
+              --stop-timeout 10 \
               ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
-
+            
             for i in $(seq 1 30); do
               if curl -sf http://localhost:$PORT/actuator/health; then
                 echo "🟢 $NEXT is healthy"
@@ -141,6 +142,7 @@ jobs:
             if [ "$i" -ge 30 ]; then
               echo "❌ health check failed"; exit 1
             fi
+            
             sleep 5
 
       - name: Update Nginx on Gateway Host
@@ -152,11 +154,11 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: |
             NEXT=${{ env.NEXT }}
-          script: |
-            sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
-                        /etc/nginx/sites-enabled/default
-            sudo nginx -t
-            sudo systemctl reload nginx
+        script: |
+          sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
+                      /etc/nginx/sites-enabled/default
+          sudo nginx -t
+          sudo systemctl reload nginx
 
       - name: Cleanup old container
         uses: appleboy/ssh-action@v1.0.0
@@ -167,7 +169,7 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: |
             ACTIVE=${{ env.ACTIVE }}
-          script: |
-            docker stop -t 5 api-$ACTIVE || true
-            docker rm      api-$ACTIVE || true
-            docker image prune -f
+        script: |
+          docker stop -t 10 api-$ACTIVE || true
+          docker rm      api-$ACTIVE || true
+          docker image prune -f
