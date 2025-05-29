@@ -8,6 +8,8 @@ on:
       - reopened
       - synchronize
       - closed
+  push:
+    branches: [ "dev" ]
 
 jobs:
   CI:
