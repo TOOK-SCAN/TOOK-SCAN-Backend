@@ -87,13 +87,13 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
-            readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green'
+            SLOT=$(readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green')
+            echo "slot=$SLOT" >> $GITHUB_OUTPUT
 
       - name: Set ACTIVE and NEXT env vars
         run: |
-          ACTIVE="${{ steps.slot.outputs.stdout }}"
-          echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
-          if [ "$ACTIVE" = "blue" ]; then
+          echo "ACTIVE=${{ steps.slot.outputs.slot }}" >> $GITHUB_ENV
+          if [ "${{ steps.slot.outputs.slot }}" = "blue" ]; then
             echo "NEXT=green" >> $GITHUB_ENV
           else
             echo "NEXT=blue"  >> $GITHUB_ENV
