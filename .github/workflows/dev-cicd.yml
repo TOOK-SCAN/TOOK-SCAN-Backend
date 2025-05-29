@@ -127,6 +127,21 @@ jobs:
             --stop-timeout 5 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
 
+            for i in $(seq 1 30); do
+            if curl -sf http://localhost:$PORT/actuator/health; then
+            echo "service is healthy"
+            break
+            else
+            echo "waiting for health ($i/30)…"
+            sleep 2
+            fi
+            done
+            if [ "$i" -ge 30 ]; then
+            echo "health check failed after 60s"
+            exit 1
+            fi
+            
+            sleep 5
       - name: Update Nginx on Gateway Host
         uses: appleboy/ssh-action@v1.0.0
         with:

@@ -32,6 +32,9 @@ jar {
 }
 
 dependencies {
+	// Health Check
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	
 	// Spring Boot Default
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
