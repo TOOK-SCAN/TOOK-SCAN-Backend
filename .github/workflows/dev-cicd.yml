@@ -8,8 +8,6 @@ on:
       - reopened
       - synchronize
       - closed
-  push:
-    branches: [ "dev" ]
 
 jobs:
   CI:
@@ -74,6 +72,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
   CD:
+    if: github.event.pull_request.merged == true
     needs: [CI]
     runs-on: ubuntu-22.04
     steps:
@@ -114,10 +113,7 @@ jobs:
             else
               PORT=8081
             fi
-            echo "Deploying $NEXT on port $PORT"
-            
             docker rm -f api-$NEXT  || true
-            docker rm -f api-server || true
             
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
