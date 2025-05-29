@@ -126,10 +126,6 @@ jobs:
             -v /home/ubuntu/aws:/app/aws \
             --stop-timeout 5 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
-            
-            # 헬스체크 + 그레이스 타임
-            until curl -sf http://localhost:$PORT/actuator/health; do sleep 2; done
-            sleep 5
 
       - name: Update Nginx on Gateway Host
         uses: appleboy/ssh-action@v1.0.0
