@@ -99,14 +99,15 @@ jobs:
 
       - name: Deploy to Backend Host
         uses: appleboy/ssh-action@v1.0.0
+        env:
+          ACTIVE: ${{ env.ACTIVE }}
+          NEXT: ${{ env.NEXT }}
         with:
           host: ${{ secrets.DEV_SSH_HOST }}
           username: ${{ secrets.DEV_SSH_USERNAME }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
-          envs: |
-            ACTIVE=${{ env.ACTIVE }}
-            NEXT=${{ env.NEXT }}
+          envs: ACTIVE,NEXT
           script: |
             if [ "$NEXT" = "blue" ]; then
               PORT=8080
@@ -152,8 +153,7 @@ jobs:
           username: ${{ secrets.DEV_GATEWAY_SSH_USERNAME }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
-          envs: |
-            NEXT=${{ env.NEXT }}
+          envs: NEXT
           script: |
             sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
                         /etc/nginx/sites-enabled/default
@@ -167,8 +167,7 @@ jobs:
           username: ${{ secrets.DEV_SSH_USERNAME }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
-          envs: |
-            ACTIVE=${{ env.ACTIVE }}
+          envs: ACTIVE
           script: |
             docker stop -t 10 api-$ACTIVE || true
             docker rm      api-$ACTIVE || true
