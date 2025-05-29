@@ -79,6 +79,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Determine Active Slot on Gateway
+        id: slot
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.DEV_GATEWAY_SSH_HOST }}
@@ -86,13 +87,17 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
-            ACTIVE=$(readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green')
-            echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
-            if [ "$ACTIVE" = "blue" ]; then
-              echo "NEXT=green" >> $GITHUB_ENV
-            else
-              echo "NEXT=blue"  >> $GITHUB_ENV
-            fi
+            readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green'
+
+      - name: Set ACTIVE and NEXT env vars
+        run: |
+          ACTIVE="${{ steps.slot.outputs.stdout }}"
+          echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
+          if [ "$ACTIVE" = "blue" ]; then
+            echo "NEXT=green" >> $GITHUB_ENV
+          else
+            echo "NEXT=blue"  >> $GITHUB_ENV
+          fi
 
       - name: Deploy to Backend Host
         uses: appleboy/ssh-action@v1.0.0
@@ -102,18 +107,18 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
-            # determine port
-            if [ "$NEXT" = "blue" ]; then
+            # 포트 결정
+            if [ "${{ env.NEXT }}" = "blue" ]; then
             PORT=8080
             else
             PORT=8081
             fi
-
-            # pull & run new container
+            
+            # Pull & run
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
             docker run -d \
-            --name api-$NEXT \
+            --name api-${{ env.NEXT }} \
             -p $PORT:8080 \
             -v /etc/localtime:/etc/localtime:ro \
             -v /etc/timezone:/etc/timezone:ro \
@@ -122,10 +127,9 @@ jobs:
             --stop-timeout 60 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
             
-            # health check & grace
+            # 헬스체크 + 그레이스 타임
             until curl -sf http://localhost:$PORT/actuator/health; do sleep 2; done
             sleep 180
-
 
       - name: Update Nginx on Gateway Host
         uses: appleboy/ssh-action@v1.0.0
@@ -135,7 +139,8 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
-            ln -sf /etc/nginx/sites-available/api-$NEXT.conf /etc/nginx/sites-enabled/default
+            ln -sf /etc/nginx/sites-available/api-${{ env.NEXT }}.conf \
+            /etc/nginx/sites-enabled/default
             nginx -t && nginx -s reload
 
       - name: Cleanup old container
@@ -146,6 +151,6 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           script: |
-            docker stop -t 60 api-$ACTIVE
-            docker rm api-$ACTIVE
+            docker stop -t 60 api-${{ env.ACTIVE }}
+            docker rm api-${{ env.ACTIVE }}
             docker image prune -f
