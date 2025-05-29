@@ -71,8 +71,6 @@ jobs:
           file: ./dev.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}
-
-  # closed에 대한 server deploy
   CD:
     if: github.event.pull_request.merged == true
     needs: [CI]
@@ -110,49 +108,39 @@ jobs:
           envs: |
             ACTIVE=${{ env.ACTIVE }}
             NEXT=${{ env.NEXT }}
-        script: |
-          # decide port based on NEXT
-          if [ "$NEXT" = "blue" ]; then
-            PORT=8080
-          else
-            PORT=8081
-          fi
-          echo "Deploying $NEXT on port $PORT"
-
-          # remove any leftover NEXT container
-          docker rm -f api-$NEXT || true
-          # remove legacy api-server if exists
-          docker rm -f api-server || true
-
-          # pull and run
-          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
-          docker run -d \
-            --name api-$NEXT \
-            -p $PORT:8080 \
-            -v /etc/localtime:/etc/localtime:ro \
-            -v /etc/timezone:/etc/timezone:ro \
-            --network ${{ secrets.DOCKER_NETWORKNAME }} \
-            -v /home/ubuntu/aws:/app/aws \
-            --stop-timeout 5 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
-
-          # bounded health check (max 60s)
-          for i in $(seq 1 30); do
-            if curl -sf http://localhost:$PORT/actuator/health; then
-              echo "🟢 $NEXT is healthy"
-              break
+          script: |
+            if [ "$NEXT" = "blue" ]; then
+              PORT=8080
             else
-              echo "⏳ waiting for health ($i/30)…"
-              sleep 2
+              PORT=8081
             fi
-          done
-          if [ "$i" -ge 30 ]; then
-            echo "❌ health check failed"; exit 1
-          fi
+            echo "Deploying $NEXT on port $PORT"
 
-          # short grace time
-          sleep 5
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
+            docker run -d \
+              --name api-$NEXT \
+              -p $PORT:8080 \
+              -v /etc/localtime:/etc/localtime:ro \
+              -v /etc/timezone:/etc/timezone:ro \
+              --network ${{ secrets.DOCKER_NETWORKNAME }} \
+              -v /home/ubuntu/aws:/app/aws \
+              --stop-timeout 5 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
+
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:$PORT/actuator/health; then
+                echo "🟢 $NEXT is healthy"
+                break
+              else
+                echo "⏳ waiting for health ($i/30)…"
+                sleep 2
+              fi
+            done
+            if [ "$i" -ge 30 ]; then
+              echo "❌ health check failed"; exit 1
+            fi
+            sleep 5
 
       - name: Update Nginx on Gateway Host
         uses: appleboy/ssh-action@v1.0.0
@@ -163,11 +151,11 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: |
             NEXT=${{ env.NEXT }}
-        script: |
-          sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
-                      /etc/nginx/sites-enabled/default
-          sudo nginx -t
-          sudo systemctl reload nginx
+          script: |
+            sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
+                        /etc/nginx/sites-enabled/default
+            sudo nginx -t
+            sudo systemctl reload nginx
 
       - name: Cleanup old container
         uses: appleboy/ssh-action@v1.0.0
@@ -178,7 +166,7 @@ jobs:
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: |
             ACTIVE=${{ env.ACTIVE }}
-        script: |
-          docker stop -t 5 api-$ACTIVE || true
-          docker rm api-$ACTIVE        || true
-          docker image prune -f
+          script: |
+            docker stop -t 5 api-$ACTIVE || true
+            docker rm      api-$ACTIVE || true
+            docker image prune -f
