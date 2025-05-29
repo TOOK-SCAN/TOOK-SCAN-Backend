@@ -89,6 +89,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("cutting_price")
     private final Integer cuttingPrice;
 
+    @JsonProperty("coupon_id")
+    private final String couponId;
+
     @JsonProperty("coupon_type")
     private final ECouponType couponType;
 
@@ -186,6 +189,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             Integer deliveryPrice,
             Integer recoveryPrice,
             Integer cuttingPrice,
+            String couponId,
             ECouponType couponType,
             Integer couponPrice,
             Integer couponPercentage,
@@ -212,6 +216,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.deliveryPrice = deliveryPrice;
         this.recoveryPrice = recoveryPrice;
         this.cuttingPrice = cuttingPrice;
+        this.couponId = couponId;
         this.couponType = couponType;
         this.couponPrice = couponPrice;
         this.couponPercentage = couponPercentage;
@@ -273,6 +278,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .documents(docs)
                 .isOneDayScan(order.getIsOneDayScan())
                 .couponName(couponName)
+                .couponId(order.getCoupon() != null ? order.getCoupon().getId().toString() : null)
                 .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
                 .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
