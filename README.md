@@ -1,6 +1,30 @@
 # Backend
 TOOK-SCAN 백엔드 레포지토리입니다.
 
+## 로컬 실행 방법
+
+### 1. 사전 준비
+
+- Java 17 이상이 설치되어 있어야 합니다.
+- Docker & Docker Compose가 설치되어 있어야 합니다.
+- MySQL, Redis 등 필요한 서비스는 Docker Compose로 함께 실행합니다.
+
+### 2. 환경변수 파일 생성
+
+프로젝트 루트에 `.env.local` 파일을 생성하고, 환경변수들을 정의합니다.
+노션에 환경변수 내용이 있으니, 해당 문서를 참고하여 필요한 환경변수를 설정하세요.
+
+- [노션 링크](https://www.notion.so/env-local-20568122bf4180909c4cf12f0b322056?source=copy_link)
+
+### 3.Docker Compose로 로컬 서비스 실행
+
+루트 디렉터리에 docker-compose.local.yml 파일을 두고, 터미널에서 아래 명령어를 실행하세요.
+이 명령은 MySQL, Redis, 백엔드 컨테이너를 한꺼번에 띄웁니다.
+
+```bash
+docker-compose -f docker-compose.local.yml up --build -d
+```
+
 # Commit Convention
 | Type | 설명 | 예시                                               |
 | --- | --- |--------------------------------------------------|

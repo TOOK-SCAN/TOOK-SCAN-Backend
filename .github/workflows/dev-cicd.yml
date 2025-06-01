@@ -32,11 +32,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      ### application.yml 설정
-      - name: Set YML
-        run: |
-          echo "${{ secrets.APPLICATION_DEV_YML }}" | base64 --decode > ./src/main/resources/application-dev.yml
-
+      ### private_key 설정
       - name: Set private_key
         run: |
           echo "${{ secrets.AWS_EX_PRIVATE_KEY }}" > ./src/main/resources/aws/aws_ex_private_key.pem
@@ -81,6 +77,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEV_SSH_KEY }}
 
+      - name: Create .env.dev on remote
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USERNAME }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.DEV_SSH_PORT }}
+          envs: ENV_DEV_FILE_CONTENT
+          script: |
+            echo "${ENV_DEV_FILE_CONTENT}" > /home/ubuntu/.env.dev
+            chmod 600 /home/ubuntu/.env.dev
+
       - name: Determine and set slots
         run: |
           ACTIVE=$(ssh -o StrictHostKeyChecking=no \
@@ -119,6 +127,7 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
             docker run -d \
               --name api-$NEXT \
+              --env-file /home/ubuntu/.env.dev \
               -p $PORT:8080 \
               -v /etc/localtime:/etc/localtime:ro \
               -v /etc/timezone:/etc/timezone:ro \
