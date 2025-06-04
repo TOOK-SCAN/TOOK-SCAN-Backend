@@ -29,10 +29,6 @@ public class DefaultLogoutProcessHandler implements LogoutHandler {
 
         CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
 
-        CookieUtil.deleteCookie(request, response, Constants.ACCESS_TOKEN);
-        CookieUtil.deleteCookie(request, response, Constants.REFRESH_TOKEN);
-        CookieUtil.deleteCookie(request, response, Constants.TEMPORARY_TOKEN);
-
         logoutUseCase.execute(principal);
     }
 }

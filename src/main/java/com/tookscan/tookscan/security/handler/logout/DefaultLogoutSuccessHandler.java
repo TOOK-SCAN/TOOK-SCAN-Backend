@@ -37,15 +37,12 @@ public class DefaultLogoutSuccessHandler
             return;
         }
 
-        // User-Agent 헤더를 통해 요청이 브라우저에서 온 것인지 확인
-        String userAgent = request.getHeader("User-Agent");
 
-        // 브라우저에서 온 요청인 경우 쿠키를 삭제함
-        if (userAgent != null && userAgent.contains("node")) {
-            CookieUtil.deleteCookie(request, response, Constants.ACCESS_TOKEN);
-            CookieUtil.deleteCookie(request, response, Constants.REFRESH_TOKEN);
-            CookieUtil.deleteCookie(request, response, "JSESSIONID");
-        }
+        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.ACCESS_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.REFRESH_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.TEMPORARY_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, "JSESSIONID");
+
 
         httpServletUtil.onSuccessBodyResponse(response, HttpStatus.OK);
     }

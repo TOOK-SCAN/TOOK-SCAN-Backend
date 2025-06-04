@@ -137,7 +137,7 @@ public class AuthController {
             @Valid @RequestBody SignUpOauthRequestDto requestDto,
             HttpServletRequest request
     ) {
-        String temporaryToken = HeaderUtil.refineHeader(request, Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX)
+        String temporaryToken = CookieUtil.refineCookie(request, Constants.TEMPORARY_TOKEN)
                 .orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
         return ResponseDto.created(signUpOauthUseCase.execute(temporaryToken, requestDto));
     }
