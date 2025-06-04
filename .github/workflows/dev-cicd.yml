@@ -84,9 +84,8 @@ jobs:
           username: ${{ secrets.DEV_SSH_USERNAME }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
-          envs: ${{secrets.ENV_DEV_FILE_CONTENT}}
           script: |
-            echo "${ENV_DEV_FILE_CONTENT}" > /home/ubuntu/.env.dev
+            echo "${{secrets.ENV_DEV_FILE_CONTENT}}" > /home/ubuntu/.env.dev
             chmod 600 /home/ubuntu/.env.dev
 
       - name: Determine and set slots
