@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.security.handler.logout;
 
+import com.tookscan.tookscan.core.constant.Constants;
+import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.security.application.usecase.LogoutUseCase;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,10 @@ public class DefaultLogoutProcessHandler implements LogoutHandler {
         }
 
         CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
+
+        CookieUtil.deleteCookie(request, response, Constants.ACCESS_TOKEN);
+        CookieUtil.deleteCookie(request, response, Constants.REFRESH_TOKEN);
+        CookieUtil.deleteCookie(request, response, Constants.TEMPORARY_TOKEN);
 
         logoutUseCase.execute(principal);
     }

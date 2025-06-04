@@ -1,5 +1,6 @@
 package com.tookscan.tookscan.security.handler.login;
 
+import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
@@ -38,6 +39,6 @@ public class DefaultLoginSuccessHandler implements AuthenticationSuccessHandler 
 
         loginByDefaultUseCase.execute(principal, jsonWebTokenDto);
 
-        httpServletUtil.onSuccessBodyResponseWithJWTBody(response, jsonWebTokenDto, principal.getRole());
+        httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, jsonWebTokenDto);
     }
 }

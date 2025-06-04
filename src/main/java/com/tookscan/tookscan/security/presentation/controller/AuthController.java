@@ -5,7 +5,9 @@ import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.HeaderUtil;
+import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.ChangePasswordUseCase;
 import com.tookscan.tookscan.security.application.usecase.DeleteAccountUseCase;
@@ -38,6 +40,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +52,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -70,17 +75,24 @@ public class AuthController {
     private final VerifyUserUseCase verifyUserUseCase;
     private final VerifyPasswordUseCase verifyPasswordUseCase;
 
+    private final HttpServletUtil httpServletUtil;
+
     /**
      * 1.2.2 JWT 재발급
      */
     @PostMapping("/reissue/token")
-    public ResponseDto<DefaultJsonWebTokenDto> reissueDefaultJsonWebToken(
-            HttpServletRequest request
-    ) {
-        String refreshToken = HeaderUtil.refineHeader(request, Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX)
-                .orElseThrow(() -> new CommonException(ErrorCode.INVALID_HEADER_ERROR));
+    public ResponseDto<Void> reissueDefaultJsonWebToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        String refreshToken = CookieUtil.refineCookie(request, Constants.REFRESH_TOKEN)
+                .orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
 
-        return ResponseDto.created(reissueJsonWebTokenUseCase.execute(refreshToken));
+        DefaultJsonWebTokenDto tokenDto = reissueJsonWebTokenUseCase.execute(refreshToken);
+
+        httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
+
+        return ResponseDto.created(null);
     }
 
     /**
@@ -126,7 +138,7 @@ public class AuthController {
             HttpServletRequest request
     ) {
         String temporaryToken = HeaderUtil.refineHeader(request, Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX)
-                .orElseThrow(() -> new CommonException(ErrorCode.INVALID_HEADER_ERROR));
+                .orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
         return ResponseDto.created(signUpOauthUseCase.execute(temporaryToken, requestDto));
     }
 
@@ -144,10 +156,13 @@ public class AuthController {
      * 2.1.5 유저 정보 검증
      */
     @PostMapping("/verification/user")
-    public ResponseDto<DefaultJsonWebTokenDto> verifyUser(
+    public ResponseDto<Void> verifyUser(
+            HttpServletResponse response,
             @Valid @RequestBody VerifyUserRequestDto requestDto
-    ) {
-        return ResponseDto.ok(verifyUserUseCase.execute(requestDto));
+    ) throws IOException {
+        DefaultJsonWebTokenDto tokenDto = verifyUserUseCase.execute(requestDto);
+        httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
+        return ResponseDto.ok(null);
     }
 
     /**

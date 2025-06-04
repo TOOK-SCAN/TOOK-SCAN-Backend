@@ -5,7 +5,7 @@ import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
-import com.tookscan.tookscan.core.utility.HeaderUtil;
+import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.presentation.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
@@ -52,7 +52,7 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        Optional<String> tokenOptional = HeaderUtil.refineHeader(request, Constants.AUTHORIZATION_HEADER, Constants.BEARER_PREFIX);
+        Optional<String> tokenOptional = CookieUtil.refineCookie(request, Constants.ACCESS_TOKEN);
 
         if (AUTH_BRIEFS_URL.equals(requestURI)) {
             if (tokenOptional.isEmpty()) {
@@ -74,7 +74,7 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        String token = tokenOptional.orElseThrow(() -> new CommonException(ErrorCode.INVALID_HEADER_ERROR));
+        String token = tokenOptional.orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
 
         Claims claims = jsonWebTokenUtil.validateToken(token);
 
