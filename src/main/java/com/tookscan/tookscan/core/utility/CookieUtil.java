@@ -26,7 +26,7 @@ public class CookieUtil {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
-            throw new CommonException(ErrorCode.INVALID_HEADER_ERROR);
+            throw new CommonException(ErrorCode.INVALID_COOKIE_ERROR);
         }
 
         return Arrays.stream(cookies)

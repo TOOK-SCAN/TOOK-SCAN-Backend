@@ -14,7 +14,6 @@ import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

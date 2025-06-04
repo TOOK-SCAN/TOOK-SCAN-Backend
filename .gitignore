@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,macos,windows,intellij+all,java
 
 ### ignore env ###
+.env
 .env.*
 
 ### ignore application.yml ###

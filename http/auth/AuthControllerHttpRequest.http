@@ -6,11 +6,6 @@ Content-Type: application/x-www-form-urlencoded
 serial_id={{auth.API_1_1_1_USER.serial_id}}&
 password={{auth.API_1_1_1_USER.password}}
 
-> {%
-    client.global.set("access_token", response.body.data.access_token);
-    client.global.set("refresh_token", response.body.data.refresh_token);
-%}
-
 ### 1.1.1 관리자 일반 로그인
 // @no-log
 POST {{host_url}}/v1/auth/login
@@ -19,20 +14,13 @@ Content-Type: application/x-www-form-urlencoded
 serial_id={{auth.API_1_1_1_ADMIN.serial_id}}&
 password={{auth.API_1_1_1_ADMIN.password}}
 
-> {%
-    client.global.set("access_token", response.body.data.access_token);
-    client.global.set("refresh_token", response.body.data.refresh_token);
-%}
-
 ### 1.2.1 JWT 재발급
 // @no-log
 POST {{host_url}}/v1/auth/reissue/token
-Authorization: Bearer {{refresh_token}}
 
 ### 1.3.1 사용자 로그아웃
 // @no-log
 POST {{host_url}}/v1/auth/logout
-Authorization: Bearer {{access_token}}
 
 ### 2.1.1 휴대폰 인증번호 발송
 // @no-log
@@ -72,7 +60,6 @@ Content-Type: application/json
 ### 2.1.6 비밀번호 검증
 // @no-log
 POST {{host_url}}/v1/auth/verification/password
-Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
@@ -94,4 +81,3 @@ Content-Type: application/json
 ### 2.2.2 계정 간단 정보 조회
 // @no-log
 GET {{host_url}}/v1/auth/briefs
-Authorization: Bearer {{access_token}}
