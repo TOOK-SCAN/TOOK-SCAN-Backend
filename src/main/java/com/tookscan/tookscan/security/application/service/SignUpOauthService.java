@@ -9,11 +9,13 @@ import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;
+import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
+import com.tookscan.tookscan.security.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,9 +32,11 @@ public class SignUpOauthService implements SignUpOauthUseCase {
     private final AuthenticationCodeHistoryRepository authenticationCodeHistoryRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final AuthenticationCodeService authenticationCodeService;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -81,6 +85,11 @@ public class SignUpOauthService implements SignUpOauthUseCase {
         authenticationCodeHistoryRepository.deleteById(requestDto.phoneNumber());
 
         // JWT 발급
-        return jsonWebTokenUtil.generateDefaultJsonWebTokens(savedUser.getId(), savedUser.getRole());
+        DefaultJsonWebTokenDto tokenDto = jsonWebTokenUtil.generateDefaultJsonWebTokens(savedUser.getId(), savedUser.getRole());
+
+        // Refresh Token 저장
+        refreshTokenRepository.save(refreshTokenService.createRefreshToken(savedUser.getId(), tokenDto.getRefreshToken()));
+
+        return tokenDto;
     }
 }
