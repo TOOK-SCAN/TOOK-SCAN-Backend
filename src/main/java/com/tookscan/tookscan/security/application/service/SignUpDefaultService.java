@@ -5,6 +5,7 @@ import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
+import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
@@ -13,6 +14,7 @@ import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
+import com.tookscan.tookscan.security.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,11 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
     private final AuthenticationCodeHistoryRepository authenticationCodeHistoryRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final AuthenticationCodeService authenticationCodeService;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JsonWebTokenUtil jsonWebTokenUtil;
@@ -69,6 +73,11 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
         authenticationCodeHistoryRepository.deleteById(requestDto.phoneNumber());
 
         // JWT 발급
-        return jsonWebTokenUtil.generateDefaultJsonWebTokens(savedUser.getId(), savedUser.getRole());
+        DefaultJsonWebTokenDto tokenDto = jsonWebTokenUtil.generateDefaultJsonWebTokens(savedUser.getId(), savedUser.getRole());
+
+        // Refresh Token 저장
+        refreshTokenRepository.save(refreshTokenService.createRefreshToken(savedUser.getId(), tokenDto.getRefreshToken()));
+
+        return tokenDto;
     }
 }

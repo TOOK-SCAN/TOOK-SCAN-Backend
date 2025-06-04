@@ -81,7 +81,7 @@ public class AuthController {
      * 1.2.2 JWT 재발급
      */
     @PostMapping("/reissue/token")
-    public ResponseDto<Void> reissueDefaultJsonWebToken(
+    public void reissueDefaultJsonWebToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
@@ -91,8 +91,6 @@ public class AuthController {
         DefaultJsonWebTokenDto tokenDto = reissueJsonWebTokenUseCase.execute(refreshToken);
 
         httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
-
-        return ResponseDto.created(null);
     }
 
     /**
@@ -109,7 +107,7 @@ public class AuthController {
      * 2.1.2 유저 회원가입
      */
     @PostMapping("/users/sign-up-default")
-    public ResponseDto<DefaultJsonWebTokenDto> signUpDefault(
+    public void signUpDefault(
             @Valid @RequestBody SignUpDefaultRequestDto requestDto,
             HttpServletResponse response
     ) throws IOException {
@@ -117,8 +115,6 @@ public class AuthController {
         DefaultJsonWebTokenDto tokenDto = signUpDefaultUseCase.execute(requestDto);
 
         httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
-
-        return ResponseDto.created(null);
     }
 
     /**
@@ -139,7 +135,7 @@ public class AuthController {
      * 2.1.3 소셜로그인 유저 회원가입
      */
     @PostMapping("/users/sign-up-oauth")
-    public ResponseDto<DefaultJsonWebTokenDto> signUpOauth(
+    public void signUpOauth(
             @Valid @RequestBody SignUpOauthRequestDto requestDto,
             HttpServletRequest request,
             HttpServletResponse response
@@ -150,8 +146,6 @@ public class AuthController {
         DefaultJsonWebTokenDto tokenDto = signUpOauthUseCase.execute(temporaryToken, requestDto);
 
         httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
-
-        return ResponseDto.created(null);
     }
 
     /**
