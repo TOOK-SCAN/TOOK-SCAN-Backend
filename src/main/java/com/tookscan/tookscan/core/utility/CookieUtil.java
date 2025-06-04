@@ -80,7 +80,7 @@ public class CookieUtil {
      * @param response HttpServletResponse
      * @param name     삭제할 Cookie 이름
      */
-    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieDomain, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return;
@@ -88,11 +88,10 @@ public class CookieUtil {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(name)) {
                 ResponseCookie removedCookie = ResponseCookie.from(name, "")
-                        .domain(cookie.getDomain())
+                        .domain(cookieDomain)
                         .path("/")
                         .maxAge(0)
-                        .httpOnly(cookie.isHttpOnly())
-                        .secure(cookie.getSecure())
+                        .httpOnly(true)
                         .build();
                 response.addHeader("Set-Cookie", removedCookie.toString());
             }
