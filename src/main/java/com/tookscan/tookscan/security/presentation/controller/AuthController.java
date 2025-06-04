@@ -110,9 +110,15 @@ public class AuthController {
      */
     @PostMapping("/users/sign-up-default")
     public ResponseDto<DefaultJsonWebTokenDto> signUpDefault(
-            @Valid @RequestBody SignUpDefaultRequestDto requestDto
-    ) {
-        return ResponseDto.created(signUpDefaultUseCase.execute(requestDto));
+            @Valid @RequestBody SignUpDefaultRequestDto requestDto,
+            HttpServletResponse response
+    ) throws IOException {
+
+        DefaultJsonWebTokenDto tokenDto = signUpDefaultUseCase.execute(requestDto);
+
+        httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
+
+        return ResponseDto.created(null);
     }
 
     /**
@@ -135,11 +141,17 @@ public class AuthController {
     @PostMapping("/users/sign-up-oauth")
     public ResponseDto<DefaultJsonWebTokenDto> signUpOauth(
             @Valid @RequestBody SignUpOauthRequestDto requestDto,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
         String temporaryToken = CookieUtil.refineCookie(request, Constants.TEMPORARY_TOKEN)
                 .orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
-        return ResponseDto.created(signUpOauthUseCase.execute(temporaryToken, requestDto));
+
+        DefaultJsonWebTokenDto tokenDto = signUpOauthUseCase.execute(temporaryToken, requestDto);
+
+        httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, tokenDto);
+
+        return ResponseDto.created(null);
     }
 
     /**
