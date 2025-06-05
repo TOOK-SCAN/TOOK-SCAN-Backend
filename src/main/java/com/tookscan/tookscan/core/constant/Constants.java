@@ -13,10 +13,11 @@ public class Constants {
     public static String BEARER_PREFIX = "Bearer ";
     public static String AUTHORIZATION_HEADER = "Authorization";
 
-    // COOKIE
+    // TOKEN
     public static String ACCESS_TOKEN = "access_token";
     public static String REFRESH_TOKEN = "refresh_token";
     public static String TEMPORARY_TOKEN = "temporary_token";
+    public static String REMEMBER_ME = "remember_me";
 
     // Oauth2 Href URL
     public static String KAKAO_OAUTH2_HREF = "/oauth2/authorization/kakao";

@@ -24,12 +24,16 @@ public class DefaultLoginSuccessHandler implements AuthenticationSuccessHandler 
     private final JsonWebTokenUtil jwtUtil;
     private final HttpServletUtil httpServletUtil;
 
+    private static final String TRUE = "true";
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication
     ) throws IOException {
+        String rememberMe = request.getParameter(Constants.REMEMBER_ME);
+
         CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
 
         DefaultJsonWebTokenDto jsonWebTokenDto = jwtUtil.generateDefaultJsonWebTokens(
@@ -39,6 +43,10 @@ public class DefaultLoginSuccessHandler implements AuthenticationSuccessHandler 
 
         loginByDefaultUseCase.execute(principal, jsonWebTokenDto);
 
-        httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, jsonWebTokenDto);
+        if (rememberMe != null && rememberMe.equals(TRUE)) {
+            httpServletUtil.onSuccessBodyResponseWithJWTCookieRememberMeTrue(response, jsonWebTokenDto);
+        } else {
+            httpServletUtil.onSuccessBodyResponseWithJWTCookie(response, jsonWebTokenDto);
+        }
     }
 }

@@ -4,7 +4,8 @@ POST {{host_url}}/v1/auth/login
 Content-Type: application/x-www-form-urlencoded
 
 serial_id={{auth.API_1_1_1_USER.serial_id}}&
-password={{auth.API_1_1_1_USER.password}}
+password={{auth.API_1_1_1_USER.password}}&
+remember_me=true
 
 ### 1.1.1 관리자 일반 로그인
 // @no-log
