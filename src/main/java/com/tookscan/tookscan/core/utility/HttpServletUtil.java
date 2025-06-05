@@ -88,6 +88,37 @@ public class HttpServletUtil {
                 cookieDomain,
                 Constants.REFRESH_TOKEN,
                 tokenDto.getRefreshToken(),
+                (int) (refreshTokenExpirePeriod / 10000L) // 기존 기한의 10분의 1로 설정 (로그인 유지 체크 안함)
+        );
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("success", true);
+        result.put("data", null);
+        result.put("error", null);
+
+        response.getWriter().write(objectMapper.writeValueAsString(result));
+    }
+
+    public void onSuccessBodyResponseWithJWTCookieRememberMeTrue(
+            HttpServletResponse response,
+            DefaultJsonWebTokenDto tokenDto
+    ) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpStatus.CREATED.value());
+
+        CookieUtil.addCookie(
+                response,
+                cookieDomain,
+                Constants.ACCESS_TOKEN,
+                tokenDto.getAccessToken()
+        );
+        CookieUtil.addSecureCookie(
+                response,
+                cookieDomain,
+                Constants.REFRESH_TOKEN,
+                tokenDto.getRefreshToken(),
                 (int) (refreshTokenExpirePeriod / 1000L)
         );
 
