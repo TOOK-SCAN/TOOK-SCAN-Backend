@@ -13,6 +13,7 @@ import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.presentation.dto.request.EstimateUserOrderPriceRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.response.EstimateUserOrderPriceResponseDto;
 import com.tookscan.tookscan.order.repository.CouponRepository;
@@ -51,6 +52,11 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         Address address = null;
 
         // 배송 정보 생성
+        Integer deliveryPrice = 0;
+        if (requestDto.documents().stream()
+                .anyMatch(document -> document.recoveryOption() != ERecoveryOption.DISCARD)) {
+            deliveryPrice = pricePolicy.getDeliveryPrice();
+        }
         Delivery delivery = deliveryService.createDelivery(
                 "",
                 "",
@@ -58,7 +64,7 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
                 EDeliveryStatus.POST_WAITING,
                 "",
                 address,
-                pricePolicy.getDeliveryPrice()
+                deliveryPrice
         );
 
         // 주문 생성

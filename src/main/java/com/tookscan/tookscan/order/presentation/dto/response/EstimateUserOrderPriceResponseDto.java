@@ -163,7 +163,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
-                .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : null)
+                .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : 0)
                 .paymentTotal(order.getTotalAmount())
                 .build();
     }
