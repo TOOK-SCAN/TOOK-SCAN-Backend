@@ -16,6 +16,7 @@ import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateUserOrderRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.response.CreateUserOrderResponseDto;
 import com.tookscan.tookscan.order.repository.CouponRepository;
@@ -82,6 +83,11 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                 .orElse(null);
 
         // 배송 정보 생성
+        Integer deliveryPrice = 0;
+        if (requestDto.documents().stream()
+                .anyMatch(document -> document.recoveryOption() != ERecoveryOption.DISCARD)) {
+            deliveryPrice = pricePolicy.getDeliveryPrice();
+        }
         Delivery delivery = deliveryService.createDelivery(
                 requestDto.deliveryInfo().receiverName(),
                 requestDto.deliveryInfo().phoneNumber(),
@@ -89,7 +95,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                 EDeliveryStatus.POST_WAITING,
                 requestDto.deliveryInfo().request(),
                 address,
-                pricePolicy.getDeliveryPrice()
+                deliveryPrice
         );
         deliveryRepository.save(delivery);
 

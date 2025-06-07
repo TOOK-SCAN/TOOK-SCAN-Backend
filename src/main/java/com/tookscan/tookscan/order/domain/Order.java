@@ -200,10 +200,7 @@ public class Order extends BaseEntity {
             amount = coupon.calculatePrice(amount);
         }
 
-        if (documents.stream()
-                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
-           amount += delivery.getDeliveryPrice();
-        }
+        amount += delivery.getDeliveryPrice();
 
         return amount;
     }

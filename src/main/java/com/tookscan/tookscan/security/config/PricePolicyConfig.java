@@ -18,7 +18,7 @@ public class PricePolicyConfig {
     private static final int DEFAULT_PRICE = 1000;
     private static final int PRICE_PER_PAGE = 10;
     private static final int PRICE_PER_PAGE_FOR_ONE_DAY_SCAN = 15;
-    private static final int DELIVERY_PRICE = 0;
+    private static final int DELIVERY_PRICE = 3000;
 
     @Bean
     public ApplicationRunner createPricePolicy() {
