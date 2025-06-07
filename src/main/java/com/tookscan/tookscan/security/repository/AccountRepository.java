@@ -33,4 +33,6 @@ public interface AccountRepository {
     void existsByPhoneNumberAndProvidersThenThrow(String phoneNumber, List<ESecurityProvider> provider);
 
     boolean existsBySerialId(String serialId);
+
+    boolean existsByPhoneNumber(String phoneNumber);
 }

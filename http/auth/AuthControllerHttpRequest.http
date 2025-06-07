@@ -67,6 +67,10 @@ Content-Type: application/json
     "password": "none"
 }
 
+### 2.2.3 휴대폰 번호 중복 검사
+// @no-log
+GET {{host_url}}/v1/auth/existence/phone-number?phone-number=01012341234
+
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
 @authentication_code = "866677"

@@ -103,4 +103,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public boolean existsBySerialId(String serialId) {
         return accountJpaRepository.findBySerialId(serialId).isPresent();
     }
+
+    @Override
+    public boolean existsByPhoneNumber(String phoneNumber) {
+        return accountJpaRepository.findByPhoneNumber(phoneNumber).isPresent();
+    }
 }

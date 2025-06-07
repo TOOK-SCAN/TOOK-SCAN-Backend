@@ -19,6 +19,7 @@ import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.application.usecase.ValidateAuthenticationCodeUseCase;
 import com.tookscan.tookscan.security.application.usecase.ValidateIdUseCase;
+import com.tookscan.tookscan.security.application.usecase.ValidatePhoneNumberUseCase;
 import com.tookscan.tookscan.security.application.usecase.VerifyPasswordUseCase;
 import com.tookscan.tookscan.security.application.usecase.VerifyUserUseCase;
 import com.tookscan.tookscan.security.presentation.dto.request.AdminSignUpDefaultRequestDto;
@@ -74,6 +75,7 @@ public class AuthController {
     private final DeleteAccountUseCase deleteAccountUseCase;
     private final VerifyUserUseCase verifyUserUseCase;
     private final VerifyPasswordUseCase verifyPasswordUseCase;
+    private final ValidatePhoneNumberUseCase validatePhoneNumberUseCase;
 
     private final HttpServletUtil httpServletUtil;
 
@@ -207,6 +209,16 @@ public class AuthController {
             @AccountID UUID accountId
     ) {
         return ResponseDto.ok("계정 간단 정보 조회는 더 이상 사용되지 않습니다.");
+    }
+
+    /**
+     * 2.2.3 휴대폰 번호 중복 검사
+     */
+    @GetMapping("/existence/phone-number")
+    public ResponseDto<ValidationResponseDto> validatePhoneNumber(
+            @RequestParam(name = "phone-number") String phoneNumber
+    ) {
+        return ResponseDto.ok(validatePhoneNumberUseCase.execute(phoneNumber));
     }
 
     /**
