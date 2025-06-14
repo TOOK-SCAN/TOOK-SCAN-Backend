@@ -77,7 +77,7 @@ public class Order extends BaseEntity {
     @Column(name = "took_scan_assistance_agreed")
     private LocalDateTime tookScanAssistanceAgreed;
 
-    @Column(name = "is_one_day_scan")
+    @Column(name = "is_one_day_scan", nullable = false)
     private Boolean isOneDayScan;
 
     /* -------------------------------------------- */

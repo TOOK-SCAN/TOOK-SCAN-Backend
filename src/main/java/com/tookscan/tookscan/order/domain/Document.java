@@ -12,16 +12,14 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -45,6 +43,9 @@ public class Document extends BaseEntity {
 
     @Column(name = "scan_task_id")
     private String scanTaskId;
+
+    @Column(name = "is_ocr_enabled", nullable = false)
+    private Boolean isOcrEnabled;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "recovery_option", nullable = false)
@@ -86,7 +87,7 @@ public class Document extends BaseEntity {
     @Builder
     public Document(String name, int pageCount, ERecoveryOption recoveryOption, Order order, PricePolicy pricePolicy,
                     int additionalPrice, EScanStatus scanStatus, String initialName, Integer initialPageCount,
-                    ERecoveryOption initialRecoveryOption) {
+                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled) {
         this.name = name;
         this.pageCount = pageCount;
         this.recoveryOption = recoveryOption;
@@ -97,6 +98,7 @@ public class Document extends BaseEntity {
         this.initialName = initialName;
         this.initialPageCount = initialPageCount;
         this.initialRecoveryOption = initialRecoveryOption;
+        this.isOcrEnabled = isOcrEnabled;
     }
 
     public void updateName(String name) {
@@ -128,21 +130,27 @@ public class Document extends BaseEntity {
     }
 
     public int calculateOneDayScanPrice() {
+        if (!order.getIsOneDayScan()) {
+            return 0;
+        }
         return pricePolicy.calculatePriceForOneDayScan(pageCount);
     }
 
-    public int calculatePrice() {
-        if (order.getIsOneDayScan()) {
-            return pricePolicy.calculatePriceForOneDayScan(pageCount, recoveryOption) + additionalPrice;
+    public int calculateOcrPrice() {
+        if (!isOcrEnabled) {
+            return 0;
         }
-        return pricePolicy.calculatePrice(pageCount, recoveryOption) + additionalPrice;
+        return pricePolicy.calculateOcrPrice(pageCount);
+    }
+
+    public int calculatePrice() {
+        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled)
+                + additionalPrice;
     }
 
     public int calculateInitialPrice() {
-        if (order.getIsOneDayScan()) {
-            return pricePolicy.calculatePriceForOneDayScan(initialPageCount, initialRecoveryOption);
-        }
-        return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption);
+        return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption,
+                order.getIsOneDayScan(), isOcrEnabled);
     }
 }
 

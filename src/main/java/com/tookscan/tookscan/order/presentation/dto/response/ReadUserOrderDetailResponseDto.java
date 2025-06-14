@@ -80,6 +80,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     @JsonProperty("one_day_scan_price")
     private final Integer oneDayScanPrice;
 
+    @JsonProperty("ocr_price")
+    private final Integer ocrPrice;
+
     @JsonProperty("delivery_price")
     private final Integer deliveryPrice;
 
@@ -125,6 +128,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         @NotNull
         private final ERecoveryOption recoveryOption;
 
+        @JsonProperty("is_ocr_enabled")
+        @NotNull
+        private final Boolean isOcrEnabled;
+
         @JsonProperty("recovery_price")
         @NotNull
         private final Integer recoveryPrice;
@@ -132,6 +139,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         @JsonProperty("one_day_scan_price")
         @NotNull
         private final Integer oneDayScanPrice;
+
+        @JsonProperty("ocr_price")
+        @NotNull
+        private final Integer ocrPrice;
 
         @JsonProperty("cutting_price")
         @NotNull
@@ -142,16 +153,20 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                                Integer pageCount,
                                Integer documentPrice,
                                ERecoveryOption recoveryOption,
+                               Boolean isOcrEnabled,
                                Integer recoveryPrice,
                                Integer oneDayScanPrice,
-                               Integer cuttingPrice) {
+                               Integer cuttingPrice,
+                               Integer ocrPrice) {
             this.name = name;
             this.pageCount = pageCount;
             this.documentPrice = documentPrice;
             this.recoveryOption = recoveryOption;
+            this.isOcrEnabled = isOcrEnabled;
             this.recoveryPrice = recoveryPrice;
             this.oneDayScanPrice = oneDayScanPrice;
             this.cuttingPrice = cuttingPrice;
+            this.ocrPrice = ocrPrice;
             this.validateSelf();
         }
 
@@ -161,8 +176,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                     .pageCount(document.getPageCount())
                     .documentPrice(document.calculateDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
+                    .isOcrEnabled(document.getIsOcrEnabled())
                     .recoveryPrice(document.getRecoveryOption().getPrice())
-                    .oneDayScanPrice(document.calculateOneDayScanPrice() - document.calculateDocumentPrice())
+                    .oneDayScanPrice(document.calculateOneDayScanPrice())
+                    .ocrPrice(document.calculateOcrPrice())
                     .cuttingPrice(document.getPricePolicy().getDefaultPrice())
                     .build();
         }
@@ -195,7 +212,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             Integer couponPercentage,
             Integer paymentTotal,
             String receiptUrl,
-            String couponName
+            String couponName,
+            Integer ocrPrice
     ) {
         this.id = id;
         this.orderNumber = orderNumber;
@@ -223,6 +241,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.paymentTotal = paymentTotal;
         this.receiptUrl = receiptUrl;
         this.couponName = couponName;
+        this.ocrPrice = ocrPrice;
         this.validateSelf();
     }
 
@@ -244,6 +263,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
         int oneDayScanPriceSum = docs.stream()
                 .mapToInt(DocumentInfoDto::getOneDayScanPrice)
+                .sum();
+
+        int ocrPriceSum = docs.stream()
+                .mapToInt(DocumentInfoDto::getOcrPrice)
                 .sum();
 
         int cuttingPriceSum = docs.stream()
@@ -286,6 +309,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
+                .ocrPrice(ocrPriceSum)
                 .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : null)
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
                 .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))

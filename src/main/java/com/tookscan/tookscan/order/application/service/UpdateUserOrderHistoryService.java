@@ -54,7 +54,8 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
                     doc.pageCount(),
                     doc.recoveryOption(),
                     order,
-                    pricePolicy
+                    pricePolicy,
+                    doc.isOcrEnabled()
             );
             order.getDocuments().add(document);
             documentRepository.save(document);

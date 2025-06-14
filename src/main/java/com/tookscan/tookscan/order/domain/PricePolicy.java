@@ -28,11 +28,14 @@ public class PricePolicy extends BaseEntity {
     @Column(name = "default_price", nullable = false)
     private Integer defaultPrice;
 
-    @Column(name = "price_per_page", nullable = false)
-    private Integer pricePerPage;
+    @Column(name = "default_price_per_page", nullable = false)
+    private Integer defaultPricePerPage;
 
-    @Column(name = "price_per_page_for_one_day_scan", nullable = false)
-    private Integer pricePerPageForOneDayScan;
+    @Column(name = "additional_price_for_one_day_scan", nullable = false)
+    private Integer additionalPriceForOneDayScan;
+
+    @Column(name = "additional_price_for_ocr", nullable = false)
+    private Integer additionalPriceForOcr;
 
     @Column(name = "delivery_price", nullable = false)
     private Integer deliveryPrice;
@@ -47,18 +50,23 @@ public class PricePolicy extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public PricePolicy(Integer defaultPrice, Integer pricePerPage, Integer pricePerPageForOneDayScan,
+    public PricePolicy(Integer defaultPrice, Integer defaultPricePerPage, Integer additionalPriceForOneDayScan,
+                       Integer additionalPriceForOcr,
                        Integer deliveryPrice, LocalDate startDate, LocalDate endDate) {
         this.defaultPrice = defaultPrice;
-        this.pricePerPage = pricePerPage;
-        this.pricePerPageForOneDayScan = pricePerPageForOneDayScan;
+        this.defaultPricePerPage = defaultPricePerPage;
+        this.additionalPriceForOneDayScan = additionalPriceForOneDayScan;
+        this.additionalPriceForOcr = additionalPriceForOcr;
         this.deliveryPrice = deliveryPrice;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public int calculatePrice(int pageCount, ERecoveryOption recoveryOption) {
+    public int calculatePrice(int pageCount, ERecoveryOption recoveryOption, Boolean isOneDayScan,
+                              Boolean isOcrEnabled) {
         int price = 0;
+        int pricePerPage = defaultPricePerPage + (isOcrEnabled ? additionalPriceForOcr : 0) +
+                (isOneDayScan ? additionalPriceForOneDayScan : 0);
         price += defaultPrice;
         price += pricePerPage * pageCount;
         price += recoveryOption.getPrice();
@@ -67,21 +75,19 @@ public class PricePolicy extends BaseEntity {
 
     public int calculateDocumentPrice(int pageCount) {
         int price = 0;
-        price += pricePerPage * pageCount;
-        return price;
-    }
-
-    public int calculatePriceForOneDayScan(int pageCount, ERecoveryOption recoveryOption) {
-        int price = 0;
-        price += defaultPrice;
-        price += pricePerPageForOneDayScan * pageCount;
-        price += recoveryOption.getPrice();
+        price += defaultPricePerPage * pageCount;
         return price;
     }
 
     public int calculatePriceForOneDayScan(int pageCount) {
         int price = 0;
-        price += pricePerPageForOneDayScan * pageCount;
+        price += additionalPriceForOneDayScan * pageCount;
+        return price;
+    }
+
+    public int calculateOcrPrice(int pageCount) {
+        int price = 0;
+        price += additionalPriceForOcr * pageCount;
         return price;
     }
 }

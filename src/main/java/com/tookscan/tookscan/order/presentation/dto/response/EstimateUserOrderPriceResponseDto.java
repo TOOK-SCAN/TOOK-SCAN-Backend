@@ -24,6 +24,9 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
     @JsonProperty("one_day_scan_price")
     private final Integer oneDayScanPrice;
 
+    @JsonProperty("ocr_price")
+    private final Integer ocrPrice;
+
     @JsonProperty("delivery_price")
     private final Integer deliveryPrice;
 
@@ -72,6 +75,10 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         @NotNull
         private final Integer oneDayScanPrice;
 
+        @JsonProperty("ocr_price")
+        @NotNull
+        private final Integer ocrPrice;
+
         @JsonProperty("cutting_price")
         @NotNull
         private final Integer cuttingPrice;
@@ -83,13 +90,15 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                                ERecoveryOption recoveryOption,
                                Integer recoveryPrice,
                                Integer oneDayScanPrice,
-                               Integer cuttingPrice) {
+                               Integer cuttingPrice,
+                               Integer ocrPrice) {
             this.name = name;
             this.pageCount = pageCount;
             this.documentPrice = documentPrice;
             this.recoveryOption = recoveryOption;
             this.recoveryPrice = recoveryPrice;
             this.oneDayScanPrice = oneDayScanPrice;
+            this.ocrPrice = ocrPrice;
             this.cuttingPrice = cuttingPrice;
             this.validateSelf();
         }
@@ -101,7 +110,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                     .documentPrice(document.calculateDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .recoveryPrice(document.getRecoveryOption().getPrice())
-                    .oneDayScanPrice(document.calculateOneDayScanPrice() - document.calculateDocumentPrice())
+                    .oneDayScanPrice(document.calculateOneDayScanPrice())
+                    .ocrPrice(document.calculateOcrPrice())
                     .cuttingPrice(document.getPricePolicy().getDefaultPrice())
                     .build();
         }
@@ -118,7 +128,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
             ECouponType couponType,
             Integer couponPrice,
             Integer couponPercentage,
-            Integer paymentTotal
+            Integer paymentTotal,
+            Integer ocrPrice
     ) {
         this.documents = documents;
         this.documentsPrice = documentsPrice;
@@ -130,6 +141,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         this.couponPrice = couponPrice;
         this.couponPercentage = couponPercentage;
         this.paymentTotal = paymentTotal;
+        this.ocrPrice = ocrPrice;
         this.validateSelf();
     }
 
@@ -146,6 +158,10 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                 .mapToInt(DocumentInfoDto::getOneDayScanPrice)
                 .sum();
 
+        int ocrPriceSum = docs.stream()
+                .mapToInt(DocumentInfoDto::getOcrPrice)
+                .sum();
+
         int cuttingPriceSum = docs.stream()
                 .mapToInt(DocumentInfoDto::getCuttingPrice)
                 .sum();
@@ -160,6 +176,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                 .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
+                .ocrPrice(ocrPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)

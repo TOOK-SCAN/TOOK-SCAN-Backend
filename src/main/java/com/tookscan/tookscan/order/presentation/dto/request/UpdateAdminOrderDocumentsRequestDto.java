@@ -39,7 +39,11 @@ public record UpdateAdminOrderDocumentsRequestDto(
 
             @JsonProperty("additional_price")
             @NotNull(message = "추가 금액을 입력해주세요.")
-            Integer additionalPrice
+            Integer additionalPrice,
+
+            @JsonProperty("is_ocr_enabled")
+            @NotNull(message = "OCR 사용 여부를 입력해주세요.")
+            Boolean isOcrEnabled
     ) {
     }
 }

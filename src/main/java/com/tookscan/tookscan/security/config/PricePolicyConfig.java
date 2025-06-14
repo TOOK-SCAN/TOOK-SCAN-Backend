@@ -16,8 +16,9 @@ public class PricePolicyConfig {
 
     private final PricePolicyRepository pricePolicyRepository;
     private static final int DEFAULT_PRICE = 1000;
-    private static final int PRICE_PER_PAGE = 10;
-    private static final int PRICE_PER_PAGE_FOR_ONE_DAY_SCAN = 15;
+    private static final int DEFAULT_PRICE_PER_PAGE = 10;
+    private static final int ADDITIONAL_PRICE_FOR_ONE_DAY_SCAN = 5;
+    private static final int ADDITIONAL_PRICE_FOR_OCR = 5;
     private static final int DELIVERY_PRICE = 3000;
 
     @Bean
@@ -30,9 +31,10 @@ public class PricePolicyConfig {
                     () -> {
                         PricePolicy pricePolicy = PricePolicy.builder()
                                 .defaultPrice(DEFAULT_PRICE)
-                                .pricePerPage(PRICE_PER_PAGE)
+                                .defaultPricePerPage(DEFAULT_PRICE_PER_PAGE)
                                 .deliveryPrice(DELIVERY_PRICE)
-                                .pricePerPageForOneDayScan(PRICE_PER_PAGE_FOR_ONE_DAY_SCAN)
+                                .additionalPriceForOneDayScan(ADDITIONAL_PRICE_FOR_ONE_DAY_SCAN)
+                                .additionalPriceForOcr(ADDITIONAL_PRICE_FOR_OCR)
                                 .startDate(LocalDate.now())
                                 .endDate(LocalDate.now().plusYears(100))
                                 .build();
