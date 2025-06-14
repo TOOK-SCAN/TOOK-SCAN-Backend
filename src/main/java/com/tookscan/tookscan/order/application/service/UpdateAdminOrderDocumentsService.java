@@ -2,11 +2,11 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDocumentsRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDocumentsUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDocumentsRequestDto;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
@@ -81,7 +81,8 @@ public class UpdateAdminOrderDocumentsService implements UpdateAdminOrderDocumen
                     document.pageCount(),
                     document.recoveryOption(),
                     order,
-                    order.getDocuments().get(0).getPricePolicy()
+                    order.getDocuments().get(0).getPricePolicy(),
+                    document.isOcrEnabled()
             );
             documentRepository.save(doc);
         });

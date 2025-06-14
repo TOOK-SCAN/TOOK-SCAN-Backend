@@ -82,7 +82,8 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
                     doc.pageCount(),
                     doc.recoveryOption(),
                     order,
-                    pricePolicy
+                    pricePolicy,
+                    doc.isOcrEnabled()
             );
             order.getDocuments().add(document);
         });

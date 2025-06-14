@@ -60,11 +60,15 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         @JsonProperty("recovery_option")
         private final ERecoveryOption recoveryOption;
 
+        @JsonProperty("is_ocr_enabled")
+        private final Boolean isOcrEnabled;
+
         @Builder
-        public DocumentDto(String name, Integer pageCount, ERecoveryOption recoveryOption) {
+        public DocumentDto(String name, Integer pageCount, ERecoveryOption recoveryOption, Boolean isOcrEnabled) {
             this.name = name;
             this.pageCount = pageCount;
             this.recoveryOption = recoveryOption;
+            this.isOcrEnabled = isOcrEnabled;
         }
     }
 
@@ -169,6 +173,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
                             .name(doc.getName())
                             .pageCount(doc.getPageCount())
                             .recoveryOption(doc.getRecoveryOption())
+                            .isOcrEnabled(doc.getIsOcrEnabled())
                             .build())
                     .toList();
 

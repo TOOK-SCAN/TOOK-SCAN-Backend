@@ -14,7 +14,8 @@ public class DocumentService {
             int pageCount,
             ERecoveryOption recoveryOption,
             Order order,
-            PricePolicy pricePolicy
+            PricePolicy pricePolicy,
+            Boolean isOcrEnabled
     ) {
         return Document.builder()
                 .name(name)
@@ -27,6 +28,7 @@ public class DocumentService {
                 .initialName(name)
                 .initialPageCount(pageCount)
                 .initialRecoveryOption(recoveryOption)
+                .isOcrEnabled(isOcrEnabled)
                 .build();
     }
 
