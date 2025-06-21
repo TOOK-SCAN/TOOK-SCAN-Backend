@@ -48,7 +48,10 @@ public record EstimateUserOrderPriceRequestDto(
 
             @JsonProperty("is_ocr_enabled")
             @NotNull(message = "OCR 여부를 입력해주세요.")
-            Boolean isOcrEnabled
+            Boolean isOcrEnabled,
+
+            @JsonProperty(value = "is_checked")
+            Boolean isChecked
     ) {
     }
 }
