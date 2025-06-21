@@ -19,6 +19,8 @@ import com.tookscan.tookscan.order.presentation.dto.response.EstimateUserOrderPr
 import com.tookscan.tookscan.order.repository.CouponRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +78,7 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         }
 
         // 문서 생성
+        List<Document> unCheckedDocuments = new ArrayList<>();
         requestDto.documents().forEach(doc -> {
             Document document = documentService.createDocument(
                     doc.name(),
@@ -85,9 +88,13 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
                     pricePolicy,
                     doc.isOcrEnabled()
             );
-            order.getDocuments().add(document);
+            if (doc.isChecked()) {
+                order.getDocuments().add(document);
+            } else {
+                unCheckedDocuments.add(document);
+            }
         });
 
-        return EstimateUserOrderPriceResponseDto.fromEntity(order);
+        return EstimateUserOrderPriceResponseDto.of(order, unCheckedDocuments);
     }
 }

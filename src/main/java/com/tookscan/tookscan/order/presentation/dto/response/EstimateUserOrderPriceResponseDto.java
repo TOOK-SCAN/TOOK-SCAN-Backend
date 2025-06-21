@@ -9,6 +9,7 @@ import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -145,33 +146,38 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         this.validateSelf();
     }
 
-    public static EstimateUserOrderPriceResponseDto fromEntity(Order order) {
-        List<DocumentInfoDto> docs = order.getDocuments().stream()
+    public static EstimateUserOrderPriceResponseDto of(Order order,
+                                                       List<Document> unCheckedDocuments) {
+        List<DocumentInfoDto> checkedDocs = order.getDocuments().stream()
                 .map(DocumentInfoDto::fromEntity)
                 .toList();
 
-        int docsPriceSum = docs.stream()
+        List<DocumentInfoDto> uncheckedDocs = unCheckedDocuments.stream()
+                .map(DocumentInfoDto::fromEntity)
+                .toList();
+
+        List<DocumentInfoDto> allDocs = Stream
+                .concat(checkedDocs.stream(), uncheckedDocs.stream())
+                .toList();
+
+        int docsPriceSum = checkedDocs.stream()
                 .mapToInt(DocumentInfoDto::getDocumentPrice)
                 .sum();
-
-        int oneDayScanPriceSum = docs.stream()
+        int oneDayScanPriceSum = checkedDocs.stream()
                 .mapToInt(DocumentInfoDto::getOneDayScanPrice)
                 .sum();
-
-        int ocrPriceSum = docs.stream()
+        int ocrPriceSum = checkedDocs.stream()
                 .mapToInt(DocumentInfoDto::getOcrPrice)
                 .sum();
-
-        int cuttingPriceSum = docs.stream()
+        int cuttingPriceSum = checkedDocs.stream()
                 .mapToInt(DocumentInfoDto::getCuttingPrice)
                 .sum();
-
-        int recoveryPriceSum = docs.stream()
+        int recoveryPriceSum = checkedDocs.stream()
                 .mapToInt(DocumentInfoDto::getRecoveryPrice)
                 .sum();
 
         return EstimateUserOrderPriceResponseDto.builder()
-                .documents(docs)
+                .documents(allDocs)
                 .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
                 .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
