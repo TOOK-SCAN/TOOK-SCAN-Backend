@@ -12,7 +12,7 @@ public interface ReadAdminUserOverviewUseCase {
             String searchType,
             String search,
             Long groupId,
-            String accountType,
+            String provider,
             String startDate,
             String endDate,
             Integer page,

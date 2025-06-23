@@ -31,7 +31,7 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
             String searchType,
             String search,
             Long groupId,
-            String accountType,
+            String provider,
             String startDate,
             String endDate,
             Integer page,
@@ -40,15 +40,15 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
 
         Pageable pageable = PageRequest.of(page-1, size);
 
-        // accountType을 ESecurityProvider로 변환
-        ESecurityProvider provider = ESecurityProvider.fromString(accountType);
+        // provider를 ESecurityProvider로 변환
+        ESecurityProvider securityProvider = ESecurityProvider.fromString(provider);
 
         // 페이지네이션 된 userId 페이지 객체 조회
         Page<UUID> userIdsPage = userRepository.findUserIdsByFilters(
                 searchType,
                 search,
                 groupId,
-                provider,
+                securityProvider,
                 startDate != null ? DateTimeUtil.convertStringToLocalDate(startDate) : null,
                 endDate != null ? DateTimeUtil.convertStringToLocalDate(endDate) : null,
                 pageable

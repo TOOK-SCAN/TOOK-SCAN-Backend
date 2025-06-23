@@ -73,20 +73,27 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
         @Schema(description = "총 주문 수", example = "5")
         private final Integer totalOrderCount;
 
+        @JsonProperty("total_order_document_count")
+        @Schema(description = "총 주문 문서 수", example = "10")
+        private final Integer totalOrderDocumentCount;
+
         @JsonProperty("memo")
         @Schema(description = "메모", example = "VIP 고객")
         private final String memo;
 
-        @JsonProperty("account_type")
-        @Schema(description = "계정 타입", example = "KAKAO", allowableValues = {"DEFAULT", "KAKAO", "GOOGLE", "NAVER"})
-        private final String accountType;
+        @JsonProperty("provider")
+        @Schema(description = "계정 제공자", example = "KAKAO", allowableValues = {"DEFAULT", "KAKAO", "GOOGLE", "NAVER"})
+        private final String provider;
 
         @JsonProperty("group_infos")
         @Schema(description = "그룹 정보 목록")
         private final GroupInfoListDto groupInfos;
 
         @Builder
-        public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email, String signInDate, Integer totalOrderAmount, Integer totalOrderCount, String memo, String accountType, GroupInfoListDto groupInfos) {
+        public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email,
+                               String signInDate, Integer totalOrderAmount, Integer totalOrderCount,
+                               Integer totalOrderDocumentCount, String memo, String provider,
+                               GroupInfoListDto groupInfos) {
             this.id = id;
             this.serialId = serialId;
             this.name = name;
@@ -95,8 +102,9 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
             this.signInDate = signInDate;
             this.totalOrderAmount = totalOrderAmount;
             this.totalOrderCount = totalOrderCount;
+            this.totalOrderDocumentCount = totalOrderDocumentCount;
             this.memo = memo;
-            this.accountType = accountType;
+            this.provider = provider;
             this.groupInfos = groupInfos;
             this.validateSelf();
         }
@@ -108,7 +116,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
                     .name(user.getName())
                     .phoneNumber(user.getPhoneNumber())
                     .email(user.getEmail())
-                    .signInDate(DateTimeUtil.convertLocalDateToDartString(user.getCreatedAt().toLocalDate()))
+                    .signInDate(DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(user.getCreatedAt()))
                     .totalOrderAmount(
                             orders.stream()
                                     .filter(order -> order.getUser().getId().equals(user.getId()))
@@ -116,8 +124,12 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
                     .totalOrderCount((int) orders.stream()
                             .filter(order -> order.getUser().getId().equals(user.getId()))
                             .count())
+                    .totalOrderDocumentCount((int) orders.stream()
+                            .filter(order -> order.getUser().getId().equals(user.getId()))
+                            .mapToLong(order -> order.getDocuments().size())
+                            .sum())
                     .memo(user.getMemo())
-                    .accountType(user.getProvider().name())
+                    .provider(user.getProvider().name())
                     .groupInfos(GroupInfoListDto.of(user))
                     .build();
         }
