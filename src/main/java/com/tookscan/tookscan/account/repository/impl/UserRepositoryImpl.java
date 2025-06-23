@@ -10,6 +10,7 @@ import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.account.repository.mysql.UserJpaRepository;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,7 +64,7 @@ public class UserRepositoryImpl implements UserRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    public Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         QUser user = QUser.user;
         QUserGroup userGroup = QUserGroup.userGroup;
 
@@ -82,6 +83,10 @@ public class UserRepositoryImpl implements UserRepository {
 
         if (groupId != null) {
             predicate = predicate.and(user.userGroups.any().id.eq(groupId));
+        }
+
+        if (provider != null) {
+            predicate = predicate.and(user.provider.eq(provider));
         }
 
         List<UUID> userIds = jpaQueryFactory

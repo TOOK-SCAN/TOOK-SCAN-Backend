@@ -77,12 +77,16 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
         @Schema(description = "메모", example = "VIP 고객")
         private final String memo;
 
+        @JsonProperty("account_type")
+        @Schema(description = "계정 타입", example = "KAKAO", allowableValues = {"DEFAULT", "KAKAO", "GOOGLE", "NAVER"})
+        private final String accountType;
+
         @JsonProperty("group_infos")
         @Schema(description = "그룹 정보 목록")
         private final GroupInfoListDto groupInfos;
 
         @Builder
-        public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email, String signInDate, Integer totalOrderAmount, Integer totalOrderCount, String memo, GroupInfoListDto groupInfos) {
+        public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email, String signInDate, Integer totalOrderAmount, Integer totalOrderCount, String memo, String accountType, GroupInfoListDto groupInfos) {
             this.id = id;
             this.serialId = serialId;
             this.name = name;
@@ -92,6 +96,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
             this.totalOrderAmount = totalOrderAmount;
             this.totalOrderCount = totalOrderCount;
             this.memo = memo;
+            this.accountType = accountType;
             this.groupInfos = groupInfos;
             this.validateSelf();
         }
@@ -112,6 +117,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
                             .filter(order -> order.getUser().getId().equals(user.getId()))
                             .count())
                     .memo(user.getMemo())
+                    .accountType(user.getProvider().name())
                     .groupInfos(GroupInfoListDto.of(user))
                     .build();
         }

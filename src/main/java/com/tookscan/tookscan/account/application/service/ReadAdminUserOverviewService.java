@@ -1,13 +1,14 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminUserOverviewResponseDto;
 import com.tookscan.tookscan.account.application.usecase.ReadAdminUserOverviewUseCase;
 import com.tookscan.tookscan.account.domain.User;
+import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminUserOverviewResponseDto;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.dto.PageInfoDto;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
             String searchType,
             String search,
             Long groupId,
+            String accountType,
             String startDate,
             String endDate,
             Integer page,
@@ -38,11 +40,15 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
 
         Pageable pageable = PageRequest.of(page-1, size);
 
+        // accountType을 ESecurityProvider로 변환
+        ESecurityProvider provider = ESecurityProvider.fromString(accountType);
+
         // 페이지네이션 된 userId 페이지 객체 조회
         Page<UUID> userIdsPage = userRepository.findUserIdsByFilters(
                 searchType,
                 search,
                 groupId,
+                provider,
                 startDate != null ? DateTimeUtil.convertStringToLocalDate(startDate) : null,
                 endDate != null ? DateTimeUtil.convertStringToLocalDate(endDate) : null,
                 pageable

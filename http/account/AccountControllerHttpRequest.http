@@ -29,6 +29,31 @@ Authorization: Bearer {{access_token}}
 GET {{host_url}}/v1/admins/users/overviews?page=1&size=10&start-date=2025.01.01&end-date=2025.12.31
 Authorization: Bearer {{access_token}}
 
+### 3.2.4.1 (관리자) 유저 리스트 조회 - 기본 계정 필터링
+// @no-log
+GET {{host_url}}/v1/admins/users/overviews?page=1&size=10&account-type=DEFAULT
+Authorization: Bearer {{access_token}}
+
+### 3.2.4.2 (관리자) 유저 리스트 조회 - 카카오 계정 필터링
+// @no-log
+GET {{host_url}}/v1/admins/users/overviews?page=1&size=10&account-type=KAKAO
+Authorization: Bearer {{access_token}}
+
+### 3.2.4.3 (관리자) 유저 리스트 조회 - 구글 계정 필터링
+// @no-log
+GET {{host_url}}/v1/admins/users/overviews?page=1&size=10&account-type=GOOGLE
+Authorization: Bearer {{access_token}}
+
+### 3.2.4.4 (관리자) 유저 리스트 조회 - 네이버 계정 필터링
+// @no-log
+GET {{host_url}}/v1/admins/users/overviews?page=1&size=10&account-type=NAVER
+Authorization: Bearer {{access_token}}
+
+### 3.2.4.5 (관리자) 유저 리스트 조회 - 계정 타입 + 검색 조건 조합
+// @no-log
+GET {{host_url}}/v1/admins/users/overviews?page=1&size=10&account-type=KAKAO&search-type=name&search=홍길동
+Authorization: Bearer {{access_token}}
+
 ### 3.2.5 (관리자) 그룹 간단 정보 조회
 // @no-log
 GET {{host_url}}/v1/admins/groups/briefs
