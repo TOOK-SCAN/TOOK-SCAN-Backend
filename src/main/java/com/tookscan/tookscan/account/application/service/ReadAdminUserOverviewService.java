@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +36,18 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
             String startDate,
             String endDate,
             Integer page,
-            Integer size
+            Integer size,
+            String sort,
+            Direction direction
     ) {
 
         Pageable pageable = PageRequest.of(page-1, size);
 
-        // provider를 ESecurityProvider로 변환
-        ESecurityProvider securityProvider = ESecurityProvider.fromString(provider);
+        // provider를 ESecurityProvider로 변환 (null 체크 추가)
+        ESecurityProvider securityProvider = null;
+        if (provider != null && !provider.trim().isEmpty()) {
+            securityProvider = ESecurityProvider.fromString(provider);
+        }
 
         // 페이지네이션 된 userId 페이지 객체 조회
         Page<UUID> userIdsPage = userRepository.findUserIdsByFilters(
@@ -51,7 +57,9 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
                 securityProvider,
                 startDate != null ? DateTimeUtil.convertStringToLocalDate(startDate) : null,
                 endDate != null ? DateTimeUtil.convertStringToLocalDate(endDate) : null,
-                pageable
+                pageable,
+                sort,
+                direction
         );
 
         // 리스트로 변환
