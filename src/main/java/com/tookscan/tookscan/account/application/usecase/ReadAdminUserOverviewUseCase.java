@@ -2,6 +2,7 @@ package com.tookscan.tookscan.account.application.usecase;
 
 import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminUserOverviewResponseDto;
 import com.tookscan.tookscan.core.annotation.bean.UseCase;
+import org.springframework.data.domain.Sort.Direction;
 
 @UseCase
 public interface ReadAdminUserOverviewUseCase {
@@ -12,9 +13,12 @@ public interface ReadAdminUserOverviewUseCase {
             String searchType,
             String search,
             Long groupId,
+            String provider,
             String startDate,
             String endDate,
             Integer page,
-            Integer size
+            Integer size,
+            String sort,
+            Direction direction
     );
 }

@@ -10,6 +10,7 @@ import com.tookscan.tookscan.core.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -42,19 +43,25 @@ public class AccountAdminQueryV1Controller {
             @RequestParam(value = "search-type", required = false) String searchType,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "group-id", required = false) Long groupId,
+            @RequestParam(value = "provider", required = false) String provider,
             @RequestParam(value = "start-date", required = false) String startDate,
             @RequestParam(value = "end-date", required = false) String endDate,
             @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size
+            @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
+            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "direction", defaultValue = "DESC") Direction direction
     ) {
         return ResponseDto.ok(readAdminUserOverviewUseCase.execute(
                 searchType,
                 search,
                 groupId,
+                provider,
                 startDate,
                 endDate,
                 page,
-                size
+                size,
+                sort,
+                direction
         ));
     }
 

@@ -60,38 +60,51 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
         @Schema(description = "이메일", example = "user@example.com")
         private final String email;
 
-        @JsonProperty("sign_in_date")
+        @JsonProperty("sign_up_date")
         @Schema(description = "가입 날짜", example = "2024.01.01")
         @NotNull
-        private final String signInDate;
+        private final String signUpDate;
 
-        @JsonProperty("total_order_amount")
-        @Schema(description = "총 주문 금액", example = "100000")
-        private final Integer totalOrderAmount;
+        @JsonProperty("total_payment_amount")
+        @Schema(description = "총 결제 금액", example = "100000")
+        private final Integer totalPaymentAmount;
 
         @JsonProperty("total_order_count")
         @Schema(description = "총 주문 수", example = "5")
         private final Integer totalOrderCount;
 
+        @JsonProperty("total_order_document_count")
+        @Schema(description = "총 주문 문서 수", example = "10")
+        private final Integer totalOrderDocumentCount;
+
         @JsonProperty("memo")
         @Schema(description = "메모", example = "VIP 고객")
         private final String memo;
+
+        @JsonProperty("provider")
+        @Schema(description = "계정 제공자", example = "KAKAO", allowableValues = {"DEFAULT", "KAKAO", "GOOGLE", "NAVER"})
+        private final String provider;
 
         @JsonProperty("group_infos")
         @Schema(description = "그룹 정보 목록")
         private final GroupInfoListDto groupInfos;
 
         @Builder
-        public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email, String signInDate, Integer totalOrderAmount, Integer totalOrderCount, String memo, GroupInfoListDto groupInfos) {
+        public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email,
+                               String signUpDate, Integer totalPaymentAmount, Integer totalOrderCount,
+                               Integer totalOrderDocumentCount, String memo, String provider,
+                               GroupInfoListDto groupInfos) {
             this.id = id;
             this.serialId = serialId;
             this.name = name;
             this.phoneNumber = phoneNumber;
             this.email = email;
-            this.signInDate = signInDate;
-            this.totalOrderAmount = totalOrderAmount;
+            this.signUpDate = signUpDate;
+            this.totalPaymentAmount = totalPaymentAmount;
             this.totalOrderCount = totalOrderCount;
+            this.totalOrderDocumentCount = totalOrderDocumentCount;
             this.memo = memo;
+            this.provider = provider;
             this.groupInfos = groupInfos;
             this.validateSelf();
         }
@@ -103,15 +116,26 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
                     .name(user.getName())
                     .phoneNumber(user.getPhoneNumber())
                     .email(user.getEmail())
-                    .signInDate(DateTimeUtil.convertLocalDateToDartString(user.getCreatedAt().toLocalDate()))
-                    .totalOrderAmount(
+                    .signUpDate(DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(user.getCreatedAt()))
+                    .totalPaymentAmount(
                             orders.stream()
                                     .filter(order -> order.getUser().getId().equals(user.getId()))
-                                    .mapToInt(Order::getTotalAmount).sum())
+                                    .mapToInt(order ->
+                                            order.getPayment() != null
+                                                    ? order.getPayment().getTotalAmount()
+                                                    : 0
+                                    )
+                                    .sum()
+                    )
                     .totalOrderCount((int) orders.stream()
                             .filter(order -> order.getUser().getId().equals(user.getId()))
                             .count())
+                    .totalOrderDocumentCount((int) orders.stream()
+                            .filter(order -> order.getUser().getId().equals(user.getId()))
+                            .mapToLong(order -> order.getDocuments().size())
+                            .sum())
                     .memo(user.getMemo())
+                    .provider(user.getProvider().name())
                     .groupInfos(GroupInfoListDto.of(user))
                     .build();
         }

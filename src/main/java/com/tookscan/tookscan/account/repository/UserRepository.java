@@ -1,12 +1,14 @@
 package com.tookscan.tookscan.account.repository;
 
 import com.tookscan.tookscan.account.domain.User;
+import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 
 public interface UserRepository {
 
@@ -20,7 +22,7 @@ public interface UserRepository {
 
     List<User> findByIdsWithDetails(List<UUID> userIds);
 
-    Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String sort, Direction direction);
 
     Integer countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

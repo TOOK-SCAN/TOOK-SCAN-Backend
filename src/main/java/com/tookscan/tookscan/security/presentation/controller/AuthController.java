@@ -24,6 +24,7 @@ import com.tookscan.tookscan.security.application.usecase.VerifyPasswordUseCase;
 import com.tookscan.tookscan.security.application.usecase.VerifyUserUseCase;
 import com.tookscan.tookscan.security.presentation.dto.request.AdminSignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ChangePasswordRequestDto;
+import com.tookscan.tookscan.security.presentation.dto.request.DeleteAccountRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.IssueAuthenticationCodeRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ReadSerialIdAndProviderRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRequestDto;
@@ -259,9 +260,10 @@ public class AuthController {
      */
     @DeleteMapping("")
     public ResponseDto<Void> deleteAccount(
-            @AccountID UUID accountId
+            @AccountID UUID accountId,
+            @RequestBody DeleteAccountRequestDto requestDto
     ) {
-        deleteAccountUseCase.execute(accountId);
+        deleteAccountUseCase.execute(accountId, requestDto);
         return ResponseDto.ok(null);
     }
 }

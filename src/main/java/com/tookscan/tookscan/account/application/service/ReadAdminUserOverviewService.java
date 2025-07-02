@@ -1,19 +1,21 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminUserOverviewResponseDto;
 import com.tookscan.tookscan.account.application.usecase.ReadAdminUserOverviewUseCase;
 import com.tookscan.tookscan.account.domain.User;
+import com.tookscan.tookscan.account.presentation.dto.response.ReadAdminUserOverviewResponseDto;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.dto.PageInfoDto;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,22 +32,34 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
             String searchType,
             String search,
             Long groupId,
+            String provider,
             String startDate,
             String endDate,
             Integer page,
-            Integer size
+            Integer size,
+            String sort,
+            Direction direction
     ) {
 
         Pageable pageable = PageRequest.of(page-1, size);
+
+        // provider를 ESecurityProvider로 변환 (null 체크 추가)
+        ESecurityProvider securityProvider = null;
+        if (provider != null && !provider.trim().isEmpty()) {
+            securityProvider = ESecurityProvider.fromString(provider);
+        }
 
         // 페이지네이션 된 userId 페이지 객체 조회
         Page<UUID> userIdsPage = userRepository.findUserIdsByFilters(
                 searchType,
                 search,
                 groupId,
+                securityProvider,
                 startDate != null ? DateTimeUtil.convertStringToLocalDate(startDate) : null,
                 endDate != null ? DateTimeUtil.convertStringToLocalDate(endDate) : null,
-                pageable
+                pageable,
+                sort,
+                direction
         );
 
         // 리스트로 변환
