@@ -15,7 +15,7 @@ public class DefaultLoginFailureHandler
         extends AbstractFailureHandler implements AuthenticationFailureHandler {
 
     private static final String BAD_CREDENTIALS_EXCEPTION = "BadCredentialsException";
-    private static final String BAD_CREDENTIALS_MESSAGE = "잘못된 이메일 또는 비밀번호입니다. 다시 입력해주세요.";
+    private static final String BAD_CREDENTIALS_MESSAGE = "잘못된 아이디 또는 비밀번호입니다. 다시 입력해주세요.";
 
     private static final String INTERNAL_AUTHENTICATION_SERVICE_EXCEPTION = "InternalAuthenticationServiceException";
     private static final String INTERNAL_AUTHENTICATION_SERVICE_MESSAGE = "인증 서비스 오류입니다. 관리자에게 문의하세요.";
