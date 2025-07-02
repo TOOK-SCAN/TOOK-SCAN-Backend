@@ -11,6 +11,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUserDetailResponseDto> {
 
@@ -65,12 +67,32 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
     @Schema(description = "총 주문 문서 수", example = "10")
     private final Integer totalOrderDocumentCount;
 
+    @JsonProperty("gender")
+    @Schema(description = "성별", example = "남성")
+    private final String gender;
+
+    @JsonProperty("birth")
+    @Schema(description = "출생년도", example = "1990년")
+    private final String birth;
+
+    @JsonProperty("deleted_at")
+    @Schema(description = "탈퇴 날짜", example = "yyyy.MM.dd HH:mm")
+    private final String deletedAt;
+
+    @JsonProperty("reason_deletion")
+    @Schema(description = "탈퇴 사유", example = "개인 정보 보호 요청")
+    private final String reasonDeletion;
+
+
+
     @Builder
     public ReadAdminUserDetailResponseDto(String signUpDate, String serialId, String name, ESecurityProvider provider,
                                           String phoneNumber,
                                           String email, AddressResponseDto address, String deliveryRequest, String memo,
                                           Integer totalPaymentAmount, Integer totalOrderCount,
-                                          Integer totalOrderDocumentCount) {
+                                          Integer totalOrderDocumentCount,
+                                          String gender, String birth, LocalDateTime deletedAt, String reasonDeletion
+                                          ) {
         this.signUpDate = signUpDate;
         this.serialId = serialId;
         this.name = name;
@@ -83,6 +105,10 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
         this.totalPaymentAmount = totalPaymentAmount;
         this.totalOrderCount = totalOrderCount;
         this.totalOrderDocumentCount = totalOrderDocumentCount;
+        this.gender = gender != null ? gender : " - ";
+        this.birth = birth != null ? birth : " - ";
+        this.deletedAt = deletedAt != null ? DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(deletedAt) : " - ";
+        this.reasonDeletion = reasonDeletion != null ? reasonDeletion : " - ";
         this.validateSelf();
     }
 
@@ -110,6 +136,10 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                 .totalOrderDocumentCount((int) user.getOrders().stream()
                         .mapToLong(order -> order.getDocuments().size())
                         .sum())
+                .gender(user.getGender())
+                .birth(user.getBirth())
+                .deletedAt(user.getDeletedAt())
+                .reasonDeletion(user.getReasonDeletion())
                 .build();
     }
 }

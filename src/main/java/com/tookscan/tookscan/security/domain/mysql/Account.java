@@ -21,7 +21,6 @@ import org.hibernate.annotations.Where;
 @DiscriminatorColumn(name = "dtype")
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE accounts SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@Where(clause = "deleted_at IS NULL")
 public abstract class Account {
 
     /* -------------------------------------------- */
@@ -63,6 +62,15 @@ public abstract class Account {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "reason_deletion", length = 500)
+    private String reasonDeletion;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "birth")
+    private String birth;
+
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
@@ -79,6 +87,9 @@ public abstract class Account {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.deletedAt = null;
+        this.reasonDeletion = null;
+        this.gender = null;
+        this.birth = null;
     }
 
     public abstract ESecurityRole getRole();
@@ -97,5 +108,9 @@ public abstract class Account {
 
     public boolean checkPassword(String password) {
         return this.password.equals(password);
+    }
+
+    public void updateReasonDeletion(String reasonDeletion) {
+        this.reasonDeletion = reasonDeletion;
     }
 }
