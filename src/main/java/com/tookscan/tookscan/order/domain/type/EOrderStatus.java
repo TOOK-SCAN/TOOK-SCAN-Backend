@@ -18,8 +18,7 @@ public enum EOrderStatus {
     RECOVERY_IN_PROGRESS("복원작업"),
     POST_WAITING("발송대기"),
     ALL_COMPLETED("작업완료"),
-    CANCEL("취소접수"),
-    AS("A/S 접수");
+    CANCEL("취소접수");
 
     private final String description;
 
@@ -35,7 +34,6 @@ public enum EOrderStatus {
             case "POST_WAITING" -> POST_WAITING;
             case "ALL_COMPLETED" -> ALL_COMPLETED;
             case "CANCEL" -> CANCEL;
-            case "AS" -> AS;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
@@ -53,7 +51,6 @@ public enum EOrderStatus {
             case SCAN_WAITING, SCAN_IN_PROGRESS -> SCAN_IN_PROGRESS;
             case RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED -> ALL_COMPLETED;
             case CANCEL -> CANCEL;
-            case AS -> AS;
         };
     }
 
@@ -65,7 +62,6 @@ public enum EOrderStatus {
             case ALL_COMPLETED -> List.of(RECOVERY_IN_PROGRESS, POST_WAITING,
                     ALL_COMPLETED);
             case CANCEL -> List.of(CANCEL);
-            case AS -> List.of(AS);
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
@@ -76,7 +72,6 @@ public enum EOrderStatus {
             case SCAN_IN_PROGRESS -> "스캔중";
             case RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED -> "스캔완료";
             case CANCEL -> "취소";
-            case AS -> "A/S";
         };
     }
 

@@ -59,6 +59,9 @@ public class Order extends BaseEntity {
     @Column(name = "payment_expiration_date")
     private LocalDateTime paymentExpirationDate;
 
+    @Column(name = "pdf_send_date")
+    private LocalDateTime pdfSendDate;
+
     @Column(name = "scan_copyright_compliance_agreed", nullable = false)
     private LocalDateTime scanCopyrightComplianceAgreed;
 
@@ -79,6 +82,9 @@ public class Order extends BaseEntity {
 
     @Column(name = "is_one_day_scan", nullable = false)
     private Boolean isOneDayScan;
+
+    @Column(name = "is_as_in_progress", nullable = false)
+    private Boolean isAsInProgress = false;
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
@@ -162,6 +168,14 @@ public class Order extends BaseEntity {
         this.isOneDayScan = isOneDayScan;
     }
 
+    public void updatePdfSendDate(LocalDateTime pdfSendDate) {
+        this.pdfSendDate = pdfSendDate;
+    }
+
+    public void updateAsInProgress(Boolean isAsInProgress) {
+        this.isAsInProgress = isAsInProgress;
+    }
+
     public void finishPayment(Payment payment) {
         this.orderStatus = EOrderStatus.PAYMENT_COMPLETED;
         this.payment = payment;
@@ -188,6 +202,14 @@ public class Order extends BaseEntity {
 
         return documents.stream()
                 .map(Document::calculatePrice)
+                .reduce(Integer::sum)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+    }
+
+    public Integer getInitialDocumentsTotalAmount() {
+
+        return documents.stream()
+                .map(Document::calculateInitialPrice)
                 .reduce(Integer::sum)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
@@ -256,5 +278,10 @@ public class Order extends BaseEntity {
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
     }
 
+    public Boolean hasRecoveryOption() {
+        return documents.stream()
+                .anyMatch(document -> document.getRecoveryOption() != null
+                        && document.getRecoveryOption() != ERecoveryOption.DISCARD);
+    }
 
 }

@@ -33,7 +33,8 @@ public interface OrderRepository {
 
     Page<Long> findOrderOverviews(String startDate, String endDate,
                                   String search, String searchType, String sort, Direction direction,
-                                  Pageable pageable, EOrderStatus orderStatus);
+                                  Pageable pageable, EOrderStatus orderStatus, Boolean isOneDayScan,
+                                  Boolean hasRecoveryOption, Boolean isAsInProgress, Boolean isInProgress);
 
     Page<Long> findDeliveriesSummaries(String startDate, String endDate, String search, String searchType,
                                        EOrderStatus orderStatus,

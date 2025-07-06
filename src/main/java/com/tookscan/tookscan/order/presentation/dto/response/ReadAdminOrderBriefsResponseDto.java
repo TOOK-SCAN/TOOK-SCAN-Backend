@@ -62,11 +62,6 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
     @Min(0)
     private final Integer cancelCount;
 
-    @JsonProperty("as_count")
-    @NotNull
-    @Min(0)
-    private final Integer asCount;
-
     @JsonProperty("all_completed_count")
     @NotNull
     @Min(0)
@@ -84,7 +79,6 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
         this.recoveryInProgressCount = recoveryInProgressCount;
         this.postWaitingCount = postWaitingCount;
         this.cancelCount = cancelCount;
-        this.asCount = asCount;
         this.allCompletedCount = allCompletedCount;
         this.validateSelf();
     }
@@ -101,7 +95,6 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
                 .recoveryInProgressCount(counts.get(EOrderStatus.RECOVERY_IN_PROGRESS))
                 .postWaitingCount(counts.get(EOrderStatus.POST_WAITING))
                 .cancelCount(counts.get(EOrderStatus.CANCEL))
-                .asCount(counts.get(EOrderStatus.AS))
                 .allCompletedCount(counts.get(EOrderStatus.ALL_COMPLETED))
                 .build();
     }

@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,5 +20,7 @@ public class CreateAdminOrderMemoService implements CreateAdminOrderMemoUseCase 
         // 주문 메모 생성
         Order order = orderRepository.findByIdOrElseThrow(orderId);
         order.createMemo(requestDto.content());
+        order.updateAsInProgress(requestDto.isAsInProgress());
+        orderRepository.save(order);
     }
 }

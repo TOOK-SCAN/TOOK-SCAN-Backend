@@ -62,6 +62,9 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
         @JsonProperty("order_status")
         private final EOrderStatus orderStatus;
 
+        @JsonProperty("predicted_price")
+        private final Integer predictedPrice;
+
         @JsonProperty("payment_amount")
         private final Integer paymentAmount;
 
@@ -77,6 +80,24 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
         @JsonProperty("payment_date")
         private final String paymentDate;
 
+        @JsonProperty("pdf_send_date")
+        private final String pdfSendDate;
+
+        @JsonProperty("is_one_day_scan")
+        private final Boolean isOneDayScan;
+
+        @JsonProperty("has_recovery_option")
+        private final Boolean hasRecoveryOption;
+
+        @JsonProperty("tracking_number")
+        private final String trackingNumber;
+
+        @JsonProperty("is_as_in_progress")
+        private final Boolean isAsInProgress;
+
+        @JsonProperty("memo")
+        private final String memo;
+
         @JsonProperty("documents")
         private final DocumentsDto documents;
 
@@ -84,7 +105,9 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
         public OrderOverviewsDto(String orderId, String orderNumber, String name, EOrderStatus orderStatus,
                                  Integer paymentAmount, EPaymentMethod paymentMethod,
                                  EEasyPaymentProvider easyPaymentProvider,
-                                 String orderDate, String paymentDate, DocumentsDto documents) {
+                                 String orderDate, String paymentDate, DocumentsDto documents, Integer predictedPrice,
+                                 String pdfSendDate, Boolean isOneDayScan, Boolean hasRecoveryOption,
+                                 String trackingNumber, Boolean isAsInProgress, String memo) {
             this.orderId = orderId;
             this.orderNumber = orderNumber;
             this.name = name;
@@ -95,6 +118,13 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
             this.orderDate = orderDate;
             this.paymentDate = paymentDate;
             this.documents = documents;
+            this.predictedPrice = predictedPrice;
+            this.pdfSendDate = pdfSendDate;
+            this.isOneDayScan = isOneDayScan;
+            this.hasRecoveryOption = hasRecoveryOption;
+            this.trackingNumber = trackingNumber;
+            this.isAsInProgress = isAsInProgress;
+            this.memo = memo;
             this.validateSelf();
         }
 
@@ -109,10 +139,21 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                     .paymentMethod(order.getPayment() == null ? null : order.getPayment().getMethod())
                     .easyPaymentProvider(order.getPayment() == null ? null
                             : order.getPayment().getEasyPaymentProvider())
-                    .orderDate(DateTimeUtil.convertLocalDateToString(order.getCreatedAt().toLocalDate()))
+                    .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
                     .paymentDate(order.getPayment() == null ? null
-                            : DateTimeUtil.convertLocalDateToString(order.getPayment().getApprovedAt().toLocalDate()))
+                            : DateTimeUtil.convertLocalDateToDartString(
+                                    order.getPayment().getApprovedAt().toLocalDate()))
                     .documents(DocumentsDto.fromEntities(order.getDocuments()))
+                    .predictedPrice(order.getInitialDocumentsTotalAmount())
+                    .pdfSendDate(order.getPdfSendDate() == null ? null
+                            : DateTimeUtil.convertLocalDateToDartString(
+                                    order.getPdfSendDate().toLocalDate()))
+                    .isOneDayScan(order.getIsOneDayScan())
+                    .hasRecoveryOption(order.hasRecoveryOption())
+                    .trackingNumber(order.getDelivery().getTrackingNumber() == null ? null
+                            : order.getDelivery().getTrackingNumber())
+                    .isAsInProgress(order.getIsAsInProgress())
+                    .memo(order.getMemo() == null ? null : order.getMemo())
                     .build();
         }
 
@@ -147,12 +188,17 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                 @JsonProperty("price")
                 private final Integer price;
 
+                @JsonProperty("is_ocr_enabled")
+                private final Boolean isOcrEnabled;
+
                 @Builder
-                public DocumentDto(String name, Integer pageCount, String recoveryOption, Integer price) {
+                public DocumentDto(String name, Integer pageCount, String recoveryOption, Integer price,
+                                   Boolean isOcrEnabled) {
                     this.name = name;
                     this.pageCount = pageCount;
                     this.recoveryOption = recoveryOption;
                     this.price = price;
+                    this.isOcrEnabled = isOcrEnabled;
                     this.validateSelf();
                 }
             }
@@ -161,11 +207,12 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                 return DocumentsDto.builder()
                         .totalCount(documents.size())
                         .documents(documents.stream()
-                                .map(document -> DocumentsDto.DocumentDto.builder()
+                                .map(document -> DocumentDto.builder()
                                         .name(document.getName())
                                         .pageCount(document.getPageCount())
                                         .recoveryOption(document.getRecoveryOption().getDescription())
                                         .price(document.calculatePrice())
+                                        .isOcrEnabled(document.getIsOcrEnabled())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build();

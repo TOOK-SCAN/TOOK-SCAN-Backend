@@ -1,7 +1,18 @@
 package com.tookscan.tookscan.order.presentation.controller.query;
 
 import com.tookscan.tookscan.core.dto.ResponseDto;
-import com.tookscan.tookscan.order.application.usecase.*;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminDeliveriesOverviewsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminDeliveriesSummariesUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsScanStatusUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDeliveryOverviewUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDocumentsOverviewsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminPaymentOverviewUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDeliveriesOverviewsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDeliveriesSummariesResponseDto;
@@ -20,7 +31,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Order", description = "Order 관련 API 입니다.")
 @RestController
@@ -137,11 +152,15 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "search-type", required = false) String searchType,
             @RequestParam(value = "sort", defaultValue = "order-date") String sort,
             @RequestParam(value = "direction", defaultValue = "ASC") Direction direction,
-            @RequestParam(value = "order-status", required = false) EOrderStatus orderStatus
+            @RequestParam(value = "order-status", required = false) EOrderStatus orderStatus,
+            @RequestParam(value = "is-one-day-scan", required = false) Boolean isOneDayScan,
+            @RequestParam(value = "has-recovery-option", required = false) Boolean hasRecoveryOption,
+            @RequestParam(value = "is-as-in-progress", required = false) Boolean isAsInProgress,
+            @RequestParam(value = "is-in-progress", required = false) Boolean isInProgress
     ) {
         return ResponseDto.ok(
                 readAdminOrderOverviewsUseCase.execute(page, size, startDate, endDate, search, searchType, sort,
-                        direction, orderStatus));
+                        direction, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress, isInProgress));
     }
 
     /**
