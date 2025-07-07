@@ -1,0 +1,49 @@
+package com.tookscan.tookscan.notice.presentation.controller.command;
+
+import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.notice.application.usecase.CreateAdminNoticeUseCase;
+import com.tookscan.tookscan.notice.application.usecase.DeleteAdminNoticeUseCase;
+import com.tookscan.tookscan.notice.application.usecase.UpdateAdminNoticeUseCase;
+import com.tookscan.tookscan.notice.presentation.dto.request.CreateAdminNoticeRequestDto;
+import com.tookscan.tookscan.notice.presentation.dto.request.UpdateAdminNoticeRequestDto;
+import com.tookscan.tookscan.notice.presentation.dto.response.ReadAdminNoticeDetailResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "Notice", description = "Notice 관련 API 입니다.")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/v1/admin/notices")
+public class NoticeAdminCommandV1Controller {
+
+    private final CreateAdminNoticeUseCase createAdminNoticeUseCase;
+    private final UpdateAdminNoticeUseCase updateAdminNoticeUseCase;
+    private final DeleteAdminNoticeUseCase deleteAdminNoticeUseCase;
+
+    @Operation(summary = "공지사항 등록", description = "새로운 공지사항을 등록합니다.")
+    @PostMapping
+    public ResponseDto<Void> createNotice(
+            @Valid @RequestBody CreateAdminNoticeRequestDto requestDto) {
+        createAdminNoticeUseCase.execute(requestDto);
+        return ResponseDto.created(null);
+    }
+
+    @Operation(summary = "공지사항 수정", description = "공지사항 정보를 수정합니다.")
+    @PutMapping("/{noticeId}")
+    public ResponseDto<ReadAdminNoticeDetailResponseDto> updateNotice(
+            @PathVariable Long noticeId,
+            @Valid @RequestBody UpdateAdminNoticeRequestDto requestDto) {
+        ReadAdminNoticeDetailResponseDto responseDto = updateAdminNoticeUseCase.execute(noticeId, requestDto);
+        return ResponseDto.ok(responseDto);
+    }
+
+    @Operation(summary = "공지사항 삭제", description = "공지사항을 삭제합니다.")
+    @DeleteMapping("/{noticeId}")
+    public ResponseDto<Object> deleteNotice(@PathVariable Long noticeId) {
+        deleteAdminNoticeUseCase.execute(noticeId);
+        return ResponseDto.noContent();
+    }
+} 

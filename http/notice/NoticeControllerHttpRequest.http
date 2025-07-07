@@ -1,0 +1,65 @@
+### 공지사항 등록 (관리자) - NoticeAdminCommandV1Controller
+POST {{host_url}}/v1/admin/notices
+Content-Type: application/json
+
+{
+  "title": "새로운 공지사항",
+  "content": "공지사항 내용입니다. 중요한 안내사항을 포함하고 있습니다.",
+  "is_public": true
+}
+
+###
+
+### 공지사항 목록 조회 (관리자) - NoticeAdminQueryV1Controller
+GET {{host_url}}/v1/admin/notices?page=1&size=10&sort=created-at&direction=desc
+
+###
+
+### 공지사항 목록 조회 - 검색 (관리자)
+GET {{host_url}}/v1/admin/notices?page=1&size=10&search=공지&search-type=title&sort=created-at&direction=desc
+
+###
+
+### 공지사항 목록 조회 - 필터링 (관리자)
+GET {{host_url}}/v1/admin/notices?page=1&size=10&is-public=true&sort=view-count&direction=desc
+
+###
+
+### 공지사항 목록 조회 - 기간 검색 (관리자)
+GET {{host_url}}/v1/admin/notices?page=1&size=10&start-date=2024-01-01&end-date=2024-12-31&sort=created-at&direction=desc
+
+###
+
+### 공지사항 상세 조회 (관리자) - NoticeAdminQueryV1Controller
+GET {{host_url}}/v1/admin/notices/1
+
+###
+
+### 공지사항 수정 (관리자) - NoticeAdminCommandV1Controller
+PUT {{host_url}}/v1/admin/notices/1
+Content-Type: application/json
+
+{
+  "title": "수정된 공지사항",
+  "content": "수정된 공지사항 내용입니다.",
+  "is_public": false
+}
+
+###
+
+### 공지사항 삭제 (관리자) - NoticeAdminCommandV1Controller
+DELETE {{host_url}}/v1/admin/notices/1
+
+###
+
+### 공지사항 목록 조회 (사용자) - NoticeUserQueryV1Controller
+### 공개된 공지사항만 조회, 생성일 기준 최신순 정렬, 검색 기능 없음
+GET {{host_url}}/v1/users/notices?page=1&size=10
+
+###
+
+### 공지사항 상세 조회 (사용자) - NoticeUserQueryV1Controller
+### 공개된 공지사항만 조회 가능, 비공개 공지사항일 경우 404 에러
+GET {{host_url}}/v1/users/notices/730014358848189437
+
+### 
