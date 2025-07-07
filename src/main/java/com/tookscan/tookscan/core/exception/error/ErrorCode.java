@@ -29,6 +29,7 @@ public enum ErrorCode {
     NOT_FOUND_PAYMENT_SESSION(40414, HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
     NOT_FOUND_COUPON(40415, HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
     NOT_FOUND_PDF_FILE(40416, HttpStatus.NOT_FOUND, "존재하지 않는 PDF 파일입니다."),
+    NOT_FOUND_NOTICE(40417, HttpStatus.NOT_FOUND, "존재하지 않는 공지사항입니다."),
 
 
     // Invalid Argument Error
