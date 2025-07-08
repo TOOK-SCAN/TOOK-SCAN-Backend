@@ -29,7 +29,7 @@ public class AdminConfig {
     @Bean
     public ApplicationRunner createSuperUser() {
         return args -> {
-            Account account = accountRepository.findBySerialIdOrProviderOrElseNull(superUserSerialId, ESecurityProvider.DEFAULT);
+            Account account = accountRepository.findBySerialIdAndProviderAndDeletedAtIsNullOrElseNull(superUserSerialId, ESecurityProvider.DEFAULT);
             if (account != null) {
                 log.info("관리자가 이미 생성되어 있습니다.");
                 return;

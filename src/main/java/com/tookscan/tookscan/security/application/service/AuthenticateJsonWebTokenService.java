@@ -19,7 +19,7 @@ public class AuthenticateJsonWebTokenService implements AuthenticateJsonWebToken
 
     @Override
     public CustomUserPrincipal execute(UUID accountId) {
-        Account account = accountRepository.findByIdOrElseThrow(accountId);
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseThrow(accountId);
 
         return accountService.createCustomUserPrincipalByAccount(account);
     }

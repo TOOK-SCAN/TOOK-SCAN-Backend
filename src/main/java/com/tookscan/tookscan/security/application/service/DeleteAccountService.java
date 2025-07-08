@@ -18,7 +18,7 @@ public class DeleteAccountService implements DeleteAccountUseCase {
     @Override
     public void execute(UUID accountId, DeleteAccountRequestDto requestDto) {
         // 계정 조회
-        Account account = accountRepository.findByIdOrElseThrow(accountId);
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseThrow(accountId);
 
         // 계정 탈퇴 사유 업데이트
         account.updateReasonDeletion(requestDto.reason());

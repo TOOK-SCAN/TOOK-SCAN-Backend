@@ -28,7 +28,7 @@ public class ChangePasswordService implements ChangePasswordUseCase {
     public void execute(UUID accountId, ChangePasswordRequestDto requestDto) {
 
         // 계정 조회
-        Account account = accountRepository.findByIdOrElseThrow(accountId);
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseThrow(accountId);
 
         // 이전 비밀번호 일치 여부 확인
         if (!bCryptPasswordEncoder.matches(requestDto.oldPassword(), account.getPassword())) {

@@ -44,10 +44,10 @@ public class VerifyUserService implements VerifyUserUseCase {
         authenticationCodeService.validateAuthenticationCode(authenticationCode);
 
         // Kakao 로 가입한 경우인지, Google 로 가입한 경우인지, Naver 로 가입한 경우인지 확인
-        accountRepository.existsByPhoneNumberAndProvidersThenThrow(requestDto.phoneNumber(), SOCIAL_PROVIDERS);
+        accountRepository.existsByPhoneNumberAndProvidersAndDeletedAtIsNullThenThrow(requestDto.phoneNumber(), SOCIAL_PROVIDERS);
 
         // Account 조회
-        Account account = accountRepository.findByPhoneNumberAndSerialIdAndNameOrElseThrow(
+        Account account = accountRepository.findByPhoneNumberAndSerialIdAndNameAndDeletedAtIsNullOrElseThrow(
                 requestDto.phoneNumber(),
                 requestDto.serialId(),
                 requestDto.name()

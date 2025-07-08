@@ -15,7 +15,7 @@ public class ValidateIdService implements ValidateIdUseCase {
     @Override
     public ValidationResponseDto execute(String serialId) {
         return ValidationResponseDto.of(
-                !accountRepository.existsBySerialId(serialId)
+                !accountRepository.existsBySerialIdAndDeletedAtIsNull(serialId)
         );
     }
 }

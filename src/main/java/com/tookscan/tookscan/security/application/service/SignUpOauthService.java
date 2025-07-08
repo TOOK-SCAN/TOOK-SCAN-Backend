@@ -54,10 +54,10 @@ public class SignUpOauthService implements SignUpOauthUseCase {
         ESecurityProvider provider = ESecurityProvider.valueOf(split[1]);
 
         // 중복된 아이디인지 확인
-        accountRepository.existsBySerialIdAndProviderThenThrow(serialId, provider);
+        accountRepository.existsBySerialIdAndProviderAndDeletedAtIsNullThenThrow(serialId, provider);
 
         // 중복된 전화번호인지 확인
-        accountRepository.existsByPhoneNumberThenThrow(requestDto.phoneNumber());
+        accountRepository.existsByPhoneNumberAndDeletedAtIsNullThenThrow(requestDto.phoneNumber());
 
         // 해당 번호에 관련된 인증번호 조회
         AuthenticationCode authenticationCode = authenticationCodeRepository.findByIdOrElseNull(requestDto.phoneNumber());

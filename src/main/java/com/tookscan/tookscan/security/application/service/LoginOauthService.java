@@ -33,7 +33,7 @@ public class LoginOauthService implements LoginOauthUseCase {
 
     public OauthJsonWebTokenDto execute(CustomUserPrincipal principal) {
         // 임시유저가 아니라면 Account 조회
-        Account account = accountRepository.findByIdOrElseThrow(principal.getId());
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseThrow(principal.getId());
 
         // Account 정보를 이용하여 Oauth Json Web Token 생성
         OauthJsonWebTokenDto jsonWebTokenDto = jsonWebTokenUtil.generateOauthJsonWebTokens(

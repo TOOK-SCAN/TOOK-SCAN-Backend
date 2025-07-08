@@ -21,7 +21,7 @@ public class ReadAccountBriefService implements ReadAccountBriefUseCase {
     public ReadAccountBriefResponseDto execute(UUID accountId) {
 
         // Account 조회
-        Account account = accountRepository.findByIdOrElseNull(accountId);
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseNull(accountId);
 
         // Account 정보를 ReadAccountBriefResponseDto로 변환
         return ReadAccountBriefResponseDto.fromEntity(account);

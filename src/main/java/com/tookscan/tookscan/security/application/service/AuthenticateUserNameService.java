@@ -21,7 +21,7 @@ public class AuthenticateUserNameService implements AuthenticateUserNameUseCase 
     @Override
     public UserDetails loadUserByUsername(String serialId) throws UsernameNotFoundException {
         try {
-            Account account = accountRepository.findBySerialIdAndProviderOrElseThrow(serialId, ESecurityProvider.DEFAULT);
+            Account account = accountRepository.findBySerialIdAndProviderAndDeletedAtIsNullOrElseThrow(serialId, ESecurityProvider.DEFAULT);
             return accountService.createCustomUserPrincipalByAccount(account);
         } catch (CommonException e) {
             throw new UsernameNotFoundException(e.getMessage());

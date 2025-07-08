@@ -35,7 +35,7 @@ public class ReissueJsonWebTokenService implements ReissueJsonWebTokenUseCase {
         UUID accountId = refreshToken.getAccountId();
 
         // Account 조회
-        Account account = accountRepository.findByIdOrElseThrow(accountId);
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseThrow(accountId);
 
         // Default Json Web Token 생성
         DefaultJsonWebTokenDto defaultJsonWebTokenDto = jsonWebTokenUtil.generateDefaultJsonWebTokens(
