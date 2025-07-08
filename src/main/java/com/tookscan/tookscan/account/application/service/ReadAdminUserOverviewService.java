@@ -37,6 +37,7 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
             String endDate,
             Integer page,
             Integer size,
+            String status,
             String sort,
             Direction direction
     ) {
@@ -58,6 +59,7 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
                 startDate != null ? DateTimeUtil.convertStringToLocalDate(startDate) : null,
                 endDate != null ? DateTimeUtil.convertStringToLocalDate(endDate) : null,
                 pageable,
+                status,
                 sort,
                 direction
         );

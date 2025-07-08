@@ -42,7 +42,7 @@ public class ReissuePasswordService implements ReissuePasswordUseCase {
         authenticationCodeService.validateAuthenticationCode(authenticationCode);
 
         // 계정 조회
-        Account account = accountRepository.findByPhoneNumberAndSerialIdOrElseThrow(requestDto.phoneNumber(), requestDto.serialId());
+        Account account = accountRepository.findByPhoneNumberAndSerialIdAndDeletedAtIsNullOrElseThrow(requestDto.phoneNumber(), requestDto.serialId());
 
         // 비밀번호 재발급 (랜덤한 숫자 + 영소문자 8자)
         String newPassword = generateRandomPassword();

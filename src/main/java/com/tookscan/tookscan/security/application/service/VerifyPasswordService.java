@@ -22,7 +22,7 @@ public class VerifyPasswordService implements VerifyPasswordUseCase {
     @Override
     public ValidationResponseDto execute(UUID accountId, VerifyPasswordRequestDto requestDto) {
         // Account 조회
-        Account account = accountRepository.findByIdOrElseThrow(accountId);
+        Account account = accountRepository.findByIdAndDeletedAtIsNullOrElseThrow(accountId);
 
         // 비밀번호 검증
         boolean isPasswordValid = bCryptPasswordEncoder.matches(requestDto.password(), account.getPassword());

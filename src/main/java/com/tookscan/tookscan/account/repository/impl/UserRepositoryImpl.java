@@ -67,7 +67,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String sort, Direction direction) {
+    public Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String status, String sort, Direction direction) {
         QUser user = QUser.user;
         QUserGroup userGroup = QUserGroup.userGroup;
 
@@ -90,6 +90,14 @@ public class UserRepositoryImpl implements UserRepository {
 
         if (provider != null) {
             predicate = predicate.and(user.provider.eq(provider));
+        }
+
+        if (status != null && (status.equals("enrolled") || !status.equals("withdrew"))) {
+            if( status.equals("enrolled")) {
+                predicate = predicate.and(user.deletedAt.isNull());
+            } else {
+                predicate = predicate.and(user.deletedAt.isNotNull());
+            }
         }
 
         // 정렬이 주문 관련인 경우 복잡한 쿼리 사용

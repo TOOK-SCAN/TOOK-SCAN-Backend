@@ -12,15 +12,17 @@ import java.util.UUID;
 @Repository
 public interface AccountJpaRepository extends JpaRepository<Account, UUID> {
 
-    Optional<Account> findBySerialIdAndProvider(String serialId, ESecurityProvider provider);
+    Optional<Account> findByIdAndDeletedAtIsNull(UUID accountId);
 
-    Optional<Account> findBySerialId(String serialId);
+    Optional<Account> findBySerialIdAndProviderAndDeletedAtIsNull(String serialId, ESecurityProvider provider);
 
-    Optional<Account> findByPhoneNumber(String phoneNumber);
+    Optional<Account> findBySerialIdAndDeletedAtIsNull(String serialId);
 
-    Optional<Account> findByPhoneNumberAndSerialId(String phoneNumber, String serialId);
+    Optional<Account> findByPhoneNumberAndDeletedAtIsNull(String phoneNumber);
 
-    Optional<Account> findByPhoneNumberAndSerialIdAndName(String phoneNumber, String serialId, String name);
+    Optional<Account> findByPhoneNumberAndSerialIdAndDeletedAtIsNull(String phoneNumber, String serialId);
+
+    Optional<Account> findByPhoneNumberAndSerialIdAndNameAndDeletedAtIsNull(String phoneNumber, String serialId, String name);
 
     void deleteByIdIn(List<UUID> ids);
 }

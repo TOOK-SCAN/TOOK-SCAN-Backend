@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface AccountRepository {
 
-    Account findByIdOrElseThrow(UUID accountId);
+    Account findByIdAndDeletedAtIsNullOrElseThrow(UUID accountId);
 
-    Account findByIdOrElseNull(UUID accountId);
+    Account findByIdAndDeletedAtIsNullOrElseNull(UUID accountId);
 
     void save(Account account);
 
@@ -18,21 +18,21 @@ public interface AccountRepository {
 
     void deleteByIdIn(List<UUID> accountIds);
 
-    Account findBySerialIdAndProviderOrElseThrow(String serialId, ESecurityProvider provider);
+    Account findBySerialIdAndProviderAndDeletedAtIsNullOrElseThrow(String serialId, ESecurityProvider provider);
 
-    Account findBySerialIdOrProviderOrElseNull(String serialId, ESecurityProvider provider);
+    Account findBySerialIdAndProviderAndDeletedAtIsNullOrElseNull(String serialId, ESecurityProvider provider);
 
-    Account findByPhoneNumberAndSerialIdOrElseThrow(String phoneNumber, String serialId);
+    Account findByPhoneNumberAndSerialIdAndDeletedAtIsNullOrElseThrow(String phoneNumber, String serialId);
 
-    Account findByPhoneNumberAndSerialIdAndNameOrElseThrow(String phoneNumber, String serialId, String name);
+    Account findByPhoneNumberAndSerialIdAndNameAndDeletedAtIsNullOrElseThrow(String phoneNumber, String serialId, String name);
 
-    void existsBySerialIdAndProviderThenThrow(String serialId, ESecurityProvider provider);
+    void existsBySerialIdAndProviderAndDeletedAtIsNullThenThrow(String serialId, ESecurityProvider provider);
 
-    void existsByPhoneNumberThenThrow(String phoneNumber);
+    void existsByPhoneNumberAndDeletedAtIsNullThenThrow(String phoneNumber);
 
-    void existsByPhoneNumberAndProvidersThenThrow(String phoneNumber, List<ESecurityProvider> provider);
+    void existsByPhoneNumberAndProvidersAndDeletedAtIsNullThenThrow(String phoneNumber, List<ESecurityProvider> provider);
 
-    boolean existsBySerialId(String serialId);
+    boolean existsBySerialIdAndDeletedAtIsNull(String serialId);
 
-    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByPhoneNumberAndDeletedAtIsNull(String phoneNumber);
 }

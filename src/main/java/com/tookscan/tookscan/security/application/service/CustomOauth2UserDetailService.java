@@ -30,7 +30,7 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
         Oauth2UserInfo oauth2UserInfo = Oauth2UserInfoFactory.getOauth2UserInfo(provider, super.loadUser(userRequest).getAttributes());
 
         // 이미 존재하는 사용자인지 확인. 존재하지 않다면 null
-        Account account = accountRepository.findBySerialIdOrProviderOrElseNull(oauth2UserInfo.getId(), provider);
+        Account account = accountRepository.findBySerialIdAndProviderAndDeletedAtIsNullOrElseNull(oauth2UserInfo.getId(), provider);
 
         // 최초 가입 유저라면 CustomTemporaryUserPrincipal 반환
         if (account == null) {

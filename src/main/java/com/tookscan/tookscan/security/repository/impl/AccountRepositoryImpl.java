@@ -21,14 +21,14 @@ public class AccountRepositoryImpl implements AccountRepository {
     private final AccountJpaRepository accountJpaRepository;
 
     @Override
-    public Account findByIdOrElseThrow(UUID id) {
-        return accountJpaRepository.findById(id)
+    public Account findByIdAndDeletedAtIsNullOrElseThrow(UUID id) {
+        return accountJpaRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ACCOUNT));
     }
 
     @Override
-    public Account findByIdOrElseNull(UUID id) {
-        return accountJpaRepository.findById(id).orElse(null);
+    public Account findByIdAndDeletedAtIsNullOrElseNull(UUID id) {
+        return accountJpaRepository.findByIdAndDeletedAtIsNull(id).orElse(null);
     }
 
     @Override
@@ -47,39 +47,39 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Account findBySerialIdAndProviderOrElseThrow(String serialId, ESecurityProvider provider) {
-        return accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
+    public Account findBySerialIdAndProviderAndDeletedAtIsNullOrElseThrow(String serialId, ESecurityProvider provider) {
+        return accountJpaRepository.findBySerialIdAndProviderAndDeletedAtIsNull(serialId, provider)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ACCOUNT));
     }
 
     @Override
-    public Account findBySerialIdOrProviderOrElseNull(String serialId, ESecurityProvider provider) {
-        return accountJpaRepository.findBySerialIdAndProvider(serialId, provider).orElse(null);
+    public Account findBySerialIdAndProviderAndDeletedAtIsNullOrElseNull(String serialId, ESecurityProvider provider) {
+        return accountJpaRepository.findBySerialIdAndProviderAndDeletedAtIsNull(serialId, provider).orElse(null);
     }
 
     @Override
-    public Account findByPhoneNumberAndSerialIdOrElseThrow(String phoneNumber, String serialId) {
-        return accountJpaRepository.findByPhoneNumberAndSerialId(phoneNumber, serialId)
+    public Account findByPhoneNumberAndSerialIdAndDeletedAtIsNullOrElseThrow(String phoneNumber, String serialId) {
+        return accountJpaRepository.findByPhoneNumberAndSerialIdAndDeletedAtIsNull(phoneNumber, serialId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ACCOUNT));
     }
 
     @Override
-    public Account findByPhoneNumberAndSerialIdAndNameOrElseThrow(String phoneNumber, String serialId, String name) {
-        return accountJpaRepository.findByPhoneNumberAndSerialIdAndName(phoneNumber, serialId, name)
+    public Account findByPhoneNumberAndSerialIdAndNameAndDeletedAtIsNullOrElseThrow(String phoneNumber, String serialId, String name) {
+        return accountJpaRepository.findByPhoneNumberAndSerialIdAndNameAndDeletedAtIsNull(phoneNumber, serialId, name)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ACCOUNT));
     }
 
     @Override
-    public void existsBySerialIdAndProviderThenThrow(String serialId, ESecurityProvider provider) {
-        accountJpaRepository.findBySerialIdAndProvider(serialId, provider)
+    public void existsBySerialIdAndProviderAndDeletedAtIsNullThenThrow(String serialId, ESecurityProvider provider) {
+        accountJpaRepository.findBySerialIdAndProviderAndDeletedAtIsNull(serialId, provider)
                 .ifPresent(account -> {
                     throw new CommonException(ErrorCode.ALREADY_EXIST_ID);
                 });
     }
 
     @Override
-    public void existsByPhoneNumberThenThrow(String phoneNumber) {
-        accountJpaRepository.findByPhoneNumber(phoneNumber)
+    public void existsByPhoneNumberAndDeletedAtIsNullThenThrow(String phoneNumber) {
+        accountJpaRepository.findByPhoneNumberAndDeletedAtIsNull(phoneNumber)
                 .ifPresent(account -> {
                     throw new CommonException(ErrorCode.ALREADY_EXIST_PHONE_NUMBER);
                 });
@@ -87,8 +87,8 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Account a WHERE a.phoneNumber = :phoneNumber AND a.provider IN :provider")
-    public void existsByPhoneNumberAndProvidersThenThrow(@Param("phoneNumber") String phoneNumber, @Param("provider") List<ESecurityProvider> provider) {
-        accountJpaRepository.findByPhoneNumber(phoneNumber)
+    public void existsByPhoneNumberAndProvidersAndDeletedAtIsNullThenThrow(@Param("phoneNumber") String phoneNumber, @Param("provider") List<ESecurityProvider> provider) {
+        accountJpaRepository.findByPhoneNumberAndDeletedAtIsNull(phoneNumber)
                 .ifPresent(account -> {
                     switch (account.getProvider()) {
                         case KAKAO -> throw new CommonException(ErrorCode.KAKAO_SIGN_IN_USE);
@@ -100,12 +100,12 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public boolean existsBySerialId(String serialId) {
-        return accountJpaRepository.findBySerialId(serialId).isPresent();
+    public boolean existsBySerialIdAndDeletedAtIsNull(String serialId) {
+        return accountJpaRepository.findBySerialIdAndDeletedAtIsNull(serialId).isPresent();
     }
 
     @Override
-    public boolean existsByPhoneNumber(String phoneNumber) {
-        return accountJpaRepository.findByPhoneNumber(phoneNumber).isPresent();
+    public boolean existsByPhoneNumberAndDeletedAtIsNull(String phoneNumber) {
+        return accountJpaRepository.findByPhoneNumberAndDeletedAtIsNull(phoneNumber).isPresent();
     }
 }
