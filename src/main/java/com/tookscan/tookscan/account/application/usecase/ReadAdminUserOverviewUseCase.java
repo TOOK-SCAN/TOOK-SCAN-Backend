@@ -18,6 +18,7 @@ public interface ReadAdminUserOverviewUseCase {
             String endDate,
             Integer page,
             Integer size,
+            String status,
             String sort,
             Direction direction
     );

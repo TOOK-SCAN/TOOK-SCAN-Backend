@@ -22,7 +22,7 @@ public interface UserRepository {
 
     List<User> findByIdsWithDetails(List<UUID> userIds);
 
-    Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String sort, Direction direction);
+    Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String status, String sort, Direction direction);
 
     Integer countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

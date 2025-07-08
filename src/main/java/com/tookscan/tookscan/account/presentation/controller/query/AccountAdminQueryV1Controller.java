@@ -48,6 +48,7 @@ public class AccountAdminQueryV1Controller {
             @RequestParam(value = "end-date", required = false) String endDate,
             @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
+            @RequestParam(value = "status", defaultValue = "all") String status,
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "direction", defaultValue = "DESC") Direction direction
     ) {
@@ -60,6 +61,7 @@ public class AccountAdminQueryV1Controller {
                 endDate,
                 page,
                 size,
+                status,
                 sort,
                 direction
         ));
