@@ -194,6 +194,7 @@ public class ReadAdminOrderDetailResponseDto extends
 
         public static DocumentDto of(Document document, Boolean isAdminChecked) {
 
+            // 관리자 검수 이후면 문서의 최종 정보로 반환
             if (isAdminChecked) {
                 return DocumentDto.builder()
                         .id(document.getId().toString())
@@ -212,13 +213,21 @@ public class ReadAdminOrderDetailResponseDto extends
                         .build();
             }
 
+            // 관리자 검수 이전이면 문서의 초기 정보로 반환
             return DocumentDto.builder()
                     .id(document.getId().toString())
                     .name(document.getInitialName())
                     .pageCount(document.getInitialPageCount())
-                    .pagePrice(document.getPricePolicy().calculateDocumentPrice(document.getInitialPageCount()))
+                    .pagePrice(document.calculateInitialDocumentPrice())
                     .recoveryOption(document.getInitialRecoveryOption())
+                    .recoveryOptionPrice(document.calculateInitialRecoveryOptionPrice())
+                    .isOcrEnabled(document.getInitialIsOcrEnabled())
+                    .ocrPrice(document.calculateInitialOcrPrice())
                     .totalPrice(document.calculateInitialPrice())
+                    .pdfs(document.getPdfs().isEmpty() ? List.of() :
+                            document.getPdfs().stream()
+                                    .map(Pdf::getPdfUrl)
+                                    .toList())
                     .build();
         }
     }

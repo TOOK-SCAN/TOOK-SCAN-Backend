@@ -29,6 +29,7 @@ public class DocumentService {
                 .initialPageCount(pageCount)
                 .initialRecoveryOption(recoveryOption)
                 .isOcrEnabled(isOcrEnabled)
+                .initialIsOcrEnabled(isOcrEnabled)
                 .build();
     }
 

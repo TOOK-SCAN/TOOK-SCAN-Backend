@@ -64,6 +64,9 @@ public class Document extends BaseEntity {
     @Column(name = "initial_recovery_option", nullable = false)
     private ERecoveryOption initialRecoveryOption;
 
+    @Column(name = "initial_is_ocr_enabled", nullable = false)
+    private Boolean initialIsOcrEnabled;
+
     /* -------------------------------------------- */
     /* Many to One Column ------------------------- */
     /* -------------------------------------------- */
@@ -87,7 +90,7 @@ public class Document extends BaseEntity {
     @Builder
     public Document(String name, int pageCount, ERecoveryOption recoveryOption, Order order, PricePolicy pricePolicy,
                     int additionalPrice, EScanStatus scanStatus, String initialName, Integer initialPageCount,
-                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled) {
+                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled, Boolean initialIsOcrEnabled) {
         this.name = name;
         this.pageCount = pageCount;
         this.recoveryOption = recoveryOption;
@@ -99,6 +102,7 @@ public class Document extends BaseEntity {
         this.initialPageCount = initialPageCount;
         this.initialRecoveryOption = initialRecoveryOption;
         this.isOcrEnabled = isOcrEnabled;
+        this.initialIsOcrEnabled = initialIsOcrEnabled;
     }
 
     public void updateName(String name) {
@@ -133,6 +137,10 @@ public class Document extends BaseEntity {
         return pricePolicy.calculateDocumentPrice(pageCount);
     }
 
+    public int calculateInitialDocumentPrice() {
+        return pricePolicy.calculateDocumentPrice(initialPageCount);
+    }
+
     public int calculateOneDayScanPrice() {
         if (!order.getIsOneDayScan()) {
             return 0;
@@ -147,6 +155,13 @@ public class Document extends BaseEntity {
         return pricePolicy.calculateOcrPrice(pageCount);
     }
 
+    public int calculateInitialOcrPrice() {
+        if (!initialIsOcrEnabled) {
+            return 0;
+        }
+        return pricePolicy.calculateOcrPrice(initialPageCount);
+    }
+
     public int calculatePrice() {
         return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled)
                 + additionalPrice;
@@ -156,9 +171,13 @@ public class Document extends BaseEntity {
         return recoveryOption.getPrice();
     }
 
+    public int calculateInitialRecoveryOptionPrice() {
+        return initialRecoveryOption.getPrice();
+    }
+
     public int calculateInitialPrice() {
         return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption,
-                order.getIsOneDayScan(), isOcrEnabled);
+                order.getIsOneDayScan(), initialIsOcrEnabled);
     }
 }
 
