@@ -9,18 +9,19 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum EOrderStatus {
-    APPLY_COMPLETED("신청완료"),
-    COMPANY_ARRIVED("업체도착"),
-    PAYMENT_WAITING("결제대기"),
-    PAYMENT_COMPLETED("결제완료"),
-    SCAN_WAITING("스캔대기"),
-    SCAN_IN_PROGRESS("스캔중"),
-    RECOVERY_IN_PROGRESS("복원작업"),
-    POST_WAITING("발송대기"),
-    ALL_COMPLETED("작업완료"),
-    CANCEL("취소접수");
+    APPLY_COMPLETED("신청완료",1),
+    COMPANY_ARRIVED("업체도착",2),
+    PAYMENT_WAITING("결제대기",3),
+    PAYMENT_COMPLETED("결제완료",4),
+    SCAN_WAITING("스캔대기",5),
+    SCAN_IN_PROGRESS("스캔중",6),
+    RECOVERY_IN_PROGRESS("복원작업",7),
+    POST_WAITING("발송대기",8),
+    ALL_COMPLETED("작업완료",9),
+    CANCEL("취소접수",0);
 
     private final String description;
+    private final Integer code;
 
     public static EOrderStatus fromString(String value) {
         return switch (value.toUpperCase()) {
