@@ -80,7 +80,7 @@ public class ReadAdminOrderDetailResponseDto extends
                 .orderNumber(order.getOrderNumber())
                 .orderStatus(order.getOrderStatus())
                 .createdAt(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
-                .arrivedAt(order.getArrivedAt() == null ? null :
+                .arrivedAt(order.getArrivedAt() == null ? " - " :
                         DateTimeUtil.convertLocalDateTimeToDartString(order.getArrivedAt()))
                 .documentDtos(order.getDocuments().stream()
                         .map(document -> DocumentDto.of(document, isAdminChecked))
