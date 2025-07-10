@@ -86,6 +86,9 @@ public class Order extends BaseEntity {
     @Column(name = "is_as_in_progress", nullable = false)
     private Boolean isAsInProgress = false;
 
+    @Column(name = "arrived_at")
+    private LocalDateTime arrivedAt;
+
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
     /* -------------------------------------------- */
@@ -130,7 +133,9 @@ public class Order extends BaseEntity {
             User user,
             Delivery delivery,
             Coupon coupon,
-            Boolean isOneDayScan
+            Boolean isOneDayScan,
+            Boolean isAsInProgress,
+            LocalDateTime arrivedAt
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
@@ -144,6 +149,8 @@ public class Order extends BaseEntity {
         this.delivery = delivery;
         this.coupon = coupon;
         this.isOneDayScan = isOneDayScan;
+        this.isAsInProgress = isAsInProgress;
+        this.arrivedAt = arrivedAt;
     }
 
     /**
@@ -174,6 +181,10 @@ public class Order extends BaseEntity {
 
     public void updateAsInProgress(Boolean isAsInProgress) {
         this.isAsInProgress = isAsInProgress;
+    }
+
+    public void updateArrivedAt() {
+        this.arrivedAt = LocalDateTime.now();
     }
 
     public void finishPayment(Payment payment) {
