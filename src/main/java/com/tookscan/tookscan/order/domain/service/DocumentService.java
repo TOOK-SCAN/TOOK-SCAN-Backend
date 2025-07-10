@@ -23,7 +23,6 @@ public class DocumentService {
                 .recoveryOption(recoveryOption)
                 .order(order)
                 .pricePolicy(pricePolicy)
-                .additionalPrice(0)
                 .scanStatus(EScanStatus.UNABLE)
                 .initialName(name)
                 .initialPageCount(pageCount)

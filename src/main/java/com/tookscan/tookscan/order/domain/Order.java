@@ -238,6 +238,8 @@ public class Order extends BaseEntity {
 
         Integer amount = getDocumentsTotalAmount();
 
+        amount -= additionalDiscount;
+
         if (coupon != null) {
             amount = coupon.calculatePrice(amount);
         }

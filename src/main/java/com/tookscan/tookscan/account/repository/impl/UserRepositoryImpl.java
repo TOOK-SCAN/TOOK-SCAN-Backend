@@ -193,14 +193,14 @@ public class UserRepositoryImpl implements UserRepository {
             return switch (sort.toLowerCase()) {
                 case "order-count" -> order.count().asc();
                 case "total-pages" -> document.pageCount.sum().asc();
-                case "total-amount" -> document.additionalPrice.sum().asc();
+//                case "total-amount" -> document.additionalPrice.sum().asc(); // TODO: 정렬 기준이 잘못 잡혀있음
                 default -> user.createdAt.desc();
             };
         } else {
             return switch (sort.toLowerCase()) {
                 case "order-count" -> order.count().desc();
                 case "total-pages" -> document.pageCount.sum().desc();
-                case "total-amount" -> document.additionalPrice.sum().desc();
+//                case "total-amount" -> document.additionalPrice.sum().desc() // TODO: 정렬 기준이 잘못잡혀있음
                 default -> user.createdAt.desc();
             };
         }
