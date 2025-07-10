@@ -10,7 +10,7 @@ import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseC
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDocumentsUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
@@ -22,7 +22,7 @@ import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminOrdersReq
 import com.tookscan.tookscan.order.presentation.dto.request.ExportAdminDeliveriesRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDocumentsRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,7 +60,7 @@ public class OrderAdminCommandV1Controller {
     private final UpdateAdminOrdersDeliveriesTrackingNumberUseCase updateAdminOrdersDeliveriesTrackingNumberUseCase;
     private final UpdateAdminOrderDeliveryTrackingNumberUseCase updateAdminOrderDeliveryTrackingNumberUseCase;
     private final DeleteAdminDocumentsUseCase deleteAdminDocumentsUseCase;
-    private final UpdateAdminOrderDocumentsUseCase updateAdminOrderDocumentsUseCase;
+    private final UpdateAdminOrderUseCase updateAdminOrderUseCase;
     private final ExportAdminDeliveriesUseCase exportAdminDeliveriesUseCase;
     private final CreateAdminOrderCouponUseCase createAdminOrderCouponUseCase;
     private final UploadAdminDocumentsPdfUseCase uploadAdminDocumentsPdfUseCase;
@@ -203,12 +203,12 @@ public class OrderAdminCommandV1Controller {
      * 4.4.1 관리자 주문 상세 상품 수정
      */
     @Operation(summary = "관리자 주문 상세 상품 수정", description = "관리자가 주문의 상세 상품을 수정합니다.")
-    @PutMapping(value = "orders/{orderId}/documents")
+    @PutMapping(value = "orders/{orderId}")
     public ResponseDto<Void> updateOrderDocuments(
             @PathVariable Long orderId,
-            @RequestBody @Valid UpdateAdminOrderDocumentsRequestDto requestDto
+            @RequestBody @Valid UpdateAdminOrderRequestDto requestDto
     ) {
-        updateAdminOrderDocumentsUseCase.execute(orderId, requestDto);
+        updateAdminOrderUseCase.execute(orderId, requestDto);
         return ResponseDto.ok(null);
     }
 

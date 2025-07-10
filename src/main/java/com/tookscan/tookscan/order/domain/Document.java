@@ -38,9 +38,6 @@ public class Document extends BaseEntity {
     @Column(name = "page_count", nullable = false)
     private Integer pageCount;
 
-    @Column(name = "additional_price", nullable = false)
-    private Integer additionalPrice;
-
     @Column(name = "scan_task_id")
     private String scanTaskId;
 
@@ -89,14 +86,13 @@ public class Document extends BaseEntity {
     /* -------------------------------------------- */
     @Builder
     public Document(String name, int pageCount, ERecoveryOption recoveryOption, Order order, PricePolicy pricePolicy,
-                    int additionalPrice, EScanStatus scanStatus, String initialName, Integer initialPageCount,
+                    EScanStatus scanStatus, String initialName, Integer initialPageCount,
                     ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled, Boolean initialIsOcrEnabled) {
         this.name = name;
         this.pageCount = pageCount;
         this.recoveryOption = recoveryOption;
         this.order = order;
         this.pricePolicy = pricePolicy;
-        this.additionalPrice = additionalPrice;
         this.scanStatus = scanStatus;
         this.initialName = initialName;
         this.initialPageCount = initialPageCount;
@@ -117,9 +113,6 @@ public class Document extends BaseEntity {
         this.recoveryOption = recoveryOption;
     }
 
-    public void updateAdditionalPrice(int additionalPrice) {
-        this.additionalPrice = additionalPrice;
-    }
 
     public void updateScanStatus(EScanStatus scanStatus) {
         this.scanStatus = scanStatus;
@@ -163,8 +156,7 @@ public class Document extends BaseEntity {
     }
 
     public int calculatePrice() {
-        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled)
-                + additionalPrice;
+        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled);
     }
 
     public int calculateRecoveryOptionPrice() {

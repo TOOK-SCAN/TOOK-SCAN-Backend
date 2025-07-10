@@ -50,6 +50,9 @@ public class Delivery extends BaseEntity {
     @Column(name = "delivery_price", nullable = false)
     private Integer deliveryPrice;
 
+    @Column(name = "is_delivery_free", nullable = false)
+    private Boolean isDeliveryFree = false;
+
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
     /* -------------------------------------------- */
@@ -66,7 +69,7 @@ public class Delivery extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Delivery(String receiverName, String phoneNumber, String email, String request, EDeliveryStatus deliveryStatus, String trackingNumber, Address address, Integer deliveryPrice) {
+    public Delivery(String receiverName, String phoneNumber, String email, String request, EDeliveryStatus deliveryStatus, String trackingNumber, Address address, Integer deliveryPrice, Boolean isDeliveryFree) {
         this.receiverName = receiverName;
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -75,6 +78,7 @@ public class Delivery extends BaseEntity {
         this.trackingNumber = trackingNumber;
         this.address = address;
         this.deliveryPrice = deliveryPrice;
+        this.isDeliveryFree = isDeliveryFree;
     }
 
     public void updateReceiverName(String receiverName) {
@@ -103,5 +107,9 @@ public class Delivery extends BaseEntity {
 
     public void updateDeliveryPrice(Integer deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
+    }
+
+    public void updateIsDeliveryFree(Boolean isDeliveryFree) {
+        this.isDeliveryFree = isDeliveryFree;
     }
 }

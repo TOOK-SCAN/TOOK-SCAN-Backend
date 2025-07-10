@@ -89,6 +89,9 @@ public class Order extends BaseEntity {
     @Column(name = "arrived_at")
     private LocalDateTime arrivedAt;
 
+    @Column(name = "additional_discount", nullable = false)
+    private Integer additionalDiscount = 0;
+
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
     /* -------------------------------------------- */
@@ -135,7 +138,8 @@ public class Order extends BaseEntity {
             Coupon coupon,
             Boolean isOneDayScan,
             Boolean isAsInProgress,
-            LocalDateTime arrivedAt
+            LocalDateTime arrivedAt,
+            Integer additionalDiscount
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
@@ -151,6 +155,7 @@ public class Order extends BaseEntity {
         this.isOneDayScan = isOneDayScan;
         this.isAsInProgress = isAsInProgress;
         this.arrivedAt = arrivedAt;
+        this.additionalDiscount = additionalDiscount;
     }
 
     /**
@@ -185,6 +190,10 @@ public class Order extends BaseEntity {
 
     public void updateArrivedAt() {
         this.arrivedAt = LocalDateTime.now();
+    }
+
+    public void updateAdditionalDiscount(Integer additionalDiscount) {
+        this.additionalDiscount = additionalDiscount;
     }
 
     public void finishPayment(Payment payment) {
@@ -233,7 +242,8 @@ public class Order extends BaseEntity {
             amount = coupon.calculatePrice(amount);
         }
 
-        amount += delivery.getDeliveryPrice();
+        if (!delivery.getIsDeliveryFree())
+         amount += delivery.getDeliveryPrice();
 
         return amount;
     }
