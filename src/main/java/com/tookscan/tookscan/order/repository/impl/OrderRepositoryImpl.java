@@ -53,6 +53,12 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Order findByIdWithDocumentsAndPdfsAndDeliveryOrElseThrow(Long id) {
+        return orderJpaRepository.findByIdWithDocumentsAndPdfsAndDelivery(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
+    }
+
+    @Override
     public List<Order> findAllByIdOrElseThrow(List<Long> ids) {
         List<Order> orders = orderJpaRepository.findAllById(ids);
 

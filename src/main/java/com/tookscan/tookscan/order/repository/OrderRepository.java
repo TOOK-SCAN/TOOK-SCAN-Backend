@@ -65,6 +65,6 @@ public interface OrderRepository {
 
     Order findByIdWithDocumentsOrElseThrow(Long id);
 
-    Order findByIdWithDocumentsAndPdfsOrElseThrow(Long id);
+    Order findByIdWithDocumentsAndPdfsAndDeliveryOrElseThrow(Long id);
 
 }

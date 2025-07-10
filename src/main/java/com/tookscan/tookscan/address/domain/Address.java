@@ -68,6 +68,11 @@ public class Address {
         return this.addressName + " " + this.region1DepthName + " " + this.region2DepthName + " " + this.region3DepthName + " " + this.region4DepthName + " " + this.addressDetail;
     }
 
+    public String getFullAddressWithZoneCode() {
+        return "(" + this.zoneCode + ") " + this.addressName + " " + this.addressDetail;
+
+    }
+
     public void updateAddressName(String addressName) {
         this.addressName = addressName;
     }

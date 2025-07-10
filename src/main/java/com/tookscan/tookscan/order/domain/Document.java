@@ -148,6 +148,10 @@ public class Document extends BaseEntity {
                 + additionalPrice;
     }
 
+    public int calculateRecoveryOptionPrice() {
+        return recoveryOption.getPrice();
+    }
+
     public int calculateInitialPrice() {
         return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption,
                 order.getIsOneDayScan(), isOcrEnabled);
