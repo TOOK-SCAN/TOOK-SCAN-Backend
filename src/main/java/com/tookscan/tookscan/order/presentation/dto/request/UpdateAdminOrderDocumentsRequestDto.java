@@ -13,12 +13,7 @@ public record UpdateAdminOrderDocumentsRequestDto(
         @JsonProperty("documents")
         @NotEmpty(message = "문서를 선택해주세요.")
         @Valid
-        List<DocumentDto> documents,
-
-        @JsonProperty("delivery_price")
-        @NotNull(message = "배송비를 입력해주세요.")
-        @Min(value = 0, message = "배송비는 0 이상이어야 합니다.")
-        Integer deliveryPrice
+        List<DocumentDto> documents
 ) {
     public record DocumentDto(
 
@@ -36,10 +31,6 @@ public record UpdateAdminOrderDocumentsRequestDto(
             @JsonProperty("recovery_option")
             @NotNull(message = "복원 옵션을 입력해주세요.")
             ERecoveryOption recoveryOption,
-
-            @JsonProperty("additional_price")
-            @NotNull(message = "추가 금액을 입력해주세요.")
-            Integer additionalPrice,
 
             @JsonProperty("is_ocr_enabled")
             @NotNull(message = "OCR 사용 여부를 입력해주세요.")

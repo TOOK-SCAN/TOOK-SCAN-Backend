@@ -68,11 +68,9 @@ public class UpdateAdminOrderDocumentsService implements UpdateAdminOrderDocumen
                     document.name(),
                     document.pageCount(),
                     document.recoveryOption(),
-                    document.additionalPrice()
+                    document.isOcrEnabled()
             );
         });
-
-        order.getDelivery().updateDeliveryPrice(requestDto.deliveryPrice());
 
         // 신규 문서 생성
         newDocuments.forEach(document -> {

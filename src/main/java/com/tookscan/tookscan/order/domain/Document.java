@@ -125,6 +125,10 @@ public class Document extends BaseEntity {
         this.scanTaskId = scanTaskId;
     }
 
+    public void updateOcrEnabled(Boolean isOcrEnabled) {
+        this.isOcrEnabled = isOcrEnabled;
+    }
+
     public int calculateDocumentPrice() {
         return pricePolicy.calculateDocumentPrice(pageCount);
     }
