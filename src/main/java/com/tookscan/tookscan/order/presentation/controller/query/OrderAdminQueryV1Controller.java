@@ -8,7 +8,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsScanSta
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDeliveryOverviewUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDocumentsOverviewsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminPaymentOverviewUseCase;
@@ -21,7 +21,7 @@ import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDocumentsS
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDeliveryOverviewResponseDto;
-import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDocumentsOverviewsResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderOverviewsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderSummariesResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminPaymentOverviewResponseDto;
@@ -45,7 +45,7 @@ public class OrderAdminQueryV1Controller {
 
     private final ReadAdminOrderBriefsUseCase readAdminOrderBriefsUseCase;
     private final ReadAdminOrderSummariesUseCase readAdminOrderSummariesUseCase;
-    private final ReadAdminOrderDocumentsOverviewsUseCase readAdminOrderDocumentsOverviewsUseCase;
+    private final ReadAdminOrderDetailUseCase readAdminOrderDetailUseCase;
     private final ReadAdminPaymentOverviewUseCase readAdminPaymentOverviewUseCase;
     private final ReadAdminOrderBriefUseCase readAdminOrderBriefUseCase;
     private final ReadAdminOrderDeliveryOverviewUseCase readAdminOrderDeliveryOverviewUseCase;
@@ -95,14 +95,14 @@ public class OrderAdminQueryV1Controller {
     }
 
     /**
-     * 4.2.8 관리자 주문 상세 상품 조회
+     * 4.2.8 관리자 주문 상세 조회
      */
-    @Operation(summary = "관리자 주문 상세 상품 내역 조회", description = "관리자가 주문 상세 상품 내역을 조회합니다.")
-    @GetMapping("/orders/{orderId}/documents/overviews")
-    public ResponseDto<ReadAdminOrderDocumentsOverviewsResponseDto> readOrderDocumentsOverviews(
+    @Operation(summary = "관리자 주문 상세 조회", description = "관리자가 주문 상세 내역을 조회합니다.")
+    @GetMapping("/orders/{orderId}/details")
+    public ResponseDto<ReadAdminOrderDetailResponseDto> readOrderDocumentsOverviews(
             @PathVariable Long orderId
     ) {
-        return ResponseDto.ok(readAdminOrderDocumentsOverviewsUseCase.execute(orderId));
+        return ResponseDto.ok(readAdminOrderDetailUseCase.execute(orderId));
     }
 
     /**
