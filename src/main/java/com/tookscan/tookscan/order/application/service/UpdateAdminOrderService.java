@@ -74,7 +74,7 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
             );
 
             if (document.customRecoveryOptionPrice() != null) {
-                documentMap.get(document.id()).updateCustomRecoveryOptionPrice(document.customRecoveryOptionPrice());
+                documentMap.get(document.id()).updateRecoveryOptionPrice(document.customRecoveryOptionPrice());
             }
             documentRepository.save(documentMap.get(document.id()));
         });
@@ -90,7 +90,7 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
                     document.isOcrEnabled()
             );
             if (document.customRecoveryOptionPrice() != null) {
-                doc.updateCustomRecoveryOptionPrice(document.customRecoveryOptionPrice());
+                doc.updateRecoveryOptionPrice(document.customRecoveryOptionPrice());
             }
             documentRepository.save(doc);
         });

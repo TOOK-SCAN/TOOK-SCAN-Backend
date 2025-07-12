@@ -64,8 +64,8 @@ public class Document extends BaseEntity {
     @Column(name = "initial_is_ocr_enabled", nullable = false)
     private Boolean initialIsOcrEnabled;
 
-    @Column(name = "custom_recovery_option_price")
-    private Integer customRecoveryOptionPrice = null;
+    @Column(name = "recovery_option_price")
+    private Integer recoveryOptionPrice = null;
 
     /* -------------------------------------------- */
     /* Many to One Column ------------------------- */
@@ -90,7 +90,7 @@ public class Document extends BaseEntity {
     @Builder
     public Document(String name, int pageCount, ERecoveryOption recoveryOption, Order order, PricePolicy pricePolicy,
                     EScanStatus scanStatus, String initialName, Integer initialPageCount,
-                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled, Boolean initialIsOcrEnabled, Integer customRecoveryOptionPrice) {
+                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled, Boolean initialIsOcrEnabled, Integer recoveryOptionPrice) {
         this.name = name;
         this.pageCount = pageCount;
         this.recoveryOption = recoveryOption;
@@ -102,7 +102,7 @@ public class Document extends BaseEntity {
         this.initialRecoveryOption = initialRecoveryOption;
         this.isOcrEnabled = isOcrEnabled;
         this.initialIsOcrEnabled = initialIsOcrEnabled;
-        this.customRecoveryOptionPrice = customRecoveryOptionPrice;
+        this.recoveryOptionPrice = recoveryOptionPrice;
     }
 
     public void updateName(String name) {
@@ -130,8 +130,8 @@ public class Document extends BaseEntity {
         this.isOcrEnabled = isOcrEnabled;
     }
 
-    public void updateCustomRecoveryOptionPrice(Integer customRecoveryOptionPrice) {
-        this.customRecoveryOptionPrice = customRecoveryOptionPrice;
+    public void updateRecoveryOptionPrice(Integer recoveryOptionPrice) {
+        this.recoveryOptionPrice = recoveryOptionPrice;
     }
 
     public int calculateDocumentPrice() {
@@ -164,7 +164,7 @@ public class Document extends BaseEntity {
     }
 
     public int calculatePrice() {
-        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled, customRecoveryOptionPrice);
+        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled, recoveryOptionPrice);
     }
 
     public int calculateRecoveryOptionPrice() {
@@ -177,7 +177,7 @@ public class Document extends BaseEntity {
 
     public int calculateInitialPrice() {
         return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption,
-                order.getIsOneDayScan(), initialIsOcrEnabled, customRecoveryOptionPrice);
+                order.getIsOneDayScan(), initialIsOcrEnabled, recoveryOptionPrice);
     }
 }
 
