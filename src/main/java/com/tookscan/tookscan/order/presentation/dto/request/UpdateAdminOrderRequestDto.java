@@ -54,8 +54,8 @@ public record UpdateAdminOrderRequestDto(
             @NotNull(message = "OCR 사용 여부를 입력해주세요.")
             Boolean isOcrEnabled,
 
-            @JsonProperty("custom_recovery_option_price")
-            Integer customRecoveryOptionPrice
+            @JsonProperty("recovery_option_price")
+            Integer recoveryOptionPrice
     ) {
     }
 }
