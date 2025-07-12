@@ -63,13 +63,17 @@ public class PricePolicy extends BaseEntity {
     }
 
     public int calculatePrice(int pageCount, ERecoveryOption recoveryOption, Boolean isOneDayScan,
-                              Boolean isOcrEnabled) {
+                              Boolean isOcrEnabled, Integer recoveryOptionPrice) {
         int price = 0;
         int pricePerPage = defaultPricePerPage + (isOcrEnabled ? additionalPriceForOcr : 0) +
                 (isOneDayScan ? additionalPriceForOneDayScan : 0);
         price += defaultPrice;
         price += pricePerPage * pageCount;
-        price += recoveryOption.getPrice();
+        if (recoveryOptionPrice != null) {
+            price += recoveryOptionPrice;
+        } else {
+            price += recoveryOption.getPrice();
+        }
         return price;
     }
 

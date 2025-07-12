@@ -95,4 +95,8 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     Page<Order> findAllByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
                                                  Pageable pageable);
+
+    @EntityGraph(attributePaths = {"documents", "documents.pdfs", "delivery"})
+    @Query("SELECT o FROM Order o WHERE o.id = :id")
+    Optional<Order> findByIdWithDocumentsAndPdfsAndDelivery(@Param("id") Long id);
 }

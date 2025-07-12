@@ -9,19 +9,19 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum EOrderStatus {
-    APPLY_COMPLETED("신청완료"),
-    COMPANY_ARRIVED("업체도착"),
-    PAYMENT_WAITING("결제대기"),
-    PAYMENT_COMPLETED("결제완료"),
-    SCAN_WAITING("스캔대기"),
-    SCAN_IN_PROGRESS("스캔중"),
-    RECOVERY_IN_PROGRESS("복원작업"),
-    POST_WAITING("발송대기"),
-    ALL_COMPLETED("작업완료"),
-    CANCEL("취소접수"),
-    AS("A/S 접수");
+    APPLY_COMPLETED("신청완료",1),
+    COMPANY_ARRIVED("업체도착",2),
+    PAYMENT_WAITING("결제대기",3),
+    PAYMENT_COMPLETED("결제완료",4),
+    SCAN_WAITING("스캔대기",5),
+    SCAN_IN_PROGRESS("스캔중",6),
+    RECOVERY_IN_PROGRESS("복원작업",7),
+    POST_WAITING("발송대기",8),
+    ALL_COMPLETED("작업완료",9),
+    CANCEL("취소접수",0);
 
     private final String description;
+    private final Integer code;
 
     public static EOrderStatus fromString(String value) {
         return switch (value.toUpperCase()) {
@@ -35,7 +35,6 @@ public enum EOrderStatus {
             case "POST_WAITING" -> POST_WAITING;
             case "ALL_COMPLETED" -> ALL_COMPLETED;
             case "CANCEL" -> CANCEL;
-            case "AS" -> AS;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
@@ -53,7 +52,6 @@ public enum EOrderStatus {
             case SCAN_WAITING, SCAN_IN_PROGRESS -> SCAN_IN_PROGRESS;
             case RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED -> ALL_COMPLETED;
             case CANCEL -> CANCEL;
-            case AS -> AS;
         };
     }
 
@@ -65,7 +63,6 @@ public enum EOrderStatus {
             case ALL_COMPLETED -> List.of(RECOVERY_IN_PROGRESS, POST_WAITING,
                     ALL_COMPLETED);
             case CANCEL -> List.of(CANCEL);
-            case AS -> List.of(AS);
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
@@ -76,7 +73,6 @@ public enum EOrderStatus {
             case SCAN_IN_PROGRESS -> "스캔중";
             case RECOVERY_IN_PROGRESS, POST_WAITING, ALL_COMPLETED -> "스캔완료";
             case CANCEL -> "취소";
-            case AS -> "A/S";
         };
     }
 

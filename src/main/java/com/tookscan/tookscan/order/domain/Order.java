@@ -59,6 +59,9 @@ public class Order extends BaseEntity {
     @Column(name = "payment_expiration_date")
     private LocalDateTime paymentExpirationDate;
 
+    @Column(name = "pdf_send_date")
+    private LocalDateTime pdfSendDate;
+
     @Column(name = "scan_copyright_compliance_agreed", nullable = false)
     private LocalDateTime scanCopyrightComplianceAgreed;
 
@@ -79,6 +82,15 @@ public class Order extends BaseEntity {
 
     @Column(name = "is_one_day_scan", nullable = false)
     private Boolean isOneDayScan;
+
+    @Column(name = "is_as_in_progress", nullable = false)
+    private Boolean isAsInProgress = false;
+
+    @Column(name = "arrived_at")
+    private LocalDateTime arrivedAt;
+
+    @Column(name = "additional_discount", nullable = false)
+    private Integer additionalDiscount = 0;
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
@@ -124,7 +136,10 @@ public class Order extends BaseEntity {
             User user,
             Delivery delivery,
             Coupon coupon,
-            Boolean isOneDayScan
+            Boolean isOneDayScan,
+            Boolean isAsInProgress,
+            LocalDateTime arrivedAt,
+            Integer additionalDiscount
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
@@ -138,6 +153,9 @@ public class Order extends BaseEntity {
         this.delivery = delivery;
         this.coupon = coupon;
         this.isOneDayScan = isOneDayScan;
+        this.isAsInProgress = isAsInProgress;
+        this.arrivedAt = arrivedAt;
+        this.additionalDiscount = additionalDiscount;
     }
 
     /**
@@ -160,6 +178,22 @@ public class Order extends BaseEntity {
 
     public void updateIsOneDayScan(Boolean isOneDayScan) {
         this.isOneDayScan = isOneDayScan;
+    }
+
+    public void updatePdfSendDate(LocalDateTime pdfSendDate) {
+        this.pdfSendDate = pdfSendDate;
+    }
+
+    public void updateAsInProgress(Boolean isAsInProgress) {
+        this.isAsInProgress = isAsInProgress;
+    }
+
+    public void updateArrivedAt() {
+        this.arrivedAt = LocalDateTime.now();
+    }
+
+    public void updateAdditionalDiscount(Integer additionalDiscount) {
+        this.additionalDiscount = additionalDiscount;
     }
 
     public void finishPayment(Payment payment) {
@@ -192,15 +226,26 @@ public class Order extends BaseEntity {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 
+    public Integer getInitialDocumentsTotalAmount() {
+
+        return documents.stream()
+                .map(Document::calculateInitialPrice)
+                .reduce(Integer::sum)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+    }
+
     public int getTotalAmount() {
 
         Integer amount = getDocumentsTotalAmount();
+
+        amount -= additionalDiscount;
 
         if (coupon != null) {
             amount = coupon.calculatePrice(amount);
         }
 
-        amount += delivery.getDeliveryPrice();
+        if (!delivery.getIsDeliveryFree())
+         amount += delivery.getDeliveryPrice();
 
         return amount;
     }
@@ -256,5 +301,10 @@ public class Order extends BaseEntity {
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
     }
 
+    public Boolean hasRecoveryOption() {
+        return documents.stream()
+                .anyMatch(document -> document.getRecoveryOption() != null
+                        && document.getRecoveryOption() != ERecoveryOption.DISCARD);
+    }
 
 }

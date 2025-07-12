@@ -23,12 +23,12 @@ public class DocumentService {
                 .recoveryOption(recoveryOption)
                 .order(order)
                 .pricePolicy(pricePolicy)
-                .additionalPrice(0)
                 .scanStatus(EScanStatus.UNABLE)
                 .initialName(name)
                 .initialPageCount(pageCount)
                 .initialRecoveryOption(recoveryOption)
                 .isOcrEnabled(isOcrEnabled)
+                .initialIsOcrEnabled(isOcrEnabled)
                 .build();
     }
 
@@ -37,11 +37,11 @@ public class DocumentService {
             String name,
             int pageCount,
             ERecoveryOption recoveryOption,
-            int additionalPrice
+            boolean isOcrEnabled
     ) {
         document.updateName(name);
         document.updatePageCount(pageCount);
         document.updateRecoveryOption(recoveryOption);
-        document.updateAdditionalPrice(additionalPrice);
+        document.updateOcrEnabled(isOcrEnabled);
     }
 }

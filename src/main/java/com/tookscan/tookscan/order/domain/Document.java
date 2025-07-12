@@ -38,9 +38,6 @@ public class Document extends BaseEntity {
     @Column(name = "page_count", nullable = false)
     private Integer pageCount;
 
-    @Column(name = "additional_price", nullable = false)
-    private Integer additionalPrice;
-
     @Column(name = "scan_task_id")
     private String scanTaskId;
 
@@ -64,6 +61,12 @@ public class Document extends BaseEntity {
     @Column(name = "initial_recovery_option", nullable = false)
     private ERecoveryOption initialRecoveryOption;
 
+    @Column(name = "initial_is_ocr_enabled", nullable = false)
+    private Boolean initialIsOcrEnabled;
+
+    @Column(name = "recovery_option_price")
+    private Integer recoveryOptionPrice = null;
+
     /* -------------------------------------------- */
     /* Many to One Column ------------------------- */
     /* -------------------------------------------- */
@@ -86,19 +89,20 @@ public class Document extends BaseEntity {
     /* -------------------------------------------- */
     @Builder
     public Document(String name, int pageCount, ERecoveryOption recoveryOption, Order order, PricePolicy pricePolicy,
-                    int additionalPrice, EScanStatus scanStatus, String initialName, Integer initialPageCount,
-                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled) {
+                    EScanStatus scanStatus, String initialName, Integer initialPageCount,
+                    ERecoveryOption initialRecoveryOption, Boolean isOcrEnabled, Boolean initialIsOcrEnabled, Integer recoveryOptionPrice) {
         this.name = name;
         this.pageCount = pageCount;
         this.recoveryOption = recoveryOption;
         this.order = order;
         this.pricePolicy = pricePolicy;
-        this.additionalPrice = additionalPrice;
         this.scanStatus = scanStatus;
         this.initialName = initialName;
         this.initialPageCount = initialPageCount;
         this.initialRecoveryOption = initialRecoveryOption;
         this.isOcrEnabled = isOcrEnabled;
+        this.initialIsOcrEnabled = initialIsOcrEnabled;
+        this.recoveryOptionPrice = recoveryOptionPrice;
     }
 
     public void updateName(String name) {
@@ -113,9 +117,6 @@ public class Document extends BaseEntity {
         this.recoveryOption = recoveryOption;
     }
 
-    public void updateAdditionalPrice(int additionalPrice) {
-        this.additionalPrice = additionalPrice;
-    }
 
     public void updateScanStatus(EScanStatus scanStatus) {
         this.scanStatus = scanStatus;
@@ -125,8 +126,20 @@ public class Document extends BaseEntity {
         this.scanTaskId = scanTaskId;
     }
 
+    public void updateOcrEnabled(Boolean isOcrEnabled) {
+        this.isOcrEnabled = isOcrEnabled;
+    }
+
+    public void updateRecoveryOptionPrice(Integer recoveryOptionPrice) {
+        this.recoveryOptionPrice = recoveryOptionPrice;
+    }
+
     public int calculateDocumentPrice() {
         return pricePolicy.calculateDocumentPrice(pageCount);
+    }
+
+    public int calculateInitialDocumentPrice() {
+        return pricePolicy.calculateDocumentPrice(initialPageCount);
     }
 
     public int calculateOneDayScanPrice() {
@@ -143,14 +156,28 @@ public class Document extends BaseEntity {
         return pricePolicy.calculateOcrPrice(pageCount);
     }
 
+    public int calculateInitialOcrPrice() {
+        if (!initialIsOcrEnabled) {
+            return 0;
+        }
+        return pricePolicy.calculateOcrPrice(initialPageCount);
+    }
+
     public int calculatePrice() {
-        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled)
-                + additionalPrice;
+        return pricePolicy.calculatePrice(pageCount, recoveryOption, order.getIsOneDayScan(), isOcrEnabled, recoveryOptionPrice);
+    }
+
+    public int calculateRecoveryOptionPrice() {
+        return recoveryOption.getPrice();
+    }
+
+    public int calculateInitialRecoveryOptionPrice() {
+        return initialRecoveryOption.getPrice();
     }
 
     public int calculateInitialPrice() {
         return pricePolicy.calculatePrice(initialPageCount, initialRecoveryOption,
-                order.getIsOneDayScan(), isOcrEnabled);
+                order.getIsOneDayScan(), initialIsOcrEnabled, recoveryOptionPrice);
     }
 }
 

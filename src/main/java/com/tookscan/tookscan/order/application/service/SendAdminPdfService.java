@@ -10,12 +10,12 @@ import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
     @Transactional
     public void execute(Long orderId) {
 
-        Order order = orderRepository.findByIdWithDocumentsAndPdfsOrElseThrow(orderId);
+        Order order = orderRepository.findByIdWithDocumentsAndPdfsAndDeliveryOrElseThrow(orderId);
 
         kakaoMessageUtil.sendAnnounceScanFinishMessage(
                 order.getUserName(),
@@ -54,6 +54,8 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
                         pdfUrls
                 )
         );
+
+        order.updatePdfSendDate(LocalDateTime.now());
 
         // 이후 배송할일이 없다면(모든 문서가 폐기라면)
         if (order.getDocuments().stream()

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum ERecoveryOption {
     DISCARD("폐기", 0),
     RAW("원본", 0),
-    SPRING("스프링", 4000);
+    SPRING("스프링", 3000);
 
     private final String description;
     private final Integer price;

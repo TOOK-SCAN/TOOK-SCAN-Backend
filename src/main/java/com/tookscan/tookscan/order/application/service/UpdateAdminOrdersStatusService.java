@@ -32,7 +32,12 @@ public class UpdateAdminOrdersStatusService implements UpdateAdminOrdersStatusUs
         List<Order> orders = orderRepository.findAllByIdOrElseThrow(requestDto.orderIds());
 
         orders.forEach(
-                order -> order.updateOrderStatus(requestDto.status())
+                order -> {
+                    order.updateOrderStatus(requestDto.status());
+                    if (requestDto.status().equals(EOrderStatus.COMPANY_ARRIVED)) {
+                        order.updateArrivedAt();
+                    }
+                }
         );
 
         orderRepository.saveAll(orders);

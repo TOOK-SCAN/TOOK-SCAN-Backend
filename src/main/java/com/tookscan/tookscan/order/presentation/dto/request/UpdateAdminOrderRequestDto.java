@@ -9,16 +9,29 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
-public record UpdateAdminOrderDocumentsRequestDto(
+public record UpdateAdminOrderRequestDto(
         @JsonProperty("documents")
         @NotEmpty(message = "문서를 선택해주세요.")
         @Valid
         List<DocumentDto> documents,
 
+        @JsonProperty("is_one_day_scan")
+        @NotNull(message = "원데이 스캔 여부를 입력해주세요.")
+        Boolean isOneDayScan,
+
         @JsonProperty("delivery_price")
         @NotNull(message = "배송비를 입력해주세요.")
-        @Min(value = 0, message = "배송비는 0 이상이어야 합니다.")
-        Integer deliveryPrice
+        Integer deliveryPrice,
+
+        @JsonProperty("is_delivery_free")
+        @NotNull(message = "무료 배송 여부를 입력해주세요.")
+        Boolean isDeliveryFree,
+
+        @JsonProperty("additional_coupon_discount")
+        @NotNull(message = "추가 쿠폰 할인 금액을 입력해주세요.")
+        @Min(value = 0, message = "추가 쿠폰 할인 금액은 0 이상이어야 합니다.")
+        Integer additionalCouponDiscount
+
 ) {
     public record DocumentDto(
 
@@ -37,13 +50,12 @@ public record UpdateAdminOrderDocumentsRequestDto(
             @NotNull(message = "복원 옵션을 입력해주세요.")
             ERecoveryOption recoveryOption,
 
-            @JsonProperty("additional_price")
-            @NotNull(message = "추가 금액을 입력해주세요.")
-            Integer additionalPrice,
-
             @JsonProperty("is_ocr_enabled")
             @NotNull(message = "OCR 사용 여부를 입력해주세요.")
-            Boolean isOcrEnabled
+            Boolean isOcrEnabled,
+
+            @JsonProperty("recovery_option_price")
+            Integer recoveryOptionPrice
     ) {
     }
 }

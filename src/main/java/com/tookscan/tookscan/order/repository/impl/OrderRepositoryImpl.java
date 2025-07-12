@@ -9,6 +9,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import java.time.LocalDate;
@@ -48,6 +49,12 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order findByIdOrElseThrow(Long id) {
         return orderJpaRepository.findById(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
+    }
+
+    @Override
+    public Order findByIdWithDocumentsAndPdfsAndDeliveryOrElseThrow(Long id) {
+        return orderJpaRepository.findByIdWithDocumentsAndPdfsAndDelivery(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
     }
 
@@ -148,7 +155,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Page<Long> findOrderOverviews(String startDate, String endDate,
                                          String search, String searchType, String sort, Direction direction,
-                                         Pageable pageable, EOrderStatus orderStatus) {
+                                         Pageable pageable, EOrderStatus orderStatus, Boolean isOneDayScan,
+                                         Boolean hasRecoveryOption, Boolean isAsInProgress, Boolean isInProgress) {
         QOrder order = QOrder.order;
 
         // 검색 조건 동적 생성
@@ -157,6 +165,48 @@ public class OrderRepositoryImpl implements OrderRepository {
         // orderStatus가 null이 아닐 때만 필터링 추가
         if (orderStatus != null) {
             predicate = predicate.and(order.orderStatus.eq(orderStatus));
+        }
+
+        // isOneDayScan 필터링
+        if (isOneDayScan != null) {
+            predicate = predicate.and(order.isOneDayScan.eq(isOneDayScan));
+        }
+
+        // hasRecoveryOption 필터링
+        if (hasRecoveryOption != null) {
+            if (hasRecoveryOption) {
+                // documents 중 recoveryOption != DISCARD 인 게 하나라도 있는 주문
+                predicate = predicate.and(
+                        order.documents.any()
+                                .recoveryOption.ne(ERecoveryOption.DISCARD)
+                );
+            } else {
+                // 모든 documents 의 recoveryOption 이 DISCARD 인 주문
+                predicate = predicate.and(
+                        order.documents.any()
+                                .recoveryOption.ne(ERecoveryOption.DISCARD)
+                                .not()
+                );
+            }
+        }
+
+        // isAsInProgress 필터링
+        if (isAsInProgress != null) {
+            predicate = predicate.and(order.isAsInProgress.eq(isAsInProgress));
+        }
+
+        if (isInProgress != null) {
+            if (isInProgress) {
+                // 진행 중인 상태(취소·완료 제외)
+                predicate = predicate.and(
+                        order.orderStatus.notIn(EOrderStatus.CANCEL, EOrderStatus.ALL_COMPLETED)
+                );
+            } else {
+                // 진행 중이 아닌 상태(취소 혹은 전부 완료)
+                predicate = predicate.and(
+                        order.orderStatus.in(EOrderStatus.CANCEL, EOrderStatus.ALL_COMPLETED)
+                );
+            }
         }
 
         // 데이터 조회
@@ -317,12 +367,6 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Order findByIdWithDocumentsOrElseThrow(Long id) {
         return orderJpaRepository.findByIdWithDocuments(id)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
-    }
-
-    @Override
-    public Order findByIdWithDocumentsAndPdfsOrElseThrow(Long id) {
-        return orderJpaRepository.findByIdWithDocumentsAndPdf(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
     }
 
