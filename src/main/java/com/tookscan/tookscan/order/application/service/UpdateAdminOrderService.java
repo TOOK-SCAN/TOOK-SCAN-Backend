@@ -72,6 +72,11 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
                     document.recoveryOption(),
                     document.isOcrEnabled()
             );
+
+            if (document.customRecoveryOptionPrice() != null) {
+                documentMap.get(document.id()).updateCustomRecoveryOptionPrice(document.customRecoveryOptionPrice());
+            }
+            documentRepository.save(documentMap.get(document.id()));
         });
 
         // 신규 문서 생성
@@ -84,6 +89,9 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
                     order.getDocuments().get(0).getPricePolicy(),
                     document.isOcrEnabled()
             );
+            if (document.customRecoveryOptionPrice() != null) {
+                doc.updateCustomRecoveryOptionPrice(document.customRecoveryOptionPrice());
+            }
             documentRepository.save(doc);
         });
 
