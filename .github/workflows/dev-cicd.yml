@@ -128,7 +128,7 @@ jobs:
             docker run -d \
               --name api-$NEXT \
               --env-file /home/ubuntu/.env.dev \
-              -p $PORT:8080 \
+              -p $PORT \
               -v /etc/localtime:/etc/localtime:ro \
               -v /etc/timezone:/etc/timezone:ro \
               --network ${{ secrets.DOCKER_NETWORKNAME }} \

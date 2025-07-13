@@ -137,3 +137,51 @@ docker-compose -f docker-compose.local.yml up --build -d
 - 커밋 컨벤션: `type/#issue-number: description`
 - 코드 스타일: 기존 코드 패턴 준수
 - 테스트: 새로운 기능 추가 시 테스트 코드 작성 필수
+
+# Claude Code 프롬프트 모음
+
+## Issue 생성 프롬프트
+
+다음 정보를 기반으로 GitHub Issue를 생성하고 branch를 생성해 주세요.
+
+1. 기본 정보:
+
+- 조직 이름: TOOK-SCAN
+- 레포지토리 이름: TOOK-SCAN-Backend
+
+2. 이슈 제목 및 내용:
+
+- '.github/ISSUE_TEMPLATE/' 디렉터리 내부 파일 형식에 맞춰 작성
+    - 새로운 기능 추가: `feature.md` 파일 참고 (✨ Feature - 접두사)
+    - 버그 수정: `fix.md` 파일 참고 (🔨 Fix - 접두사)
+    - 코드 리팩토링: `refactor.md` 파일 참고 (♻️ Refactor - 접두사)
+    - 문서 수정: `docs.md` 파일 참고 (📃 Docs - 접두사)
+    - 설정 수정: `setting.md` 파일 참고 (⚙️ Setting - 접두사)
+    - 테스트 관련: `test.md` 파일 참고 (✅ Test - 접두사)
+    - 배포 관련: `deploy.md` 파일 참고 (🌏 Deploy - 접두사)
+    - 크로스 브라우징: `crossBrowsing.md` 파일 참고 (💻 CrossBrowsing - 접두사)
+
+3. 브랜치 이름:
+
+- 브랜치 이름은 `Type/#이슈번호` 형식으로 생성합니다.
+- Type은 대문자로 시작합니다 (Feature, Fix, Refactor, Docs, Setting, Test, Deploy, CrossBrowsing)
+- 예시: `Feature/#123`, `Fix/#456`
+
+## PR 생성 프롬프트
+
+다음 정보를 기반으로 GitHub PR을 생성해 주세요.
+
+1. 기본 정보:
+
+- 조직 이름: TOOK-SCAN
+- 레포지토리 이름: TOOK-SCAN-Backend
+- 타겟 브랜치: dev
+
+2. PR 제목:
+
+- 규칙: PR 제목은 이슈 제목과 동일하게 작성합니다.
+
+3. PR 내용:
+
+- '.github/pull_request_template.md' 파일 형식에 맞춰 작성
+- 현재 브랜치의 변경사항을 반영하여 상세하게 작성

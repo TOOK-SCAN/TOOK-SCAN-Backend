@@ -5,6 +5,9 @@
 .vscode/*
 run-local.sh
 
+### ignore claude ###
+.claude/
+
 ### ignore env ###
 .env
 .env.*
