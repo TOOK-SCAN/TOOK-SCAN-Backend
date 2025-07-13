@@ -19,6 +19,8 @@ public interface OrderRepository {
 
     Order findByIdOrElseThrow(Long id);
 
+    Order findWithPricePolicyByIdOrElseThrow(Long id);
+
     List<Order> findAllByIdOrElseThrow(List<Long> ids);
 
     List<Order> findAllByOrderStatusDateBetweenOrElseThrow(LocalDateTime startDate, LocalDateTime endDate,
@@ -48,6 +50,8 @@ public interface OrderRepository {
                                                                  Direction direction);
 
     Order findByOrderNumberOrElseThrow(String orderNumber);
+
+    Order findWithDeliveryByOrderNumberOrElseThrow(String orderNumber);
 
     List<Order> findAllByUserIds(List<UUID> userIds);
 

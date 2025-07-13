@@ -48,6 +48,18 @@ public class KakaoMessageUtil {
     @Value("${solapi.sender}")
     private String sender;
 
+    @Value("${solapi.tip-url}")
+    private String tipUrl;
+
+    @Value("${solapi.payment-url}")
+    private String paymentUrl;
+
+    @Value("${solapi.order-detail-url}")
+    private String orderDetailUrl;
+
+    @Value("${solapi.order-waybill-url}")
+    private String orderWaybillUrl;
+
     public KakaoMessageUtil(
             @Value("${solapi.api-key}") String apiKey,
             @Value("${solapi.api-secret}") String apiSecret,
@@ -56,13 +68,15 @@ public class KakaoMessageUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, url);
     }
 
-    public void sendCreateOrderMessage(String userName, String orderName, String to) {
+    public void sendCreateOrderMessage(String userName, String userPhone, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put("#{userName}", userName);
+        variables.put("#{userPhone}", userPhone);
         variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{tipUrl}", tipUrl);
 
         kakaoOption.setVariables(variables);
 
@@ -78,25 +92,16 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(ESecurityRole role, String userName, String orderName, String orderNumber, Long orderId, String to) {
+    public void sendRequestPaymentMessage(String orderName, Integer orderPrice, Long orderId, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
 
-        switch (role) {
-            case USER -> {
-                variables.put("#{paymentPath}", "로그인 > 마이페이지 > 결제하기");
-                variables.put("#{paymentUrl}", pathForUser);
-            }
-            case GUEST -> {
-                variables.put("#{paymentPath}", "비회원 주문조회 > 주문 정보 입력 > 결제하기");
-                variables.put("#{paymentUrl}", pathForGuest + "order=" + orderNumber + "&name=" + userName + "&id=" + orderId);
-            }
-            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
-        }
-        variables.put("#{userName}", userName);
         variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{orderPrice}", String.valueOf(orderPrice));
+        variables.put("#{paymentUrl}", paymentUrl + orderId);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
 
         kakaoOption.setVariables(variables);
 
@@ -112,25 +117,15 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestScanMessage(ESecurityRole role, String userName, String orderNumber, String orderName, Long orderId, String to) {
+    public void sendRequestScanMessage(String orderName, Long orderId, String userEmail, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
 
         variables.put("#{orderName}", "[" + orderName + "]");
-
-        switch (role) {
-            case USER -> {
-                variables.put("#{scanPath}", "로그인 > 마이페이지 > 스캔하기");
-                variables.put("#{scanUrl}", pathForUser);
-            }
-            case GUEST -> {
-                variables.put("#{scanPath}", "비회원 주문조회 > 주문 정보 입력 > 스캔하기");
-                variables.put("#{scanUrl}", pathForGuest + "order=" + orderNumber + "&name=" + userName + "&id=" + orderId);
-            }
-            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
-        }
+        variables.put("#{userEmail}", userEmail);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
 
         kakaoOption.setVariables(variables);
 
@@ -145,13 +140,13 @@ public class KakaoMessageUtil {
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendAnnounceScanFinishMessage(String userName, String orderName, String to) {
+    public void sendAnnounceScanFinishMessage(String userEmail, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{userName}", userName);
         variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{userEmail}", userEmail);
         kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
@@ -165,9 +160,17 @@ public class KakaoMessageUtil {
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendAnnounceDeliveryMessage(String to) {
+    public void sendAnnounceDeliveryMessage(String orderName, String orderWaybill, Long orderId, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
+
+        HashMap<String, String> variables = new HashMap<>();
+        variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{orderWaybill}", orderWaybill);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
+        variables.put("#{orderWaybillUrl}", orderWaybillUrl + orderId);
+
+        kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
         kakaoOption.setTemplateId(templateIdAnnounceDelivery);

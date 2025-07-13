@@ -51,7 +51,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
         PaymentDto response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendPost(tossConfirmApiUrl, requestHeaders, payload));
 
-        Order order = orderRepository.findByOrderNumberOrElseThrow(requestDto.orderNumber());
+        Order order = orderRepository.findWithDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
 
         Payment payment = paymentService.createPayment(
                 response.paymentKey(),
@@ -76,11 +76,9 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
             // 스캔 요청 메시지 전송
             kakaoMessageUtil.sendRequestScanMessage(
-                    order.getRole(),
-                    order.getUserName(),
-                    order.getOrderNumber(),
                     order.getDocumentsDescription(),
                     order.getId(),
+                    order.getDelivery().getEmail(),
                     order.getPhoneNumber()
             );
         }

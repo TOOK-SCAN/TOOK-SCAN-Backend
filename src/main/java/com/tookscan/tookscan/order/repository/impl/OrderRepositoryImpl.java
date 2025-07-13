@@ -53,6 +53,12 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Order findWithPricePolicyByIdOrElseThrow(Long id) {
+        return orderJpaRepository.findWithPricePolicyById(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
+    }
+
+    @Override
     public Order findByIdWithDocumentsAndDeliveryOrElseThrow(Long id) {
         return orderJpaRepository.findByIdWithDocumentsAndDelivery(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
@@ -263,6 +269,12 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Order findByOrderNumberOrElseThrow(String orderNumber) {
+        return orderJpaRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 번호: " + orderNumber));
+    }
+
+    @Override
+    public Order findWithDeliveryByOrderNumberOrElseThrow(String orderNumber) {
         return orderJpaRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 번호: " + orderNumber));
     }
