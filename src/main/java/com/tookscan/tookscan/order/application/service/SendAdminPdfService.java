@@ -36,7 +36,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         Order order = orderRepository.findByIdWithDocumentsAndDeliveryOrElseThrow(orderId);
 
         kakaoMessageUtil.sendAnnounceScanFinishMessage(
-                order.getUserName(),
+                order.getDelivery().getEmail(),
                 order.getDocumentsDescription(),
                 order.getPhoneNumber()
         );

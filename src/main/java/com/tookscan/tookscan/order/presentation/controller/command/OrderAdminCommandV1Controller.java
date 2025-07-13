@@ -15,6 +15,7 @@ import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPay
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
+import com.tookscan.tookscan.order.application.usecase.ValidateAdminPdfUseCase;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminDocumentsRequestDto;
@@ -24,6 +25,7 @@ import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeli
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ValidateAdminPdfResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -64,6 +66,7 @@ public class OrderAdminCommandV1Controller {
     private final ExportAdminDeliveriesUseCase exportAdminDeliveriesUseCase;
     private final CreateAdminOrderCouponUseCase createAdminOrderCouponUseCase;
     private final UploadAdminDocumentsPdfUseCase uploadAdminDocumentsPdfUseCase;
+    private final ValidateAdminPdfUseCase validateAdminPdfUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -86,6 +89,18 @@ public class OrderAdminCommandV1Controller {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(excelBytes.length)
                 .body(resource);
+    }
+
+    /**
+     * 4.1.4 관리자 PDF 워터마크 검수
+     */
+    @Operation(summary = "관리자 PDF 워터마크 검수", description = "관리자가 PDF 파일에 워터마크를 검수합니다.")
+    @PostMapping(value = "/pdfs/validation")
+    public ResponseDto<ValidateAdminPdfResponseDto> validatePdf(
+            @RequestParam("file") MultipartFile file
+    ) {
+
+        return ResponseDto.ok(validateAdminPdfUseCase.execute(file));
     }
 
     /**

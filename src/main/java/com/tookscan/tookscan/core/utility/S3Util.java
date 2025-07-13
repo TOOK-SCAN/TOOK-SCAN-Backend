@@ -11,6 +11,9 @@ import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -53,6 +56,12 @@ public class S3Util {
 
     @Value("${cloud.aws.cloudfront.key-id}")
     private String keyId;
+
+    @Value("${cloud.aws.s3.default-path}")
+    private String s3DefaultPath;
+
+    @Value("${cloud.aws.cloudfront.path}")
+    private String cloudFrontPath;
 
     /**
      * S3 key를 전달받아 해당 객체의 최종 URL을 반환 (AmazonS3Client가 제공하는 기본 메서드를 사용)
@@ -145,23 +154,25 @@ public class S3Util {
      * @param document 업로드할 PDF 파일에 대한 정보를 가진 Document 객체
      * @param file     업로드할 MultipartFile
      */
-    public String uploadPdf(Document document, MultipartFile file) {
+    public String uploadPdf(Document document, File file) {
         String finalKey = PDF_CONTENT_PREFIX
                 + document.getOrder().getId() + '/'
                 + document.getName() + '_' + document.getId() + ".pdf";
         try {
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(file.getSize());
-            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.length());
+            metadata.setContentType("application/pdf");
 
-            amazonS3Client.putObject(bucketName, finalKey, file.getInputStream(), metadata);
+            try (InputStream inputStream = new FileInputStream(file)) {
+                amazonS3Client.putObject(bucketName, finalKey, inputStream, metadata);
+            }
 
-            return amazonS3Client.getUrl(bucketName, finalKey).toString();
+            String directUrl = amazonS3Client.getUrl(bucketName, finalKey).toString();
+            return directUrl.replace(s3DefaultPath, cloudFrontPath);
         } catch (IOException e) {
             throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
-
     /**
      * CloudFront 서명 URL을 생성합니다. 이 방법은 PEM 키 파일을 jar 내부에서 읽어 PrivateKey 객체로 파싱하여 사용합니다.
      */

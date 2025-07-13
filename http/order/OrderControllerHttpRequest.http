@@ -37,8 +37,7 @@ Authorization: Bearer {{access_token}}
 
 ### 결제 요청
 //@no-log
-PATCH {{host_url}}/v1/admins/orders/15/payment-requests
-Authorization: Bearer {{access_token}}
+PATCH {{host_url}}/v1/admins/orders/732253863457092131/payment-requests
 
 ### PDF 전송
 //@no-log
@@ -54,3 +53,29 @@ Authorization: Bearer {{access_token}}
 //@no-log
 GET {{host_url}}/v1/admins/orders/688623424943448498/payments/overviews
 Authorization: Bearer {{access_token}}
+
+### 관리자 주문 상세 조회
+//@no-log
+GET {{host_url}}/v1/admins/orders/732163380529619446/details
+
+### 관리자 pdf 업로드
+//@no-log
+POST {{host_url}}/v1/admins/documents/732163380542202321/pdfs
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="test.pdf"
+Content-Type: application/pdf
+
+< /Users/kyeom/Desktop/Project/PDF-Watermark/src/main/resources/test.pdf
+
+### 관리자 PDF 워터마크 검수
+//@no-log
+POST {{host_url}}/v1/admins/pdfs/validation
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="new_test.pdf"
+Content-Type: application/pdf
+
+< /Users/kyeom/Desktop/tset_732163380542202321.pdf

@@ -139,8 +139,10 @@ cloud:
         expiration-seconds: ${S3_PDF_EXPIRATION_SECONDS}
       mail-template-images:
         url: ${S3_MAIL_TEMPLATE_URL}
+      default-path: ${S3_DEFAULT_PATH}
     cloudfront:
       domain: ${CLOUDFRONT_DOMAIN}
+      path: ${CLOUDFRONT_PATH}
       private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
       key-id: ${CLOUDFRONT_KEY_ID}
 
@@ -198,6 +200,11 @@ solapi:
   path-for-user: ${SOLAPI_PATH_FOR_USER}
   path-for-guest: ${SOLAPI_PATH_FOR_GUEST}
   sender: ${SOLAPI_SENDER}
+  tip-url: ${SOLAPI_TIP_URL}
+  payment-url: ${SOLAPI_PAYMENT_URL}
+  order-detail-url: ${SOLAPI_ORDER_DETAIL_URL}
+  order-waybill-url: ${SOLAPI_ORDER_WAYBILL_URL}
+
 
 # === Admin 계정 공통 설정 ===
 admin:
@@ -214,3 +221,6 @@ rest:
 slack:
   webhook:
     url: ${SLACK_WEBHOOK_URL}
+
+# === AES 암호화 공통 설정 ===
+aes-key: ${AES_KEY}
