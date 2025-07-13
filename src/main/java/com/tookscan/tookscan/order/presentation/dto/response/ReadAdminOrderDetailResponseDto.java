@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class ReadAdminOrderDetailResponseDto extends
@@ -73,7 +74,8 @@ public class ReadAdminOrderDetailResponseDto extends
         this.validateSelf();
     }
 
-    public static ReadAdminOrderDetailResponseDto fromEntity(Order order) {
+    public static ReadAdminOrderDetailResponseDto fromEntity(Order order,
+                                                            Map<Document, List<Pdf>> documentPdfsMap) {
 
         boolean isAdminChecked = order.getOrderStatus().getCode() >= EOrderStatus.APPLY_COMPLETED.getCode();
         return ReadAdminOrderDetailResponseDto.builder()
@@ -82,8 +84,9 @@ public class ReadAdminOrderDetailResponseDto extends
                 .createdAt(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
                 .arrivedAt(order.getArrivedAt() == null ? " - " :
                         DateTimeUtil.convertLocalDateTimeToDartString(order.getArrivedAt()))
+                .userDto(UserDto.fromEntity(order))
                 .documentDtos(order.getDocuments().stream()
-                        .map(document -> DocumentDto.of(document, isAdminChecked))
+                        .map(document -> DocumentDto.of(document, isAdminChecked, documentPdfsMap.get(document)))
                         .toList())
                 .paymentInfoDto(PaymentInfoDto.fromEntity(order))
                 .orderMemo(order.getMemo())
@@ -192,7 +195,8 @@ public class ReadAdminOrderDetailResponseDto extends
             this.validateSelf();
         }
 
-        public static DocumentDto of(Document document, Boolean isAdminChecked) {
+        public static DocumentDto of(Document document, Boolean isAdminChecked,
+                                     List<Pdf> pdfs) {
 
             // 관리자 검수 이후면 문서의 최종 정보로 반환
             if (isAdminChecked) {
@@ -206,8 +210,8 @@ public class ReadAdminOrderDetailResponseDto extends
                         .isOcrEnabled(document.getIsOcrEnabled())
                         .ocrPrice(document.calculateOcrPrice())
                         .totalPrice(document.calculatePrice())
-                        .pdfs(document.getPdfs().isEmpty() ? List.of() :
-                                document.getPdfs().stream()
+                        .pdfs(pdfs.isEmpty() ? List.of() :
+                                pdfs.stream()
                                         .map(Pdf::getPdfUrl)
                                         .toList())
                         .build();

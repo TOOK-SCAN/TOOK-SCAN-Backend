@@ -6,10 +6,17 @@ import com.tookscan.tookscan.order.repository.mysql.PdfJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class PdfRepositoryImpl implements PdfRepository {
     private final PdfJpaRepository pdfJpaRepository;
+
+    @Override
+    public List<Pdf> findAllByDocumentId(Long documentId) {
+        return pdfJpaRepository.findAllByDocumentId(documentId);
+    }
 
     @Override
     public void save(Pdf pdf) {
