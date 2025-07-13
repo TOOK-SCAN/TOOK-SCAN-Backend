@@ -31,7 +31,7 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
     @Transactional
     public void execute(Long orderId, UpdateAdminOrderRequestDto requestDto) {
         // 주문(Order) 엔티티 조회
-        Order order = orderRepository.findByIdWithDocumentsAndPdfsAndDeliveryOrElseThrow(orderId);
+        Order order = orderRepository.findByIdWithDocumentsAndDeliveryOrElseThrow(orderId);
         Set<Long> orderDocumentIds = order.getDocuments().stream()
                 .map(Document::getId)
                 .collect(Collectors.toSet());
