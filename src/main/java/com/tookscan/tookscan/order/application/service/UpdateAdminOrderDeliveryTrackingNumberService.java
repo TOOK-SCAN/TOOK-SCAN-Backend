@@ -9,6 +9,8 @@ import com.tookscan.tookscan.order.repository.DeliveryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +28,17 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
 
         deliveryRepository.save(delivery);
 
-        // 운송장 등록 메세지 전송
-        kakaoMessageUtil.sendAnnounceDeliveryMessage(
-                delivery.getPhoneNumber()
-        );
-
-
-        // 감사 메세지 전송
-        kakaoMessageUtil.sendThanksForUsingMessage(
-                delivery.getPhoneNumber()
-        );
+        // 운송장 등록 메세지 전송 및 감사 메세지 전송
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                kakaoMessageUtil.sendAnnounceDeliveryMessage(
+                        delivery.getPhoneNumber()
+                );
+                kakaoMessageUtil.sendThanksForUsingMessage(
+                        delivery.getPhoneNumber()
+                );
+            }
+        });
     }
 }

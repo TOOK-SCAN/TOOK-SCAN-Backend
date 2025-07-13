@@ -9,6 +9,8 @@ import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +31,20 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
         order.updateOrderStatus(EOrderStatus.PAYMENT_WAITING);
         orderService.updatePaymentExpirationDate(order);
 
-        kakaoMessageUtil.sendRequestPaymentMessage(
-                order.getRole(),
-                order.getUserName(),
-                order.getDocumentsDescription(),
-                order.getOrderNumber(),
-                order.getId(),
-                order.getPhoneNumber()
-        );
+        // 결제 요청 메세지 전송
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                kakaoMessageUtil.sendRequestPaymentMessage(
+                        order.getRole(),
+                        order.getUserName(),
+                        order.getDocumentsDescription(),
+                        order.getOrderNumber(),
+                        order.getId(),
+                        order.getPhoneNumber()
+                );
+            }
+        });
 
         orderRepository.save(order);
     }

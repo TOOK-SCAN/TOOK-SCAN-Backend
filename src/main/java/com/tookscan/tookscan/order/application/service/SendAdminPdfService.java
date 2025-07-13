@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -64,9 +66,14 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             orderRepository.save(order);
 
             // 감사 메세지 전송
-            kakaoMessageUtil.sendThanksForUsingMessage(
-                    order.getPhoneNumber()
-            );
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    kakaoMessageUtil.sendThanksForUsingMessage(
+                            order.getPhoneNumber()
+                    );
+                }
+            });
         } else {
             order.updateOrderStatus(EOrderStatus.RECOVERY_IN_PROGRESS);
             orderRepository.save(order);

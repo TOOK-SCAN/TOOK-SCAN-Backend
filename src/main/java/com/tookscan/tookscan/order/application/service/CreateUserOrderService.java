@@ -30,6 +30,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -122,12 +124,16 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                     documentRepository.save(document);
         });
 
-        // 주문 접수 문자 발송
-        kakaoMessageUtil.sendCreateOrderMessage(
-                user.getName(),
-                order.getDocumentsDescription(),
-                user.getPhoneNumber()
-        );
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                kakaoMessageUtil.sendCreateOrderMessage(
+                        user.getName(),
+                        order.getDocumentsDescription(),
+                        user.getPhoneNumber()
+                );
+            }
+        });
 
         return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber())
                 .orderId(order.getId().toString()).build();
