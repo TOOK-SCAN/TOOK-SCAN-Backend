@@ -153,9 +153,9 @@ public class Order extends BaseEntity {
         this.delivery = delivery;
         this.coupon = coupon;
         this.isOneDayScan = isOneDayScan;
-        this.isAsInProgress = isAsInProgress;
+        this.isAsInProgress = isAsInProgress != null ? isAsInProgress : false;
         this.arrivedAt = arrivedAt;
-        this.additionalDiscount = additionalDiscount;
+        this.additionalDiscount = additionalDiscount != null ? additionalDiscount : 0;
     }
 
     /**
