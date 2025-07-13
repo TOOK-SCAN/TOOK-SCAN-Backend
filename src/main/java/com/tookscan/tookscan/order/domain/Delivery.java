@@ -78,7 +78,7 @@ public class Delivery extends BaseEntity {
         this.trackingNumber = trackingNumber;
         this.address = address;
         this.deliveryPrice = deliveryPrice;
-        this.isDeliveryFree = isDeliveryFree;
+        this.isDeliveryFree = isDeliveryFree != null ? isDeliveryFree : false;
     }
 
     public void updateReceiverName(String receiverName) {
