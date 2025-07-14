@@ -11,21 +11,22 @@ import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.account.repository.mysql.UserJpaRepository;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.order.domain.QDocument;
+import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
 
 @Repository
 @RequiredArgsConstructor
@@ -92,8 +93,8 @@ public class UserRepositoryImpl implements UserRepository {
             predicate = predicate.and(user.provider.eq(provider));
         }
 
-        if (status != null && (status.equals("enrolled") || !status.equals("withdrew"))) {
-            if( status.equals("enrolled")) {
+        if (status != null && (status.equals("enrolled") || status.equals("withdrawn"))) {
+            if(status.equals("enrolled")) {
                 predicate = predicate.and(user.deletedAt.isNull());
             } else {
                 predicate = predicate.and(user.deletedAt.isNotNull());
@@ -178,7 +179,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     private OrderSpecifier<?> resolveUserSort(QUser user, String sort, Direction direction) {
         if (direction.isAscending()) {
-            return switch (sort.toLowerCase()) {
+            return switch (sort) {
                 case "created-at" -> user.createdAt.asc();
                 case "name" -> user.name.asc();
                 case "email" -> user.email.asc();
@@ -186,7 +187,7 @@ public class UserRepositoryImpl implements UserRepository {
                 default -> user.createdAt.asc();
             };
         } else {
-            return switch (sort.toLowerCase()) {
+            return switch (sort) {
                 case "created-at" -> user.createdAt.desc();
                 case "name" -> user.name.desc();
                 case "email" -> user.email.desc();

@@ -9,8 +9,6 @@ import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -73,8 +77,14 @@ public class ReadAdminUserOverviewService implements ReadAdminUserOverviewUseCas
         // User 리스트 조회
         List<User> users = userRepository.findByIdsWithDetails(userIds);
 
+        Map<UUID, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+        List<User> sortedUsers = userIds.stream()
+                .map(userMap::get)
+                .toList();
+
         return ReadAdminUserOverviewResponseDto.of(
-                users,
+                sortedUsers,
                 orders,
                 PageInfoDto.fromEntity(userIdsPage)
         );
