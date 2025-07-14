@@ -38,7 +38,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                 kakaoMessageUtil.sendRequestPaymentMessage(
                         order.getDocumentsDescription(),
                         order.getTotalAmount(),
-                        order.getId(),
+                        order.getOrderNumber(),
                         order.getPhoneNumber()
                 );
             }

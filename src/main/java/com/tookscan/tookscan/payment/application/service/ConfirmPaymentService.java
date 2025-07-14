@@ -77,7 +77,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             // 스캔 요청 메시지 전송
             kakaoMessageUtil.sendRequestScanMessage(
                     order.getDocumentsDescription(),
-                    order.getId(),
+                    order.getOrderNumber(),
                     order.getDelivery().getEmail(),
                     order.getPhoneNumber()
             );

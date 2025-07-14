@@ -92,7 +92,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(String orderName, Integer orderPrice, Long orderId, String to) {
+    public void sendRequestPaymentMessage(String orderName, Integer orderPrice, String orderNumber, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -100,8 +100,8 @@ public class KakaoMessageUtil {
 
         variables.put("#{orderName}", "[" + orderName + "]");
         variables.put("#{orderPrice}", String.valueOf(orderPrice));
-        variables.put("#{paymentUrl}", paymentUrl + orderId);
-        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
+        variables.put("#{paymentUrl}", paymentUrl + orderNumber);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
 
         kakaoOption.setVariables(variables);
 
@@ -117,7 +117,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestScanMessage(String orderName, Long orderId, String userEmail, String to) {
+    public void sendRequestScanMessage(String orderName, String orderNumber, String userEmail, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -125,7 +125,7 @@ public class KakaoMessageUtil {
 
         variables.put("#{orderName}", "[" + orderName + "]");
         variables.put("#{userEmail}", userEmail);
-        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
 
         kakaoOption.setVariables(variables);
 
@@ -160,15 +160,17 @@ public class KakaoMessageUtil {
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendAnnounceDeliveryMessage(String orderName, String orderWaybill, Long orderId, String to) {
+    public void sendAnnounceDeliveryMessage(String orderName, String orderWaybill, String orderNumber, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
+
+        String waybillUrl = orderWaybillUrl.replace("{orderNumber}", orderNumber);
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put("#{orderName}", "[" + orderName + "]");
         variables.put("#{orderWaybill}", orderWaybill);
-        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
-        variables.put("#{orderWaybillUrl}", orderWaybillUrl + orderId);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
+        variables.put("#{orderWaybillUrl}", waybillUrl);
 
         kakaoOption.setVariables(variables);
 
