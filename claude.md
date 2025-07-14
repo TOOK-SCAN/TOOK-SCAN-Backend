@@ -161,11 +161,24 @@ docker-compose -f docker-compose.local.yml up --build -d
     - 배포 관련: `deploy.md` 파일 참고 (🌏 Deploy - 접두사)
     - 크로스 브라우징: `crossBrowsing.md` 파일 참고 (💻 CrossBrowsing - 접두사)
 
-3. 브랜치 이름:
+3. 브랜치 생성:
 
+- GitHub API로 원격 저장소에 브랜치를 생성합니다 (dev 브랜치 기준)
 - 브랜치 이름은 `Type/#이슈번호` 형식으로 생성합니다.
 - Type은 대문자로 시작합니다 (Feature, Fix, Refactor, Docs, Setting, Test, Deploy, CrossBrowsing)
 - 예시: `Feature/#123`, `Fix/#456`
+
+4. 로컬 작업 환경 설정:
+
+브랜치 생성 후 로컬에서 다음 명령어를 실행하여 작업 환경을 설정해야 합니다:
+
+```bash
+# 1. 원격 저장소의 최신 정보 가져오기 (새로 생성된 브랜치 포함)
+git fetch origin
+
+# 2. 원격 브랜치로 이동 (로컬 브랜치 자동 생성 및 추적)
+git checkout "Type/#이슈번호"
+```
 
 ## PR 생성 프롬프트
 
