@@ -7,7 +7,6 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.payment.domain.Payment;
-import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,7 +37,7 @@ import org.hibernate.annotations.Where;
 public class Order extends BaseEntity {
 
     /* -------------------------------------------- */
-    /* Information Column ------------------------- */
+    /* Basic Order Information ------------------- */
     /* -------------------------------------------- */
     @Column(name = "order_number", nullable = false, unique = true)
     private String orderNumber;
@@ -47,12 +46,12 @@ public class Order extends BaseEntity {
     @Column(name = "order_status", nullable = false)
     private EOrderStatus orderStatus;
 
-    @Column(name = "is_by_user", nullable = false)
-    private boolean isByUser;
-
     @Column(name = "memo", length = 500)
     private String memo;
 
+    /* -------------------------------------------- */
+    /* Date & Time Information -------------------- */
+    /* -------------------------------------------- */
     @Column(name = "delivery_expiration_date", nullable = false)
     private LocalDateTime deliveryExpirationDate;
 
@@ -62,6 +61,12 @@ public class Order extends BaseEntity {
     @Column(name = "pdf_send_date")
     private LocalDateTime pdfSendDate;
 
+    @Column(name = "arrived_at")
+    private LocalDateTime arrivedAt;
+
+    /* -------------------------------------------- */
+    /* Agreement Information --------------------- */
+    /* -------------------------------------------- */
     @Column(name = "scan_copyright_compliance_agreed", nullable = false)
     private LocalDateTime scanCopyrightComplianceAgreed;
 
@@ -80,21 +85,32 @@ public class Order extends BaseEntity {
     @Column(name = "took_scan_assistance_agreed")
     private LocalDateTime tookScanAssistanceAgreed;
 
+    /* -------------------------------------------- */
+    /* Service Options ---------------------------- */
+    /* -------------------------------------------- */
     @Column(name = "is_one_day_scan", nullable = false)
     private Boolean isOneDayScan;
 
     @Column(name = "is_as_in_progress", nullable = false)
-    private Boolean isAsInProgress = false;
+    private Boolean isAsInProgress;
 
-    @Column(name = "arrived_at")
-    private LocalDateTime arrivedAt;
+    /* -------------------------------------------- */
+    /* Price Information -------------------------- */
+    /* -------------------------------------------- */
 
-    @Column(name = "additional_discount", nullable = false)
-    private Integer additionalDiscount = 0;
+    @Column(name = "additional_price_for_one_day_scan", nullable = false)
+    private Integer additionalPriceForOneDayScan;
+
+    @Column(name = "total_amount", nullable = false)
+    private Integer totalAmount;
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
     /* -------------------------------------------- */
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "initial_order_id")
+    private InitialOrder initialOrder;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "delivery_id", nullable = false)
     private Delivery delivery;
@@ -127,7 +143,6 @@ public class Order extends BaseEntity {
     public Order(
             String orderNumber,
             EOrderStatus orderStatus,
-            boolean isByUser,
             LocalDateTime deliveryExpirationDate,
             LocalDateTime scanCopyrightComplianceAgreed,
             LocalDateTime illegalDistributionProhibitionAgreed,
@@ -139,11 +154,11 @@ public class Order extends BaseEntity {
             Boolean isOneDayScan,
             Boolean isAsInProgress,
             LocalDateTime arrivedAt,
-            Integer additionalDiscount
+            Integer totalAmount,
+            Integer additionalPriceForOneDayScan
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
-        this.isByUser = isByUser;
         this.deliveryExpirationDate = deliveryExpirationDate;
         this.scanCopyrightComplianceAgreed = scanCopyrightComplianceAgreed;
         this.illegalDistributionProhibitionAgreed = illegalDistributionProhibitionAgreed;
@@ -153,16 +168,16 @@ public class Order extends BaseEntity {
         this.delivery = delivery;
         this.coupon = coupon;
         this.isOneDayScan = isOneDayScan;
-        this.isAsInProgress = isAsInProgress != null ? isAsInProgress : false;
+        this.isAsInProgress = isAsInProgress;
         this.arrivedAt = arrivedAt;
-        this.additionalDiscount = additionalDiscount != null ? additionalDiscount : 0;
+        this.totalAmount = totalAmount;
+        this.additionalPriceForOneDayScan = additionalPriceForOneDayScan;
     }
 
-    /**
-     * 주문 상태를 변경합니다.
-     *
-     * @param orderStatus 변경할 주문 상태
-     */
+    public void createMemo(String memo) {
+        this.memo = memo;
+    }
+
     public void updateOrderStatus(EOrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
@@ -179,7 +194,6 @@ public class Order extends BaseEntity {
     public void updateIsOneDayScan(Boolean isOneDayScan) {
         this.isOneDayScan = isOneDayScan;
     }
-
     public void updatePdfSendDate(LocalDateTime pdfSendDate) {
         this.pdfSendDate = pdfSendDate;
     }
@@ -188,17 +202,16 @@ public class Order extends BaseEntity {
         this.isAsInProgress = isAsInProgress;
     }
 
-    public void updateArrivedAt() {
-        this.arrivedAt = LocalDateTime.now();
-    }
-
-    public void updateAdditionalDiscount(Integer additionalDiscount) {
-        this.additionalDiscount = additionalDiscount;
-    }
-
-    public void finishPayment(Payment payment) {
-        this.orderStatus = EOrderStatus.PAYMENT_COMPLETED;
+    public void updatePayment(Payment payment) {
         this.payment = payment;
+    }
+
+    public void updateArrivedAt(LocalDateTime arrivedAt) {
+        this.arrivedAt = arrivedAt;
+    }
+
+    public void updateInitialOrder(InitialOrder initialOrder) {
+        this.initialOrder = initialOrder;
     }
 
     public String getDocumentsDescription() {
@@ -218,36 +231,24 @@ public class Order extends BaseEntity {
         return documentName + " 외 " + (documents.size() - 1) + "건";
     }
 
+
     public Integer getDocumentsTotalAmount() {
 
         return documents.stream()
-                .map(Document::calculatePrice)
+                .map(Document::getTotalAmount)
                 .reduce(Integer::sum)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 
-    public Integer getInitialDocumentsTotalAmount() {
-
+    public Integer getDocumentsPrice() {
         return documents.stream()
-                .map(Document::calculateInitialPrice)
+                .map(Document::getDocumentPrice)
                 .reduce(Integer::sum)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 
-    public int getTotalAmount() {
-
-        Integer amount = getDocumentsTotalAmount();
-
-        amount -= additionalDiscount;
-
-        if (coupon != null) {
-            amount = coupon.calculatePrice(amount);
-        }
-
-        if (!delivery.getIsDeliveryFree())
-         amount += delivery.getDeliveryPrice();
-
-        return amount;
+    public Boolean getIsAdminChecked() {
+        return orderStatus.getCode() >= EOrderStatus.COMPANY_ARRIVED.getCode();
     }
 
     public int getDiscountAmount() {
@@ -257,54 +258,26 @@ public class Order extends BaseEntity {
         return coupon.getDiscountPrice(getDocumentsTotalAmount());
     }
 
-    public void createMemo(String memo) {
-        this.memo = memo;
-    }
-
-    public String getPdfUrls() {
-        if (documents.isEmpty()) {
-            throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
-        }
-
-        return documents.stream()
-                .map(doc -> {
-                    List<Pdf> pdfs = doc.getPdfs();
-                    String content = doc.getName() + " :<br />";
-                    for (Pdf pdf : pdfs) {
-                        if (pdf.getPdfUrl() != null) {
-                            content += "<a href=\"" + pdf.getPdfUrl() + "\" target=\"_blank\">" +
-                                    pdf.getPdfUrl() + "</a> <br />";
-                        } else {
-                            content += "PDF URL이 없습니다. <br />";
-                        }
-                    }
-                    return content;
-                })
-                .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
-    }
-
-    public String getUserName() {
-        return user != null ? user.getName() : delivery.getReceiverName();
-    }
-
-    public String getPhoneNumber() {
-        return user != null ? user.getPhoneNumber() : delivery.getPhoneNumber();
-    }
-
-    public ESecurityRole getRole() {
-        return user != null ? ESecurityRole.USER : ESecurityRole.GUEST;
-    }
-
     public boolean isDelivery() {
         return documents.stream()
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
     }
 
-    public Boolean hasRecoveryOption() {
-        return documents.stream()
-                .anyMatch(document -> document.getRecoveryOption() != null
-                        && document.getRecoveryOption() != ERecoveryOption.DISCARD);
+
+    public void calculateTotalAmount() {
+        documents.forEach(Document::calculateTotalAmount);
+
+        int total = getDocumentsTotalAmount();
+
+        if (coupon != null) {
+            total = coupon.calculatePrice(total);
+        }
+
+        if (isDelivery()) {
+            total += delivery.getDeliveryPrice();
+        }
+
+        this.totalAmount = total;
     }
 
 }

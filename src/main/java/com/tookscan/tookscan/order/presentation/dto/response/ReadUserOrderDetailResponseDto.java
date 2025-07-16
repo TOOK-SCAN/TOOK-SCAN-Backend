@@ -174,13 +174,13 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .documentPrice(document.calculateDocumentPrice())
+                    .documentPrice(document.getDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .isOcrEnabled(document.getIsOcrEnabled())
-                    .recoveryPrice(document.getRecoveryOption().getPrice())
-                    .oneDayScanPrice(document.calculateOneDayScanPrice())
-                    .ocrPrice(document.calculateOcrPrice())
-                    .cuttingPrice(document.getPricePolicy().getDefaultPrice())
+                    .recoveryPrice(document.getRecoveryOptionPrice())
+                    .oneDayScanPrice(document.getOneDayScanPrice())
+                    .ocrPrice(document.getOcrPrice())
+                    .cuttingPrice(document.getCuttingPrice())
                     .build();
         }
     }

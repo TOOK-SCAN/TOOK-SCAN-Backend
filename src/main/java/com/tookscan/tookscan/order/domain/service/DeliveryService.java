@@ -42,6 +42,10 @@ public class DeliveryService {
         delivery.updateRequest(request);
         delivery.updateTrackingNumber(trackingNumber);
         delivery.updateAddress(address);
+    }
 
+    public void updateDeliveryPrice(Delivery delivery, Integer deliveryPrice) {
+        delivery.updateDeliveryPrice(deliveryPrice);
+        delivery.getOrder().calculateTotalAmount();
     }
 }

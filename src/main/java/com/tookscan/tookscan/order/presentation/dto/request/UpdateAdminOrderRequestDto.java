@@ -3,7 +3,6 @@ package com.tookscan.tookscan.order.presentation.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,16 +20,7 @@ public record UpdateAdminOrderRequestDto(
 
         @JsonProperty("delivery_price")
         @NotNull(message = "배송비를 입력해주세요.")
-        Integer deliveryPrice,
-
-        @JsonProperty("is_delivery_free")
-        @NotNull(message = "무료 배송 여부를 입력해주세요.")
-        Boolean isDeliveryFree,
-
-        @JsonProperty("additional_coupon_discount")
-        @NotNull(message = "추가 쿠폰 할인 금액을 입력해주세요.")
-        @Min(value = 0, message = "추가 쿠폰 할인 금액은 0 이상이어야 합니다.")
-        Integer additionalCouponDiscount
+        Integer deliveryPrice
 
 ) {
     public record DocumentDto(

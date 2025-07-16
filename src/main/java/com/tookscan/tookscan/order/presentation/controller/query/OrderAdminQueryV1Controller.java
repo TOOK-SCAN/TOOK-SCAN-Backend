@@ -5,14 +5,12 @@ import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUse
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderSummariesUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDocumentsPdfsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderOverviewsResponseDto;
-import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderSummariesResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderAdminQueryV1Controller {
 
     private final ReadAdminOrderBriefsUseCase readAdminOrderBriefsUseCase;
-    private final ReadAdminOrderSummariesUseCase readAdminOrderSummariesUseCase;
     private final ReadAdminOrderDetailUseCase readAdminOrderDetailUseCase;
     private final ReadAdminOrderOverviewsUseCase readAdminOrderOverviewsUseCase;
     private final ReadStatisticsSummariesUseCase readStatisticsSummariesUseCase;
@@ -45,24 +42,6 @@ public class OrderAdminQueryV1Controller {
     @GetMapping("/orders/briefs")
     public ResponseDto<ReadAdminOrderBriefsResponseDto> readOrderBriefs() {
         return ResponseDto.ok(readAdminOrderBriefsUseCase.execute());
-    }
-
-    /**
-     * 4.2.6 관리자 주문 리스트 요약 정보 조회
-     */
-    @Operation(summary = "관리자 주문 리스트 요약 정보 조회", description = "관리자가 주문 리스트 요약 정보를 조회합니다.")
-    @GetMapping("/orders/summaries")
-    public ResponseDto<ReadAdminOrderSummariesResponseDto> readOrderSummaries(
-            @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
-            @RequestParam(value = "start-date", required = false) String startDate,
-            @RequestParam(value = "end-date", required = false) String endDate,
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "search-type", required = false) String searchType,
-            @RequestParam(value = "sort", defaultValue = "order-date") String sort,
-            @RequestParam(value = "direction", defaultValue = "ASC") Direction direction
-    ) {
-        return ResponseDto.ok(readAdminOrderSummariesUseCase.execute(page, size, startDate, endDate, search, searchType, sort, direction));
     }
 
     /**

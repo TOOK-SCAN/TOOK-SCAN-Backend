@@ -36,12 +36,9 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
             @Override
             public void afterCommit() {
                 kakaoMessageUtil.sendRequestPaymentMessage(
-                        order.getRole(),
-                        order.getUserName(),
+                        order.getDelivery().getPhoneNumber(),
                         order.getDocumentsDescription(),
-                        order.getOrderNumber(),
-                        order.getId(),
-                        order.getPhoneNumber()
+                        order.getDelivery().getPhoneNumber()
                 );
             }
         });

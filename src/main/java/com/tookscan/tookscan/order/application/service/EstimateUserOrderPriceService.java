@@ -70,7 +70,8 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         );
 
         // 주문 생성
-        Order order = orderService.createOrder(user, true, delivery, coupon, requestDto.isOneDayScan());
+        Order order = orderService.createOrder(user, delivery, coupon, requestDto.isOneDayScan(),
+                pricePolicy.getAdditionalPriceForOneDayScan());
 
         // 쿠폰 적용
         if (coupon != null) {
@@ -85,7 +86,9 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
                     doc.pageCount(),
                     doc.recoveryOption(),
                     order,
-                    pricePolicy,
+                    pricePolicy.getCuttingPrice(),
+                    pricePolicy.getDefaultPricePerPage(),
+                    pricePolicy.getAdditionalPriceForOcr(),
                     doc.isOcrEnabled()
             );
             if (doc.isChecked()) {
