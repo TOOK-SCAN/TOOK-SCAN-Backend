@@ -1,8 +1,6 @@
 package com.tookscan.tookscan.core.utility;
 
-import com.tookscan.tookscan.core.exception.error.ErrorCode;
-import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.security.domain.type.ESecurityRole;
+import java.util.HashMap;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.KakaoOption;
 import net.nurigo.sdk.message.model.Message;
@@ -10,8 +8,6 @@ import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
 
 @Component
 public class KakaoMessageUtil {
@@ -78,23 +74,13 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(ESecurityRole role, String userName, String orderName, String orderNumber, Long orderId, String to) {
+    public void sendRequestPaymentMessage(String userName, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-
-        switch (role) {
-            case USER -> {
-                variables.put("#{paymentPath}", "로그인 > 마이페이지 > 결제하기");
-                variables.put("#{paymentUrl}", pathForUser);
-            }
-            case GUEST -> {
-                variables.put("#{paymentPath}", "비회원 주문조회 > 주문 정보 입력 > 결제하기");
-                variables.put("#{paymentUrl}", pathForGuest + "order=" + orderNumber + "&name=" + userName + "&id=" + orderId);
-            }
-            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
-        }
+        variables.put("#{paymentPath}", "로그인 > 마이페이지 > 결제하기");
+        variables.put("#{paymentUrl}", pathForUser);
         variables.put("#{userName}", userName);
         variables.put("#{orderName}", "[" + orderName + "]");
 
@@ -112,25 +98,15 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestScanMessage(ESecurityRole role, String userName, String orderNumber, String orderName, Long orderId, String to) {
+    public void sendRequestScanMessage(String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
 
         variables.put("#{orderName}", "[" + orderName + "]");
-
-        switch (role) {
-            case USER -> {
-                variables.put("#{scanPath}", "로그인 > 마이페이지 > 스캔하기");
-                variables.put("#{scanUrl}", pathForUser);
-            }
-            case GUEST -> {
-                variables.put("#{scanPath}", "비회원 주문조회 > 주문 정보 입력 > 스캔하기");
-                variables.put("#{scanUrl}", pathForGuest + "order=" + orderNumber + "&name=" + userName + "&id=" + orderId);
-            }
-            default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
-        }
+        variables.put("#{scanPath}", "로그인 > 마이페이지 > 스캔하기");
+        variables.put("#{scanUrl}", pathForUser);
 
         kakaoOption.setVariables(variables);
 

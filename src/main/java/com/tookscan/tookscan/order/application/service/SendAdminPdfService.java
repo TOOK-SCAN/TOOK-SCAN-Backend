@@ -7,6 +7,7 @@ import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.service.PdfService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -28,6 +29,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
     private final KakaoMessageUtil kakaoMessageUtil;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final PdfService pdfService;
 
     @Override
     @Transactional
@@ -36,9 +38,9 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         Order order = orderRepository.findByIdWithDocumentsAndDeliveryOrElseThrow(orderId);
 
         kakaoMessageUtil.sendAnnounceScanFinishMessage(
-                order.getUserName(),
+                order.getDelivery().getPhoneNumber(),
                 order.getDocumentsDescription(),
-                order.getPhoneNumber()
+                order.getDelivery().getPhoneNumber()
         );
 
         List<Document> documents = order.getDocuments();
@@ -47,7 +49,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
         }
 
-        String pdfUrls = order.getPdfUrls();
+        String pdfUrls = pdfService.getPdfUrls(order.getDocuments());
 
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(
@@ -70,7 +72,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
                 @Override
                 public void afterCommit() {
                     kakaoMessageUtil.sendThanksForUsingMessage(
-                            order.getPhoneNumber()
+                            order.getDelivery().getPhoneNumber()
                     );
                 }
             });

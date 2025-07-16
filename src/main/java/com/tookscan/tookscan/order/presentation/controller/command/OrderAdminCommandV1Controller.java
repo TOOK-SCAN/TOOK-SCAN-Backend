@@ -11,6 +11,7 @@ import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
@@ -56,6 +57,7 @@ public class OrderAdminCommandV1Controller {
     private final DeleteAdminOrdersUseCase deleteAdminOrdersUseCase;
     private final UpdateAdminOrderDeliveryUseCase updateAdminOrderDeliveryUseCase;
     private final SendAdminPdfUseCase sendAdminPdfUseCase;
+    private final UpdateAdminOrderStatusCompanyArrivedUseCase updateAdminOrderStatusCompanyArrivedUseCase;
     private final UpdateAdminOrderStatusPaymentWaitingUseCase updateAdminOrderStatusPaymentWaitingUseCase;
     private final UpdateAdminOrdersDeliveriesTrackingNumberUseCase updateAdminOrdersDeliveriesTrackingNumberUseCase;
     private final UpdateAdminOrderDeliveryTrackingNumberUseCase updateAdminOrderDeliveryTrackingNumberUseCase;
@@ -163,7 +165,19 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
-     * 4.3.6 관리자 결제 요청
+     * 4.3.6 관리자 업체 도착 상태 변경
+     */
+    @Operation(summary = "관리자 업체 도착 상태 변경", description = "관리자가 주문 상태를 업체 도착으로 변경합니다.")
+    @PatchMapping(value = "/orders/{id}/company-arrived")
+    public ResponseDto<Void> updateOrderStatusCompanyArrived(
+            @PathVariable Long id
+    ) {
+        updateAdminOrderStatusCompanyArrivedUseCase.execute(id);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 4.3.7 관리자 결제 요청
      */
     @Operation(summary = "관리자 결제 요청", description = "관리자가 주문에 대해 결제를 요청합니다.")
     @PatchMapping(value = "/orders/{id}/payment-requests")

@@ -14,19 +14,18 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.QDocument;
 import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -202,14 +201,14 @@ public class UserRepositoryImpl implements UserRepository {
             return switch (sort.toLowerCase()) {
                 case "order-count" -> order.count().asc();
                 case "total-pages" -> document.pageCount.sum().asc();
-//                case "total-amount" -> document.additionalPrice.sum().asc(); // TODO: 정렬 기준이 잘못 잡혀있음
+                case "total-amount" -> order.totalAmount.sum().asc();
                 default -> user.createdAt.desc();
             };
         } else {
             return switch (sort.toLowerCase()) {
                 case "order-count" -> order.count().desc();
                 case "total-pages" -> document.pageCount.sum().desc();
-//                case "total-amount" -> document.additionalPrice.sum().desc() // TODO: 정렬 기준이 잘못잡혀있음
+                case "total-amount" -> order.totalAmount.sum().desc();
                 default -> user.createdAt.desc();
             };
         }

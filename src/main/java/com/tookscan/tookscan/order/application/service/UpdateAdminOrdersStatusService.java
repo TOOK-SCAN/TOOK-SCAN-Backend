@@ -2,22 +2,23 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UpdateAdminOrdersStatusService implements UpdateAdminOrdersStatusUseCase {
 
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
     @Override
     @Transactional
@@ -33,10 +34,7 @@ public class UpdateAdminOrdersStatusService implements UpdateAdminOrdersStatusUs
 
         orders.forEach(
                 order -> {
-                    order.updateOrderStatus(requestDto.status());
-                    if (requestDto.status().equals(EOrderStatus.COMPANY_ARRIVED)) {
-                        order.updateArrivedAt();
-                    }
+                    orderService.updateOrderStatus(order, requestDto.status());
                 }
         );
 

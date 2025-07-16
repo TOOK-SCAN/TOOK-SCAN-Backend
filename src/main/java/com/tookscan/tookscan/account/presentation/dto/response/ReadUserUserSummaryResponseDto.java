@@ -50,7 +50,7 @@ public class ReadUserUserSummaryResponseDto extends SelfValidating<ReadUserUserS
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail() != null ? user.getEmail() : null)
                 .address(user.getAddress() != null ? AddressResponseDto.fromEntity(user.getAddress()) : null)
-                .deliveryRequest(user.getDeliveryRequest())
+                .deliveryRequest(user.getDeliveryRequest() != null ? user.getDeliveryRequest() : null)
                 .build();
     }
 }

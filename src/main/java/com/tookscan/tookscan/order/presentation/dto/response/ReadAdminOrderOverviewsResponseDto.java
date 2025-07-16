@@ -132,7 +132,7 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
             return OrderOverviewsDto.builder()
                     .orderId(order.getId().toString())
                     .orderNumber(order.getOrderNumber())
-                    .name(order.isByUser() ? order.getUser().getName() : order.getDelivery().getReceiverName())
+                    .name(order.getDelivery().getReceiverName())
                     .orderStatus(order.getOrderStatus())
                     .paymentAmount(
                             order.getPayment() == null ? null : order.getPayment().getTotalAmount())
@@ -144,12 +144,14 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                             : DateTimeUtil.convertLocalDateToDartString(
                                     order.getPayment().getApprovedAt().toLocalDate()))
                     .documents(DocumentsDto.fromEntities(order.getDocuments()))
-                    .predictedPrice(order.getInitialDocumentsTotalAmount())
+                    .predictedPrice(order.getIsAdminChecked()
+                            ? order.getInitialOrder().getTotalAmount()
+                            : order.getTotalAmount())
                     .pdfSendDate(order.getPdfSendDate() == null ? null
                             : DateTimeUtil.convertLocalDateToDartString(
                                     order.getPdfSendDate().toLocalDate()))
                     .isOneDayScan(order.getIsOneDayScan())
-                    .hasRecoveryOption(order.hasRecoveryOption())
+                    .hasRecoveryOption(order.isDelivery())
                     .trackingNumber(order.getDelivery().getTrackingNumber() == null ? null
                             : order.getDelivery().getTrackingNumber())
                     .isAsInProgress(order.getIsAsInProgress())
@@ -211,7 +213,7 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                                         .name(document.getName())
                                         .pageCount(document.getPageCount())
                                         .recoveryOption(document.getRecoveryOption().getDescription())
-                                        .price(document.calculatePrice())
+                                        .price(document.getDocumentPrice())
                                         .isOcrEnabled(document.getIsOcrEnabled())
                                         .build())
                                 .collect(Collectors.toList()))

@@ -54,14 +54,16 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
                     doc.pageCount(),
                     doc.recoveryOption(),
                     order,
-                    pricePolicy,
+                    pricePolicy.getCuttingPrice(),
+                    pricePolicy.getDefaultPricePerPage(),
+                    pricePolicy.getAdditionalPriceForOcr(),
                     doc.isOcrEnabled()
             );
             order.getDocuments().add(document);
             documentRepository.save(document);
         });
 
-        order.updateIsOneDayScan(requestDto.isOneDayScan());
+        orderService.updateIsOneDayScan(order, requestDto.isOneDayScan());
         if (requestDto.address() != null) {
             Address address = addressService.createAddress(
                     requestDto.address().addressName(),
