@@ -52,7 +52,6 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o " +
             "LEFT JOIN FETCH o.documents d " +
-            "LEFT JOIN FETCH d.pricePolicy p " +
             "LEFT JOIN FETCH o.delivery del " +
             "LEFT JOIN FETCH o.user u " +
             "WHERE o.createdAt BETWEEN :startDate AND :endDate " +
@@ -64,7 +63,6 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o " +
             "LEFT JOIN FETCH o.documents d " +
-            "LEFT JOIN FETCH d.pricePolicy p " +
             "LEFT JOIN FETCH o.delivery del " +
             "LEFT JOIN FETCH o.user u " +
             "WHERE o.id IN :ids")
@@ -85,7 +83,7 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     Integer countByCreatedAtBetween(LocalDateTime createdAt, LocalDateTime createdAt2);
 
-    @EntityGraph(attributePaths = {"documents", "documents.pricePolicy", "delivery"})
+    @EntityGraph(attributePaths = {"documents", "delivery"})
     @Query("SELECT o FROM Order o WHERE o.id = :id")
     Optional<Order> findByIdWithDocuments(@Param("id") Long id);
 

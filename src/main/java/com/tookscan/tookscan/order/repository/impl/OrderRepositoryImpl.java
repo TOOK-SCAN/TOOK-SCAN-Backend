@@ -418,18 +418,22 @@ public class OrderRepositoryImpl implements OrderRepository {
     private OrderSpecifier<?> resolveSort(QOrder order, String sort, Direction direction) {
         if (direction.isAscending()) {
             return switch (sort.toLowerCase()) {
-                case "order-number" -> order.orderNumber.asc();
-                case "order-date" -> order.createdAt.asc();
-                case "payment-amount" -> order.payment.totalAmount.asc();
+                case "created-at" -> order.createdAt.asc();
                 case "payment-date" -> order.payment.createdAt.asc();
+                case "document-count" -> order.documents.size().asc();
+                case "total-amount" -> order.totalAmount.sum().asc();
+                case "payment-amount" -> order.payment.totalAmount.asc();
+                case "pdf-send-date" -> order.pdfSendDate.asc();
                 default -> order.id.asc();
             };
         } else {
             return switch (sort.toLowerCase()) {
-                case "order-number" -> order.orderNumber.desc();
-                case "order-date" -> order.createdAt.desc();
-                case "payment-amount" -> order.payment.totalAmount.desc();
+                case "created-at" -> order.createdAt.desc();
                 case "payment-date" -> order.payment.createdAt.desc();
+                case "document-count" -> order.documents.size().desc();
+                case "total-amount" -> order.totalAmount.sum().desc();
+                case "payment-amount" -> order.payment.totalAmount.desc();
+                case "pdf-send-date" -> order.pdfSendDate.desc();
                 default -> order.id.desc();
             };
         }
