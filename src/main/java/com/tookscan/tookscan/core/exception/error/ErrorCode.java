@@ -23,7 +23,6 @@ public enum ErrorCode {
     NOT_FOUND_PRICE_POLICY(40407, HttpStatus.NOT_FOUND, "존재하지 않는 가격 정책입니다."),
     NOT_FOUND_DELIVERY(40408, HttpStatus.NOT_FOUND, "존재하지 않는 배송입니다."),
     NOT_FOUND_PAYMENT(40409, HttpStatus.NOT_FOUND, "존재하지 않는 결제입니다."),
-    NOT_FOUND_TERM(40410, HttpStatus.NOT_FOUND, "존재하지 않는 약관입니다."),
     NOT_FOUND_USER_GROUP(40411, HttpStatus.NOT_FOUND, "존재하지 않는 사용자 그룹입니다."),
     NOT_FOUND_AUTHENTICATION_CODE(40413, HttpStatus.NOT_FOUND, "존재하지 않는 인증 코드입니다."),
     NOT_FOUND_PAYMENT_SESSION(40414, HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
