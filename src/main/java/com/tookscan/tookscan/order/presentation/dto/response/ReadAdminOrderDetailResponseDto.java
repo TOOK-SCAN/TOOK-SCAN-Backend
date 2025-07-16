@@ -45,6 +45,9 @@ public class ReadAdminOrderDetailResponseDto extends
     @NotNull
     private final List<DocumentDto> documentDtos;
 
+    @JsonProperty("initial_documents")
+    private final List<InitialDocumentDto> initialDocumentDtos;
+
     @JsonProperty("payment_info")
     @NotNull
     private final PaymentInfoDto paymentInfoDto;
@@ -60,6 +63,7 @@ public class ReadAdminOrderDetailResponseDto extends
             String arrivedAt,
             UserDto userDto,
             List<DocumentDto> documentDtos,
+            List<InitialDocumentDto> initialDocumentDtos,
             PaymentInfoDto paymentInfoDto,
             String orderMemo
     ) {
@@ -69,15 +73,15 @@ public class ReadAdminOrderDetailResponseDto extends
         this.arrivedAt = arrivedAt;
         this.userDto = userDto;
         this.documentDtos = documentDtos;
+        this.initialDocumentDtos = initialDocumentDtos;
         this.paymentInfoDto = paymentInfoDto;
         this.orderMemo = orderMemo;
         this.validateSelf();
     }
 
     public static ReadAdminOrderDetailResponseDto fromEntity(Order order,
-                                                            Map<Document, List<Pdf>> documentPdfsMap) {
+                                                             Map<Document, List<Pdf>> documentPdfsMap) {
 
-        boolean isAdminChecked = order.getOrderStatus().getCode() >= EOrderStatus.APPLY_COMPLETED.getCode();
         return ReadAdminOrderDetailResponseDto.builder()
                 .orderNumber(order.getOrderNumber())
                 .orderStatus(order.getOrderStatus())
@@ -86,7 +90,10 @@ public class ReadAdminOrderDetailResponseDto extends
                         DateTimeUtil.convertLocalDateTimeToDartString(order.getArrivedAt()))
                 .userDto(UserDto.fromEntity(order))
                 .documentDtos(order.getDocuments().stream()
-                        .map(document -> DocumentDto.of(document, isAdminChecked, documentPdfsMap.get(document)))
+                        .map(document -> DocumentDto.of(document, documentPdfsMap.get(document)))
+                        .toList())
+                .initialDocumentDtos(order.getDocuments().stream()
+                        .map(InitialDocumentDto::fromEntity)
                         .toList())
                 .paymentInfoDto(PaymentInfoDto.fromEntity(order))
                 .orderMemo(order.getMemo())
@@ -195,30 +202,84 @@ public class ReadAdminOrderDetailResponseDto extends
             this.validateSelf();
         }
 
-        public static DocumentDto of(Document document, Boolean isAdminChecked,
-                                     List<Pdf> pdfs) {
-
-            // 관리자 검수 이후면 문서의 최종 정보로 반환
-            if (isAdminChecked) {
-                return DocumentDto.builder()
-                        .id(document.getId().toString())
-                        .name(document.getName())
-                        .pageCount(document.getPageCount())
-                        .pagePrice(document.calculateDocumentPrice())
-                        .recoveryOption(document.getRecoveryOption())
-                        .recoveryOptionPrice(document.calculateRecoveryOptionPrice())
-                        .isOcrEnabled(document.getIsOcrEnabled())
-                        .ocrPrice(document.calculateOcrPrice())
-                        .totalPrice(document.calculatePrice())
-                        .pdfs(pdfs.isEmpty() ? List.of() :
-                                pdfs.stream()
-                                        .map(Pdf::getPdfUrl)
-                                        .toList())
-                        .build();
-            }
-
-            // 관리자 검수 이전이면 문서의 초기 정보로 반환
+        public static DocumentDto of(Document document, List<Pdf> pdfs) {
             return DocumentDto.builder()
+                    .id(document.getId().toString())
+                    .name(document.getName())
+                    .pageCount(document.getPageCount())
+                    .pagePrice(document.calculateDocumentPrice())
+                    .recoveryOption(document.getRecoveryOption())
+                    .recoveryOptionPrice(document.calculateRecoveryOptionPrice())
+                    .isOcrEnabled(document.getIsOcrEnabled())
+                    .ocrPrice(document.calculateOcrPrice())
+                    .totalPrice(document.calculatePrice())
+                    .pdfs(pdfs.isEmpty() ? List.of() :
+                            pdfs.stream()
+                                    .map(Pdf::getPdfUrl)
+                                    .toList())
+                    .build();
+        }
+    }
+
+
+    @Getter
+    public static class InitialDocumentDto extends SelfValidating<InitialDocumentDto> {
+
+        @JsonProperty("id")
+        @NotNull
+        private final String id;
+
+        @JsonProperty("name")
+        @NotBlank
+        private final String name;
+
+        @JsonProperty("page_count")
+        @NotNull
+        private final Integer pageCount;
+
+        @JsonProperty("page_price")
+        @NotNull
+        private final Integer pagePrice;
+
+        @JsonProperty("recovery_option")
+        @NotNull
+        private final ERecoveryOption recoveryOption;
+
+        @JsonProperty("recovery_option_price")
+        @NotNull
+        private final Integer recoveryOptionPrice;
+
+        @JsonProperty("is_ocr_enabled")
+        @NotNull
+        private final Boolean isOcrEnabled;
+
+        @JsonProperty("ocr_price")
+        @NotNull
+        private final Integer ocrPrice;
+
+        @JsonProperty("total_price")
+        @NotNull
+        private final Integer totalPrice;
+
+        @Builder
+        public InitialDocumentDto(String id, String name, Integer pageCount, Integer pagePrice, ERecoveryOption recoveryOption,
+                                  Integer recoveryOptionPrice, Boolean isOcrEnabled, Integer ocrPrice, Integer totalPrice
+        ) {
+            this.id = id;
+            this.name = name;
+            this.pageCount = pageCount;
+            this.pagePrice = pagePrice;
+            this.recoveryOption = recoveryOption;
+            this.recoveryOptionPrice = recoveryOptionPrice;
+            this.isOcrEnabled = isOcrEnabled;
+            this.ocrPrice = ocrPrice;
+            this.totalPrice = totalPrice;
+
+            this.validateSelf();
+        }
+
+        public static InitialDocumentDto fromEntity(Document document) {
+            return InitialDocumentDto.builder()
                     .id(document.getId().toString())
                     .name(document.getInitialName())
                     .pageCount(document.getInitialPageCount())
@@ -228,10 +289,6 @@ public class ReadAdminOrderDetailResponseDto extends
                     .isOcrEnabled(document.getInitialIsOcrEnabled())
                     .ocrPrice(document.calculateInitialOcrPrice())
                     .totalPrice(document.calculateInitialPrice())
-                    .pdfs(document.getPdfs().isEmpty() ? List.of() :
-                            document.getPdfs().stream()
-                                    .map(Pdf::getPdfUrl)
-                                    .toList())
                     .build();
         }
     }
