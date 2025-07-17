@@ -108,7 +108,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .documentPrice(document.getTotalAmount())
+                    .documentPrice(document.getPagePrice())
                     .recoveryOption(document.getRecoveryOption())
                     .recoveryPrice(document.getRecoveryOptionPrice())
                     .oneDayScanPrice(document.getOneDayScanPrice())

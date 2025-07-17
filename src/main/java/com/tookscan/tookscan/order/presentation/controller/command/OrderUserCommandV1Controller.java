@@ -6,7 +6,6 @@ import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderCancelUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderHistoryUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderInfoUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderScanUseCase;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateUserOrderRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderInfoRequestDto;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/users/orders")
 public class OrderUserCommandV1Controller {
     private final CreateUserOrderUseCase createUserOrderUseCase;
-    private final UpdateUserOrderScanUseCase updateUserOrderScanUseCase;
     private final UpdateUserOrderCancelUseCase updateUserOrderCancelUseCase;
     private final UpdateUserOrderInfoUseCase updateUserOrderInfoUseCase;
     private final UpdateUserOrderHistoryUseCase updateUserOrderHistoryUseCase;
@@ -47,18 +45,6 @@ public class OrderUserCommandV1Controller {
         return ResponseDto.created(createUserOrderUseCase.execute(accountId, requestDto));
     }
 
-    /**
-     * 4.4 회원 스캔하기
-     */
-    @Operation(summary = "회원 스캔하기", description = "회원이 주문을 스캔합니다.")
-    @PatchMapping(value = "/{orderId}/scan")
-    public ResponseDto<Void> updateOrderScan(
-            @Parameter(hidden = true) @AccountID UUID accountId,
-            @PathVariable Long orderId
-    ) {
-        updateUserOrderScanUseCase.execute(accountId, orderId);
-        return ResponseDto.ok(null);
-    }
 
     /**
      * 4.3.9 회원 주문 취소하기

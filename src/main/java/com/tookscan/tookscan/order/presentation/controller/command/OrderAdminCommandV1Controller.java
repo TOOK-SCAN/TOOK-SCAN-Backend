@@ -1,33 +1,38 @@
 package com.tookscan.tookscan.order.presentation.controller.command;
 
+import com.tookscan.tookscan.core.annotation.security.AccountID;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
-import com.tookscan.tookscan.order.application.usecase.DeleteAdminOrdersUseCase;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusCancelUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusRecoveryOptionUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminDocumentsRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminOrdersRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.ExportAdminDeliveriesRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusCancelRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRecoveryOptionRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -54,7 +59,7 @@ public class OrderAdminCommandV1Controller {
 
     private final CreateAdminOrderMemoUseCase createAdminOrderMemoUseCase;
     private final UpdateAdminOrdersStatusUseCase updateAdminOrdersStatusUseCase;
-    private final DeleteAdminOrdersUseCase deleteAdminOrdersUseCase;
+    private final UpdateAdminOrdersStatusCancelUseCase updateAdminOrdersStatusCancelUseCase;
     private final UpdateAdminOrderDeliveryUseCase updateAdminOrderDeliveryUseCase;
     private final SendAdminPdfUseCase sendAdminPdfUseCase;
     private final UpdateAdminOrderStatusCompanyArrivedUseCase updateAdminOrderStatusCompanyArrivedUseCase;
@@ -66,6 +71,7 @@ public class OrderAdminCommandV1Controller {
     private final ExportAdminDeliveriesUseCase exportAdminDeliveriesUseCase;
     private final CreateAdminOrderCouponUseCase createAdminOrderCouponUseCase;
     private final UploadAdminDocumentsPdfUseCase uploadAdminDocumentsPdfUseCase;
+    private final UpdateAdminOrdersStatusRecoveryOptionUseCase updateAdminOrdersStatusRecoveryOptionUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -227,14 +233,14 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
-     * 4.5.1 관리자 주문 일괄 삭제
+     * 4.5.1 관리자 주문 일괄 취소
      */
-    @Operation(summary = "관리자 주문 일괄 삭제", description = "관리자가 여러 주문을 삭제합니다.")
-    @DeleteMapping(value = "/orders")
+    @Operation(summary = "관리자 주문 일괄 취소", description = "관리자가 여러 주문을 취소합니다.")
+    @PatchMapping(value = "/orders/cancel")
     public ResponseDto<Void> deleteOrders(
-            @RequestBody @Valid DeleteAdminOrdersRequestDto requestDto
+            @RequestBody @Valid UpdateAdminOrdersStatusCancelRequestDto requestDto
     ) {
-        deleteAdminOrdersUseCase.execute(requestDto);
+        updateAdminOrdersStatusCancelUseCase.execute(requestDto);
         return ResponseDto.ok(null);
     }
 
@@ -247,6 +253,19 @@ public class OrderAdminCommandV1Controller {
             @RequestBody @Valid DeleteAdminDocumentsRequestDto requestDto
     ) {
         deleteAdminDocumentsUseCase.execute(requestDto);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 관리자 주문 일괄 복원 완료
+     */
+    @Operation(summary = "관리자 주문 일괄 복원 완료", description = "관리자가 여러 주문의 복원 작업을 완료합니다.")
+    @PatchMapping(value = "/orders/recovery-completed")
+    public ResponseDto<Void> updateOrdersRecoveryCompleted(
+            @Parameter(hidden = true) @AccountID UUID accountId,
+            @RequestBody @Valid UpdateAdminOrdersStatusRecoveryOptionRequestDto requestDto
+    ) {
+        updateAdminOrdersStatusRecoveryOptionUseCase.execute(accountId, requestDto);
         return ResponseDto.ok(null);
     }
 }

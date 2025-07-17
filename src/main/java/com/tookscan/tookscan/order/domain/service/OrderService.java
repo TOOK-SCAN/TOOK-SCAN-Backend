@@ -97,6 +97,25 @@ public class OrderService {
         order.calculateTotalAmount();
     }
 
+    public void cancelOrder(Order order, String reason) {
+        order.updateOrderStatus(EOrderStatus.CANCEL);
+        order.updateCancelledAt(LocalDateTime.now());
+        order.updateCancelReason(reason);
+    }
+
+    public void completeOrder(Order order) {
+        order.updateOrderStatus(EOrderStatus.ALL_COMPLETED);
+        order.updateAllCompletedAt(LocalDateTime.now());
+    }
+
+    public void completeRecovery(Order order) {
+        if (order.getOrderStatus() != EOrderStatus.RECOVERY_IN_PROGRESS) {
+            throw new CommonException(ErrorCode.NOT_RECOVERY_IN_PROGRESS);
+        }
+        order.updateOrderStatus(EOrderStatus.POST_WAITING);
+        order.updateRecoveryCompletedAt(LocalDateTime.now());
+    }
+
     public void calculateTotalAmount(Order order) {
         order.calculateTotalAmount();
     }

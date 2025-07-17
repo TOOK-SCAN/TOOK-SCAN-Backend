@@ -1,10 +1,11 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
+import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,18 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdminOrderDeliveryTrackingNumberUseCase {
     private final DeliveryRepository deliveryRepository;
 
+    private final DeliveryService deliveryService;
+
     private final KakaoMessageUtil kakaoMessageUtil;
 
     @Override
     @Transactional
     public void execute(Long deliveryId, UpdateAdminOrderDeliveryTrackingNumberRequestDto requestDto) {
         Delivery delivery = deliveryRepository.findByIdWithOrderOrElseThrow(deliveryId);
-        delivery.updateTrackingNumber(requestDto.trackingNumber());
+        deliveryService.updateTrackingNumber(
+                delivery,
+                requestDto.trackingNumber()
+        );
         delivery.getOrder().updateOrderStatus(EOrderStatus.ALL_COMPLETED);
 
         deliveryRepository.save(delivery);

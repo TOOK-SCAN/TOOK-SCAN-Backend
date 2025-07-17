@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.order.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.Document;
@@ -60,6 +61,21 @@ public class ReadAdminOrderDetailResponseDto extends
     @JsonProperty("order_memo")
     private final String orderMemo;
 
+    @JsonProperty("tracking_number")
+    private final String trackingNumber;
+
+    @JsonProperty("tracking_number_registered_at")
+    private final String trackingNumberRegisteredAt;
+
+    @JsonProperty("recovery_completed_at")
+    private final String recoveryCompletedAt;
+
+    @JsonProperty("cancelled_at")
+    private final String orderCancelledAt;
+
+    @JsonProperty("cancel_reason")
+    private final String cancelReason;
+
     @Builder
     public ReadAdminOrderDetailResponseDto(
             String orderNumber,
@@ -71,7 +87,12 @@ public class ReadAdminOrderDetailResponseDto extends
             List<DocumentDto> documentDtos,
             InitialOrderDto initialOrderDto,
             PaymentInfoDto paymentInfoDto,
-            String orderMemo
+            String orderMemo,
+            String trackingNumber,
+            String trackingNumberRegisteredAt,
+            String recoveryCompletedAt,
+            String orderCancelledAt,
+            String cancelReason
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
@@ -83,6 +104,11 @@ public class ReadAdminOrderDetailResponseDto extends
         this.initialOrderDto = initialOrderDto;
         this.paymentInfoDto = paymentInfoDto;
         this.orderMemo = orderMemo;
+        this.trackingNumber = trackingNumber;
+        this.trackingNumberRegisteredAt = trackingNumberRegisteredAt;
+        this.recoveryCompletedAt = recoveryCompletedAt;
+        this.orderCancelledAt = orderCancelledAt;
+        this.cancelReason = cancelReason;
         this.validateSelf();
     }
 
@@ -104,6 +130,18 @@ public class ReadAdminOrderDetailResponseDto extends
                         InitialOrderDto.fromEntity(order) : null)
                 .paymentInfoDto(PaymentInfoDto.fromEntity(order))
                 .orderMemo(order.getMemo())
+                .trackingNumber(order.getDelivery() != null ? order.getDelivery().getTrackingNumber() : null)
+                .trackingNumberRegisteredAt(order.getDelivery() != null
+                        ? DateTimeUtil.convertLocalDateTimeToDartString(
+                        order.getDelivery().getTrackingNumberRegisteredAt())
+                        : null)
+                .recoveryCompletedAt(order.getRecoveryCompletedAt() != null
+                        ? DateTimeUtil.convertLocalDateTimeToDartString(order.getRecoveryCompletedAt())
+                        : null)
+                .orderCancelledAt(order.getCancelledAt() != null
+                        ? DateTimeUtil.convertLocalDateTimeToDartString(order.getCancelledAt())
+                        : null)
+                .cancelReason(order.getCancelReason() != null ? order.getCancelReason() : null)
                 .build();
     }
 
@@ -127,10 +165,10 @@ public class ReadAdminOrderDetailResponseDto extends
         private final String email;
 
         @JsonProperty("address")
-        private final String address;
+        private final AddressResponseDto address;
 
         @Builder
-        public UserDto(Long id, String name, String phoneNumber, String email, String address) {
+        public UserDto(Long id, String name, String phoneNumber, String email, AddressResponseDto address) {
             this.id = id;
             this.name = name;
             this.phoneNumber = phoneNumber;
@@ -145,7 +183,9 @@ public class ReadAdminOrderDetailResponseDto extends
                     .name(order.getDelivery().getReceiverName())
                     .phoneNumber(order.getDelivery().getPhoneNumber())
                     .email(order.getDelivery().getEmail())
-                    .address(order.getDelivery().getAddress().getFullAddressWithZoneCode() + " / " + order.getDelivery().getRequest())
+                    .address(order.getDelivery().getAddress() != null
+                            ? AddressResponseDto.fromEntity(order.getDelivery().getAddress())
+                            : null)
                     .build();
         }
     }
