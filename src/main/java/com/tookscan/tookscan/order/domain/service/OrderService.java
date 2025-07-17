@@ -56,6 +56,16 @@ public class OrderService {
         createInitialOrderAndDocuments(order);
     }
 
+    public void startScan(Order order) {
+        order.updateOrderStatus(EOrderStatus.SCAN_IN_PROGRESS);
+        order.updateScanStartedAt(LocalDateTime.now());
+    }
+
+    public void completeScan(Order order) {
+        order.updateOrderStatus(EOrderStatus.SCAN_COMPLETED);
+        order.updateScanCompletedAt(LocalDateTime.now());
+    }
+
     private void createInitialOrderAndDocuments(Order order) {
         // InitialOrder 생성
         InitialOrder initialOrder = InitialOrder.builder()

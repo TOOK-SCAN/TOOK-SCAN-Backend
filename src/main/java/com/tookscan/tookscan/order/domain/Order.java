@@ -76,6 +76,12 @@ public class Order extends BaseEntity {
     @Column(name = "all_completed_at")
     private LocalDateTime allCompletedAt;
 
+    @Column(name = "scan_started_at")
+    private LocalDateTime scanStartedAt;
+
+    @Column(name = "scan_completed_at")
+    private LocalDateTime scanCompletedAt;
+
     /* -------------------------------------------- */
     /* Agreement Information --------------------- */
     /* -------------------------------------------- */
@@ -240,6 +246,14 @@ public class Order extends BaseEntity {
 
     public void updateAllCompletedAt(LocalDateTime allCompletedAt) {
         this.allCompletedAt = allCompletedAt;
+    }
+
+    public void updateScanStartedAt(LocalDateTime scanStartedAt) {
+        this.scanStartedAt = scanStartedAt;
+    }
+
+    public void updateScanCompletedAt(LocalDateTime scanCompletedAt) {
+        this.scanCompletedAt = scanCompletedAt;
     }
 
     public String getDocumentsDescription() {
