@@ -3,6 +3,7 @@ package com.tookscan.tookscan.order.domain.service;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,5 +48,10 @@ public class DeliveryService {
     public void updateDeliveryPrice(Delivery delivery, Integer deliveryPrice) {
         delivery.updateDeliveryPrice(deliveryPrice);
         delivery.getOrder().calculateTotalAmount();
+    }
+
+    public void updateTrackingNumber(Delivery delivery, String trackingNumber) {
+        delivery.updateTrackingNumber(trackingNumber);
+        delivery.updateTrackingNumberRegisteredAt(LocalDateTime.now());
     }
 }

@@ -64,6 +64,27 @@ public class Order extends BaseEntity {
     @Column(name = "arrived_at")
     private LocalDateTime arrivedAt;
 
+    @Column(name = "recovery_completed_at")
+    private LocalDateTime recoveryCompletedAt;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
+    @Column(name = "cancel_reason", length = 500)
+    private String cancelReason;
+
+    @Column(name = "all_completed_at")
+    private LocalDateTime allCompletedAt;
+
+    @Column(name = "scan_started_at")
+    private LocalDateTime scanStartedAt;
+
+    @Column(name = "scan_completed_at")
+    private LocalDateTime scanCompletedAt;
+
+    @Column(name = "recovery_started_at")
+    private LocalDateTime recoveryStartedAt;
+
     /* -------------------------------------------- */
     /* Agreement Information --------------------- */
     /* -------------------------------------------- */
@@ -212,6 +233,34 @@ public class Order extends BaseEntity {
 
     public void updateInitialOrder(InitialOrder initialOrder) {
         this.initialOrder = initialOrder;
+    }
+
+    public void updateRecoveryCompletedAt(LocalDateTime recoveryCompletedAt) {
+        this.recoveryCompletedAt = recoveryCompletedAt;
+    }
+
+    public void updateCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
+
+    public void updateCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public void updateAllCompletedAt(LocalDateTime allCompletedAt) {
+        this.allCompletedAt = allCompletedAt;
+    }
+
+    public void updateScanStartedAt(LocalDateTime scanStartedAt) {
+        this.scanStartedAt = scanStartedAt;
+    }
+
+    public void updateScanCompletedAt(LocalDateTime scanCompletedAt) {
+        this.scanCompletedAt = scanCompletedAt;
+    }
+
+    public void updateRecoveryStartedAt(LocalDateTime recoveryStartedAt) {
+        this.recoveryStartedAt = recoveryStartedAt;
     }
 
     public String getDocumentsDescription() {

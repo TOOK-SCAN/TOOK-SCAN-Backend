@@ -10,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,6 +50,9 @@ public class Delivery extends BaseEntity {
 
     @Column(name = "delivery_price", nullable = false)
     private Integer deliveryPrice;
+
+    @Column(name = "tracking_number_registered_at")
+    private LocalDateTime trackingNumberRegisteredAt;
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
@@ -104,6 +108,10 @@ public class Delivery extends BaseEntity {
 
     public void updateDeliveryPrice(Integer deliveryPrice) {
         this.deliveryPrice = deliveryPrice;
+    }
+
+    public void updateTrackingNumberRegisteredAt(LocalDateTime trackingNumberRegisteredAt) {
+        this.trackingNumberRegisteredAt = trackingNumberRegisteredAt;
     }
 
 }

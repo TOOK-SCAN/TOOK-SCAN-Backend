@@ -1,10 +1,6 @@
 package com.tookscan.tookscan.core.utility;
 
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.cloudfront.CloudFrontUrlSigner;
-import com.amazonaws.services.cloudfront.util.SignerUtils;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.tookscan.tookscan.core.dto.PdfFileDto;
@@ -13,14 +9,6 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -102,37 +90,6 @@ public class S3Util {
         }
     }
 
-    /**
-     * 특정 Document에 대한 PDF 파일을 일정 시간만 유효한 프리사인드 URL로 반환
-     *
-     * @param document PDF 파일을 가지고 있는 Document 객체
-     * @return 만료 시간 이후 사용 불가능한 임시 다운로드 URL
-     */
-    public String getPdfPresignedUrl(Document document) {
-        // 최종 S3 객체 키 구성
-        String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
-                '/' + document.getName() + '_' + document.getId() + ".pdf";
-
-        // 만료 시간 계산
-        Date expiration = new Date();
-        long now = expiration.getTime();
-        expiration.setTime(now + pdfExpirationSeconds * 1000);
-
-        // 존재하지 않는 PDF 파일인 경우
-        if (!doesObjectExist(document)) {
-            throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
-        }
-
-        // Presigned URL 요청 생성
-        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, finalKey)
-                .withMethod(HttpMethod.GET)
-                .withExpiration(expiration);
-
-        // Presigned URL 생성
-        URL presignedUrl = amazonS3Client.generatePresignedUrl(request);
-        return presignedUrl.toString();
-    }
-
     public boolean doesObjectExist(Document doc) {
         String key = PDF_CONTENT_PREFIX + doc.getOrder().getId() + '/' + doc.getName() + '_' + doc.getId() + ".pdf";
         return amazonS3Client.doesObjectExist(bucketName, key);
@@ -162,102 +119,4 @@ public class S3Util {
         }
     }
 
-    /**
-     * CloudFront 서명 URL을 생성합니다. 이 방법은 PEM 키 파일을 jar 내부에서 읽어 PrivateKey 객체로 파싱하여 사용합니다.
-     */
-    public String generateSignedUrl(Document document) {
-        try {
-            String encodedDocumentName = encodeURIComponent(document.getName());
-
-            String finalKey = PDF_CONTENT_PREFIX + document.getOrder().getId() +
-                    "/" + encodedDocumentName + "_" + document.getId() + ".pdf";
-
-            Date expiration = new Date();
-            long now = expiration.getTime();
-            expiration.setTime(now + pdfExpirationSeconds * 1000);
-
-            if (!doesObjectExist(document)) {
-                throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
-            }
-
-            // PEM 키를 직접 PrivateKey 객체로 로드
-            PrivateKey privateKey = loadPrivateKeyFromResource(privateKeyPath);
-
-            // CloudFront 리소스 경로 생성
-            String resourcePath = SignerUtils.generateResourcePath(SignerUtils.Protocol.https, domain, finalKey);
-
-            return CloudFrontUrlSigner.getSignedURLWithCannedPolicy(
-                    resourcePath,
-                    keyId,
-                    privateKey,
-                    expiration
-            );
-        } catch (InvalidKeySpecException | IOException e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-
-    /**
-     * PEM 키 파일을 읽어 PrivateKey 객체로 파싱합니다.
-     */
-    private PrivateKey loadPrivateKeyFromResource(String resourcePath) throws IOException, InvalidKeySpecException {
-        // 리소스 경로 앞에 '/'를 붙여 절대 경로로 지정 (예: "/aws/cloudfront/aws_ex_private_key.pem")
-        try (InputStream in = this.getClass().getClassLoader()
-                .getResourceAsStream(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath)) {
-            if (in == null) {
-                throw new IOException("PEM 키 리소스를 찾을 수 없습니다: " + resourcePath);
-            }
-            String keyString = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            // PEM 헤더와 푸터, 공백 제거
-            keyString = keyString.replace("-----BEGIN PRIVATE KEY-----", "")
-                    .replace("-----END PRIVATE KEY-----", "")
-                    .replaceAll("\\s", "");
-            byte[] keyBytes = Base64.getDecoder().decode(keyString);
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            return kf.generatePrivate(spec);
-        } catch (Exception e) {
-            throw new InvalidKeySpecException("PEM 키 파싱에 실패하였습니다.", e);
-        }
-    }
-
-    /**
-     * 문자열을 RFC 3986 규칙에 따라 인코딩합니다. Unreserved 문자(알파벳, 숫자, '-', '_', '.', '~')는 그대로 두고 나머지는 %HH 형태로 인코딩합니다.
-     */
-    private String encodeURIComponent(String s) {
-        StringBuilder sb = new StringBuilder();
-        for (char c : s.toCharArray()) {
-            if (isUnreserved(c)) {
-                sb.append(c);
-            } else {
-                sb.append(String.format("%%%02X", (int) c));
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 해당 문자가 URL에서 unreserved 문자(알파벳, 숫자, '-', '_', '.', '~')에 해당하는지 확인합니다.
-     */
-    private boolean isUnreserved(char c) {
-        // ASCII unreserved 문자
-        if ((c >= 'A' && c <= 'Z') ||
-                (c >= 'a' && c <= 'z') ||
-                (c >= '0' && c <= '9') ||
-                c == '-' || c == '_' || c == '.' || c == '~') {
-            return true;
-        }
-        // 한글 완성형 (가 ~ 힣)
-        if (c >= '\uAC00' && c <= '\uD7A3') {
-            return true;
-        }
-        // 한글 자모 (초성, 중성, 종성)
-        if (c >= '\u1100' && c <= '\u11FF') {
-            return true;
-        }
-        if (c >= '\u3130' && c <= '\u318F') {
-            return true;
-        }
-        return false;
-    }
 }

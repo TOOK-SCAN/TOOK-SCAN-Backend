@@ -56,6 +56,21 @@ public class OrderService {
         createInitialOrderAndDocuments(order);
     }
 
+    public void startScan(Order order) {
+        order.updateOrderStatus(EOrderStatus.SCAN_IN_PROGRESS);
+        order.updateScanStartedAt(LocalDateTime.now());
+    }
+
+    public void completeScan(Order order) {
+        order.updateOrderStatus(EOrderStatus.SCAN_COMPLETED);
+        order.updateScanCompletedAt(LocalDateTime.now());
+    }
+
+    public void startRecovery(Order order) {
+        order.updateOrderStatus(EOrderStatus.RECOVERY_IN_PROGRESS);
+        order.updateRecoveryStartedAt(LocalDateTime.now());
+    }
+
     private void createInitialOrderAndDocuments(Order order) {
         // InitialOrder 생성
         InitialOrder initialOrder = InitialOrder.builder()
@@ -95,6 +110,25 @@ public class OrderService {
     public void updateIsOneDayScan(Order order, Boolean isOneDayScan) {
         order.updateIsOneDayScan(isOneDayScan);
         order.calculateTotalAmount();
+    }
+
+    public void cancelOrder(Order order, String reason) {
+        order.updateOrderStatus(EOrderStatus.CANCEL);
+        order.updateCancelledAt(LocalDateTime.now());
+        order.updateCancelReason(reason);
+    }
+
+    public void allComplete(Order order) {
+        order.updateOrderStatus(EOrderStatus.ALL_COMPLETED);
+        order.updateAllCompletedAt(LocalDateTime.now());
+    }
+
+    public void completeRecovery(Order order) {
+        if (order.getOrderStatus() != EOrderStatus.RECOVERY_IN_PROGRESS) {
+            throw new CommonException(ErrorCode.NOT_RECOVERY_IN_PROGRESS);
+        }
+        order.updateOrderStatus(EOrderStatus.POST_WAITING);
+        order.updateRecoveryCompletedAt(LocalDateTime.now());
     }
 
     public void calculateTotalAmount(Order order) {

@@ -25,7 +25,7 @@ public class DeleteOldOrdersService implements DeleteOldOrdersUseCase {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
         List<Order> orders = orderRepository.findAllByCreatedAtBeforeWithEOrderStatus(twoWeeksAgo,
                 EOrderStatus.APPLY_COMPLETED);
-        orders.forEach(order -> orderService.updateOrderStatus(order, EOrderStatus.CANCEL));
+        orders.forEach(order -> orderService.cancelOrder(order, "2주 이상 지난 주문 자동 삭제"));
         orderRepository.saveAll(orders);
     }
 }

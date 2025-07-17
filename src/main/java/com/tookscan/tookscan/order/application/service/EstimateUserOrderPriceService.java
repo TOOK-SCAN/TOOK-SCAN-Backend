@@ -98,6 +98,8 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
             }
         });
 
+        orderService.calculateTotalAmount(order);
+
         return EstimateUserOrderPriceResponseDto.of(order, unCheckedDocuments);
     }
 }
