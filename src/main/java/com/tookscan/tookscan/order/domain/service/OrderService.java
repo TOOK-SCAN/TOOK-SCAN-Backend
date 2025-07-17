@@ -66,6 +66,11 @@ public class OrderService {
         order.updateScanCompletedAt(LocalDateTime.now());
     }
 
+    public void startRecovery(Order order) {
+        order.updateOrderStatus(EOrderStatus.RECOVERY_IN_PROGRESS);
+        order.updateRecoveryStartedAt(LocalDateTime.now());
+    }
+
     private void createInitialOrderAndDocuments(Order order) {
         // InitialOrder 생성
         InitialOrder initialOrder = InitialOrder.builder()

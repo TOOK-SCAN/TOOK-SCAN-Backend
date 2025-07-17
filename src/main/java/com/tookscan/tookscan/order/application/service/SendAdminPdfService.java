@@ -9,7 +9,6 @@ import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.service.PdfService;
-import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.time.LocalDateTime;
@@ -80,7 +79,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
                 }
             });
         } else {
-            order.updateOrderStatus(EOrderStatus.RECOVERY_IN_PROGRESS);
+            orderService.startRecovery(order);
             orderRepository.save(order);
         }
 

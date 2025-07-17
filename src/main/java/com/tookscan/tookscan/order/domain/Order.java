@@ -82,6 +82,9 @@ public class Order extends BaseEntity {
     @Column(name = "scan_completed_at")
     private LocalDateTime scanCompletedAt;
 
+    @Column(name = "recovery_started_at")
+    private LocalDateTime recoveryStartedAt;
+
     /* -------------------------------------------- */
     /* Agreement Information --------------------- */
     /* -------------------------------------------- */
@@ -254,6 +257,10 @@ public class Order extends BaseEntity {
 
     public void updateScanCompletedAt(LocalDateTime scanCompletedAt) {
         this.scanCompletedAt = scanCompletedAt;
+    }
+
+    public void updateRecoveryStartedAt(LocalDateTime recoveryStartedAt) {
+        this.recoveryStartedAt = recoveryStartedAt;
     }
 
     public String getDocumentsDescription() {
