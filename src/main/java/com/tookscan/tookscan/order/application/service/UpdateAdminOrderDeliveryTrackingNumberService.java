@@ -4,7 +4,7 @@ import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;
-import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,7 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
     private final DeliveryRepository deliveryRepository;
 
     private final DeliveryService deliveryService;
+    private final OrderService orderService;
 
     private final KakaoMessageUtil kakaoMessageUtil;
 
@@ -30,7 +31,7 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
                 delivery,
                 requestDto.trackingNumber()
         );
-        delivery.getOrder().updateOrderStatus(EOrderStatus.ALL_COMPLETED);
+        orderService.allComplete(delivery.getOrder());
 
         deliveryRepository.save(delivery);
 

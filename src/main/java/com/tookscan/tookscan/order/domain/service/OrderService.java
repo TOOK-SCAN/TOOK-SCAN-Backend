@@ -103,7 +103,7 @@ public class OrderService {
         order.updateCancelReason(reason);
     }
 
-    public void completeOrder(Order order) {
+    public void allComplete(Order order) {
         order.updateOrderStatus(EOrderStatus.ALL_COMPLETED);
         order.updateAllCompletedAt(LocalDateTime.now());
     }

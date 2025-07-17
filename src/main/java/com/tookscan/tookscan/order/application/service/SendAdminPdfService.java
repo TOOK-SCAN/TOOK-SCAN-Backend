@@ -7,6 +7,7 @@ import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.service.PdfService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
@@ -25,6 +26,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     private final OrderRepository orderRepository;
+
+    private final OrderService orderService;
 
     private final KakaoMessageUtil kakaoMessageUtil;
 
@@ -64,7 +67,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         // 이후 배송할일이 없다면(모든 문서가 폐기라면)
         if (order.getDocuments().stream()
                 .noneMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
-            order.updateOrderStatus(EOrderStatus.ALL_COMPLETED);
+            orderService.allComplete(order);
             orderRepository.save(order);
 
             // 감사 메세지 전송
