@@ -10,11 +10,11 @@ import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseC
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
-import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusCancelUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusRecoveryOptionUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
@@ -26,6 +26,7 @@ import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeli
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusCancelRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusCompanyArrivedRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRecoveryOptionRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,9 +61,9 @@ public class OrderAdminCommandV1Controller {
     private final CreateAdminOrderMemoUseCase createAdminOrderMemoUseCase;
     private final UpdateAdminOrdersStatusUseCase updateAdminOrdersStatusUseCase;
     private final UpdateAdminOrdersStatusCancelUseCase updateAdminOrdersStatusCancelUseCase;
+    private final UpdateAdminOrdersStatusCompanyArrivedUseCase updateAdminOrdersStatusCompanyArrivedUseCase;
     private final UpdateAdminOrderDeliveryUseCase updateAdminOrderDeliveryUseCase;
     private final SendAdminPdfUseCase sendAdminPdfUseCase;
-    private final UpdateAdminOrderStatusCompanyArrivedUseCase updateAdminOrderStatusCompanyArrivedUseCase;
     private final UpdateAdminOrderStatusPaymentWaitingUseCase updateAdminOrderStatusPaymentWaitingUseCase;
     private final UpdateAdminOrdersDeliveriesTrackingNumberUseCase updateAdminOrdersDeliveriesTrackingNumberUseCase;
     private final UpdateAdminOrderDeliveryTrackingNumberUseCase updateAdminOrderDeliveryTrackingNumberUseCase;
@@ -171,18 +172,6 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
-     * 4.3.6 관리자 업체 도착 상태 변경
-     */
-    @Operation(summary = "관리자 업체 도착 상태 변경", description = "관리자가 주문 상태를 업체 도착으로 변경합니다.")
-    @PatchMapping(value = "/orders/{id}/company-arrived")
-    public ResponseDto<Void> updateOrderStatusCompanyArrived(
-            @PathVariable Long id
-    ) {
-        updateAdminOrderStatusCompanyArrivedUseCase.execute(id);
-        return ResponseDto.ok(null);
-    }
-
-    /**
      * 4.3.7 관리자 결제 요청
      */
     @Operation(summary = "관리자 결제 요청", description = "관리자가 주문에 대해 결제를 요청합니다.")
@@ -266,6 +255,18 @@ public class OrderAdminCommandV1Controller {
             @RequestBody @Valid UpdateAdminOrdersStatusRecoveryOptionRequestDto requestDto
     ) {
         updateAdminOrdersStatusRecoveryOptionUseCase.execute(accountId, requestDto);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 관리자 주문 일괄 업체 도착 상태 변경
+     */
+    @Operation(summary = "관리자 주문 일괄 업체 도착 상태 변경", description = "관리자가 여러 주문의 상태를 업체 도착으로 일괄 변경합니다.")
+    @PatchMapping(value = "/orders/company-arrived")
+    public ResponseDto<Void> updateOrdersStatusCompanyArrived(
+            @RequestBody @Valid UpdateAdminOrdersStatusCompanyArrivedRequestDto requestDto
+    ) {
+        updateAdminOrdersStatusCompanyArrivedUseCase.execute(requestDto);
         return ResponseDto.ok(null);
     }
 }
