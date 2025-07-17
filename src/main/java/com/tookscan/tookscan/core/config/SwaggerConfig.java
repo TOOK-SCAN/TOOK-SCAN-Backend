@@ -1,5 +1,6 @@
 package com.tookscan.tookscan.core.config;
 
+import com.tookscan.tookscan.core.config.swagger.ErrorCodeCustomizer;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -15,13 +16,16 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class SwaggerConfig {
 
     private static final String JWT_SCHEMA_NAME = "JWT TOKEN";
@@ -30,6 +34,8 @@ public class SwaggerConfig {
 
     @Value("${web-engine.server-url}")
     private String serverUrl;
+    
+    private final ErrorCodeCustomizer errorCodeCustomizer;
 
     @Bean
     public GroupedOpenApi publicApi() {
@@ -37,6 +43,7 @@ public class SwaggerConfig {
                 .group("public")
                 .pathsToMatch("/**")
                 .addOpenApiCustomizer(loginEndpointCustomiser())
+                .addOperationCustomizer(errorCodeCustomizer)
                 .build();
     }
 
@@ -45,6 +52,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("user")
                 .pathsToMatch("/v1/users/**")
+                .addOperationCustomizer(errorCodeCustomizer)
                 .build();
     }
 
@@ -53,6 +61,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("admin")
                 .pathsToMatch("/v1/admins/**")
+                .addOperationCustomizer(errorCodeCustomizer)
                 .build();
     }
 

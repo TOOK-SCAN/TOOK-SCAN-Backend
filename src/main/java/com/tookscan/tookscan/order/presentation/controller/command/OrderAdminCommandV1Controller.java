@@ -1,7 +1,10 @@
 package com.tookscan.tookscan.order.presentation.controller.command;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorExceptions;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
@@ -40,6 +43,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -125,6 +129,14 @@ public class OrderAdminCommandV1Controller {
      * 4.3.2 관리자 주문 상태 일괄 변경
      */
     @Operation(summary = "관리자 주문 상태 일괄 변경", description = "관리자가 여러 주문의 상태를 일괄 변경합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.INVALID_ORDER_STATUS,
+            ErrorCode.ACCESS_DENIED
+    })
+    @ApiErrorExceptions({
+            MethodArgumentNotValidException.class
+    })
     @PostMapping(value = "/orders/status")
     public ResponseDto<Void> updateOrderStatus(
          @RequestBody @Valid UpdateAdminOrdersStatusRequestDto requestDto
@@ -137,6 +149,13 @@ public class OrderAdminCommandV1Controller {
      * 4.3.3 관리자 주문 메모 작성
      */
     @Operation(summary = "관리자 주문 메모 작성", description = "관리자가 주문에 메모를 작성합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.ACCESS_DENIED
+    })
+    @ApiErrorExceptions({
+            MethodArgumentNotValidException.class
+    })
     @PostMapping(value = "/orders/{orderId}/memo")
     public ResponseDto<Void> createOrderMemo(
             @PathVariable Long orderId,
