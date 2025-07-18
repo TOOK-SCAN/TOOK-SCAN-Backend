@@ -15,7 +15,7 @@ public class RedirectUrlFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        if (requestURI.startsWith(Constants.KAKAO_OAUTH2_HREF) || requestURI.startsWith(Constants.GOOGLE_OAUTH2_HREF)) {
+        if (requestURI.startsWith(Constants.KAKAO_OAUTH2_HREF) || requestURI.startsWith(Constants.GOOGLE_OAUTH2_HREF) || requestURI.startsWith(Constants.NAVER_OAUTH2_HREF)) {
             String redirectPath = request.getParameter("redirect-path");
             if (redirectPath != null && !redirectPath.isEmpty()) {
                 request.getSession().setAttribute("REDIRECT_PATH", redirectPath);
