@@ -134,6 +134,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
             public void afterCommit() {
                 kakaoMessageUtil.sendCreateOrderMessage(
                         user.getName(),
+                        user.getPhoneNumber(),
                         order.getDocumentsDescription(),
                         order.getDelivery().getPhoneNumber()
                 );

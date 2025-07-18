@@ -26,7 +26,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
     @Transactional
     public void execute(Long orderId) {
 
-        Order order = orderRepository.findByIdOrElseThrow(orderId);
+        Order order = orderRepository.findWithPricePolicyByIdOrElseThrow(orderId);
 
         order.updateOrderStatus(EOrderStatus.PAYMENT_WAITING);
         orderService.updatePaymentExpirationDate(order);
@@ -36,8 +36,9 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
             @Override
             public void afterCommit() {
                 kakaoMessageUtil.sendRequestPaymentMessage(
-                        order.getDelivery().getPhoneNumber(),
                         order.getDocumentsDescription(),
+                        order.getTotalAmount(),
+                        order.getOrderNumber(),
                         order.getDelivery().getPhoneNumber()
                 );
             }

@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.core.utility;
 
-import java.util.HashMap;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.KakaoOption;
 import net.nurigo.sdk.message.model.Message;
@@ -8,6 +10,8 @@ import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
 
 @Component
 public class KakaoMessageUtil {
@@ -44,6 +48,18 @@ public class KakaoMessageUtil {
     @Value("${solapi.sender}")
     private String sender;
 
+    @Value("${solapi.tip-url}")
+    private String tipUrl;
+
+    @Value("${solapi.payment-url}")
+    private String paymentUrl;
+
+    @Value("${solapi.order-detail-url}")
+    private String orderDetailUrl;
+
+    @Value("${solapi.order-waybill-url}")
+    private String orderWaybillUrl;
+
     public KakaoMessageUtil(
             @Value("${solapi.api-key}") String apiKey,
             @Value("${solapi.api-secret}") String apiSecret,
@@ -52,13 +68,15 @@ public class KakaoMessageUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, url);
     }
 
-    public void sendCreateOrderMessage(String userName, String orderName, String to) {
+    public void sendCreateOrderMessage(String userName, String userPhone, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put("#{userName}", userName);
+        variables.put("#{userPhone}", userPhone);
         variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{tipUrl}", tipUrl);
 
         kakaoOption.setVariables(variables);
 
@@ -74,15 +92,16 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(String userName, String orderName, String to) {
+    public void sendRequestPaymentMessage(String orderName, Integer orderPrice, String orderNumber, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{paymentPath}", "로그인 > 마이페이지 > 결제하기");
-        variables.put("#{paymentUrl}", pathForUser);
-        variables.put("#{userName}", userName);
+
         variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{orderPrice}", String.valueOf(orderPrice));
+        variables.put("#{paymentUrl}", paymentUrl + orderNumber);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
 
         kakaoOption.setVariables(variables);
 
@@ -98,15 +117,15 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestScanMessage(String orderName, String to) {
+    public void sendRequestScanMessage(String orderName, String orderNumber, String userEmail, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
 
         variables.put("#{orderName}", "[" + orderName + "]");
-        variables.put("#{scanPath}", "로그인 > 마이페이지 > 스캔하기");
-        variables.put("#{scanUrl}", pathForUser);
+        variables.put("#{userEmail}", userEmail);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
 
         kakaoOption.setVariables(variables);
 
@@ -121,13 +140,13 @@ public class KakaoMessageUtil {
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendAnnounceScanFinishMessage(String userName, String orderName, String to) {
+    public void sendAnnounceScanFinishMessage(String userEmail, String orderName, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
         HashMap<String, String> variables = new HashMap<>();
-        variables.put("#{userName}", userName);
         variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{userEmail}", userEmail);
         kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
@@ -141,9 +160,19 @@ public class KakaoMessageUtil {
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendAnnounceDeliveryMessage(String to) {
+    public void sendAnnounceDeliveryMessage(String orderName, String orderWaybill, String orderNumber, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
+
+        String waybillUrl = orderWaybillUrl.replace("{orderNumber}", orderNumber);
+
+        HashMap<String, String> variables = new HashMap<>();
+        variables.put("#{orderName}", "[" + orderName + "]");
+        variables.put("#{orderWaybill}", orderWaybill);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
+        variables.put("#{orderWaybillUrl}", waybillUrl);
+
+        kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
         kakaoOption.setTemplateId(templateIdAnnounceDelivery);

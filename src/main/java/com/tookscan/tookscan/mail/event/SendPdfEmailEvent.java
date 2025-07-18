@@ -8,12 +8,16 @@ import lombok.Getter;
 public class SendPdfEmailEvent {
 
     String email;
+    String userName;
+    String orderNumber;
     String orderName;
     String pdfUrl;
 
-    public static SendPdfEmailEvent of(String email, String orderName, String pdfUrl) {
+    public static SendPdfEmailEvent of(String email, String userName, String orderNumber, String orderName, String pdfUrl) {
         return SendPdfEmailEvent.builder()
                 .email(email)
+                .userName(userName)
+                .orderNumber(orderNumber)
                 .orderName(orderName)
                 .pdfUrl(pdfUrl)
                 .build();

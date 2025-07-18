@@ -40,6 +40,9 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
             @Override
             public void afterCommit() {
                 kakaoMessageUtil.sendAnnounceDeliveryMessage(
+                        delivery.getOrder().getDocumentsDescription(),
+                        delivery.getTrackingNumber(),
+                        delivery.getOrder().getOrderNumber(),
                         delivery.getPhoneNumber()
                 );
                 kakaoMessageUtil.sendThanksForUsingMessage(

@@ -51,8 +51,8 @@ public class ReadAdminOrderDetailResponseDto extends
     @NotNull
     private final List<DocumentDto> documentDtos;
 
-    @JsonProperty("initial_order")
-    private final InitialOrderDto initialOrderDto;
+    @JsonProperty("initial_documents")
+    private final List<InitialDocumentDto> initialDocumentDtos;
 
     @JsonProperty("payment_info")
     @NotNull
@@ -85,7 +85,7 @@ public class ReadAdminOrderDetailResponseDto extends
             String arrivedAt,
             UserDto userDto,
             List<DocumentDto> documentDtos,
-            InitialOrderDto initialOrderDto,
+            List<InitialDocumentDto> initialDocumentDtos,
             PaymentInfoDto paymentInfoDto,
             String orderMemo,
             String trackingNumber,
@@ -101,7 +101,7 @@ public class ReadAdminOrderDetailResponseDto extends
         this.arrivedAt = arrivedAt;
         this.userDto = userDto;
         this.documentDtos = documentDtos;
-        this.initialOrderDto = initialOrderDto;
+        this.initialDocumentDtos = initialDocumentDtos;
         this.paymentInfoDto = paymentInfoDto;
         this.orderMemo = orderMemo;
         this.trackingNumber = trackingNumber;
@@ -113,7 +113,7 @@ public class ReadAdminOrderDetailResponseDto extends
     }
 
     public static ReadAdminOrderDetailResponseDto fromEntity(Order order,
-                                                            Map<Document, List<Pdf>> documentPdfsMap) {
+                                                             Map<Document, List<Pdf>> documentPdfsMap) {
 
         return ReadAdminOrderDetailResponseDto.builder()
                 .orderNumber(order.getOrderNumber())
@@ -125,6 +125,9 @@ public class ReadAdminOrderDetailResponseDto extends
                 .userDto(UserDto.fromEntity(order))
                 .documentDtos(order.getDocuments().stream()
                         .map(document -> DocumentDto.of(document, documentPdfsMap.get(document)))
+                        .toList())
+                .initialDocumentDtos(order.getDocuments().stream()
+                        .map(InitialDocumentDto::fromEntity)
                         .toList())
                 .initialOrderDto(order.getInitialOrder() != null ?
                         InitialOrderDto.fromEntity(order) : null)
@@ -268,16 +271,88 @@ public class ReadAdminOrderDetailResponseDto extends
                     .id(document.getId().toString())
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .pagePrice(document.getPagePrice())
+                    .pagePrice(document.calculateDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
-                    .recoveryOptionPrice(document.getRecoveryOptionPrice())
+                    .recoveryOptionPrice(document.calculateRecoveryOptionPrice())
                     .isOcrEnabled(document.getIsOcrEnabled())
-                    .ocrPrice(document.getOcrPrice())
-                    .totalPrice(document.getDocumentPrice())
+                    .ocrPrice(document.calculateOcrPrice())
+                    .totalPrice(document.calculatePrice())
                     .pdfs(pdfs.isEmpty() ? List.of() :
                             pdfs.stream()
                                     .map(Pdf::getPdfUrl)
                                     .toList())
+                    .build();
+        }
+    }
+
+
+    @Getter
+    public static class InitialDocumentDto extends SelfValidating<InitialDocumentDto> {
+
+        @JsonProperty("id")
+        @NotNull
+        private final String id;
+
+        @JsonProperty("name")
+        @NotBlank
+        private final String name;
+
+        @JsonProperty("page_count")
+        @NotNull
+        private final Integer pageCount;
+
+        @JsonProperty("page_price")
+        @NotNull
+        private final Integer pagePrice;
+
+        @JsonProperty("recovery_option")
+        @NotNull
+        private final ERecoveryOption recoveryOption;
+
+        @JsonProperty("recovery_option_price")
+        @NotNull
+        private final Integer recoveryOptionPrice;
+
+        @JsonProperty("is_ocr_enabled")
+        @NotNull
+        private final Boolean isOcrEnabled;
+
+        @JsonProperty("ocr_price")
+        @NotNull
+        private final Integer ocrPrice;
+
+        @JsonProperty("total_price")
+        @NotNull
+        private final Integer totalPrice;
+
+        @Builder
+        public InitialDocumentDto(String id, String name, Integer pageCount, Integer pagePrice, ERecoveryOption recoveryOption,
+                                  Integer recoveryOptionPrice, Boolean isOcrEnabled, Integer ocrPrice, Integer totalPrice
+        ) {
+            this.id = id;
+            this.name = name;
+            this.pageCount = pageCount;
+            this.pagePrice = pagePrice;
+            this.recoveryOption = recoveryOption;
+            this.recoveryOptionPrice = recoveryOptionPrice;
+            this.isOcrEnabled = isOcrEnabled;
+            this.ocrPrice = ocrPrice;
+            this.totalPrice = totalPrice;
+
+            this.validateSelf();
+        }
+
+        public static InitialDocumentDto fromEntity(Document document) {
+            return InitialDocumentDto.builder()
+                    .id(document.getId().toString())
+                    .name(document.getInitialName())
+                    .pageCount(document.getInitialPageCount())
+                    .pagePrice(document.calculateInitialDocumentPrice())
+                    .recoveryOption(document.getInitialRecoveryOption())
+                    .recoveryOptionPrice(document.calculateInitialRecoveryOptionPrice())
+                    .isOcrEnabled(document.getInitialIsOcrEnabled())
+                    .ocrPrice(document.calculateInitialOcrPrice())
+                    .totalPrice(document.calculateInitialPrice())
                     .build();
         }
     }
