@@ -102,7 +102,8 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         deliveryRepository.save(delivery);
 
         // 주문 생성
-        Order order = orderService.createOrder(user, true, delivery, coupon, requestDto.isOneDayScan());
+        Order order = orderService.createOrder(user, delivery, coupon, requestDto.isOneDayScan(),
+                pricePolicy.getAdditionalPriceForOneDayScan());
         orderRepository.save(order);
 
         // 쿠폰 적용
@@ -117,12 +118,16 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                             doc.pageCount(),
                             doc.recoveryOption(),
                             order,
-                            pricePolicy,
+                            pricePolicy.getCuttingPrice(),
+                            pricePolicy.getDefaultPricePerPage(),
+                            pricePolicy.getAdditionalPriceForOcr(),
                             doc.isOcrEnabled()
                     );
                     order.getDocuments().add(document);
                     documentRepository.save(document);
         });
+
+        orderService.calculateTotalAmount(order);
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -131,7 +136,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                         user.getName(),
                         user.getPhoneNumber(),
                         order.getDocumentsDescription(),
-                        user.getPhoneNumber()
+                        order.getDelivery().getPhoneNumber()
                 );
             }
         });

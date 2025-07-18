@@ -5,11 +5,15 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.PricePolicy;
+import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderRequestDto;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-
+import com.tookscan.tookscan.order.repository.PricePolicyRepository;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +27,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
 
+    private final PricePolicyRepository pricePolicyRepository;
     private final OrderRepository orderRepository;
     private final DocumentRepository documentRepository;
     private final DocumentService documentService;
+    private final OrderService orderService;
+    private final DeliveryService deliveryService;
 
     @Override
     @Transactional
     public void execute(Long orderId, UpdateAdminOrderRequestDto requestDto) {
+        // 가격 정책 조회
+        PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
+                LocalDate.now(), LocalDate.now());
+
         // 주문(Order) 엔티티 조회
         Order order = orderRepository.findByIdWithDocumentsAndDeliveryOrElseThrow(orderId);
         Set<Long> orderDocumentIds = order.getDocuments().stream()
@@ -70,11 +81,13 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
                     document.name(),
                     document.pageCount(),
                     document.recoveryOption(),
-                    document.isOcrEnabled()
+                    document.isOcrEnabled(),
+                    pricePolicy.getAdditionalPriceForOcr()
             );
 
             if (document.recoveryOptionPrice() != null) {
-                documentMap.get(document.id()).updateRecoveryOptionPrice(document.recoveryOptionPrice());
+                Document doc = documentMap.get(document.id());
+                documentService.updateRecoveryOptionPrice(doc, document.recoveryOptionPrice());
             }
             documentRepository.save(documentMap.get(document.id()));
         });
@@ -86,11 +99,13 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
                     document.pageCount(),
                     document.recoveryOption(),
                     order,
-                    order.getDocuments().get(0).getPricePolicy(),
+                    pricePolicy.getCuttingPrice(),
+                    pricePolicy.getDefaultPricePerPage(),
+                    pricePolicy.getAdditionalPriceForOcr(),
                     document.isOcrEnabled()
             );
             if (document.recoveryOptionPrice() != null) {
-                doc.updateRecoveryOptionPrice(document.recoveryOptionPrice());
+                documentService.updateRecoveryOptionPrice(doc, document.recoveryOptionPrice());
             }
             documentRepository.save(doc);
         });
@@ -106,15 +121,12 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
         // 삭제 처리 (필요하다면 Order 엔티티에서도 해당 Document를 제거)
         order.getDocuments().removeIf(doc -> toDeleteIds.contains(doc.getId()));
         toDeleteIds.forEach(documentRepository::deleteByIdOrElseThrow);
+        orderService.calculateTotalAmount(order);
 
         // 주문 정보 업데이트
-        order.updateIsOneDayScan(requestDto.isOneDayScan());
+        orderService.updateIsOneDayScan(order, requestDto.isOneDayScan());
 
-        order.getDelivery().updateDeliveryPrice(requestDto.deliveryPrice());
-
-        order.getDelivery().updateIsDeliveryFree(requestDto.isDeliveryFree());
-
-        order.updateAdditionalDiscount(requestDto.additionalCouponDiscount());
+        deliveryService.updateDeliveryPrice(order.getDelivery(), requestDto.deliveryPrice());
 
         orderRepository.save(order);
     }

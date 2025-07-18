@@ -108,12 +108,12 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .documentPrice(document.calculateDocumentPrice())
+                    .documentPrice(document.getPagePrice())
                     .recoveryOption(document.getRecoveryOption())
-                    .recoveryPrice(document.getRecoveryOption().getPrice())
-                    .oneDayScanPrice(document.calculateOneDayScanPrice())
-                    .ocrPrice(document.calculateOcrPrice())
-                    .cuttingPrice(document.getPricePolicy().getDefaultPrice())
+                    .recoveryPrice(document.getRecoveryOptionPrice())
+                    .oneDayScanPrice(document.getOneDayScanPrice())
+                    .ocrPrice(document.getOcrPrice())
+                    .cuttingPrice(document.getCuttingPrice())
                     .build();
         }
     }

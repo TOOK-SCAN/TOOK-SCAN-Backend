@@ -5,22 +5,22 @@ import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-import com.tookscan.tookscan.payment.presentation.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.application.usecase.ConfirmPaymentUseCase;
 import com.tookscan.tookscan.payment.domain.Payment;
 import com.tookscan.tookscan.payment.domain.service.PaymentService;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import com.tookscan.tookscan.payment.domain.type.EPaymentStatus;
+import com.tookscan.tookscan.payment.presentation.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
+import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
     private final OrderRepository orderRepository;
 
     private final PaymentService paymentService;
+    private final OrderService orderService;
 
     private final TossPaymentUtil tossPaymentUtil;
     private final RestClientUtil restClientUtil;
@@ -71,7 +72,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
         // 결제 완료 시 주문 상태 변경
         if (payment.getStatus().equals(EPaymentStatus.DONE)) {
-            order.finishPayment(payment);
+            orderService.finishPayment(order, payment);
             orderRepository.save(order);
 
             // 스캔 요청 메시지 전송
@@ -79,7 +80,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                     order.getDocumentsDescription(),
                     order.getOrderNumber(),
                     order.getDelivery().getEmail(),
-                    order.getPhoneNumber()
+                    order.getDelivery().getPhoneNumber()
             );
         }
 

@@ -7,7 +7,8 @@ import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
-import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.service.OrderService;
+import com.tookscan.tookscan.order.domain.service.PdfService;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.time.LocalDateTime;
@@ -25,9 +26,12 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     private final OrderRepository orderRepository;
 
+    private final OrderService orderService;
+
     private final KakaoMessageUtil kakaoMessageUtil;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final PdfService pdfService;
 
     @Override
     @Transactional
@@ -38,7 +42,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         kakaoMessageUtil.sendAnnounceScanFinishMessage(
                 order.getDelivery().getEmail(),
                 order.getDocumentsDescription(),
-                order.getPhoneNumber()
+                order.getDelivery().getPhoneNumber()
         );
 
         List<Document> documents = order.getDocuments();
@@ -47,7 +51,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
         }
 
-        String pdfUrls = order.getPdfUrls();
+        String pdfUrls = pdfService.getPdfUrls(order.getDocuments());
 
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(
@@ -64,7 +68,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         // 이후 배송할일이 없다면(모든 문서가 폐기라면)
         if (order.getDocuments().stream()
                 .noneMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
-            order.updateOrderStatus(EOrderStatus.ALL_COMPLETED);
+            orderService.allComplete(order);
             orderRepository.save(order);
 
             // 감사 메세지 전송
@@ -72,12 +76,12 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
                 @Override
                 public void afterCommit() {
                     kakaoMessageUtil.sendThanksForUsingMessage(
-                            order.getPhoneNumber()
+                            order.getDelivery().getPhoneNumber()
                     );
                 }
             });
         } else {
-            order.updateOrderStatus(EOrderStatus.RECOVERY_IN_PROGRESS);
+            orderService.startRecovery(order);
             orderRepository.save(order);
         }
 

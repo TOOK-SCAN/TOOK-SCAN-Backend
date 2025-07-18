@@ -23,7 +23,6 @@ public enum ErrorCode {
     NOT_FOUND_PRICE_POLICY(40407, HttpStatus.NOT_FOUND, "존재하지 않는 가격 정책입니다."),
     NOT_FOUND_DELIVERY(40408, HttpStatus.NOT_FOUND, "존재하지 않는 배송입니다."),
     NOT_FOUND_PAYMENT(40409, HttpStatus.NOT_FOUND, "존재하지 않는 결제입니다."),
-    NOT_FOUND_TERM(40410, HttpStatus.NOT_FOUND, "존재하지 않는 약관입니다."),
     NOT_FOUND_USER_GROUP(40411, HttpStatus.NOT_FOUND, "존재하지 않는 사용자 그룹입니다."),
     NOT_FOUND_AUTHENTICATION_CODE(40413, HttpStatus.NOT_FOUND, "존재하지 않는 인증 코드입니다."),
     NOT_FOUND_PAYMENT_SESSION(40414, HttpStatus.NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
@@ -86,6 +85,8 @@ public enum ErrorCode {
     GOOGLE_SIGN_IN_USE(40050, HttpStatus.BAD_REQUEST, "구글 로그인 사용 중인 휴대폰 번호입니다."),
     NAVER_SIGN_IN_USE(40051, HttpStatus.BAD_REQUEST, "네이버 로그인 사용 중인 휴대폰 번호입니다."),
     NOT_UPDATABLE_ORDER(40052, HttpStatus.BAD_REQUEST, "주문 상태가 변경되어 더 이상 수정할 수 없습니다."),
+    NOT_RECOVERY_IN_PROGRESS(40053, HttpStatus.BAD_REQUEST, "주문 상태가 복원 작업이 아닙니다."),
+    NOT_PAYMENT_COMPLETED(40054, HttpStatus.BAD_REQUEST, "주문 상태가 결제 완료가 아닙니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),

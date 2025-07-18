@@ -2,9 +2,7 @@ package com.tookscan.tookscan.order.domain.service;
 
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
-import com.tookscan.tookscan.order.domain.PricePolicy;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
-import com.tookscan.tookscan.order.domain.type.EScanStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,22 +12,25 @@ public class DocumentService {
             int pageCount,
             ERecoveryOption recoveryOption,
             Order order,
-            PricePolicy pricePolicy,
+            Integer cuttingPrice,
+            Integer defaultPricePerPage,
+            Integer additionalPriceForOcr,
             Boolean isOcrEnabled
     ) {
-        return Document.builder()
+        Document document = Document.builder()
                 .name(name)
                 .pageCount(pageCount)
                 .recoveryOption(recoveryOption)
                 .order(order)
-                .pricePolicy(pricePolicy)
-                .scanStatus(EScanStatus.UNABLE)
-                .initialName(name)
-                .initialPageCount(pageCount)
-                .initialRecoveryOption(recoveryOption)
+                .cuttingPrice(cuttingPrice)
+                .defaultPricePerPage(defaultPricePerPage)
+                .recoveryOptionPrice(recoveryOption.getPrice())
                 .isOcrEnabled(isOcrEnabled)
-                .initialIsOcrEnabled(isOcrEnabled)
+                .additionalPriceForOcr(additionalPriceForOcr)
+                .totalAmount(0) // 초기 총액은 0으로 설정
                 .build();
+        document.calculateTotalAmount();
+        return document;
     }
 
     public void updateDocument(
@@ -37,11 +38,18 @@ public class DocumentService {
             String name,
             int pageCount,
             ERecoveryOption recoveryOption,
-            boolean isOcrEnabled
+            boolean isOcrEnabled,
+            Integer additionalPriceForOcr
     ) {
         document.updateName(name);
         document.updatePageCount(pageCount);
         document.updateRecoveryOption(recoveryOption);
-        document.updateOcrEnabled(isOcrEnabled);
+        document.updateOcrEnabled(isOcrEnabled, additionalPriceForOcr);
+        document.calculateTotalAmount();
+    }
+
+    public void updateRecoveryOptionPrice(Document document, Integer recoveryOptionPrice) {
+        document.updateRecoveryOptionPrice(recoveryOptionPrice);
+        document.calculateTotalAmount();
     }
 }

@@ -5,7 +5,6 @@ import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderCancelUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
-import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,8 @@ public class UpdateUserOrderCancelService implements UpdateUserOrderCancelUseCas
         Order order = orderRepository.findByIdOrElseThrow(orderId);
         orderService.validateOrderUser(order, user);
         orderService.validateUpdatableOrder(order);
+        orderService.cancelOrder(order, "사용자 요청에 의한 주문 취소");
 
-        order.updateOrderStatus(EOrderStatus.CANCEL);
         orderRepository.save(order);
     }
 }

@@ -57,7 +57,6 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
     private final String email;
 
     @JsonProperty("address")
-    @NotNull
     private final AddressResponseDto address;
 
     @JsonProperty("delivery_request")
@@ -174,13 +173,13 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .documentPrice(document.calculateDocumentPrice())
+                    .documentPrice(document.getDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .isOcrEnabled(document.getIsOcrEnabled())
-                    .recoveryPrice(document.getRecoveryOption().getPrice())
-                    .oneDayScanPrice(document.calculateOneDayScanPrice())
-                    .ocrPrice(document.calculateOcrPrice())
-                    .cuttingPrice(document.getPricePolicy().getDefaultPrice())
+                    .recoveryPrice(document.getRecoveryOptionPrice())
+                    .oneDayScanPrice(document.getOneDayScanPrice())
+                    .ocrPrice(document.getOcrPrice())
+                    .cuttingPrice(document.getCuttingPrice())
                     .build();
         }
     }
@@ -296,7 +295,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .phoneNumber(order.getDelivery().getPhoneNumber())
                 .receiverName(order.getDelivery().getReceiverName())
                 .email(order.getDelivery().getEmail())
-                .address(AddressResponseDto.fromEntity(order.getDelivery().getAddress()))
+                .address(order.getDelivery().getAddress() != null
+                        ? AddressResponseDto.fromEntity(order.getDelivery().getAddress())
+                        : null)
                 .deliveryRequest(order.getDelivery().getRequest())
                 .documents(docs)
                 .isOneDayScan(order.getIsOneDayScan())

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class PricePolicyConfig {
 
     private final PricePolicyRepository pricePolicyRepository;
-    private static final int DEFAULT_PRICE = 1000;
+    private static final int CUTTING_PRICE = 1000;
     private static final int DEFAULT_PRICE_PER_PAGE = 10;
     private static final int ADDITIONAL_PRICE_FOR_ONE_DAY_SCAN = 5;
     private static final int ADDITIONAL_PRICE_FOR_OCR = 5;
@@ -30,7 +30,7 @@ public class PricePolicyConfig {
                     },
                     () -> {
                         PricePolicy pricePolicy = PricePolicy.builder()
-                                .defaultPrice(DEFAULT_PRICE)
+                                .cuttingPrice(CUTTING_PRICE)
                                 .defaultPricePerPage(DEFAULT_PRICE_PER_PAGE)
                                 .deliveryPrice(DELIVERY_PRICE)
                                 .additionalPriceForOneDayScan(ADDITIONAL_PRICE_FOR_ONE_DAY_SCAN)

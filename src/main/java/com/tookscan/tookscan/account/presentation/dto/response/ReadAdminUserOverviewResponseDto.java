@@ -89,11 +89,15 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
         @Schema(description = "그룹 정보 목록")
         private final GroupInfoListDto groupInfos;
 
+        @JsonProperty("status")
+        @Schema(description = "사용자 상태", example = "enrolled", allowableValues = {"enrolled", "withdrawn"})
+        private final String status;
+
         @Builder
         public UserOverviewDto(UUID id, String serialId, String name, String phoneNumber, String email,
                                String signUpDate, Integer totalPaymentAmount, Integer totalOrderCount,
                                Integer totalOrderDocumentCount, String memo, String provider,
-                               GroupInfoListDto groupInfos) {
+                               GroupInfoListDto groupInfos, String status) {
             this.id = id;
             this.serialId = serialId;
             this.name = name;
@@ -106,6 +110,8 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
             this.memo = memo;
             this.provider = provider;
             this.groupInfos = groupInfos;
+            this.status = status;
+
             this.validateSelf();
         }
 
@@ -137,6 +143,7 @@ public class ReadAdminUserOverviewResponseDto extends SelfValidating<ReadAdminUs
                     .memo(user.getMemo())
                     .provider(user.getProvider().name())
                     .groupInfos(GroupInfoListDto.of(user))
+                    .status(user.getDeletedAt() == null ? "enrolled" : "withdrawn")
                     .build();
         }
     }

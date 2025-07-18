@@ -155,11 +155,6 @@ ncp:
     service-id: ${NCP_SMS_SERVICE_ID}
     sender: ${NCP_SMS_SENDER}
 
-# === Scanner 공통 설정 ===
-scanner:
-  base-url: ${SCANNER_BASE_URL}
-  is-prod: ${SCANNER_IS_PROD}
-
 # === TookScan 배송 관련 공통 설정 ===
 tookscan:
   delivery:
@@ -224,3 +219,13 @@ slack:
 
 # === AES 암호화 공통 설정 ===
 aes-key: ${AES_KEY}
+
+# === Swagger 공통 설정 ===
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+  api-docs:
+    path: /v3/api-docs
+  show-login-endpoint: true
+

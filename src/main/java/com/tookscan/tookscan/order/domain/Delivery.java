@@ -10,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,8 +51,8 @@ public class Delivery extends BaseEntity {
     @Column(name = "delivery_price", nullable = false)
     private Integer deliveryPrice;
 
-    @Column(name = "is_delivery_free", nullable = false)
-    private Boolean isDeliveryFree = false;
+    @Column(name = "tracking_number_registered_at")
+    private LocalDateTime trackingNumberRegisteredAt;
 
     /* -------------------------------------------- */
     /* One To One Mapping ------------------------- */
@@ -69,7 +70,8 @@ public class Delivery extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Delivery(String receiverName, String phoneNumber, String email, String request, EDeliveryStatus deliveryStatus, String trackingNumber, Address address, Integer deliveryPrice, Boolean isDeliveryFree) {
+    public Delivery(String receiverName, String phoneNumber, String email, String request,
+                    EDeliveryStatus deliveryStatus, String trackingNumber, Address address, Integer deliveryPrice) {
         this.receiverName = receiverName;
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -78,7 +80,6 @@ public class Delivery extends BaseEntity {
         this.trackingNumber = trackingNumber;
         this.address = address;
         this.deliveryPrice = deliveryPrice;
-        this.isDeliveryFree = isDeliveryFree != null ? isDeliveryFree : false;
     }
 
     public void updateReceiverName(String receiverName) {
@@ -109,7 +110,8 @@ public class Delivery extends BaseEntity {
         this.deliveryPrice = deliveryPrice;
     }
 
-    public void updateIsDeliveryFree(Boolean isDeliveryFree) {
-        this.isDeliveryFree = isDeliveryFree;
+    public void updateTrackingNumberRegisteredAt(LocalDateTime trackingNumberRegisteredAt) {
+        this.trackingNumberRegisteredAt = trackingNumberRegisteredAt;
     }
+
 }

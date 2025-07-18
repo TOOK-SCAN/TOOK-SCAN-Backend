@@ -47,7 +47,6 @@ public class CookieUtil {
                 .domain(cookieDomain)
                 .path("/")
                 .httpOnly(true)
-                .maxAge(60 * 60) // 1 hour
                 .sameSite("Lax")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());

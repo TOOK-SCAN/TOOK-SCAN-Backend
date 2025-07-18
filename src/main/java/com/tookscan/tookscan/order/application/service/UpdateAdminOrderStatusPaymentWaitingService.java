@@ -39,7 +39,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                         order.getDocumentsDescription(),
                         order.getTotalAmount(),
                         order.getOrderNumber(),
-                        order.getPhoneNumber()
+                        order.getDelivery().getPhoneNumber()
                 );
             }
         });

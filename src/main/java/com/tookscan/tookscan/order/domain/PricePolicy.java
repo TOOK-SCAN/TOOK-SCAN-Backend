@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.order.domain;
 
 import com.tookscan.tookscan.core.dto.BaseEntity;
-import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -25,8 +24,8 @@ public class PricePolicy extends BaseEntity {
     /* Information Column ------------------------- */
     /* -------------------------------------------- */
 
-    @Column(name = "default_price", nullable = false)
-    private Integer defaultPrice;
+    @Column(name = "cutting_price", nullable = false)
+    private Integer cuttingPrice;
 
     @Column(name = "default_price_per_page", nullable = false)
     private Integer defaultPricePerPage;
@@ -50,48 +49,15 @@ public class PricePolicy extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public PricePolicy(Integer defaultPrice, Integer defaultPricePerPage, Integer additionalPriceForOneDayScan,
+    public PricePolicy(Integer cuttingPrice, Integer defaultPricePerPage, Integer additionalPriceForOneDayScan,
                        Integer additionalPriceForOcr,
                        Integer deliveryPrice, LocalDate startDate, LocalDate endDate) {
-        this.defaultPrice = defaultPrice;
+        this.cuttingPrice = cuttingPrice;
         this.defaultPricePerPage = defaultPricePerPage;
         this.additionalPriceForOneDayScan = additionalPriceForOneDayScan;
         this.additionalPriceForOcr = additionalPriceForOcr;
         this.deliveryPrice = deliveryPrice;
         this.startDate = startDate;
         this.endDate = endDate;
-    }
-
-    public int calculatePrice(int pageCount, ERecoveryOption recoveryOption, Boolean isOneDayScan,
-                              Boolean isOcrEnabled, Integer recoveryOptionPrice) {
-        int price = 0;
-        int pricePerPage = defaultPricePerPage + (isOcrEnabled ? additionalPriceForOcr : 0) +
-                (isOneDayScan ? additionalPriceForOneDayScan : 0);
-        price += defaultPrice;
-        price += pricePerPage * pageCount;
-        if (recoveryOptionPrice != null) {
-            price += recoveryOptionPrice;
-        } else {
-            price += recoveryOption.getPrice();
-        }
-        return price;
-    }
-
-    public int calculateDocumentPrice(int pageCount) {
-        int price = 0;
-        price += defaultPricePerPage * pageCount;
-        return price;
-    }
-
-    public int calculatePriceForOneDayScan(int pageCount) {
-        int price = 0;
-        price += additionalPriceForOneDayScan * pageCount;
-        return price;
-    }
-
-    public int calculateOcrPrice(int pageCount) {
-        int price = 0;
-        price += additionalPriceForOcr * pageCount;
-        return price;
     }
 }
