@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.notice.presentation.controller.command;
 
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.notice.application.usecase.CreateAdminNoticeUseCase;
 import com.tookscan.tookscan.notice.application.usecase.DeleteAdminNoticeUseCase;
 import com.tookscan.tookscan.notice.application.usecase.UpdateAdminNoticeUseCase;
@@ -30,6 +32,11 @@ public class NoticeAdminCommandV1Controller {
     private final DeleteAdminNoticeUseCase deleteAdminNoticeUseCase;
 
     @Operation(summary = "공지사항 등록", description = "새로운 공지사항을 등록합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.INTERNAL_SERVER_ERROR
+    })
     @PostMapping
     public ResponseDto<Void> createNotice(
             @Valid @RequestBody CreateAdminNoticeRequestDto requestDto) {
@@ -38,6 +45,12 @@ public class NoticeAdminCommandV1Controller {
     }
 
     @Operation(summary = "공지사항 수정", description = "공지사항 정보를 수정합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_NOTICE,
+        ErrorCode.INTERNAL_SERVER_ERROR
+    })
     @PutMapping("/{noticeId}")
     public ResponseDto<ReadAdminNoticeDetailResponseDto> updateNotice(
             @PathVariable Long noticeId,
@@ -47,6 +60,12 @@ public class NoticeAdminCommandV1Controller {
     }
 
     @Operation(summary = "공지사항 삭제", description = "공지사항을 삭제합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_NOTICE,
+        ErrorCode.INTERNAL_SERVER_ERROR
+    })
     @DeleteMapping("/{noticeId}")
     public ResponseDto<Object> deleteNotice(@PathVariable Long noticeId) {
         deleteAdminNoticeUseCase.execute(noticeId);

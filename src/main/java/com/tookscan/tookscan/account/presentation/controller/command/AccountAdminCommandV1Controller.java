@@ -11,7 +11,10 @@ import com.tookscan.tookscan.account.application.usecase.DeleteAdminGroupUseCase
 import com.tookscan.tookscan.account.application.usecase.DeleteAdminUserUseCase;
 import com.tookscan.tookscan.account.application.usecase.UpdateAdminGroupUseCase;
 import com.tookscan.tookscan.account.application.usecase.UpdateAdminUserUseCase;
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -41,6 +44,12 @@ public class AccountAdminCommandV1Controller {
     /**
      * 3.1.1 (관리자) 그룹 만들기
      */
+    @Operation(summary = "관리자 그룹 생성", description = "관리자가 새로운 그룹을 생성합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.ALREADY_EXIST_RESOURCE,
+        ErrorCode.ACCESS_DENIED
+    })
     @PostMapping("/groups")
     public ResponseDto<Void> createAdminGroup(
             @RequestBody @Valid CreateAdminGroupRequestDto requestDto
@@ -52,6 +61,13 @@ public class AccountAdminCommandV1Controller {
     /**
      * 3.3.1 (관리자) 그룹 수정
      */
+    @Operation(summary = "관리자 그룹 수정", description = "관리자가 기존 그룹 정보를 수정합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_USER_GROUP,
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.ALREADY_EXIST_RESOURCE,
+        ErrorCode.ACCESS_DENIED
+    })
     @PatchMapping("/groups/{id}")
     public ResponseDto<Void> updateAdminGroup(
             @PathVariable Long id,
@@ -64,6 +80,12 @@ public class AccountAdminCommandV1Controller {
     /**
      * 3.4.2 (관리자) 유저 정보 수정
      */
+    @Operation(summary = "관리자 유저 정보 수정", description = "관리자가 사용자 정보를 수정합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.ACCESS_DENIED
+    })
     @PutMapping("/users/{id}")
     public ResponseDto<Void> updateAdminUser(
             @RequestBody @Valid UpdateAdminUserRequestDto requestDto,
@@ -76,6 +98,13 @@ public class AccountAdminCommandV1Controller {
     /**
      * 3.4.3 (관리자) 사용자 그룹 지정
      */
+    @Operation(summary = "관리자 사용자 그룹 지정", description = "관리자가 사용자들을 특정 그룹에 배정합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.NOT_FOUND_USER_GROUP,
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.ACCESS_DENIED
+    })
     @PutMapping("/groups/users")
     public ResponseDto<Void> createAdminUserGroup(
             @RequestBody @Valid CreateAdminUserGroupRequestDto requestDto
@@ -87,6 +116,12 @@ public class AccountAdminCommandV1Controller {
     /**
      * 3.5.1 (관리자) 그룹 삭제
      */
+    @Operation(summary = "관리자 그룹 삭제", description = "관리자가 기존 그룹을 삭제합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_USER_GROUP,
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.ACCESS_DENIED
+    })
     @DeleteMapping("/groups/{id}")
     public ResponseDto<Void> deleteAdminGroup(
             @PathVariable Long id
@@ -98,6 +133,12 @@ public class AccountAdminCommandV1Controller {
     /**
      * 3.5.2 (관리자) 유저 삭제
      */
+    @Operation(summary = "관리자 유저 삭제", description = "관리자가 사용자들을 시스템에서 삭제합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.ACCESS_DENIED
+    })
     @DeleteMapping("/users")
     public ResponseDto<Void> deleteAdminUser(
             @RequestBody @Valid DeleteAdminUserRequestDto requestDto

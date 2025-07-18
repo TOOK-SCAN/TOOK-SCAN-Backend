@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.notice.presentation.controller.query;
 
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.notice.application.usecase.ReadUserNoticeDetailUseCase;
 import com.tookscan.tookscan.notice.application.usecase.ReadUserNoticeOverviewsUseCase;
 import com.tookscan.tookscan.notice.presentation.dto.response.ReadUserNoticeDetailResponseDto;
@@ -26,12 +28,23 @@ public class NoticeUserQueryV1Controller {
     private final ReadUserNoticeOverviewsUseCase readUserNoticeOverviewsUseCase;
 
     @Operation(summary = "공지사항 상세 조회", description = "공개된 공지사항의 상세 정보를 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_NOTICE,
+        ErrorCode.INTERNAL_SERVER_ERROR
+    })
     @GetMapping("/{noticeId}/details")
     public ResponseDto<ReadUserNoticeDetailResponseDto> getNotice(@PathVariable Long noticeId) {
         return ResponseDto.ok(readUserNoticeDetailUseCase.execute(noticeId));
     }
 
     @Operation(summary = "공지사항 목록 조회", description = "공개된 공지사항 목록을 생성일 기준 최신순으로 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.INTERNAL_SERVER_ERROR
+    })
     @GetMapping("/overviews")
     public ResponseDto<ReadUserNoticeOverviewsResponseDto> getNoticeList(
             @RequestParam(value = "page", defaultValue = "1") Integer page,

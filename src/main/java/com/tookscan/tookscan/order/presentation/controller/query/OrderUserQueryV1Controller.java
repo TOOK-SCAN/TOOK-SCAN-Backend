@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.presentation.controller.query;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.order.application.usecase.EstimateUserOrderPriceUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderCouponDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderDeliveryUseCase;
@@ -47,6 +49,14 @@ public class OrderUserQueryV1Controller {
      * 4.1.9 회원 스캔 가격 계산
      */
     @Operation(summary = "회원 스캔 가격 계산", description = "회원이 스캔 가격을 계산합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_PRICE_POLICY,
+            ErrorCode.NOT_FOUND_COUPON,
+            ErrorCode.NOT_AVAILABLE_COUPON,
+            ErrorCode.USED_COUPON,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER
+    })
     @PostMapping(value = "/estimate")
     public ResponseDto<EstimateUserOrderPriceResponseDto> estimateOrderPrice(
             @Parameter(hidden = true) @AccountID UUID accountId,
@@ -59,6 +69,11 @@ public class OrderUserQueryV1Controller {
      * 4.2.2 회원 주문 내역 조회
      */
     @Operation(summary = "회원 주문 내역 조회", description = "회원이 주문 내역을 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER
+    })
     @GetMapping(value = "/overviews")
     public ResponseDto<ReadUserOrderOverviewResponseDto> getOrderOverview(
             @Parameter(hidden = true) @AccountID UUID accountId,
@@ -67,7 +82,7 @@ public class OrderUserQueryV1Controller {
             @RequestParam(value = "start-date", required = false) String startDate,
             @RequestParam(value = "end-date", required = false) String endDate,
             @RequestParam(value = "order-status", required = false) EOrderStatus orderStatus,
-            @RequestParam(value = "sort", required = false) String sort,
+            @Parameter(description = "정렬 기준 (order-date, total-amount, document-count)") @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction
 
@@ -81,6 +96,12 @@ public class OrderUserQueryV1Controller {
      * 4.2.3 회원 주문 상세 조회
      */
     @Operation(summary = "회원 주문 상세 조회", description = "회원이 주문 상세를 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_MATCH_ORDER_USER,
+            ErrorCode.ACCESS_DENIED
+    })
     @GetMapping(value = "/{orderId}/details")
     public ResponseDto<ReadUserOrderDetailResponseDto> getUserOrderDetail(
             @Parameter(hidden = true) @AccountID UUID accountId,
@@ -93,6 +114,13 @@ public class OrderUserQueryV1Controller {
      * 4.2.4 회원 상세 배송 정보 조회
      */
     @Operation(summary = "회원 상세 배송 정보 조회", description = "회원이 상세 배송 정보를 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_MATCH_ORDER_USER,
+            ErrorCode.INVALID_ORDER_STATUS,
+            ErrorCode.ACCESS_DENIED
+    })
     @GetMapping(value = "/{orderId}/delivery")
     public ResponseDto<ReadUserOrderDeliveryResponseDto> getUserOrderDelivery(
             @Parameter(hidden = true) @AccountID UUID accountId,
@@ -105,6 +133,12 @@ public class OrderUserQueryV1Controller {
      * 4.2.16 회원 주문 요약 조회
      */
     @Operation(summary = "회원 주문 요약 조회", description = "회원이 주문 요약을 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_MATCH_ORDER_USER,
+            ErrorCode.ACCESS_DENIED
+    })
     @GetMapping(value = "/summary")
     public ResponseDto<ReadUserOrderSummaryResponseDto> getUserOrderSummary(
             @Parameter(hidden = true) @AccountID UUID accountId,
@@ -117,6 +151,12 @@ public class OrderUserQueryV1Controller {
      * 4.2.19 회원 쿠폰 정보 조회
      */
     @Operation(summary = "회원 쿠폰 정보 조회", description = "회원이 쿠폰 정보를 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_COUPON,
+            ErrorCode.NOT_AVAILABLE_COUPON,
+            ErrorCode.USED_COUPON,
+            ErrorCode.INVALID_ARGUMENT
+    })
     @GetMapping(value = "/coupon/detail")
     public ResponseDto<ReadUserOrderCouponDetailResponseDto> getUserCouponDetail(
             @Parameter(hidden = true) @AccountID UUID accountId,

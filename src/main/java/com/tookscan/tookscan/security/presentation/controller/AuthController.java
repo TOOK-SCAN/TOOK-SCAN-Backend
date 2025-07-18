@@ -37,10 +37,10 @@ import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticat
 import com.tookscan.tookscan.security.presentation.dto.response.ReadSerialIdAndProviderResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReissuePasswordResponseDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ValidationResponseDto;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -55,12 +55,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@Hidden
+@Tag(name = "Auth", description = "Auth 관련 API 입니다.")
 @RequestMapping("/v1/auth")
 public class AuthController {
 
@@ -83,6 +82,18 @@ public class AuthController {
     /**
      * 1.2.2 JWT 재발급
      */
+    @Operation(summary = "JWT 재발급", description = "쿠키에 저장된 Refresh Token을 사용하여 새로운 JWT 토큰을 발급합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_COOKIE_ERROR,
+        ErrorCode.EXPIRED_TOKEN_ERROR,
+        ErrorCode.INVALID_TOKEN_ERROR,
+        ErrorCode.TOKEN_MALFORMED_ERROR,
+        ErrorCode.TOKEN_TYPE_ERROR,
+        ErrorCode.TOKEN_UNSUPPORTED_ERROR,
+        ErrorCode.TOKEN_GENERATION_ERROR,
+        ErrorCode.TOKEN_UNKNOWN_ERROR,
+        ErrorCode.NOT_FOUND_ACCOUNT
+    })
     @PostMapping("/reissue/token")
     public void reissueDefaultJsonWebToken(
             HttpServletRequest request,
@@ -99,6 +110,15 @@ public class AuthController {
     /**
      * 2.1.1 휴대폰 인증번호 발송
      */
+    @Operation(summary = "휴대폰 인증번호 발송", description = "휴대폰 번호로 인증번호를 발송합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.TOO_FAST_AUTHENTICATION_CODE_REQUESTS,
+        ErrorCode.TOO_MANY_AUTHENTICATION_CODE_REQUESTS,
+        ErrorCode.EXTERNAL_SERVER_ERROR,
+        ErrorCode.PROVIDER_ERROR
+    })
     @PostMapping("/authentication-code")
     public ResponseDto<IssueAuthenticationCodeResponseDto> issueAuthenticationCode(
             @Valid @RequestBody IssueAuthenticationCodeRequestDto requestDto
@@ -109,6 +129,17 @@ public class AuthController {
     /**
      * 2.1.2 유저 회원가입
      */
+    @Operation(summary = "유저 회원가입", description = "일반 회원가입을 진행하고 JWT 토큰을 발급합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.ALREADY_EXIST_ID,
+        ErrorCode.ALREADY_EXIST_PHONE_NUMBER,
+        ErrorCode.NOT_VERIFIED_AUTHENTICATION_CODE,
+        ErrorCode.NOT_FOUND_AUTHENTICATION_CODE,
+        ErrorCode.NOT_MATCH_AUTHENTICATION_CODE,
+        ErrorCode.TOKEN_GENERATION_ERROR
+    })
     @PostMapping("/users/sign-up-default")
     public void signUpDefault(
             @Valid @RequestBody SignUpDefaultRequestDto requestDto,
@@ -123,6 +154,8 @@ public class AuthController {
     /**
      * 관리자 회원가입 (더 이상 사용되지 않음)
      */
+    @Operation(summary = "관리자 회원가입 (사용 중단)", description = "관리자 회원가입 API입니다. 더 이상 사용되지 않습니다.")
+    @ApiErrorCode({})
     @Deprecated
     @PostMapping("/admins/sign-up-default")
 //    public ResponseDto<Void> adminSignUpDefault(
@@ -137,6 +170,24 @@ public class AuthController {
     /**
      * 2.1.3 소셜로그인 유저 회원가입
      */
+    @Operation(summary = "소셜로그인 유저 회원가입", description = "소셜 로그인 후 추가 정보를 입력하여 회원가입을 완료합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_COOKIE_ERROR,
+        ErrorCode.EXPIRED_TOKEN_ERROR,
+        ErrorCode.INVALID_TOKEN_ERROR,
+        ErrorCode.TOKEN_MALFORMED_ERROR,
+        ErrorCode.TOKEN_TYPE_ERROR,
+        ErrorCode.TOKEN_UNSUPPORTED_ERROR,
+        ErrorCode.TOKEN_UNKNOWN_ERROR,
+        ErrorCode.NOT_FOUND_TEMPORARY_ACCOUNT,
+        ErrorCode.ALREADY_EXIST_PHONE_NUMBER,
+        ErrorCode.NOT_VERIFIED_AUTHENTICATION_CODE,
+        ErrorCode.NOT_FOUND_AUTHENTICATION_CODE,
+        ErrorCode.NOT_MATCH_AUTHENTICATION_CODE,
+        ErrorCode.TOKEN_GENERATION_ERROR,
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER
+    })
     @PostMapping("/users/sign-up-oauth")
     public void signUpOauth(
             @Valid @RequestBody SignUpOauthRequestDto requestDto,
@@ -154,6 +205,15 @@ public class AuthController {
     /**
      * 2.1.4 아이디 찾기
      */
+    @Operation(summary = "아이디 찾기", description = "휴대폰 번호를 통해 사용자의 아이디와 로그인 제공자를 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.NOT_VERIFIED_AUTHENTICATION_CODE,
+        ErrorCode.NOT_FOUND_AUTHENTICATION_CODE,
+        ErrorCode.NOT_MATCH_AUTHENTICATION_CODE
+    })
     @PostMapping("/verification/serial-id")
     public ResponseDto<ReadSerialIdAndProviderResponseDto> readSerialId(
             @Valid @RequestBody ReadSerialIdAndProviderRequestDto requestDto
@@ -164,6 +224,16 @@ public class AuthController {
     /**
      * 2.1.5 유저 정보 검증
      */
+    @Operation(summary = "유저 정보 검증", description = "사용자의 아이디와 휴대폰 번호를 검증하고 임시 토큰을 발급합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.NOT_VERIFIED_AUTHENTICATION_CODE,
+        ErrorCode.NOT_FOUND_AUTHENTICATION_CODE,
+        ErrorCode.NOT_MATCH_AUTHENTICATION_CODE,
+        ErrorCode.TOKEN_GENERATION_ERROR
+    })
     @PostMapping("/verification/user")
     public ResponseDto<Void> verifyUser(
             HttpServletResponse response,
@@ -177,9 +247,16 @@ public class AuthController {
     /**
      * 2.1.6 비밀번호 검증
      */
+    @Operation(summary = "비밀번호 검증", description = "사용자의 현재 비밀번호를 검증합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.FAILURE_LOGIN
+    })
     @PostMapping("/verification/password")
     public ResponseDto<ValidationResponseDto> verifyPassword(
-            @AccountID UUID accountId,
+            @Parameter(hidden = true) @AccountID UUID accountId,
             @Valid @RequestBody VerifyPasswordRequestDto requestDto
     ) {
         return ResponseDto.ok(verifyPasswordUseCase.execute(accountId, requestDto));
@@ -188,6 +265,12 @@ public class AuthController {
     /**
      * 2.2.1 아이디 중복 검사
      */
+    @Operation(summary = "아이디 중복 검사", description = "회원가입 시 아이디의 중복 여부를 확인합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.ALREADY_EXIST_ID
+    })
     @GetMapping("/existence/serial-id")
     public ResponseDto<ValidationResponseDto> validateId(
             @RequestParam(name = "serial-id") String serialId
@@ -198,16 +281,13 @@ public class AuthController {
     /**
      * 2.2.2 계정 간단 정보 조회 (더 이상 사용되지 않음)
      */
+    @Operation(summary = "계정 간단 정보 조회 (사용 중단)", description = "계정 간단 정보 조회 API입니다. 더 이상 사용되지 않습니다.")
+    @ApiErrorCode({})
     @Deprecated
     @GetMapping("/briefs")
-    @Operation(summary = "계정 간단 정보 조회", description = "계정 유형(ADMIN, USER)과 이름을 포함한 유저의 기본 정보를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음")
-    })
 //    public ResponseDto<ReadAccountBriefResponseDto> readAccountBrief(
     public ResponseDto<String> readAccountBrief(
-            @AccountID UUID accountId
+            @Parameter(hidden = true) @AccountID UUID accountId
     ) {
         return ResponseDto.ok("계정 간단 정보 조회는 더 이상 사용되지 않습니다.");
     }
@@ -215,6 +295,15 @@ public class AuthController {
     /**
      * 2.2.3 휴대폰 번호 중복 검사
      */
+    @Operation(summary = "휴대폰 번호 중복 검사", description = "회원가입 시 휴대폰 번호의 중복 여부를 확인합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.ALREADY_EXIST_PHONE_NUMBER,
+        ErrorCode.KAKAO_SIGN_IN_USE,
+        ErrorCode.GOOGLE_SIGN_IN_USE,
+        ErrorCode.NAVER_SIGN_IN_USE
+    })
     @GetMapping("/existence/phone-number")
     public ResponseDto<ValidationResponseDto> validatePhoneNumber(
             @RequestParam(name = "phone-number") String phoneNumber
@@ -225,6 +314,14 @@ public class AuthController {
     /**
      * 2.3.1 휴대폰 인증번호 검증
      */
+    @Operation(summary = "휴대폰 인증번호 검증", description = "발송된 인증번호를 검증하여 인증을 완료합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_AUTHENTICATION_CODE,
+        ErrorCode.NOT_MATCH_AUTHENTICATION_CODE,
+        ErrorCode.EXCEED_MAX_AUTH_COUNT
+    })
     @PatchMapping("/authentication-code")
     public ResponseDto<Void> validateAuthenticationCode(
             @Valid @RequestBody ValidateAuthenticationCodeRequestDto requestDto
@@ -236,6 +333,17 @@ public class AuthController {
     /**
      * 2.3.2 임시 비밀번호 발급
      */
+    @Operation(summary = "임시 비밀번호 발급", description = "사용자 검증 후 임시 비밀번호를 발급합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.NOT_VERIFIED_AUTHENTICATION_CODE,
+        ErrorCode.NOT_FOUND_AUTHENTICATION_CODE,
+        ErrorCode.NOT_MATCH_AUTHENTICATION_CODE,
+        ErrorCode.EXTERNAL_SERVER_ERROR,
+        ErrorCode.PROVIDER_ERROR
+    })
     @PatchMapping("/reissue/password")
     public ResponseDto<ReissuePasswordResponseDto> reissuePassword(
             @Valid @RequestBody ReissuePasswordRequestDto requestDto
@@ -246,9 +354,16 @@ public class AuthController {
     /**
      * 2.3.3 비밀번호 변경
      */
+    @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.FAILURE_LOGIN
+    })
     @PatchMapping("/password")
     public ResponseDto<Void> changePassword(
-            @AccountID UUID accountId,
+            @Parameter(hidden = true) @AccountID UUID accountId,
             @Valid @RequestBody ChangePasswordRequestDto requestDto
     ) {
         changePasswordUseCase.execute(accountId, requestDto);
@@ -258,9 +373,16 @@ public class AuthController {
     /**
      * 2.5.1 회원 탈퇴
      */
+    @Operation(summary = "회원 탈퇴", description = "사용자 계정을 삭제합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.NOT_FOUND_ACCOUNT,
+        ErrorCode.FAILURE_LOGIN
+    })
     @DeleteMapping("")
     public ResponseDto<Void> deleteAccount(
-            @AccountID UUID accountId,
+            @Parameter(hidden = true) @AccountID UUID accountId,
             @RequestBody DeleteAccountRequestDto requestDto
     ) {
         deleteAccountUseCase.execute(accountId, requestDto);
