@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.order.presentation.controller.query;
 
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
@@ -13,6 +15,7 @@ import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetai
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderOverviewsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,9 @@ public class OrderAdminQueryV1Controller {
      * 4.2.5 관리자 주문 요약 정보 조회
      */
     @Operation(summary = "관리자 주문 요약 정보 조회", description = "관리자가 주문 요약 정보를 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.ACCESS_DENIED
+    })
     @GetMapping("/orders/briefs")
     public ResponseDto<ReadAdminOrderBriefsResponseDto> readOrderBriefs() {
         return ResponseDto.ok(readAdminOrderBriefsUseCase.execute());
@@ -48,6 +54,10 @@ public class OrderAdminQueryV1Controller {
      * 4.2.7 관리자 스캔 파일 다운로드
      */
     @Operation(summary = "관리자 스캔 PDF 파일 다운로드", description = "관리자가 주문의 스캔 PDF 파일을 다운로드합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_DOCUMENT,
+        ErrorCode.ACCESS_DENIED
+    })
     @GetMapping("/documents/{documentId}/pdfs")
     public ResponseDto<ReadAdminDocumentsPdfsResponseDto> downloadScanFile(
             @PathVariable Long documentId
@@ -59,6 +69,10 @@ public class OrderAdminQueryV1Controller {
      * 4.2.8 관리자 주문 상세 조회
      */
     @Operation(summary = "관리자 주문 상세 조회", description = "관리자가 주문 상세 내역을 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_ORDER,
+        ErrorCode.ACCESS_DENIED
+    })
     @GetMapping("/orders/{orderId}/details")
     public ResponseDto<ReadAdminOrderDetailResponseDto> readOrderDocumentsOverviews(
             @PathVariable Long orderId
@@ -71,6 +85,11 @@ public class OrderAdminQueryV1Controller {
      * 4.2.12 관리자 주문 리스트 조회
      */
     @Operation(summary = "관리자 주문 리스트 조회", description = "관리자가 주문 리스트를 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.ACCESS_DENIED
+    })
     @GetMapping("/orders/overviews")
     public ResponseDto<ReadAdminOrderOverviewsResponseDto> readOrderOverviews(
             @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
@@ -78,8 +97,8 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "start-date", required = false) String startDate,
             @RequestParam(value = "end-date", required = false) String endDate,
             @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "search-type", required = false) String searchType,
-            @RequestParam(value = "sort", defaultValue = "order-date") String sort,
+            @Parameter(description = "검색 타입 (id, name, email, phone, order-number)") @RequestParam(value = "search-type", required = false) String searchType,
+            @Parameter(description = "정렬 기준 (order-date, total-amount, document-count)") @RequestParam(value = "sort", defaultValue = "order-date") String sort,
             @RequestParam(value = "direction", defaultValue = "ASC") Direction direction,
             @RequestParam(value = "order-status", required = false) EOrderStatus orderStatus,
             @RequestParam(value = "is-one-day-scan", required = false) Boolean isOneDayScan,
@@ -88,8 +107,8 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "is-in-progress", required = false) Boolean isInProgress
     ) {
         return ResponseDto.ok(
-                readAdminOrderOverviewsUseCase.execute(page, size, startDate, endDate, search, searchType, sort,
-                        direction, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress, isInProgress));
+                readAdminOrderOverviewsUseCase.execute(page, size, startDate, endDate, search, 
+                        searchType, sort, direction, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress, isInProgress));
     }
 
 
@@ -97,6 +116,11 @@ public class OrderAdminQueryV1Controller {
      * 5.2.1 관리자 통계 조회
      */
     @Operation(summary = "관리자 통계 조회", description = "관리자가 통계 정보를 조회합니다.")
+    @ApiErrorCode({
+        ErrorCode.INVALID_ARGUMENT,
+        ErrorCode.BAD_REQUEST_PARAMETER,
+        ErrorCode.ACCESS_DENIED
+    })
     @GetMapping("/statistics/summaries")
     public ResponseDto<ReadStatisticsSummariesResponseDto> readStatisticsSummaries(
             @RequestParam(value = "start-year-month", required = false) String startYearMonth,

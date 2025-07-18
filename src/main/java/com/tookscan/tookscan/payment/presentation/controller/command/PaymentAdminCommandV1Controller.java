@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.payment.presentation.controller.command;
 
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.payment.application.usecase.RefundPaymentUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +24,23 @@ public class PaymentAdminCommandV1Controller {
      * 7.3.1 (관리자) 환불하기
      */
     @Operation(summary = "관리자 환불하기", description = "관리자가 환불을 진행합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_PAYMENT,
+        ErrorCode.ALREADY_CANCELED_PAYMENT,
+        ErrorCode.NOT_CANCELABLE_PAYMENT,
+        ErrorCode.NOT_CANCELABLE_AMOUNT,
+        ErrorCode.FORBIDDEN_CONSECUTIVE_REQUEST,
+        ErrorCode.PROVIDER_ERROR,
+        ErrorCode.EXTERNAL_SERVER_ERROR,
+        ErrorCode.EXTERNAL_SERVER_TIMEOUT,
+        ErrorCode.REST_CLIENT_ERROR,
+        ErrorCode.UNKNOWN_PAYMENT_ERROR,
+        ErrorCode.FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING,
+        ErrorCode.FAILED_REFUND_PROCESS,
+        ErrorCode.FAILED_METHOD_HANDLING_CANCEL,
+        ErrorCode.FAILED_PARTIAL_REFUND,
+        ErrorCode.COMMON_ERROR
+    })
     @PatchMapping("/{id}/cancel")
     public ResponseDto<Void> refundPayment(
             @PathVariable Long id
