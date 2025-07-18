@@ -22,6 +22,7 @@ public class Constants {
     // Oauth2 Href URL
     public static String KAKAO_OAUTH2_HREF = "/oauth2/authorization/kakao";
     public static String GOOGLE_OAUTH2_HREF = "/oauth2/authorization/google";
+    public static String NAVER_OAUTH2_HREF = "/oauth2/authorization/naver";
 
     // Additional Info Input Url
     public static String ADDITIONAL_INFO_INPUT_PATH = "/auth/join?provider=easy";
@@ -35,6 +36,8 @@ public class Constants {
             "/login/oauth2/code/kakao",
             "/oauth2/authorization/google",
             "/login/oauth2/code/google",
+            "/oauth2/authorization/naver",
+            "/login/oauth2/code/naver",
             "/v1/auth/login",
             "/v1/auth/reissue/token",
             "/v1/auth/authentication-code",
