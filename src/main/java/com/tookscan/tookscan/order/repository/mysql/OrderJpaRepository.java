@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,24 +20,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
-    @Query("SELECT o FROM Order o " +
-            "JOIN o.documents d " +
-            "WHERE o.user = :user " +
-            "AND (o.orderNumber LIKE %:search% " +
-            "OR d.name LIKE %:search%)" +
-            "AND o.createdAt BETWEEN :startDate AND :endDate")
-    Page<Order> findAllByUserAndSearchAndCreatedAtBetween(@Param("user") User user, @Param("search") String search,
-                                                          Pageable pageable,
-                                                          @Param("startDate") LocalDateTime startDate,
-                                                          @Param("endDate") LocalDateTime endDate);
-
-    @Query("SELECT o FROM Order o " +
-            "JOIN o.documents d " +
-            "WHERE o.user = :user " +
-            "AND (o.orderNumber LIKE %:search% " +
-            "OR d.name LIKE %:search%)")
-    Page<Order> findAllByUserAndSearch(@Param("user") User user, @Param("search") String search,
-                                       Pageable pageable);
 
     @Query("SELECT o FROM Order o " +
             "WHERE o.user = :user")
@@ -47,13 +31,6 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     @EntityGraph(attributePaths = {"documents", "documents.pricePolicy"})
     Optional<Order> findWithPricePolicyById(Long id);
-
-    @Query("SELECT o FROM Order o " +
-            "LEFT JOIN FETCH o.documents d " +
-            "LEFT JOIN FETCH d.pricePolicy p " +
-            "LEFT JOIN FETCH o.delivery del " +
-            "WHERE o.orderNumber = :orderNumber")
-    Optional<Order> findWithDeliveryByOrderNumber(String orderNumber);
 
     @Query("SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.documents d " +
@@ -93,16 +70,24 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     Integer countByCreatedAtBetween(LocalDateTime createdAt, LocalDateTime createdAt2);
 
+    @Query(
+            "SELECT COUNT(o) FROM Order o " +
+            "WHERE o.createdAt BETWEEN :startDate AND :endDate " +
+            "AND o.orderStatus = :orderStatus"
+    )
+    Integer countByCreatedAtBetweenAndOrderStatus(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, @Param("orderStatus") EOrderStatus orderStatus);
+
+    @Query(
+            "SELECT COUNT(d) FROM Order o " +
+                    "JOIN o.documents d " +
+                    "WHERE o.createdAt BETWEEN :startDate AND :endDate " +
+                    "AND d.recoveryOption = :recoveryOption"
+    )
+    Integer countByCreatedAtBetweenAndRecoveryOption(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, @Param("recoveryOption") ERecoveryOption recoveryOption);
+
     @EntityGraph(attributePaths = {"documents", "delivery"})
     @Query("SELECT o FROM Order o WHERE o.id = :id")
     Optional<Order> findByIdWithDocuments(@Param("id") Long id);
-
-    @EntityGraph(attributePaths = {"delivery","documents", "documents.pdfs"})
-    @Query("SELECT o FROM Order o WHERE o.id = :id")
-    Optional<Order> findByIdWithDocumentsAndPdf(@Param("id") Long id);
-
-    Page<Order> findAllByUserAndCreatedAtBetween(User user, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore,
-                                                 Pageable pageable);
 
     @EntityGraph(attributePaths = {"documents", "delivery"})
     @Query("SELECT o FROM Order o WHERE o.id = :id")

@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto.MonthlyStatisticsDto;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
@@ -24,7 +26,13 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
 
     @Override
     @Transactional
-    public ReadStatisticsSummariesResponseDto execute(String startYearMonth, String endYearMonth) {
+    public ReadStatisticsSummariesResponseDto execute(
+            String startYearMonth,
+            String endYearMonth,
+            Boolean isApplied,
+            Boolean isArrived,
+            Boolean isCompleted
+    ) {
         LocalDate start = LocalDate.parse(startYearMonth + "-01");
         LocalDate end = LocalDate.parse(endYearMonth + "-01");
         // 결과를 담을 리스트
@@ -54,10 +62,17 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
             // TODO: page view count, visitant count 추가
             Integer pageViewCount = 0;
             Integer visitantCount = 0;
+            Integer appliedCount = orderRepository.countByCreatedAtBetweenAndOrderStatus(monthStart, monthEnd, EOrderStatus.APPLY_COMPLETED);
+            Integer arrivedCount = orderRepository.countByCreatedAtBetweenAndOrderStatus(monthStart, monthEnd, EOrderStatus.COMPANY_ARRIVED);
+            Integer completedCount = orderRepository.countByCreatedAtBetweenAndOrderStatus(monthStart, monthEnd, EOrderStatus.ALL_COMPLETED);
+
+            Integer discardedCount = orderRepository.countByCreatedAtBetweenAndRecoveryOption(monthStart, monthEnd, ERecoveryOption.DISCARD);
+            Integer springCount = orderRepository.countByCreatedAtBetweenAndRecoveryOption(monthStart, monthEnd, ERecoveryOption.SPRING);
+            Integer rawCount = orderRepository.countByCreatedAtBetweenAndRecoveryOption(monthStart, monthEnd, ERecoveryOption.RAW);
 
             // 5) DTO에 담아서 결과 리스트에 추가
-            result.add(MonthlyStatisticsDto.of(yearMonth, pageViewCount, visitantCount, signUpCount, orderCount,
-                    totalAmount));
+            result.add(MonthlyStatisticsDto.of(yearMonth, pageViewCount, visitantCount, signUpCount, orderCount
+                    , appliedCount, arrivedCount, completedCount, discardedCount, springCount, rawCount));
 
             // 다음 달로 이동
             current = current.plusMonths(1);

@@ -377,6 +377,16 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Integer countByCreatedAtBetweenAndOrderStatus(LocalDateTime startDate, LocalDateTime endDate, EOrderStatus orderStatus) {
+        return orderJpaRepository.countByCreatedAtBetweenAndOrderStatus(startDate, endDate, orderStatus);
+    }
+
+    @Override
+    public Integer countByCreatedAtBetweenAndRecoveryOption(LocalDateTime startDate, LocalDateTime endDate, ERecoveryOption recoveryOption) {
+        return orderJpaRepository.countByCreatedAtBetweenAndRecoveryOption(startDate, endDate, recoveryOption);
+    }
+
+    @Override
     public Order findByIdWithDocumentsOrElseThrow(Long id) {
         return orderJpaRepository.findByIdWithDocuments(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));

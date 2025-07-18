@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -66,6 +68,10 @@ public interface OrderRepository {
     void deleteAllById(List<Long> ids);
 
     Integer countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    Integer countByCreatedAtBetweenAndOrderStatus(LocalDateTime startDate, LocalDateTime endDate, EOrderStatus orderStatus);
+
+    Integer countByCreatedAtBetweenAndRecoveryOption(LocalDateTime startDate, LocalDateTime endDate, ERecoveryOption recoveryOption);
 
     Order findByIdWithDocumentsOrElseThrow(Long id);
 

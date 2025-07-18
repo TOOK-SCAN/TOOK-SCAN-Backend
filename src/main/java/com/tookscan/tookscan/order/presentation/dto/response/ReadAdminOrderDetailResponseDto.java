@@ -11,13 +11,13 @@ import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.Pdf;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
-import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto.InitialOrderDto.PaymentInfoDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
+import java.util.Map;
 
 @Getter
 public class ReadAdminOrderDetailResponseDto extends
@@ -126,11 +126,10 @@ public class ReadAdminOrderDetailResponseDto extends
                 .documentDtos(order.getDocuments().stream()
                         .map(document -> DocumentDto.of(document, documentPdfsMap.get(document)))
                         .toList())
-                .initialDocumentDtos(order.getDocuments().stream()
-                        .map(InitialDocumentDto::fromEntity)
-                        .toList())
-                .initialOrderDto(order.getInitialOrder() != null ?
-                        InitialOrderDto.fromEntity(order) : null)
+                .initialDocumentDtos(order.getInitialOrder() != null ?
+                        order.getInitialOrder().getInitialDocuments().stream()
+                                .map(InitialDocumentDto::fromEntity)
+                                .toList() : List.of())
                 .paymentInfoDto(PaymentInfoDto.fromEntity(order))
                 .orderMemo(order.getMemo())
                 .trackingNumber(
@@ -271,12 +270,12 @@ public class ReadAdminOrderDetailResponseDto extends
                     .id(document.getId().toString())
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .pagePrice(document.calculateDocumentPrice())
+                    .pagePrice(document.getDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
-                    .recoveryOptionPrice(document.calculateRecoveryOptionPrice())
+                    .recoveryOptionPrice(document.getRecoveryOptionPrice())
                     .isOcrEnabled(document.getIsOcrEnabled())
-                    .ocrPrice(document.calculateOcrPrice())
-                    .totalPrice(document.calculatePrice())
+                    .ocrPrice(document.getOcrPrice())
+                    .totalPrice(document.getTotalAmount())
                     .pdfs(pdfs.isEmpty() ? List.of() :
                             pdfs.stream()
                                     .map(Pdf::getPdfUrl)
@@ -342,267 +341,161 @@ public class ReadAdminOrderDetailResponseDto extends
             this.validateSelf();
         }
 
-        public static InitialDocumentDto fromEntity(Document document) {
+        public static InitialDocumentDto fromEntity(InitialDocument document) {
             return InitialDocumentDto.builder()
                     .id(document.getId().toString())
-                    .name(document.getInitialName())
-                    .pageCount(document.getInitialPageCount())
-                    .pagePrice(document.calculateInitialDocumentPrice())
-                    .recoveryOption(document.getInitialRecoveryOption())
-                    .recoveryOptionPrice(document.calculateInitialRecoveryOptionPrice())
-                    .isOcrEnabled(document.getInitialIsOcrEnabled())
-                    .ocrPrice(document.calculateInitialOcrPrice())
-                    .totalPrice(document.calculateInitialPrice())
+                    .name(document.getName())
+                    .pageCount(document.getPageCount())
+                    .pagePrice(document.getPagePrice())
+                    .recoveryOption(document.getRecoveryOption())
+                    .recoveryOptionPrice(document.getRecoveryOptionPrice())
+                    .isOcrEnabled(document.getIsOcrEnabled())
+                    .ocrPrice(document.getOcrPrice())
+                    .totalPrice(document.getTotalAmount())
                     .build();
         }
     }
 
     @Getter
-    public static class InitialOrderDto extends SelfValidating<InitialOrderDto> {
+    public static class InitialPaymentInfoDto extends SelfValidating<InitialPaymentInfoDto> {
 
-        @JsonProperty("order_number")
-        @NotBlank
-        private final String orderNumber;
-
-        @JsonProperty("created_at")
-        @NotBlank
-        private final String createdAt;
-
-        @JsonProperty("initial_documents")
-        private final List<InitialDocumentDto> initialDocumentDtos;
-
-        @JsonProperty("initial_payment_info")
+        @JsonProperty("documents_price")
         @NotNull
-        private final InitialPaymentInfoDto initialPaymentInfoDto;
+        private final Integer documentsPrice;
+
+        @JsonProperty("cutting_price")
+        @NotNull
+        private final Integer cuttingPrice;
+
+        @JsonProperty("is_one_day_scan")
+        @NotNull
+        private final Boolean isOneDayScan;
+
+        @JsonProperty("one_day_scan_price")
+        @NotNull
+        private final Integer oneDayScanPrice;
+
+        @JsonProperty("delivery_price")
+        @NotNull
+        private final Integer deliveryPrice;
+
+        @JsonProperty("coupon_name")
+        private final String couponName;
+
+        @JsonProperty("coupon_discount")
+        @NotNull
+        private final Integer couponDiscount;
+
+        @JsonProperty("total_price")
+        @NotNull
+        private final Integer totalPrice;
 
         @Builder
-        public InitialOrderDto(String orderNumber, String createdAt,
-                               List<InitialDocumentDto> initialDocumentDtos,
-                               InitialPaymentInfoDto initialPaymentInfoDto) {
-            this.orderNumber = orderNumber;
-            this.createdAt = createdAt;
-            this.initialDocumentDtos = initialDocumentDtos;
-            this.initialPaymentInfoDto = initialPaymentInfoDto;
+        public InitialPaymentInfoDto(Integer documentsPrice, Integer cuttingPrice, Boolean isOneDayScan,
+                                     Integer oneDayScanPrice, Integer deliveryPrice, Integer couponDiscount,
+                                     Integer totalPrice, String couponName) {
+            this.documentsPrice = documentsPrice;
+            this.cuttingPrice = cuttingPrice;
+            this.isOneDayScan = isOneDayScan;
+            this.oneDayScanPrice = oneDayScanPrice;
+            this.deliveryPrice = deliveryPrice;
+            this.couponDiscount = couponDiscount;
+            this.totalPrice = totalPrice;
+            this.couponName = couponName;
             this.validateSelf();
         }
 
-        public static InitialOrderDto fromEntity(Order order) {
-            return InitialOrderDto.builder()
-                    .orderNumber(order.getOrderNumber())
-                    .createdAt(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
-                    .initialDocumentDtos(order.getInitialOrder().getInitialDocuments().stream()
-                            .map(InitialDocumentDto::of)
-                            .toList())
-                    .initialPaymentInfoDto(InitialPaymentInfoDto.fromEntity(order.getInitialOrder()))
+        public static InitialPaymentInfoDto fromEntity(InitialOrder order) {
+            return InitialPaymentInfoDto.builder()
+                    .documentsPrice(order.getDocumentsPrice())
+                    .cuttingPrice(
+                            order.getInitialDocuments().stream()
+                                    .map(InitialDocument::getCuttingPrice)
+                                    .reduce(0, Integer::sum)
+                    )
+                    .isOneDayScan(order.getIsOneDayScan())
+                    .oneDayScanPrice(order.getInitialDocuments().stream()
+                            .map(InitialDocument::getOneDayScanPrice)
+                            .reduce(0, Integer::sum))
+                    .deliveryPrice(order.getDeliveryPrice())
+                    .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
+                    .couponDiscount(order.getCoupon() != null ?
+                            order.getCoupon().getDiscountPrice(order.getTotalAmount()) : 0)
+                    .totalPrice(order.getTotalAmount())
                     .build();
         }
+    }
 
-        @Getter
-        public static class InitialDocumentDto extends SelfValidating<InitialDocumentDto> {
 
-            @JsonProperty("name")
-            @NotBlank
-            private final String name;
+    @Getter
+    public static class PaymentInfoDto extends SelfValidating<PaymentInfoDto> {
 
-            @JsonProperty("page_count")
-            @NotNull
-            private final Integer pageCount;
+        @JsonProperty("documents_price")
+        @NotNull
+        private final Integer documentsPrice;
 
-            @JsonProperty("page_price")
-            @NotNull
-            private final Integer pagePrice;
+        @JsonProperty("cutting_price")
+        @NotNull
+        private final Integer cuttingPrice;
 
-            @JsonProperty("recovery_option")
-            @NotNull
-            private final ERecoveryOption recoveryOption;
+        @JsonProperty("is_one_day_scan")
+        @NotNull
+        private final Boolean isOneDayScan;
 
-            @JsonProperty("recovery_option_price")
-            @NotNull
-            private final Integer recoveryOptionPrice;
+        @JsonProperty("one_day_scan_price")
+        @NotNull
+        private final Integer oneDayScanPrice;
 
-            @JsonProperty("is_ocr_enabled")
-            @NotNull
-            private final Boolean isOcrEnabled;
+        @JsonProperty("delivery_price")
+        @NotNull
+        private final Integer deliveryPrice;
 
-            @JsonProperty("ocr_price")
-            @NotNull
-            private final Integer ocrPrice;
+        @JsonProperty("coupon_name")
+        private final String couponName;
 
-            @JsonProperty("total_price")
-            @NotNull
-            private final Integer totalPrice;
+        @JsonProperty("coupon_discount")
+        @NotNull
+        private final Integer couponDiscount;
 
-            @Builder
-            public InitialDocumentDto(String name, Integer pageCount, Integer pagePrice,
-                                      ERecoveryOption recoveryOption,
-                                      Integer recoveryOptionPrice, Boolean isOcrEnabled, Integer ocrPrice,
-                                      Integer totalPrice
-            ) {
-                this.name = name;
-                this.pageCount = pageCount;
-                this.pagePrice = pagePrice;
-                this.recoveryOption = recoveryOption;
-                this.recoveryOptionPrice = recoveryOptionPrice;
-                this.isOcrEnabled = isOcrEnabled;
-                this.ocrPrice = ocrPrice;
-                this.totalPrice = totalPrice;
-                this.validateSelf();
-            }
+        @JsonProperty("total_price")
+        @NotNull
+        private final Integer totalPrice;
 
-            public static InitialDocumentDto of(InitialDocument document) {
-                return InitialDocumentDto.builder()
-                        .name(document.getName())
-                        .pageCount(document.getPageCount())
-                        .pagePrice(document.getPagePrice())
-                        .recoveryOption(document.getRecoveryOption())
-                        .recoveryOptionPrice(document.getRecoveryOptionPrice())
-                        .isOcrEnabled(document.getIsOcrEnabled())
-                        .ocrPrice(document.getOcrPrice())
-                        .totalPrice(document.getDocumentPrice())
-                        .build();
-            }
+        @Builder
+        public PaymentInfoDto(Integer documentsPrice, Integer cuttingPrice, Boolean isOneDayScan,
+                              Integer oneDayScanPrice, Integer deliveryPrice, Integer couponDiscount,
+                              Integer totalPrice, String couponName) {
+            this.documentsPrice = documentsPrice;
+            this.cuttingPrice = cuttingPrice;
+            this.isOneDayScan = isOneDayScan;
+            this.oneDayScanPrice = oneDayScanPrice;
+            this.deliveryPrice = deliveryPrice;
+            this.couponDiscount = couponDiscount;
+            this.couponName = couponName;
+            this.totalPrice = totalPrice;
+            this.validateSelf();
         }
 
-        @Getter
-        public static class InitialPaymentInfoDto extends SelfValidating<InitialPaymentInfoDto> {
-
-            @JsonProperty("documents_price")
-            @NotNull
-            private final Integer documentsPrice;
-
-            @JsonProperty("cutting_price")
-            @NotNull
-            private final Integer cuttingPrice;
-
-            @JsonProperty("is_one_day_scan")
-            @NotNull
-            private final Boolean isOneDayScan;
-
-            @JsonProperty("one_day_scan_price")
-            @NotNull
-            private final Integer oneDayScanPrice;
-
-            @JsonProperty("delivery_price")
-            @NotNull
-            private final Integer deliveryPrice;
-
-            @JsonProperty("coupon_name")
-            private final String couponName;
-
-            @JsonProperty("coupon_discount")
-            @NotNull
-            private final Integer couponDiscount;
-
-            @JsonProperty("total_price")
-            @NotNull
-            private final Integer totalPrice;
-
-            @Builder
-            public InitialPaymentInfoDto(Integer documentsPrice, Integer cuttingPrice, Boolean isOneDayScan,
-                                         Integer oneDayScanPrice, Integer deliveryPrice, Integer couponDiscount,
-                                         Integer totalPrice, String couponName) {
-                this.documentsPrice = documentsPrice;
-                this.cuttingPrice = cuttingPrice;
-                this.isOneDayScan = isOneDayScan;
-                this.oneDayScanPrice = oneDayScanPrice;
-                this.deliveryPrice = deliveryPrice;
-                this.couponDiscount = couponDiscount;
-                this.totalPrice = totalPrice;
-                this.couponName = couponName;
-                this.validateSelf();
-            }
-
-            public static InitialPaymentInfoDto fromEntity(InitialOrder order) {
-                return InitialPaymentInfoDto.builder()
-                        .documentsPrice(order.getDocumentsPrice())
-                        .cuttingPrice(
-                                order.getInitialDocuments().stream()
-                                        .map(InitialDocument::getCuttingPrice)
-                                        .reduce(0, Integer::sum)
-                        )
-                        .isOneDayScan(order.getIsOneDayScan())
-                        .oneDayScanPrice(order.getInitialDocuments().stream()
-                                .map(InitialDocument::getOneDayScanPrice)
-                                .reduce(0, Integer::sum))
-                        .deliveryPrice(order.getDeliveryPrice())
-                        .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
-                        .couponDiscount(order.getCoupon() != null ?
-                                order.getCoupon().getDiscountPrice(order.getTotalAmount()) : 0)
-                        .totalPrice(order.getTotalAmount())
-                        .build();
-            }
-        }
-
-
-        @Getter
-        public static class PaymentInfoDto extends SelfValidating<PaymentInfoDto> {
-
-            @JsonProperty("documents_price")
-            @NotNull
-            private final Integer documentsPrice;
-
-            @JsonProperty("cutting_price")
-            @NotNull
-            private final Integer cuttingPrice;
-
-            @JsonProperty("is_one_day_scan")
-            @NotNull
-            private final Boolean isOneDayScan;
-
-            @JsonProperty("one_day_scan_price")
-            @NotNull
-            private final Integer oneDayScanPrice;
-
-            @JsonProperty("delivery_price")
-            @NotNull
-            private final Integer deliveryPrice;
-
-            @JsonProperty("coupon_name")
-            private final String couponName;
-
-            @JsonProperty("coupon_discount")
-            @NotNull
-            private final Integer couponDiscount;
-
-            @JsonProperty("total_price")
-            @NotNull
-            private final Integer totalPrice;
-
-            @Builder
-            public PaymentInfoDto(Integer documentsPrice, Integer cuttingPrice, Boolean isOneDayScan,
-                                  Integer oneDayScanPrice, Integer deliveryPrice, Integer couponDiscount,
-                                  Integer totalPrice, String couponName) {
-                this.documentsPrice = documentsPrice;
-                this.cuttingPrice = cuttingPrice;
-                this.isOneDayScan = isOneDayScan;
-                this.oneDayScanPrice = oneDayScanPrice;
-                this.deliveryPrice = deliveryPrice;
-                this.couponDiscount = couponDiscount;
-                this.couponName = couponName;
-                this.totalPrice = totalPrice;
-                this.validateSelf();
-            }
-
-            public static PaymentInfoDto fromEntity(Order order) {
-                return PaymentInfoDto.builder()
-                        .documentsPrice(order.getDocumentsPrice())
-                        .cuttingPrice(
-                                order.getDocuments().stream()
-                                        .map(Document::getCuttingPrice)
-                                        .reduce(0, Integer::sum)
-                        )
-                        .isOneDayScan(order.getIsOneDayScan())
-                        .oneDayScanPrice(order.getDocuments().stream()
-                                .map(Document::getOneDayScanPrice)
-                                .reduce(0, Integer::sum))
-                        .deliveryPrice(order.getDelivery().getDeliveryPrice())
-                        .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
-                        .couponDiscount(order.getCoupon() != null ?
-                                order.getCoupon().getDiscountPrice(order.getTotalAmount()) : 0)
-                        .totalPrice(order.getTotalAmount())
-                        .build();
-            }
+        public static PaymentInfoDto fromEntity(Order order) {
+            return PaymentInfoDto.builder()
+                    .documentsPrice(order.getDocumentsPrice())
+                    .cuttingPrice(
+                            order.getDocuments().stream()
+                                    .map(Document::getCuttingPrice)
+                                    .reduce(0, Integer::sum)
+                    )
+                    .isOneDayScan(order.getIsOneDayScan())
+                    .oneDayScanPrice(order.getDocuments().stream()
+                            .map(Document::getOneDayScanPrice)
+                            .reduce(0, Integer::sum))
+                    .deliveryPrice(order.getDelivery().getDeliveryPrice())
+                    .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
+                    .couponDiscount(order.getCoupon() != null ?
+                            order.getCoupon().getDiscountPrice(order.getTotalAmount()) : 0)
+                    .totalPrice(order.getTotalAmount())
+                    .build();
         }
     }
 }
+
 

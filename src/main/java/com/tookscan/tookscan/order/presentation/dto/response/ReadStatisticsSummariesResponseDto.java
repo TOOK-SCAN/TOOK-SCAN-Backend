@@ -51,29 +51,58 @@ public class ReadStatisticsSummariesResponseDto extends SelfValidating<ReadStati
         @JsonProperty("order_count")
         private final Integer orderCount;
 
-        @JsonProperty("sales")
-        private final Integer sales;
+        @JsonProperty("applied_count")
+        private final Integer appliedCount;
+
+        @JsonProperty("arrived_count")
+        private final Integer arrivedCount;
+
+        @JsonProperty("completed_count")
+        private final Integer completedCount;
+
+        @JsonProperty("discarded_count")
+        private final Integer discardedCount;
+
+        @JsonProperty("spring_count")
+        private final Integer springCount;
+
+        @JsonProperty("raw_count")
+        private final Integer rawCount;
 
         @Builder
         public MonthlyStatisticsDto(String yearMonth, Integer pageViewCount, Integer visitantCount,
-                                    Integer signUpCount, Integer orderCount, Integer sales) {
+                                    Integer signUpCount, Integer orderCount, Integer appliedCount,
+                                    Integer arrivedCount, Integer completedCount, Integer discardedCount,
+                                    Integer springCount, Integer rawCount) {
             this.yearMonth = yearMonth;
             this.pageViewCount = pageViewCount;
             this.visitantCount = visitantCount;
             this.signUpCount = signUpCount;
             this.orderCount = orderCount;
-            this.sales = sales;
+            this.appliedCount = appliedCount;
+            this.arrivedCount = arrivedCount;
+            this.completedCount = completedCount;
+            this.discardedCount = discardedCount;
+            this.springCount = springCount;
+            this.rawCount = rawCount;
         }
 
         public static MonthlyStatisticsDto of(String yearMonth, Integer pageViewCount, Integer visitantCount,
-                                              Integer signUpCount, Integer orderCount, Integer sales) {
+                                              Integer signUpCount, Integer orderCount, Integer appliedCount,
+                                                Integer arrivedCount, Integer completedCount,
+                                                Integer discardedCount, Integer springCount, Integer rawCount) {
             return MonthlyStatisticsDto.builder()
                     .yearMonth(yearMonth)
                     .pageViewCount(pageViewCount)
                     .visitantCount(visitantCount)
                     .signUpCount(signUpCount)
                     .orderCount(orderCount)
-                    .sales(sales)
+                    .appliedCount(appliedCount)
+                    .arrivedCount(arrivedCount)
+                    .completedCount(completedCount)
+                    .discardedCount(discardedCount)
+                    .springCount(springCount)
+                    .rawCount(rawCount)
                     .build();
         }
     }
