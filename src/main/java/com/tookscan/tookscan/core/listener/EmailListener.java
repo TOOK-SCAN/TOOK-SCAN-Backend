@@ -35,6 +35,8 @@ public class EmailListener {
         try {
             mailUtil.sendPdfEmail(
                     event.getEmail(),
+                    event.getUserName(),
+                    event.getOrderNumber(),
                     event.getOrderName(),
                     event.getPdfUrl()
             );

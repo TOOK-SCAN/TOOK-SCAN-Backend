@@ -52,6 +52,8 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(
                         order.getDelivery().getEmail(),
+                        order.getDelivery().getReceiverName(),
+                        order.getOrderNumber(),
                         order.getDocumentsDescription(),
                         pdfUrls
                 )

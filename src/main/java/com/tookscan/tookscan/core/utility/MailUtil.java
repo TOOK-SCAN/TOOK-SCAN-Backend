@@ -53,40 +53,65 @@ public class MailUtil {
         """;
 
     private static final String PDF_EMAIL_TEMPLATE = """
-            <!doctype html>
-            <html lang="ko">
-              <head>
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>${OrderName} 스캔본 전송 - TOOKSCAN</title>
-              </head>
-              <body style="margin: 0; padding: 64px; font-family: Arial, sans-serif; background-color: #ffffff;">
-                <div class="container" style="width: 100%; max-width: 600px; margin: 0 auto; background: #f2f7ff; padding: 3.125rem; box-sizing: border-box; border-radius: 1.5rem;">
-                  <div class="blue-bar" style="width: 100%; height: 3px; background-color: #5592fc;"></div>
-                 \s
-                  <div class="title-section" style="text-align: center; padding: 3.25rem; margin-top: 5rem;">
-                    <h1 style="font-size: 2rem; color: #5592fc; margin: 0; text-align: center;">요청하신 책의 스캔본이 도착했어요!</h1>
-                    <p style="font-size: 1.25rem; color: #777777; text-align: center; margin-top: 8px;">가장 합리적인 비대면 셀프 스캔, 한방에 툭스캔!</p>
-                  </div>
-                 \s
-                  <div class="img" style="text-align: center;">
-                    <img src=${MailImgUrl} alt="mailimg" style="max-width: 250px; height: auto;" />
-                  </div>
-                 \s
-                  <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
-                    <p>
-                      안녕하세요, 요청하신 ${orderName} 스캔본을 발송드렸습니다.<br /><br />
-                      아래 url을 통해 다운로드 받아주세요!<br />
-                      ${PdfUrl}<br /><br />
-                      툭스캔과 함께 더 편리한 서비스를 경험하실 수 있도록<br />
-                      항상 노력하겠습니다 :)
-                    </p>
-                  </div>
-                 \s
-                  <div class="blue-bar" style="width: 100%; height: 3px; background-color: #5592fc;"></div>
-                </div>
-              </body>
-            </html>
+            <!DOCTYPE html>
+                   <html lang="ko">
+                   <head>
+                     <meta charset="UTF-8">
+                     <title>[툭스캔] 주문하신 PDF 파일이 도착했어요.</title>
+                   </head>
+                   <body style="margin:0; padding:0; background-color:#f5f8fc; font-family: 'Apple SD Gothic Neo', sans-serif;">
+                     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f8fc; padding:20px 0;">
+                       <tr>
+                         <td align="center">
+                           <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden;">
+            
+                             <!-- 🖼️ 상단 배너 이미지 -->
+                             <tr>
+                               <td align="center">
+                                 <img src=${MailImgUrl}
+                                      alt="툭스캔 PDF 도착 안내"
+                                      style="width:100%; max-width:600px; min-width:280px; height:auto; display:block;" />
+                               </td>
+                             </tr>
+            
+                             <!-- 📄 본문 텍스트 영역 -->
+                             <tr>
+                               <td style="padding:24px; color:#222222; font-size:16px; line-height:1.6;">
+                                 <p style="margin:0 0 8px;">툭스캔에 주문하신 PDF 파일이 도착했습니다!</p>
+                                 <p style="margin:0 0 16px;">( 주문번호:${orderNumber})</p>
+            
+                                 <p style="margin:0 0 16px;">
+                                   안녕하세요, ${userName} 고객님.<br>
+                                   주문해주신 ${orderName} PDF 파일을 아래 링크를 통해 전달드립니다.
+                                 </p>
+            
+                                 <!-- 🔗 PDF 다운로드 링크 -->
+                                 <ul style="list-style: none; padding-left: 0; margin: 0 0 24px;">
+                                   ${PdfUrl}
+                                 </ul>
+            
+                                 <!-- ⬇️ 유의사항 앞 줄바꿈 2회 처리 -->
+                                 <div style="height:20px;"></div>
+            
+                                 <!-- ℹ️ 안내 문구 -->
+                                 <p style="font-size:13px; color:#888888; margin:0 0 8px;">
+                                   ※ 각 링크는 14일 후 자동 만료되며, 저작권 보호를 위해 만료 시 자동 삭제됩니다. 기한 내 반드시 다운로드를 완료해 주세요.
+                                 </p>
+            
+                                 <p style="font-size:13px; color:#888888; margin:0;">
+                                   ※ 이 메일은 발신 전용입니다. 문의 사항이 있으신 경우\s
+                                   <a href="https://pf.kakao.com/_uxixexln" style="color:#1a73e8; text-decoration:none;">[툭스캔 카카오톡 채널]</a>을 통해 연락 부탁드립니다.
+                                 </p>
+                               </td>
+                             </tr>
+   
+                           </table>
+                         </td>
+                       </tr>
+                     </table>
+                   </body>
+                   </html>
+            
             """;
 
     private static final String FORGET_PASSWORD_TEMPLATE = """
@@ -129,6 +154,8 @@ public class MailUtil {
 
     public void sendPdfEmail(
             String receiverAddress,
+            String userName,
+            String orderNumber,
             String orderName,
             String pdfUrl
     ) throws MessagingException {
@@ -142,16 +169,11 @@ public class MailUtil {
         // UTF-8로 인코딩
         String content = PDF_EMAIL_TEMPLATE
                 .replace("${MailImgUrl}", mailTemplateImagesUrl)
+                .replace("${orderNumber}", orderNumber)
                 .replace("${PdfUrl}", pdfUrl)
-                .replace("${OrderName}", orderName)
+                .replace("${userName}", userName)
                 .replace("${orderName}", orderName);
         mimeMessageHelper.setText(content, true);
-
-        // PdfFile 객체를 순회하면서 첨부파일 추가
-//        for (PdfFileDto pdfFile : pdfFiles) {
-//            DataSource dataSource = new ByteArrayDataSource(pdfFile.content(), pdfFile.contentType());
-//            mimeMessageHelper.addAttachment(pdfFile.fileName(), dataSource);
-//        }
 
         javaMailSender.send(mimeMessage);
     }
