@@ -309,6 +309,15 @@ public class Order extends BaseEntity {
 
     public boolean isDelivery() {
         return documents.stream()
+                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
+    }
+
+    public String getPdfUrls() {
+        if (documents.isEmpty()) {
+            throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
+        }
+
+        return documents.stream()
                 .map(doc -> {
                     List<Pdf> pdfs = doc.getPdfs();
                     String content = "<ul style=\"list-style: none; padding-left: 0; margin: 0 0 24px;\">";
@@ -323,7 +332,6 @@ public class Order extends BaseEntity {
                 })
                 .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
-                .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
     }
 
 

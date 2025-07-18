@@ -5,5 +5,11 @@ import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSumma
 
 @UseCase
 public interface ReadStatisticsSummariesUseCase {
-    ReadStatisticsSummariesResponseDto execute(String startYearMonth, String endYearMonth);
+    ReadStatisticsSummariesResponseDto execute(
+            String startYearMonth,
+            String endYearMonth,
+            Boolean isApplied,
+            Boolean isArrived,
+            Boolean isCompleted
+    );
 }
