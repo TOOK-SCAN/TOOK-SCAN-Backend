@@ -130,8 +130,10 @@ public class ReadAdminOrderDetailResponseDto extends
                         InitialOrderDto.fromEntity(order) : null)
                 .paymentInfoDto(PaymentInfoDto.fromEntity(order))
                 .orderMemo(order.getMemo())
-                .trackingNumber(order.getDelivery() != null ? order.getDelivery().getTrackingNumber() : null)
-                .trackingNumberRegisteredAt(order.getDelivery() != null
+                .trackingNumber(
+                        order.getDelivery().getTrackingNumber() != null ? order.getDelivery().getTrackingNumber()
+                                : null)
+                .trackingNumberRegisteredAt(order.getDelivery().getTrackingNumberRegisteredAt() != null
                         ? DateTimeUtil.convertLocalDateTimeToDartString(
                         order.getDelivery().getTrackingNumberRegisteredAt())
                         : null)
@@ -167,13 +169,22 @@ public class ReadAdminOrderDetailResponseDto extends
         @JsonProperty("address")
         private final AddressResponseDto address;
 
+        @JsonProperty("delivery_id")
+        private final String deliveryId;
+
+        @JsonProperty("delivery_request")
+        private final String deliveryRequest;
+
         @Builder
-        public UserDto(Long id, String name, String phoneNumber, String email, AddressResponseDto address) {
+        public UserDto(Long id, String name, String phoneNumber, String email, AddressResponseDto address,
+                       String deliveryId, String deliveryRequest) {
             this.id = id;
             this.name = name;
             this.phoneNumber = phoneNumber;
             this.email = email;
             this.address = address;
+            this.deliveryId = deliveryId;
+            this.deliveryRequest = deliveryRequest;
             this.validateSelf();
         }
 
@@ -186,6 +197,9 @@ public class ReadAdminOrderDetailResponseDto extends
                     .address(order.getDelivery().getAddress() != null
                             ? AddressResponseDto.fromEntity(order.getDelivery().getAddress())
                             : null)
+                    .deliveryId(order.getDelivery().getId().toString())
+                    .deliveryRequest(order.getDelivery().getRequest() != null
+                            ? order.getDelivery().getRequest() : null)
                     .build();
         }
     }
