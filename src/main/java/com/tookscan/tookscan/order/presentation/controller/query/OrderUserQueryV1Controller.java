@@ -59,7 +59,6 @@ public class OrderUserQueryV1Controller {
     })
     @PostMapping(value = "/estimate")
     public ResponseDto<EstimateUserOrderPriceResponseDto> estimateOrderPrice(
-            @Parameter(hidden = true) @AccountID UUID accountId,
             @RequestBody @Valid EstimateUserOrderPriceRequestDto requestDto
     ) {
         return ResponseDto.ok(estimateUserOrderPriceUseCase.execute(requestDto));

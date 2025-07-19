@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.ExcelUtils;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
         UpdateAdminOrdersDeliveriesTrackingNumberUseCase {
 
     private final OrderRepository orderRepository;
+
+    private final DeliveryService deliveryService;
 
     private final ExcelUtils excelUtils;
 
@@ -72,7 +75,7 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
             String trackingNumber = rowData.trackingNumber();
 
             Order order = orderMap.get(orderNumber);
-            order.getDelivery().updateTrackingNumber(trackingNumber);
+            deliveryService.updateTrackingNumber(order.getDelivery(), trackingNumber);
         }
     }
 

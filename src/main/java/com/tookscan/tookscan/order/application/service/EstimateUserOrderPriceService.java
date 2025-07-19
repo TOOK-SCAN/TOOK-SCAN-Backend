@@ -57,7 +57,8 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         Integer deliveryPrice = 0;
         if (requestDto.documents().stream()
                 .anyMatch(document -> document.recoveryOption() != ERecoveryOption.DISCARD)) {
-            deliveryPrice = pricePolicy.getDeliveryPrice();
+            deliveryPrice =
+                    requestDto.deliveryPrice() != null ? requestDto.deliveryPrice() : pricePolicy.getDeliveryPrice();
         }
         Delivery delivery = deliveryService.createDelivery(
                 "",
@@ -91,6 +92,9 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
                     pricePolicy.getAdditionalPriceForOcr(),
                     doc.isOcrEnabled()
             );
+            if (doc.recoveryOptionPrice() != null) {
+                documentService.updateRecoveryOptionPrice(document, doc.recoveryOptionPrice());
+            }
             if (doc.isChecked()) {
                 order.getDocuments().add(document);
             } else {
