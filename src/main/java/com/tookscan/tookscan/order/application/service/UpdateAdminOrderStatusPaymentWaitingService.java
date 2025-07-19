@@ -26,7 +26,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
     @Transactional
     public void execute(Long orderId) {
 
-        Order order = orderRepository.findWithPricePolicyByIdOrElseThrow(orderId);
+        Order order = orderRepository.findByIdOrElseThrow(orderId);
 
         order.updateOrderStatus(EOrderStatus.PAYMENT_WAITING);
         orderService.updatePaymentExpirationDate(order);

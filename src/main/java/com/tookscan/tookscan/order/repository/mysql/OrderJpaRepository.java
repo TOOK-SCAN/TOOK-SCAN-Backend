@@ -29,9 +29,6 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByOrderNumber(String orderNumber);
 
-    @EntityGraph(attributePaths = {"documents", "documents.pricePolicy"})
-    Optional<Order> findWithPricePolicyById(Long id);
-
     @Query("SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.documents d " +
             "WHERE o.user.id IN :userIds")
