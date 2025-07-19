@@ -11,7 +11,8 @@ public enum EPaymentMethod {
     CARD("카드"),
     VIRTUAL_ACCOUNT("가상계좌"),
     EASY_PAYMENT("간편결제"),
-    ACCOUNT_TRANSFER("계좌이체")
+    ACCOUNT_TRANSFER("계좌이체"),
+    ETC("기타")
     ;
 
     private final String name;
@@ -25,6 +26,7 @@ public enum EPaymentMethod {
             case "가상계좌" -> VIRTUAL_ACCOUNT;
             case "간편결제" -> EASY_PAYMENT;
             case "계좌이체" -> ACCOUNT_TRANSFER;
+            case "기타" -> ETC;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }
