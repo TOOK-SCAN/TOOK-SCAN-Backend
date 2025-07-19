@@ -37,7 +37,7 @@ Authorization: Bearer {{access_token}}
 
 ### 결제 요청
 //@no-log
-PATCH {{host_url}}/v1/admins/orders/732253863457092131/payment-requests
+PATCH {{host_url}}/v1/admins/orders/734276020051665347/payment-requests
 
 ### PDF 전송
 //@no-log

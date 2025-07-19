@@ -21,8 +21,6 @@ public interface OrderRepository {
 
     Order findByIdOrElseThrow(Long id);
 
-    Order findWithPricePolicyByIdOrElseThrow(Long id);
-
     List<Order> findAllByIdOrElseThrow(List<Long> ids);
 
     List<Order> findAllByOrderStatusDateBetweenOrElseThrow(LocalDateTime startDate, LocalDateTime endDate,
