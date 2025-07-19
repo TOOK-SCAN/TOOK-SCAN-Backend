@@ -41,6 +41,7 @@ public class OrderService {
                 .additionalPriceForOneDayScan(additionalPriceForOneDayScan)
                 .totalAmount(0)
                 .build();
+
         return order;
     }
 

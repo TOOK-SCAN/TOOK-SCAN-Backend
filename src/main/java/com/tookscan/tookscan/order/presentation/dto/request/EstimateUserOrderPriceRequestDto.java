@@ -23,7 +23,10 @@ public record EstimateUserOrderPriceRequestDto(
 
         @JsonProperty("is_one_day_scan")
         @NotNull(message = "원데이 스캔 여부를 입력해주세요.")
-        Boolean isOneDayScan
+        Boolean isOneDayScan,
+
+        @JsonProperty("delivery_price")
+        Integer deliveryPrice
 ) {
     public record RequestDocument(
 
@@ -46,11 +49,15 @@ public record EstimateUserOrderPriceRequestDto(
             @JsonProperty("recovery_option")
             ERecoveryOption recoveryOption,
 
+            @JsonProperty("recovery_option_price")
+            Integer recoveryOptionPrice,
+
             @JsonProperty("is_ocr_enabled")
             @NotNull(message = "OCR 여부를 입력해주세요.")
             Boolean isOcrEnabled,
 
             @JsonProperty(value = "is_checked")
+            @NotNull(message = "체크 여부를 입력해주세요.")
             Boolean isChecked
     ) {
     }

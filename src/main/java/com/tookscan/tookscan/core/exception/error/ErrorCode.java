@@ -87,6 +87,7 @@ public enum ErrorCode {
     NOT_UPDATABLE_ORDER(40052, HttpStatus.BAD_REQUEST, "주문 상태가 변경되어 더 이상 수정할 수 없습니다."),
     NOT_RECOVERY_IN_PROGRESS(40053, HttpStatus.BAD_REQUEST, "주문 상태가 복원 작업이 아닙니다."),
     NOT_PAYMENT_COMPLETED(40054, HttpStatus.BAD_REQUEST, "주문 상태가 결제 완료가 아닙니다."),
+    DUPLICATE_DOCUMENT_NAME(40055, HttpStatus.BAD_REQUEST, "이미 존재하는 문서 이름입니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),

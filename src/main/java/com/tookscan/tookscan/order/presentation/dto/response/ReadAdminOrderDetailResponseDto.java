@@ -244,11 +244,12 @@ public class ReadAdminOrderDetailResponseDto extends
         private final Integer totalPrice;
 
         @JsonProperty("pdfs")
-        private final List<String> pdfs;
+        private final List<PdfDto> pdfs;
 
         @Builder
         public DocumentDto(String id, String name, Integer pageCount, Integer pagePrice, ERecoveryOption recoveryOption,
-                           Integer recoveryOptionPrice, Boolean isOcrEnabled, Integer ocrPrice, Integer totalPrice, List<String> pdfs
+                           Integer recoveryOptionPrice, Boolean isOcrEnabled, Integer ocrPrice, Integer totalPrice,
+                           List<PdfDto> pdfs
         ) {
             this.id = id;
             this.name = name;
@@ -276,9 +277,40 @@ public class ReadAdminOrderDetailResponseDto extends
                     .totalPrice(document.getDocumentPrice())
                     .pdfs(pdfs.isEmpty() ? List.of() :
                             pdfs.stream()
-                                    .map(Pdf::getPdfUrl)
+                                    .map(PdfDto::fromEntity)
                                     .toList())
                     .build();
+        }
+
+        @Getter
+        public static class PdfDto extends SelfValidating<PdfDto> {
+
+            @JsonProperty("pdf_url")
+            @NotBlank
+            private final String pdfUrl;
+
+            @JsonProperty("is_expired")
+            private final Boolean isExpired;
+
+            @JsonProperty("expired_at")
+            private final String expiredAt;
+
+            @Builder
+            public PdfDto(String pdfUrl, Boolean isExpired, String expiredAt) {
+                this.pdfUrl = pdfUrl;
+                this.isExpired = isExpired;
+                this.expiredAt = expiredAt;
+                this.validateSelf();
+            }
+
+            public static PdfDto fromEntity(Pdf pdf) {
+                return PdfDto.builder()
+                        .pdfUrl(pdf.getPdfUrl())
+                        .isExpired(pdf.getExpiredAt() != null)
+                        .expiredAt(pdf.getExpiredAt() != null
+                                ? DateTimeUtil.convertLocalDateTimeToDartString(pdf.getExpiredAt()) : null)
+                        .build();
+            }
         }
     }
 

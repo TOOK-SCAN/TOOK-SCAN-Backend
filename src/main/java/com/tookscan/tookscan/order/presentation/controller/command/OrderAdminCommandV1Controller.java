@@ -9,6 +9,7 @@ import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
+import com.tookscan.tookscan.order.application.usecase.DeleteAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
@@ -80,6 +81,7 @@ public class OrderAdminCommandV1Controller {
     private final UploadAdminDocumentsPdfUseCase uploadAdminDocumentsPdfUseCase;
     private final ValidateAdminPdfUseCase validateAdminPdfUseCase;
     private final UpdateAdminOrdersStatusRecoveryOptionUseCase updateAdminOrdersStatusRecoveryOptionUseCase;
+    private final DeleteAdminPdfUseCase deleteAdminPdfUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -381,6 +383,24 @@ public class OrderAdminCommandV1Controller {
             @RequestBody @Valid UpdateAdminOrdersStatusCompanyArrivedRequestDto requestDto
     ) {
         updateAdminOrdersStatusCompanyArrivedUseCase.execute(requestDto);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 관리자 PDF 삭제
+     */
+    @Operation(summary = "관리자 PDF 삭제", description = "관리자가 상품의 PDF를 삭제합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_PDF_FILE,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
+    })
+    @DeleteMapping(value = "/orders/documents/pdf/{pdfId}")
+    public ResponseDto<Void> deleteOrdersDocumentsPdf(
+            @PathVariable Long pdfId
+    ) {
+        deleteAdminPdfUseCase.execute(pdfId);
         return ResponseDto.ok(null);
     }
 }

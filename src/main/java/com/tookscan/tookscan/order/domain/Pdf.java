@@ -35,6 +35,9 @@ public class Pdf extends BaseEntity {
     @Column(name = "is_checked", nullable = false)
     private boolean isChecked;
 
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
+
     /* -------------------------------------------- */
     /* Many To One Mapping ------------------------ */
     /* -------------------------------------------- */
@@ -51,5 +54,9 @@ public class Pdf extends BaseEntity {
         this.pdfCreatedAt = pdfCreatedAt;
         this.isChecked = isChecked;
         this.document = document;
+    }
+
+    public void updateExpiredAt(LocalDateTime expiredAt) {
+        this.expiredAt = expiredAt;
     }
 }

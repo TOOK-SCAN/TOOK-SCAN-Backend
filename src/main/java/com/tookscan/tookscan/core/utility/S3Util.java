@@ -7,7 +7,6 @@ import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.multipart.MultipartFile;
 
 @Configuration
 @RequiredArgsConstructor
@@ -85,7 +83,7 @@ public class S3Util {
             throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
         }
         String finalKey =
-                PDF_CONTENT_PREFIX + document.getOrder().getId() + '/' + document.getName() + '_' + document.getId()
+                PDF_CONTENT_PREFIX + document.getOrder().getId() + '/' + document.getName()
                         + ".pdf";
 
         S3Object s3Object = amazonS3Client.getObject(bucketName, finalKey);
@@ -114,7 +112,7 @@ public class S3Util {
     public String uploadPdf(Document document, File file) {
         String finalKey = PDF_CONTENT_PREFIX
                 + document.getOrder().getId() + '/'
-                + document.getName() + '_' + document.getId() + ".pdf";
+                + document.getName() + ".pdf";
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.length());
