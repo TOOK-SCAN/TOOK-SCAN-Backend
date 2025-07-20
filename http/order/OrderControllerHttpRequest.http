@@ -1,20 +1,21 @@
 ### 주문 생성
 //@no-log
 POST {{host_url}}/v1/users/orders
-Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
   "documents": [
     {
       "name": "홍보 전단지",
-      "page_prediction": 5,
-      "recovery_option": "SPRING"
+      "page_count": 5,
+      "recovery_option": "SPRING",
+      "is_ocr_enabled": false
     },
     {
       "name": "카탈로그",
-      "page_prediction": 10,
-      "recovery_option": "SPRING"
+      "page_count": 10,
+      "recovery_option": "SPRING",
+      "is_ocr_enabled": false
     }
   ],
   "delivery_info": {
@@ -27,7 +28,8 @@ Content-Type: application/json
       "address1": "서울특별시 강남구 테헤란로 123",
       "address2": "강남빌딩 5층"
     }
-  }
+  },
+  "is_one_day_scan": false
 }
 
 ### 주문 조회
@@ -79,3 +81,12 @@ Content-Disposition: form-data; name="file"; filename="new_test.pdf"
 Content-Type: application/pdf
 
 < /Users/kyeom/Desktop/tset_732163380542202321.pdf
+
+### 관리자 운송장 등록
+//@no-log
+PATCH {{host_url}}/v1/admins/deliveries/734571270750274302/tracking-number
+Content-Type: application/json
+
+{
+  "tracking_number": "1234567890"
+}

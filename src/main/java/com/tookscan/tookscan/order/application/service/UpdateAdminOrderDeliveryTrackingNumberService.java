@@ -45,9 +45,6 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
                         delivery.getOrder().getOrderNumber(),
                         delivery.getPhoneNumber()
                 );
-                kakaoMessageUtil.sendThanksForUsingMessage(
-                        delivery.getPhoneNumber()
-                );
             }
         });
     }

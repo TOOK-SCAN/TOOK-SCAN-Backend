@@ -70,16 +70,6 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
                 .noneMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD)) {
             orderService.allComplete(order);
             orderRepository.save(order);
-
-            // 감사 메세지 전송
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    kakaoMessageUtil.sendThanksForUsingMessage(
-                            order.getDelivery().getPhoneNumber()
-                    );
-                }
-            });
         } else {
             orderService.startRecovery(order);
             orderRepository.save(order);

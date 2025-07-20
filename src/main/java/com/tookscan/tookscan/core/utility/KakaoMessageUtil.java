@@ -181,20 +181,4 @@ public class KakaoMessageUtil {
 
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
-
-    public void sendThanksForUsingMessage(String to) {
-
-        KakaoOption kakaoOption = new KakaoOption();
-
-        kakaoOption.setPfId(pfId);
-        kakaoOption.setTemplateId(templateIdThanksForUsing);
-
-        Message message = new Message();
-        message.setTo(to);
-        message.setFrom(sender);
-        message.setKakaoOptions(kakaoOption);
-
-        this.messageService.sendOne(new SingleMessageSendingRequest(message));
-    }
-
 }
