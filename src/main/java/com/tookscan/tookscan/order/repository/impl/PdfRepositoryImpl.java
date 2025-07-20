@@ -30,4 +30,10 @@ public class PdfRepositoryImpl implements PdfRepository {
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_PDF_FILE, "문서 ID: " + id));
         pdfJpaRepository.deleteById(id);
     }
+
+    @Override
+    public Pdf findByIdOrElseThrow(Long id) {
+        return pdfJpaRepository.findById(id)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_PDF_FILE, "문서 ID: " + id));
+    }
 }

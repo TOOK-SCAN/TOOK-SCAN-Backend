@@ -9,4 +9,6 @@ public interface PdfRepository {
     void save(Pdf pdf);
 
     void deleteByIdOrElseThrow(Long pdfId);
+
+    Pdf findByIdOrElseThrow(Long pdfId);
 }

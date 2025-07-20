@@ -59,4 +59,8 @@ public class Pdf extends BaseEntity {
     public void updateExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
     }
+
+    public void updatePdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
 }

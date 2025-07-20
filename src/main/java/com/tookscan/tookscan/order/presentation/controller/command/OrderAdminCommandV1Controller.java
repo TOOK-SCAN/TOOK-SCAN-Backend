@@ -5,7 +5,6 @@ import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.annotation.swagger.ApiErrorExceptions;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
-import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
@@ -90,7 +89,8 @@ public class OrderAdminCommandV1Controller {
     @ApiErrorCode({
         ErrorCode.INVALID_ARGUMENT,
         ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.ACCESS_DENIED,
+            ErrorCode.NOT_POST_WAITING_ORDER
     })
     @PostMapping(value = "/deliveries/export")
     public ResponseEntity<Resource> exportDeliveries(
@@ -100,8 +100,7 @@ public class OrderAdminCommandV1Controller {
         byte[] excelBytes = exportAdminDeliveriesUseCase.execute(requestDto);
 
         // 2) 스프링에서 파일 다운로드를 위한 HTTP 응답 헤더 설정
-        String fileName = DateTimeUtil.convertStringToDartDate(requestDto.startDate()) + "~"
-                + DateTimeUtil.convertStringToDartDate(requestDto.endDate()) + "_deliveries.xlsx";
+        String fileName = "orders.xlsx";
         ByteArrayResource resource = new ByteArrayResource(excelBytes);
 
         return ResponseEntity.ok()
