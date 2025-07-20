@@ -1,13 +1,13 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.core.utility.DateTimeUtil;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.ExcelUtils;
-import com.tookscan.tookscan.order.presentation.dto.request.ExportAdminDeliveriesRequestDto;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.presentation.dto.request.ExportAdminDeliveriesRequestDto;
 import com.tookscan.tookscan.order.repository.OrderRepository;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,11 +23,14 @@ public class ExportAdminDeliveriesService implements ExportAdminDeliveriesUseCas
     @Override
     @Transactional
     public byte[] execute(ExportAdminDeliveriesRequestDto requestDto) {
-        LocalDateTime startDate = DateTimeUtil.convertStringToDartDate(requestDto.startDate()).atStartOfDay();
-        LocalDateTime endDate = DateTimeUtil.convertStringToDartDate(requestDto.endDate()).plusDays(1).atStartOfDay();
+        List<Order> orders = orderRepository.findAllByIdOrElseThrow(requestDto.orderIds());
 
-        List<Order> orders = orderRepository.findAllByOrderStatusDateBetweenOrElseThrow(startDate, endDate,
-                EOrderStatus.POST_WAITING);
+        orders.forEach(order -> {
+            if (order.getOrderStatus() != EOrderStatus.POST_WAITING) {
+                throw new CommonException(ErrorCode.NOT_POST_WAITING_ORDER,
+                        "주문 ID: " + order.getId());
+            }
+        });
 
         return excelUtils.writeDeliveries(orders);
     }
