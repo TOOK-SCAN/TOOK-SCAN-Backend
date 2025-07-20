@@ -88,6 +88,8 @@ public enum ErrorCode {
     NOT_RECOVERY_IN_PROGRESS(40053, HttpStatus.BAD_REQUEST, "주문 상태가 복원 작업이 아닙니다."),
     NOT_PAYMENT_COMPLETED(40054, HttpStatus.BAD_REQUEST, "주문 상태가 결제 완료가 아닙니다."),
     DUPLICATE_DOCUMENT_NAME(40055, HttpStatus.BAD_REQUEST, "이미 존재하는 문서 이름입니다."),
+    NOT_COMAPNY_ARRIVED_ORDER(40056, HttpStatus.BAD_REQUEST, "주문 상태가 업체 도착이 아닙니다."),
+    NOT_POST_WAITING_ORDER(40057, HttpStatus.BAD_REQUEST, "주문 상태가 POST_WAITING이 아닙니다."),
 
     // SIGN UP Error
     ALREADY_EXIST_ID(40200, HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
