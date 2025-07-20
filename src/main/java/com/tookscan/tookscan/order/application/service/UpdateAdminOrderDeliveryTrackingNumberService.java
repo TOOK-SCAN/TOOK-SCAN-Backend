@@ -35,7 +35,7 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
 
         deliveryRepository.save(delivery);
 
-        // 운송장 등록 메세지 전송 및 감사 메세지 전송
+        // 운송장 등록 메세지 전송
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -43,9 +43,6 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
                         delivery.getOrder().getDocumentsDescription(),
                         delivery.getTrackingNumber(),
                         delivery.getOrder().getOrderNumber(),
-                        delivery.getPhoneNumber()
-                );
-                kakaoMessageUtil.sendThanksForUsingMessage(
                         delivery.getPhoneNumber()
                 );
             }
