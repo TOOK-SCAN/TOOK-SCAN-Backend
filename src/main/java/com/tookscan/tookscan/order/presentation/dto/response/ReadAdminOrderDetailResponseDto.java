@@ -12,6 +12,8 @@ import com.tookscan.tookscan.order.domain.Pdf;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto.InitialOrderDto.PaymentInfoDto;
+import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
+import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -76,6 +78,21 @@ public class ReadAdminOrderDetailResponseDto extends
     @JsonProperty("cancel_reason")
     private final String cancelReason;
 
+    @JsonProperty("pdf_sended_at")
+    private final String pdfSendedAt;
+
+    @JsonProperty("paymented_at")
+    private final String paymentedAt;
+
+    @JsonProperty("payment_method")
+    private final EPaymentMethod paymentMethod;
+
+    @JsonProperty("payment_provider")
+    private final EEasyPaymentProvider paymentProvider;
+
+    @JsonProperty("payment_receipt_url")
+    private final String paymentReceiptUrl;
+
     @Builder
     public ReadAdminOrderDetailResponseDto(
             String orderNumber,
@@ -92,7 +109,12 @@ public class ReadAdminOrderDetailResponseDto extends
             String trackingNumberRegisteredAt,
             String recoveryCompletedAt,
             String orderCancelledAt,
-            String cancelReason
+            String cancelReason,
+            String pdfSendedAt,
+            String paymentedAt,
+            EPaymentMethod paymentMethod,
+            EEasyPaymentProvider paymentProvider,
+            String paymentReceiptUrl
     ) {
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
@@ -109,6 +131,11 @@ public class ReadAdminOrderDetailResponseDto extends
         this.recoveryCompletedAt = recoveryCompletedAt;
         this.orderCancelledAt = orderCancelledAt;
         this.cancelReason = cancelReason;
+        this.pdfSendedAt = pdfSendedAt;
+        this.paymentedAt = paymentedAt;
+        this.paymentMethod = paymentMethod;
+        this.paymentProvider = paymentProvider;
+        this.paymentReceiptUrl = paymentReceiptUrl;
         this.validateSelf();
     }
 
@@ -144,6 +171,15 @@ public class ReadAdminOrderDetailResponseDto extends
                         ? DateTimeUtil.convertLocalDateTimeToDartString(order.getCancelledAt())
                         : null)
                 .cancelReason(order.getCancelReason() != null ? order.getCancelReason() : null)
+                .pdfSendedAt(order.getPdfSendDate() != null
+                        ? DateTimeUtil.convertLocalDateTimeToDartString(order.getPdfSendDate())
+                        : null)
+                .paymentedAt(order.getPayment() != null && order.getPayment().getApprovedAt() != null
+                        ? DateTimeUtil.convertLocalDateTimeToDartString(order.getPayment().getApprovedAt())
+                        : null)
+                .paymentMethod(order.getPayment() != null ? order.getPayment().getMethod() : null)
+                .paymentProvider(order.getPayment() != null ? order.getPayment().getEasyPaymentProvider() : null)
+                .paymentReceiptUrl(order.getPayment() != null ? order.getPayment().getReceiptUrl() : null)
                 .build();
     }
 
