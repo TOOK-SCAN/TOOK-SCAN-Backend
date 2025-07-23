@@ -13,15 +13,15 @@ import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PdfRepository;
+import java.io.File;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -41,35 +41,61 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
 
     @Override
     @Transactional
-    public void execute(Long documentId, MultipartFile file) {
+    public void execute(Long documentId, List<MultipartFile> files) {
         Document document = documentRepository.findByIdOrElseThrow(documentId);
-
         Order order = orderRepository.findByIdOrElseThrow(document.getOrder().getId());
-
         User user = userRepository.findByIdOrElseThrow(order.getUser().getId());
 
+        // 병렬 처리용 데이터 준비 (엔티티에서 필요한 값들만 추출)
+        String userName = user.getName();
+        String userPhone = user.getPhoneNumber();
+        String orderNumber = order.getOrderNumber();
+        String orderCreatedAt = DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt());
+
+        // 병렬로 워터마킹 및 S3 업로드 처리 (트랜잭션 외부에서 실행)
+        List<String> pdfUrls = processFilesInParallel(document, files, userName, userPhone, orderNumber, orderCreatedAt);
+
+        // DB 저장은 순차적으로 (트랜잭션 내에서)
+        for (String pdfUrl : pdfUrls) {
+            Pdf pdf = Pdf.builder()
+                    .pdfUrl(pdfUrl)
+                    .pdfCreatedAt(LocalDateTime.now())
+                    .document(document)
+                    .build();
+            
+            pdfRepository.save(pdf);
+            document.getPdfs().add(pdf);
+        }
+
+        updateOrderStatusBasedOnPdfStorage(order);
+    }
+
+    private List<String> processFilesInParallel(Document document, List<MultipartFile> files, 
+                                               String userName, String userPhone, String orderNumber, String orderCreatedAt) {
+        // 병렬로 워터마킹 및 S3 업로드 처리
+        List<CompletableFuture<String>> futures = files.stream()
+                .map(file -> CompletableFuture.supplyAsync(() -> 
+                    processFileToUrl(document, file, userName, userPhone, orderNumber, orderCreatedAt)))
+                .toList();
+
+        // 모든 병렬 작업 완료 대기
+        return futures.stream()
+                .map(CompletableFuture::join)
+                .toList();
+    }
+
+    private String processFileToUrl(Document document, MultipartFile file, 
+                                   String userName, String userPhone, String orderNumber, String orderCreatedAt) {
         File watermarkedPdf = PdfWatermarkUtil.embedWatermark(
                 file,
-                user.getName(),
-                user.getPhoneNumber(),
-                order.getOrderNumber(),
-                DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()),
+                userName,
+                userPhone,
+                orderNumber,
+                orderCreatedAt,
                 aesKeyString.getBytes()
         );
 
-        String pdfUrl = s3Util.uploadPdf(document, watermarkedPdf);
-
-        Pdf pdf = Pdf.builder()
-                .pdfUrl(pdfUrl)
-                .pdfCreatedAt(LocalDateTime.now())
-                .document(document)
-                .build();
-
-        pdfRepository.save(pdf);
-        document.getPdfs().add(pdf);
-
-        // PDF 저장 후 주문 상태 업데이트
-        updateOrderStatusBasedOnPdfStorage(document.getOrder());
+        return s3Util.uploadPdf(document, watermarkedPdf);
     }
 
     private void updateOrderStatusBasedOnPdfStorage(Order order) {

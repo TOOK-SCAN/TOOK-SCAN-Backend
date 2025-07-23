@@ -38,6 +38,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -141,9 +142,9 @@ public class OrderAdminCommandV1Controller {
     }
 
     /**
-     * 4.1.6 관리자 pdf 파일 업로드
+     * 4.1.6 관리자 pdf 파일 업로드 (단일/다중 지원)
      */
-    @Operation(summary = "관리자 pdf 파일 업로드", description = "관리자가 pdf 파일을 업로드합니다.")
+    @Operation(summary = "관리자 pdf 파일 업로드", description = "관리자가 pdf 파일을 업로드합니다. 단일 파일 또는 다중 파일 업로드를 지원합니다.")
     @ApiErrorCode({
         ErrorCode.NOT_FOUND_DOCUMENT,
         ErrorCode.UNSUPPORTED_MEDIA_TYPE,
@@ -153,11 +154,12 @@ public class OrderAdminCommandV1Controller {
     @PostMapping(value = "/documents/{documentId}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDto<Void> uploadPdf(
             @PathVariable Long documentId,
-            @RequestPart("file") MultipartFile file
+            @RequestPart("files") List<MultipartFile> files
     ) {
-        uploadAdminDocumentsPdfUseCase.execute(documentId, file);
+        uploadAdminDocumentsPdfUseCase.execute(documentId, files);
         return ResponseDto.ok(null);
     }
+
     /**
      * 4.3.2 관리자 주문 상태 일괄 변경
      */
