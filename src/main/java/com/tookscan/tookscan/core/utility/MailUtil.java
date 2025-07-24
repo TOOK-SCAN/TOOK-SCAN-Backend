@@ -78,7 +78,7 @@ public class MailUtil {
                              <tr>
                                <td style="padding:24px; color:#222222; font-size:16px; line-height:1.6;">
                                  <p style="margin:0 0 8px;">툭스캔에 주문하신 PDF 파일이 도착했습니다!</p>
-                                 <p style="margin:0 0 16px;">( 주문번호:<strong>${orderNumber}</strong>)</p>
+                                 <p style="margin:0 0 16px;">(주문번호:<strong>${orderNumber}</strong>)</p>
             
                                  <p style="margin:0 0 16px;">
                                    안녕하세요, <strong>${userName}</strong> 고객님.<br>
