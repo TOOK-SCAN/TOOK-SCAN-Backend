@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -77,7 +78,7 @@ public class Document extends BaseEntity {
     /* One to Many Column ------------------------- */
     /* -------------------------------------------- */
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pdf> pdfs;
+    private List<Pdf> pdfs = new ArrayList<>();
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
