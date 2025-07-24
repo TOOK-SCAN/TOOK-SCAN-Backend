@@ -323,12 +323,19 @@ public class Order extends BaseEntity {
                     if (pdfs.isEmpty()) {
                         throw new CommonException(ErrorCode.NOT_FOUND_PDF);
                     }
-                    String content = "- \uD83D\uDCC1 " + doc.getName() + "<ul style=\"list-style: none; margin: 6px 0 0 18px; padding: 0;\">";
+                    String content = "<li style=\"margin-bottom: 10px;\">";
+                    content += "- \uD83D\uDCC1 " + doc.getName() + "<ul style=\"list-style: none; margin: 6px 0 0 18px; padding: 0;\">";
+                    content += "<ul style=\"list-style: none; margin: 6px 0 0 18px; padding: 0;\">";
                     int pdfCount = 1;
                     for (Pdf pdf : pdfs) {
                         if (pdf.getPdfUrl() != null) {
-                            content += "<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + " (" + pdfCount + ")" + "</a>";
-                            pdfCount++;
+                            if (pdfs.size() > 1) {
+                                content += "<li>└ \uD83D\uDCC4<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + " (" + pdfCount + ")" + "</a></li>";
+                                pdfCount++;
+                            }
+                            else {
+                                content += "<li>└ \uD83D\uDCC4<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + "</a></li>";
+                            }
                         } else {
                             content += "<li style=\"margin-bottom: 6px;\">- 📁 <span style=\"color:#888888;\">PDF 파일이 준비되지 않았습니다.</span></li>";
                         }
