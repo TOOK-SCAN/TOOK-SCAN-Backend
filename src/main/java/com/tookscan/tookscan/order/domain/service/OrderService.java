@@ -154,10 +154,6 @@ public class OrderService {
         }
     }
 
-    public void updateScanTermsAgreed(Order order) {
-        order.updateScanTermsAgreed();
-    }
-
     public void updatePaymentExpirationDate(Order order) {
         order.updatePaymentExpirationDate(LocalDateTime.now().plusDays(PAYMENT_EXPIRATION_PERIOD));
     }

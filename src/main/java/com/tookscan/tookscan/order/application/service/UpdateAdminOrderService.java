@@ -30,6 +30,7 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
     private final PricePolicyRepository pricePolicyRepository;
     private final OrderRepository orderRepository;
     private final DocumentRepository documentRepository;
+
     private final DocumentService documentService;
     private final OrderService orderService;
     private final DeliveryService deliveryService;
@@ -121,13 +122,18 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
         // 삭제 처리 (필요하다면 Order 엔티티에서도 해당 Document를 제거)
         order.getDocuments().removeIf(doc -> toDeleteIds.contains(doc.getId()));
         toDeleteIds.forEach(documentRepository::deleteByIdOrElseThrow);
-        orderService.calculateTotalAmount(order);
+
 
         // 주문 정보 업데이트
         orderService.updateIsOneDayScan(order, requestDto.isOneDayScan());
-
+        if (order.isDelivery()) {
+            deliveryService.updateDeliveryPrice(order.getDelivery(), pricePolicy.getDeliveryPrice());
+        } else {
+            deliveryService.updateDeliveryPrice(order.getDelivery(), 0);
+        }
         deliveryService.updateDeliveryPrice(order.getDelivery(), requestDto.deliveryPrice());
 
+        orderService.calculateTotalAmount(order);
         orderRepository.save(order);
     }
 }
