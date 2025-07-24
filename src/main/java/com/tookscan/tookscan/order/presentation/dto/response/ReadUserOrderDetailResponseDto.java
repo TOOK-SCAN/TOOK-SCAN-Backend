@@ -111,6 +111,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
     @Getter
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
+
+        @JsonProperty("id")
+        private final String id;
+
         @JsonProperty("name")
         @NotNull
         private final String name;
@@ -156,7 +160,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                                Integer recoveryPrice,
                                Integer oneDayScanPrice,
                                Integer cuttingPrice,
-                               Integer ocrPrice) {
+                               Integer ocrPrice,
+                               String id
+        ) {
             this.name = name;
             this.pageCount = pageCount;
             this.documentPrice = documentPrice;
@@ -166,6 +172,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             this.oneDayScanPrice = oneDayScanPrice;
             this.cuttingPrice = cuttingPrice;
             this.ocrPrice = ocrPrice;
+            this.id = id;
             this.validateSelf();
         }
 
@@ -180,6 +187,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                     .oneDayScanPrice(document.getOneDayScanPrice())
                     .ocrPrice(document.getOcrPrice())
                     .cuttingPrice(document.getCuttingPrice())
+                    .id(document.getId().toString())
                     .build();
         }
     }

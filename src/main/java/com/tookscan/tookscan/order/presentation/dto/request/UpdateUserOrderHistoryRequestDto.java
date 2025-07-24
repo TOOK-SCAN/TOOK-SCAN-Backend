@@ -32,6 +32,10 @@ public record UpdateUserOrderHistoryRequestDto(
 ) {
     public record RequestDocument(
 
+            @JsonProperty("id")
+            @NotNull(message = "문서 ID를 입력해주세요.")
+            Long id,
+
             @JsonProperty("name")
             @NotBlank(message = "문서 이름을 입력해주세요.")
             @ByteSize(min = 2, max = 100, message = "문서 이름의 크기는 최소 2바이트 ~ 최대 100바이트 입니다.")

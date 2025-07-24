@@ -4,18 +4,27 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderHistoryUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.PricePolicy;
+import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto.RequestDocument;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +41,7 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
     private final OrderService orderService;
     private final DocumentService documentService;
     private final AddressService addressService;
+    private final DeliveryService deliveryService;
 
     @Override
     @Transactional
@@ -44,26 +54,78 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
         // 가격 정책 조회
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
                 LocalDate.now(), LocalDate.now());
-        // 문서 삭제
-        order.getDocuments().clear();
+        Set<Long> orderDocumentIds = order.getDocuments().stream()
+                .map(Document::getId)
+                .collect(Collectors.toSet());
 
-        // 문서 생성
-        requestDto.documents().forEach(doc -> {
-            Document document = documentService.createDocument(
-                    doc.name(),
-                    doc.pageCount(),
-                    doc.recoveryOption(),
+        // 요청으로 들어온 문서들을 신규 문서(id == null)와 기존 문서(id != null)로 분리
+        List<RequestDocument> newDocuments = requestDto.documents().stream()
+                .filter(doc -> doc.id() == null)
+                .toList();
+
+        List<RequestDocument> existingDocuments = requestDto.documents().stream()
+                .filter(doc -> doc.id() != null)
+                .toList();
+
+        // 기존 문서의 경우, 해당 주문에 속한 문서인지 검증
+        List<Long> existingDocumentIds = existingDocuments.stream()
+                .map(RequestDocument::id)
+                .toList();
+
+        List<Long> invalidDocumentIds = existingDocumentIds.stream()
+                .filter(id -> !orderDocumentIds.contains(id))
+                .toList();
+
+        if (!invalidDocumentIds.isEmpty()) {
+            throw new CommonException(ErrorCode.INVALID_ARGUMENT,
+                    "해당 주문(Order)에 속하지 않는 문서(Document)가 포함되었습니다: " + invalidDocumentIds);
+        }
+
+        // 기존 문서 업데이트
+        Map<Long, Document> documentMap = documentRepository.findAllByIdsOrElseThrow(existingDocumentIds)
+                .stream()
+                .collect(Collectors.toMap(Document::getId, document -> document));
+
+        existingDocuments.forEach(document -> {
+            documentService.updateDocument(
+                    documentMap.get(document.id()),
+                    document.name(),
+                    document.pageCount(),
+                    document.recoveryOption(),
+                    document.isOcrEnabled(),
+                    pricePolicy.getAdditionalPriceForOcr()
+            );
+
+            documentRepository.save(documentMap.get(document.id()));
+        });
+
+        // 신규 문서 생성
+        newDocuments.forEach(document -> {
+            Document doc = documentService.createDocument(
+                    document.name(),
+                    document.pageCount(),
+                    document.recoveryOption(),
                     order,
                     pricePolicy.getCuttingPrice(),
                     pricePolicy.getDefaultPricePerPage(),
                     pricePolicy.getAdditionalPriceForOcr(),
-                    doc.isOcrEnabled()
+                    document.isOcrEnabled()
             );
-            order.getDocuments().add(document);
-            documentRepository.save(document);
+            documentRepository.save(doc);
         });
 
-        orderService.updateIsOneDayScan(order, requestDto.isOneDayScan());
+        // 삭제 처리: DB에 존재하지만 요청에 포함되지 않은 문서는 삭제
+        // 요청에 포함된 기존 문서의 ID 집합
+        Set<Long> requestExistingIds = new HashSet<>(existingDocumentIds);
+        // 주문에 속한 기존 문서 중 요청에 포함되지 않은 ID 찾기
+        Set<Long> toDeleteIds = orderDocumentIds.stream()
+                .filter(id -> !requestExistingIds.contains(id))
+                .collect(Collectors.toSet());
+        System.out.println("toDeleteIds = " + toDeleteIds);
+        // 삭제 처리 (필요하다면 Order 엔티티에서도 해당 Document를 제거)
+        order.getDocuments().removeIf(doc -> toDeleteIds.contains(doc.getId()));
+        toDeleteIds.forEach(documentRepository::deleteByIdOrElseThrow);
+
         if (requestDto.address() != null) {
             Address address = addressService.createAddress(
                     requestDto.address().addressName(),
@@ -80,6 +142,16 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
             order.getDelivery().updateRequest(requestDto.deliveryRequest());
         }
 
+        // 주문 정보 업데이트
+        orderService.updateIsOneDayScan(order, requestDto.isOneDayScan());
+
+        if (order.isDelivery()) {
+            deliveryService.updateDeliveryPrice(order.getDelivery(), pricePolicy.getDeliveryPrice());
+        } else {
+            deliveryService.updateDeliveryPrice(order.getDelivery(), 0);
+        }
+
+        orderService.calculateTotalAmount(order);
         orderRepository.save(order);
     }
 }
