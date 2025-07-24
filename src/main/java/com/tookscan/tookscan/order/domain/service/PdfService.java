@@ -69,27 +69,4 @@ public class PdfService {
         int lastSlashIndex = url.lastIndexOf('/');
         return lastSlashIndex != -1 ? url.substring(lastSlashIndex + 1) : url;
     }
-
-    public String getPdfUrls(List<Document> documents) {
-        if (documents.isEmpty()) {
-            throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
-        }
-
-        return documents.stream()
-                .map(doc -> {
-                    List<Pdf> pdfs = doc.getPdfs();
-                    String content = doc.getName() + " :<br />";
-                    for (Pdf pdf : pdfs) {
-                        if (pdf.getPdfUrl() != null) {
-                            content += "<a href=\"" + pdf.getPdfUrl() + "\" target=\"_blank\">" +
-                                    pdf.getPdfUrl() + "</a> <br />";
-                        } else {
-                            content += "PDF URL이 없습니다. <br />";
-                        }
-                    }
-                    return content;
-                })
-                .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
-                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
-    }
 }

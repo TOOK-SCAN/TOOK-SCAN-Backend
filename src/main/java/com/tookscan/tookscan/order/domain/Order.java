@@ -320,10 +320,15 @@ public class Order extends BaseEntity {
         return documents.stream()
                 .map(doc -> {
                     List<Pdf> pdfs = doc.getPdfs();
-                    String content = "<ul style=\"list-style: none; padding-left: 0; margin: 0 0 24px;\">";
+                    if (pdfs.isEmpty()) {
+                        throw new CommonException(ErrorCode.NOT_FOUND_PDF);
+                    }
+                    String content = "- \uD83D\uDCC1 " + doc.getName() + "<ul style=\"list-style: none; margin: 6px 0 0 18px; padding: 0;\">";
+                    int pdfCount = 1;
                     for (Pdf pdf : pdfs) {
                         if (pdf.getPdfUrl() != null) {
-                            content += "<li style=\"margin-bottom: 6px;\">- 📁 <a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" +pdf.getDocument().getName() + "</a></li>";
+                            content += "<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + " (" + pdfCount + ")" + "</a>";
+                            pdfCount++;
                         } else {
                             content += "<li style=\"margin-bottom: 6px;\">- 📁 <span style=\"color:#888888;\">PDF 파일이 준비되지 않았습니다.</span></li>";
                         }
