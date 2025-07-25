@@ -33,15 +33,6 @@ public class KakaoMessageUtil {
     @Value("${solapi.template-id.announce-delivery}")
     private String templateIdAnnounceDelivery;
 
-    @Value("${solapi.template-id.thanks-for-using}")
-    private String templateIdThanksForUsing;
-
-    @Value("${solapi.path-for-user}")
-    private String pathForUser;
-
-    @Value("${solapi.path-for-guest}")
-    private String pathForGuest;
-
     @Value("${solapi.sender}")
     private String sender;
 
@@ -56,6 +47,15 @@ public class KakaoMessageUtil {
 
     @Value("${solapi.order-waybill-url}")
     private String orderWaybillUrl;
+
+    @Value("${solapi.user-post-way-1-url}")
+    private String userPostWay1Url;
+
+    @Value("${solapi.user-post-way-2-url}")
+    private String userPostWay2Url;
+
+    @Value("${solapi.post-price-url}")
+    private String postPriceUrl;
 
     public KakaoMessageUtil(
             @Value("${solapi.api-key}") String apiKey,
@@ -73,6 +73,9 @@ public class KakaoMessageUtil {
         variables.put("#{userName}", userName);
         variables.put("#{userPhone}", userPhone);
         variables.put("#{orderName}", orderName);
+        variables.put("#{userPostWay1}", userPostWay1Url);
+        variables.put("#{userPostWay2}", userPostWay2Url);
+        variables.put("#{postPrice}", postPriceUrl);
         variables.put("#{tipUrl}", tipUrl);
 
         kakaoOption.setVariables(variables);

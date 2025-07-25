@@ -191,14 +191,14 @@ solapi:
     request-scan: ${SOLAPI_TEMPLATE_REQUEST_SCAN}
     announce-scan-finish: ${SOLAPI_TEMPLATE_ANNOUNCE_SCAN_FINISH}
     announce-delivery: ${SOLAPI_TEMPLATE_ANNOUNCE_DELIVERY}
-    thanks-for-using: ${SOLAPI_TEMPLATE_THANKS_FOR_USING}
-  path-for-user: ${SOLAPI_PATH_FOR_USER}
-  path-for-guest: ${SOLAPI_PATH_FOR_GUEST}
   sender: ${SOLAPI_SENDER}
   tip-url: ${SOLAPI_TIP_URL}
   payment-url: ${SOLAPI_PAYMENT_URL}
   order-detail-url: ${SOLAPI_ORDER_DETAIL_URL}
   order-waybill-url: ${SOLAPI_ORDER_WAYBILL_URL}
+  user-post-way-1-url: ${SOLAPI_USER_POST_WAY_1_URL}
+  user-post-way-2-url: ${SOLAPI_USER_POST_WAY_2_URL}
+  post-price-url: ${SOLAPI_POST_PRICE_URL}
 
 
 # === Admin 계정 공통 설정 ===
