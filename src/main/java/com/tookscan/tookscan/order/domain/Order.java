@@ -340,6 +340,7 @@ public class Order extends BaseEntity {
                             content += "<li style=\"margin-bottom: 6px;\">- 📁 <span style=\"color:#888888;\">PDF 파일이 준비되지 않았습니다.</span></li>";
                         }
                     }
+                    content += "</ul></li>";
                     return content;
                 })
                 .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)

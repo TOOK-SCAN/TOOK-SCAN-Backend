@@ -95,6 +95,8 @@ public class MailUtil {
                                  <div style="height:20px;"></div>
             
                                  <!-- ℹ️ 안내 문구 -->
+                                 </br>
+                                 </br>
                                  <p style="font-size:13px; color:#888888; margin:0 0 8px;">
                                    ※ 각 링크는 14일 후 자동 만료되며, 저작권 보호를 위해 만료 시 자동 삭제됩니다. 기한 내 반드시 다운로드를 완료해 주세요.
                                  </p>
