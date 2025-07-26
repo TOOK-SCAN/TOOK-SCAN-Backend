@@ -1,16 +1,15 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
+import com.tookscan.tookscan.message.event.RequestPaymentMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
 
     private final OrderService orderService;
 
-    private final KakaoMessageUtil kakaoMessageUtil;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -31,19 +30,15 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
         order.updateOrderStatus(EOrderStatus.PAYMENT_WAITING);
         orderService.updatePaymentExpirationDate(order);
 
-        // 결제 요청 메세지 전송
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                kakaoMessageUtil.sendRequestPaymentMessage(
+        orderRepository.save(order);
+
+        applicationEventPublisher.publishEvent(
+                RequestPaymentMessageEvent.of(
                         order.getDocumentsDescription(),
                         order.getTotalAmount(),
                         order.getOrderNumber(),
                         order.getDelivery().getPhoneNumber()
-                );
-            }
-        });
-
-        orderRepository.save(order);
+                )
+        );
     }
 }

@@ -4,7 +4,7 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
-import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
+import com.tookscan.tookscan.message.event.CreateOrderMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -28,10 +28,9 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +49,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
     private final DeliveryService deliveryService;
     private final CouponService couponService;
 
-    private final KakaoMessageUtil kakaoMessageUtil;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -129,17 +128,14 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
 
         orderService.calculateTotalAmount(order);
 
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                kakaoMessageUtil.sendCreateOrderMessage(
+        applicationEventPublisher.publishEvent(
+                CreateOrderMessageEvent.of(
                         user.getName(),
                         user.getPhoneNumber(),
                         order.getDocumentsDescription(),
                         order.getDelivery().getPhoneNumber()
-                );
-            }
-        });
+                )
+        );
 
         return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber())
                 .orderId(order.getId().toString()).build();

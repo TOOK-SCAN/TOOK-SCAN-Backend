@@ -2,8 +2,8 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
+import com.tookscan.tookscan.message.event.AnnounceScanFinishMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
@@ -26,8 +26,6 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     private final OrderService orderService;
 
-    private final KakaoMessageUtil kakaoMessageUtil;
-
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -36,10 +34,13 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
         Order order = orderRepository.findByIdWithDocumentsAndDeliveryOrElseThrow(orderId);
 
-        kakaoMessageUtil.sendAnnounceScanFinishMessage(
-                order.getDelivery().getEmail(),
-                order.getDocumentsDescription(),
-                order.getDelivery().getPhoneNumber()
+        // 스캔 완료 알림 메시지 이벤트 발행
+        applicationEventPublisher.publishEvent(
+                AnnounceScanFinishMessageEvent.of(
+                        order.getDelivery().getEmail(),
+                        order.getDocumentsDescription(),
+                        order.getDelivery().getPhoneNumber()
+                )
         );
 
         List<Document> documents = order.getDocuments();

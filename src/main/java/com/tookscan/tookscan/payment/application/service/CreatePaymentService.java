@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.payment.application.service;
 
+import com.tookscan.tookscan.message.event.RequestScanMessageEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -21,6 +23,8 @@ public class CreatePaymentService implements CreatePaymentUseCase {
 
     private final OrderService orderService;
 
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     @Override
     @Transactional
     public void execute(CreatePaymentRequestDto requestDto) {
@@ -38,8 +42,17 @@ public class CreatePaymentService implements CreatePaymentUseCase {
                 .build();
 
         orderService.finishPayment(order, payment);
-
-        // 결제 정보 저장
+        orderRepository.save(order);
         paymentRepository.save(payment);
+
+        // 스캔 요청 메시지 이벤트 발행
+        applicationEventPublisher.publishEvent(
+                RequestScanMessageEvent.of(
+                        order.getDocumentsDescription(),
+                        order.getOrderNumber(),
+                        order.getDelivery().getEmail(),
+                        order.getDelivery().getPhoneNumber()
+                )
+        );
     }
 }

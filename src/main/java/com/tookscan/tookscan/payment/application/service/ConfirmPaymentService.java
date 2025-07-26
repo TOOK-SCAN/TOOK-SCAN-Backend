@@ -1,7 +1,8 @@
 package com.tookscan.tookscan.payment.application.service;
 
 import com.tookscan.tookscan.core.dto.PaymentDto;
-import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
+import com.tookscan.tookscan.message.event.RequestScanMessageEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.Order;
@@ -34,7 +35,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
     private final TossPaymentUtil tossPaymentUtil;
     private final RestClientUtil restClientUtil;
-    private final KakaoMessageUtil kakaoMessageUtil;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -75,12 +76,14 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             orderService.finishPayment(order, payment);
             orderRepository.save(order);
 
-            // 스캔 요청 메시지 전송
-            kakaoMessageUtil.sendRequestScanMessage(
-                    order.getDocumentsDescription(),
-                    order.getOrderNumber(),
-                    order.getDelivery().getEmail(),
-                    order.getDelivery().getPhoneNumber()
+            // 스캔 요청 메시지 이벤트 발행
+            applicationEventPublisher.publishEvent(
+                    RequestScanMessageEvent.of(
+                            order.getDocumentsDescription(),
+                            order.getOrderNumber(),
+                            order.getDelivery().getEmail(),
+                            order.getDelivery().getPhoneNumber()
+                    )
             );
         }
 
