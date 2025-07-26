@@ -21,8 +21,8 @@ public class UpdateAdminOrdersStatusCompanyArrivedService implements UpdateAdmin
     @Transactional
     public void execute(UpdateAdminOrdersStatusCompanyArrivedRequestDto requestDto) {
         List<Order> orders = orderRepository.findAllByIdOrElseThrow(requestDto.orderIds());
-        
-        orders.forEach(order -> orderService.arriveCompany(order));
+
+        orders.forEach(orderService::arriveCompany);
         orderRepository.saveAll(orders);
     }
 }

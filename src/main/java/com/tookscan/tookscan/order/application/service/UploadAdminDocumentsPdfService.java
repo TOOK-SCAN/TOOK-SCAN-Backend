@@ -2,6 +2,7 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.core.utility.PdfWatermarkUtil;
 import com.tookscan.tookscan.core.utility.S3Util;
@@ -10,6 +11,7 @@ import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.Pdf;
 import com.tookscan.tookscan.order.domain.service.OrderService;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PdfRepository;
@@ -45,6 +47,15 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         Document document = documentRepository.findByIdOrElseThrow(documentId);
         Order order = orderRepository.findByIdOrElseThrow(document.getOrder().getId());
         User user = userRepository.findByIdOrElseThrow(order.getUser().getId());
+
+        // 주문 상태 검증
+        List<EOrderStatus> validStatuses = List.of(
+                EOrderStatus.PAYMENT_COMPLETED,
+                EOrderStatus.SCAN_IN_PROGRESS,
+                EOrderStatus.SCAN_COMPLETED
+        );
+
+        orderService.validateOrderStatuses(order, validStatuses, ErrorCode.INVALID_ORDER_STATUS);
 
         // 병렬 처리용 데이터 준비 (엔티티에서 필요한 값들만 추출)
         String userName = user.getName();
