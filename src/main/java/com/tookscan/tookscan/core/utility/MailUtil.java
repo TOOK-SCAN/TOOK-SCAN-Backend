@@ -163,7 +163,7 @@ public class MailUtil {
             String pdfUrl
     ) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        mimeMessage.setSubject(orderName + " 스캔본 전송 - TOOKSCAN");
+        mimeMessage.setSubject("[툭스캔] 주문하신 PDF 파일이 도착했어요.");
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
