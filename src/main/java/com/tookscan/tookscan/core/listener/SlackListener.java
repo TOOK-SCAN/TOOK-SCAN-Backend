@@ -24,7 +24,7 @@ public class SlackListener {
     @Value("${slack.webhook.url}")
     private String slackWebhookUrl;
 
-    @Async
+    @Async("notificationTaskExecutor")
     @EventListener
     public void sendSlackMessage(SendSlackErrorDto event) {
         String stackTrace = Arrays.stream(event.e().getStackTrace())
