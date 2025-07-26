@@ -1,5 +1,8 @@
 package com.tookscan.tookscan.core.config;
 
+import java.lang.reflect.Method;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -8,14 +11,12 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-
 @Slf4j
 @Configuration
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
+
+    private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     /**
      * 이메일 발송용 전용 스레드 풀
@@ -25,8 +26,8 @@ public class AsyncConfig implements AsyncConfigurer {
     @Bean(name = "emailTaskExecutor")
     public ThreadPoolTaskExecutor emailTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(5);
+        executor.setCorePoolSize(PROCESSORS);
+        executor.setMaxPoolSize(PROCESSORS * 2);
         executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("email-async-");
@@ -49,8 +50,8 @@ public class AsyncConfig implements AsyncConfigurer {
     @Bean(name = "notificationTaskExecutor")
     public ThreadPoolTaskExecutor notificationTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(8);
+        executor.setCorePoolSize(PROCESSORS);
+        executor.setMaxPoolSize(PROCESSORS * 2);
         executor.setQueueCapacity(200);
         executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("notification-async-");
@@ -74,7 +75,7 @@ public class AsyncConfig implements AsyncConfigurer {
     public ThreadPoolTaskExecutor fileProcessingTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(3);
+        executor.setMaxPoolSize(PROCESSORS);
         executor.setQueueCapacity(50);
         executor.setKeepAliveSeconds(120);
         executor.setThreadNamePrefix("file-processing-async-");
@@ -96,8 +97,8 @@ public class AsyncConfig implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(PROCESSORS);
+        executor.setMaxPoolSize(PROCESSORS + 1);
         executor.setQueueCapacity(150);
         executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("default-async-");

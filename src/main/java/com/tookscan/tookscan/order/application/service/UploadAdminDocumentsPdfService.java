@@ -19,14 +19,16 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import lombok.RequiredArgsConstructor;
+import java.util.concurrent.Executor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
 public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUseCase {
 
     @Value("${aes-key}")
@@ -40,6 +42,25 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
     private final OrderService orderService;
 
     private final S3Util s3Util;
+
+    private final Executor fileProcessingExecutor;
+    
+    public UploadAdminDocumentsPdfService(
+            DocumentRepository documentRepository,
+            OrderRepository orderRepository,
+            UserRepository userRepository,
+            PdfRepository pdfRepository,
+            OrderService orderService,
+            S3Util s3Util,
+            @Qualifier("fileProcessingTaskExecutor") Executor fileProcessingExecutor) {
+        this.documentRepository = documentRepository;
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.pdfRepository = pdfRepository;
+        this.orderService = orderService;
+        this.s3Util = s3Util;
+        this.fileProcessingExecutor = fileProcessingExecutor;
+    }
 
     @Override
     @Transactional
@@ -83,10 +104,11 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
 
     private List<String> processFilesInParallel(Document document, List<MultipartFile> files, 
                                                String userName, String userPhone, String orderNumber, String orderCreatedAt) {
-        // 병렬로 워터마킹 및 S3 업로드 처리
+        // 전용 스레드풀에서 병렬로 워터마킹 및 S3 업로드 처리
         List<CompletableFuture<String>> futures = files.stream()
-                .map(file -> CompletableFuture.supplyAsync(() -> 
-                    processFileToUrl(document, file, userName, userPhone, orderNumber, orderCreatedAt)))
+                .map(file -> CompletableFuture.supplyAsync(() ->
+                                processFileToUrl(document, file, userName, userPhone, orderNumber, orderCreatedAt),
+                        fileProcessingExecutor))
                 .toList();
 
         // 모든 병렬 작업 완료 대기
