@@ -59,6 +59,32 @@ public class RestClientUtil {
         }
     }
 
+    public JSONObject sendGet(String url, HttpHeaders headers) {
+        try {
+            return new JSONObject(Objects.requireNonNull(
+                    restClient.get()
+                            .uri(url)
+                            .headers(httpHeaders -> httpHeaders.addAll(headers))
+                            .retrieve()
+                            .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                                throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+                            })
+                            .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                                throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+                            })
+                            .toEntity(JSONObject.class)
+                            .getBody()));
+        } catch (ResourceAccessException e) {
+            // 타임아웃의 경우 ResourceAccessException의 원인이 SocketTimeoutException임
+            if (e.getCause() instanceof SocketTimeoutException) {
+                throw new CommonException(ErrorCode.EXTERNAL_SERVER_TIMEOUT);
+            }
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+        } catch (Exception e) {
+            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+        }
+    }
+
     public Map<String, Object> sendPostMethod(String url, HttpHeaders headers, String body) {
         try {
             return Objects.requireNonNull(

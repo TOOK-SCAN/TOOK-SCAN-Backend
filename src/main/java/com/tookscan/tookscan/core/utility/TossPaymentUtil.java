@@ -25,6 +25,9 @@ public class TossPaymentUtil {
     @Value("${toss.payments.refund-url}")
     private String tossRefundApiUrl;
 
+    @Value("${toss.payments.info-url}")
+    private String tossInfoApiUrl;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public String getTossConfirmRequestUrl() {
@@ -33,6 +36,10 @@ public class TossPaymentUtil {
 
     public String getTossRefundRequestUrl(String paymentKey) {
         return tossRefundApiUrl.replace("{paymentKey}", paymentKey);
+    }
+
+    public String getTossInfoRequestUrl(String paymentKey) {
+        return tossInfoApiUrl.replace("{paymentKey}", paymentKey);
     }
 
     public HttpHeaders getTossConfirmRequestHeaders() {
@@ -44,6 +51,14 @@ public class TossPaymentUtil {
     }
 
     public HttpHeaders getTossRefundRequestHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String encodedKey = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        headers.set("Authorization", "Basic " + encodedKey);
+        return headers;
+    }
+
+    public HttpHeaders getTossInfoRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String encodedKey = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
