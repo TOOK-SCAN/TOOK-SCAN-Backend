@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.payment.presentation.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.application.usecase.ConfirmPaymentUseCase;
+import com.tookscan.tookscan.payment.presentation.dto.response.ConfirmPaymentResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -70,10 +71,9 @@ public class PaymentCommandV1Controller {
         ErrorCode.COMMON_ERROR
     })
     @PostMapping("")
-    public ResponseDto<Void> confirmPayment(
+    public ResponseDto<ConfirmPaymentResponseDto> confirmPayment(
             @RequestBody @Valid ConfirmPaymentRequestDto requestDto
     ) {
-        confirmPaymentUseCase.execute(requestDto);
-        return ResponseDto.created(null);
+        return ResponseDto.created(confirmPaymentUseCase.execute(requestDto));
     }
 }

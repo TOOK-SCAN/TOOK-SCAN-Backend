@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.payment.application.service;
 
 import com.tookscan.tookscan.core.dto.PaymentDto;
+import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
@@ -14,8 +16,11 @@ import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import com.tookscan.tookscan.payment.domain.type.EPaymentStatus;
 import com.tookscan.tookscan.payment.presentation.dto.request.ConfirmPaymentRequestDto;
+import com.tookscan.tookscan.payment.presentation.dto.response.ConfirmPaymentResponseDto;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
+
 import java.time.OffsetDateTime;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,7 +44,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
     @Override
     @Transactional
-    public void execute(ConfirmPaymentRequestDto requestDto) {
+    public ConfirmPaymentResponseDto execute(ConfirmPaymentRequestDto requestDto) {
 
         String tossConfirmApiUrl = tossPaymentUtil.getTossConfirmRequestUrl();
 
@@ -51,7 +56,24 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 requestDto.amount()
         );
 
-        PaymentDto response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendPost(tossConfirmApiUrl, requestHeaders, payload));
+        PaymentDto response;
+
+        try {
+            response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendPost(tossConfirmApiUrl, requestHeaders, payload));
+        } catch (CommonException e) {
+            String tossInfoApiUrl = tossPaymentUtil.getTossInfoRequestUrl(requestDto.paymentKey());
+            HttpHeaders infoHeaders = tossPaymentUtil.getTossInfoRequestHeaders();
+            response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendGet(tossInfoApiUrl, infoHeaders));
+            return ConfirmPaymentResponseDto.of(
+                    false,
+                    response.orderId(),
+                    null,
+                    response.method() != null ? EPaymentMethod.fromString(response.method()) : null,
+                    response.easyPay() != null ? EEasyPaymentProvider.fromString(response.easyPay().provider()) : null,
+                    response.totalAmount(),
+                    e.getMessage()
+            );
+        }
 
         Order order = orderRepository.findWithDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
 
@@ -68,7 +90,6 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 response.receipt() != null && response.receipt().url() != null ? response.receipt().url() : null
         );
 
-        log.info("결제 주문 상태: {}", payment.getStatus());
         payment = paymentRepository.saveAndReturn(payment);
 
         // 결제 완료 시 주문 상태 변경
@@ -87,5 +108,14 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             );
         }
 
+        return ConfirmPaymentResponseDto.of(
+                true,
+                order.getOrderNumber(),
+                payment.getApprovedAt() != null ? payment.getApprovedAt().toString() : null,
+                payment.getMethod() != null ? payment.getMethod() : null,
+                payment.getEasyPaymentProvider() != null ? payment.getEasyPaymentProvider() : null,
+                payment.getTotalAmount(),
+                null
+        );
     }
 }
