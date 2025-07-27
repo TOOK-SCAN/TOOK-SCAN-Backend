@@ -3,7 +3,7 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.ExcelUtils;
-import com.tookscan.tookscan.message.event.AnnounceDeliveryMessageEvent;
+import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;

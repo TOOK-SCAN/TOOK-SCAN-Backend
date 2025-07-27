@@ -2,21 +2,20 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
-import com.tookscan.tookscan.message.event.AnnounceScanFinishMessageEvent;
+import com.tookscan.tookscan.mail.domain.event.SendPdfEmailEvent;
+import com.tookscan.tookscan.message.domain.event.AnnounceScanFinishMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

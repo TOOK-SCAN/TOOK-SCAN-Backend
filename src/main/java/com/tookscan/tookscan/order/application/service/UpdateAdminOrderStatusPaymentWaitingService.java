@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.message.event.RequestPaymentMessageEvent;
+import com.tookscan.tookscan.message.domain.event.RequestPaymentMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;

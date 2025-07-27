@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
-import com.tookscan.tookscan.message.event.AnnounceDeliveryMessageEvent;
+import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;

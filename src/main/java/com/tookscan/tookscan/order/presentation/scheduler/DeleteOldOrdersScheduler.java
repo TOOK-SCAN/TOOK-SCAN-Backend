@@ -1,4 +1,4 @@
-package com.tookscan.tookscan.order.application.scheduler;
+package com.tookscan.tookscan.order.presentation.scheduler;
 
 import com.tookscan.tookscan.order.application.usecase.DeleteOldOrdersUseCase;
 import lombok.RequiredArgsConstructor;

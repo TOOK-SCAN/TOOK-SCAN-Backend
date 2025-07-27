@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.payment.application.service;
 
-import com.tookscan.tookscan.message.event.RequestScanMessageEvent;
-import org.springframework.context.ApplicationEventPublisher;
+import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -12,6 +11,7 @@ import com.tookscan.tookscan.payment.presentation.dto.request.CreatePaymentReque
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service

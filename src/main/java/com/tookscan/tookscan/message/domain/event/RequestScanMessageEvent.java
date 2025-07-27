@@ -1,4 +1,4 @@
-package com.tookscan.tookscan.message.event;
+package com.tookscan.tookscan.message.domain.event;
 
 import lombok.Builder;
 import lombok.Getter;

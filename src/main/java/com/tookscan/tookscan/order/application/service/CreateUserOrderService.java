@@ -4,7 +4,7 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
-import com.tookscan.tookscan.message.event.CreateOrderMessageEvent;
+import com.tookscan.tookscan.message.domain.event.CreateOrderMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
