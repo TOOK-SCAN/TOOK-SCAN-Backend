@@ -139,17 +139,17 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                     .paymentMethod(order.getPayment() == null ? null : order.getPayment().getMethod())
                     .easyPaymentProvider(order.getPayment() == null ? null
                             : order.getPayment().getEasyPaymentProvider())
-                    .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
+                    .orderDate(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
                     .paymentDate(order.getPayment() == null ? null
-                            : DateTimeUtil.convertLocalDateToDartString(
-                                    order.getPayment().getApprovedAt().toLocalDate()))
+                            : DateTimeUtil.convertLocalDateTimeToDartString(
+                                    order.getPayment().getApprovedAt()))
                     .documents(DocumentsDto.fromEntities(order.getDocuments()))
                     .predictedPrice(order.getIsAdminChecked()
                             ? order.getInitialOrder().getTotalAmount()
                             : order.getTotalAmount())
                     .pdfSendDate(order.getPdfSendDate() == null ? null
-                            : DateTimeUtil.convertLocalDateToDartString(
-                                    order.getPdfSendDate().toLocalDate()))
+                            : DateTimeUtil.convertLocalDateTimeToDartString(
+                                    order.getPdfSendDate()))
                     .isOneDayScan(order.getIsOneDayScan())
                     .hasRecoveryOption(order.isDelivery())
                     .trackingNumber(order.getDelivery().getTrackingNumber() == null ? null

@@ -60,6 +60,10 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         @NotNull
         private final Integer pageCount;
 
+        @JsonProperty("page_price")
+        @NotNull
+        private final Integer pagePrice;
+
         @JsonProperty("document_price")
         @NotNull
         private final Integer documentPrice;
@@ -87,6 +91,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         @Builder
         public DocumentInfoDto(String name,
                                Integer pageCount,
+                               Integer pagePrice,
                                Integer documentPrice,
                                ERecoveryOption recoveryOption,
                                Integer recoveryPrice,
@@ -95,6 +100,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                                Integer ocrPrice) {
             this.name = name;
             this.pageCount = pageCount;
+            this.pagePrice = pagePrice;
             this.documentPrice = documentPrice;
             this.recoveryOption = recoveryOption;
             this.recoveryPrice = recoveryPrice;
@@ -108,7 +114,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .documentPrice(document.getPagePrice())
+                    .pagePrice(document.getPagePrice())
+                    .documentPrice(document.getDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .recoveryPrice(document.getRecoveryOptionPrice())
                     .oneDayScanPrice(document.getOneDayScanPrice())

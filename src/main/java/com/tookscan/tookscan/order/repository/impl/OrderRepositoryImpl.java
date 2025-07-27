@@ -419,8 +419,13 @@ public class OrderRepositoryImpl implements OrderRepository {
             case "order-number" -> predicate.and(order.orderNumber.containsIgnoreCase(search));
             case "name" -> predicate.and(order.user.name.containsIgnoreCase(search)
                     .or(order.delivery.receiverName.containsIgnoreCase(search)));
+            case "document-name" -> predicate.and(order.documents.any().name.containsIgnoreCase(search));
+            case "tracking-number" -> predicate.and(order.delivery.trackingNumber.containsIgnoreCase(search));
+            case "email" -> predicate.and(order.user.email.containsIgnoreCase(search)
+                    .or(order.delivery.email.containsIgnoreCase(search)));
             case "phone-number" -> predicate.and(order.user.phoneNumber.containsIgnoreCase(search)
                     .or(order.delivery.phoneNumber.containsIgnoreCase(search)));
+            case "memo" -> predicate.and(order.memo.containsIgnoreCase(search));
             case "address" -> predicate.and(order.delivery.address.addressName.containsIgnoreCase(search)
                     .or(order.delivery.address.region1DepthName.containsIgnoreCase(search))
                     .or(order.delivery.address.region2DepthName.containsIgnoreCase(search))
@@ -434,20 +439,20 @@ public class OrderRepositoryImpl implements OrderRepository {
     private OrderSpecifier<?> resolveSort(QOrder order, String sort, Direction direction) {
         if (direction.isAscending()) {
             return switch (sort.toLowerCase()) {
-                case "created-at" -> order.createdAt.asc();
+                case "order-date" -> order.createdAt.asc();
                 case "payment-date" -> order.payment.createdAt.asc();
                 case "document-count" -> order.documents.size().asc();
-                case "total-amount" -> order.totalAmount.sum().asc();
+                case "total-amount" -> order.totalAmount.asc();
                 case "payment-amount" -> order.payment.totalAmount.asc();
                 case "pdf-send-date" -> order.pdfSendDate.asc();
                 default -> order.id.asc();
             };
         } else {
             return switch (sort.toLowerCase()) {
-                case "created-at" -> order.createdAt.desc();
+                case "order-date" -> order.createdAt.desc();
                 case "payment-date" -> order.payment.createdAt.desc();
                 case "document-count" -> order.documents.size().desc();
-                case "total-amount" -> order.totalAmount.sum().desc();
+                case "total-amount" -> order.totalAmount.desc();
                 case "payment-amount" -> order.payment.totalAmount.desc();
                 case "pdf-send-date" -> order.pdfSendDate.desc();
                 default -> order.id.desc();

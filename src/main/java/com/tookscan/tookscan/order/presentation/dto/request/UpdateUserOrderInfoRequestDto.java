@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 
 public record UpdateUserOrderInfoRequestDto(
         @JsonProperty("email")
@@ -12,7 +11,6 @@ public record UpdateUserOrderInfoRequestDto(
         String email,
 
         @JsonProperty("address")
-        @NotNull(message = "주소를 입력해주세요.")
         @Valid
         AddressRequestDto address,
 
