@@ -7,7 +7,10 @@ import jakarta.validation.constraints.Pattern;
 public record UpdateAdminOrderDeliveryTrackingNumberRequestDto(
         @JsonProperty("tracking_number")
         @NotNull(message = "운송장 번호를 입력해주세요.")
-        @Pattern(regexp = "^[0-9]{9,}$", message = "운송장 번호는 숫자 9자리 이상이어야 합니다.")
+        @Pattern(
+                regexp = "^\\d{4}-\\d{4}-\\d{4}$",
+                message = "운송장 번호는 1234-5678-9101 형식의 12자리 숫자여야 합니다."
+        )
         String trackingNumber
 ) {
 }

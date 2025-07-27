@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -32,9 +33,11 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
         orderService.validateOrderStatus(delivery.getOrder(), EOrderStatus.POST_WAITING,
                 ErrorCode.INVALID_ORDER_STATUS);
 
+        // 트래킹 번호 하이픈 제거 후 업데이트
+        String sanitizedTrackingNumber = sanitizeTrackingNumber(requestDto.trackingNumber());
         deliveryService.updateTrackingNumber(
                 delivery,
-                requestDto.trackingNumber()
+                sanitizedTrackingNumber
         );
         orderService.allComplete(delivery.getOrder());
 
@@ -49,4 +52,28 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
                 )
         );
     }
+
+    /**
+     * 트래킹 번호에서 하이픈을 제거하여 DB 저장용으로 변환 예: "1234-5678-9101" → "123456789101"
+     *
+     * @param trackingNumber 원본 트래킹 번호
+     * @return 하이픈이 제거된 트래킹 번호
+     */
+    public static String sanitizeTrackingNumber(String trackingNumber) {
+        if (trackingNumber == null || trackingNumber.trim().isEmpty()) {
+            return trackingNumber;
+        }
+
+        // 하이픈 제거 및 공백 제거
+        String sanitized = trackingNumber.replaceAll("-", "").trim();
+
+        // 12자리 숫자 형식 검증
+        if (!sanitized.matches("\\d{12}")) {
+            throw new CommonException(ErrorCode.INVALID_ARGUMENT,
+                    "트래킹 번호는 12자리 숫자여야 합니다. 입력값: " + trackingNumber);
+        }
+
+        return sanitized;
+    }
+
 }

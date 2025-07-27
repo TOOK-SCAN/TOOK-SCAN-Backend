@@ -48,7 +48,9 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
                     if (orderNumber.isEmpty() && trackingNumber.isEmpty()) {
                         return null;
                     }
-                    return new MyOrderExcelRow(orderNumber, trackingNumber);
+                    // 트래킹 번호에서 하이픈 제거 (1234-5678-9101 → 123456789101)
+                    String sanitizedTrackingNumber = sanitizeTrackingNumber(trackingNumber);
+                    return new MyOrderExcelRow(orderNumber, sanitizedTrackingNumber);
                 })
                 .stream()
                 .filter(Objects::nonNull)
@@ -103,6 +105,29 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
                     )
             );
         }
+    }
+
+    /**
+     * 트래킹 번호에서 하이픈을 제거하여 DB 저장용으로 변환 예: "1234-5678-9101" → "123456789101"
+     *
+     * @param trackingNumber 원본 트래킹 번호
+     * @return 하이픈이 제거된 트래킹 번호
+     */
+    public static String sanitizeTrackingNumber(String trackingNumber) {
+        if (trackingNumber == null || trackingNumber.trim().isEmpty()) {
+            return trackingNumber;
+        }
+
+        // 하이픈 제거 및 공백 제거
+        String sanitized = trackingNumber.replaceAll("-", "").trim();
+
+        // 12자리 숫자 형식 검증
+        if (!sanitized.matches("\\d{12}")) {
+            throw new CommonException(ErrorCode.INVALID_ARGUMENT,
+                    "트래킹 번호는 12자리 숫자여야 합니다. 입력값: " + trackingNumber);
+        }
+
+        return sanitized;
     }
 
     public record MyOrderExcelRow(String orderNumber, String trackingNumber) {
