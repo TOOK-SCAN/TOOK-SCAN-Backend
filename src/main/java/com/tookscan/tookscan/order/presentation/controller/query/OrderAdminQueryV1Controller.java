@@ -98,7 +98,7 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "end-date", required = false) String endDate,
             @RequestParam(value = "search", required = false) String search,
             @Parameter(description = "검색 타입 (id, name, email, phone, order-number)") @RequestParam(value = "search-type", required = false) String searchType,
-            @Parameter(description = "정렬 기준 (order-date, total-amount, document-count)") @RequestParam(value = "sort", defaultValue = "order-date") String sort,
+            @Parameter(description = "정렬 기준 (order-date, payment-date, total-amount, payment-amount, document-count, pdf-send-date)") @RequestParam(value = "sort", defaultValue = "order-date") String sort,
             @RequestParam(value = "direction", defaultValue = "ASC") Direction direction,
             @RequestParam(value = "order-status", required = false) EOrderStatus orderStatus,
             @RequestParam(value = "is-one-day-scan", required = false) Boolean isOneDayScan,

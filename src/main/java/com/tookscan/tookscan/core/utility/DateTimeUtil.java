@@ -21,7 +21,7 @@ public class DateTimeUtil {
     public static final DateTimeFormatter KORDateTimeEFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd (E) HH:mm",
             Locale.KOREAN);
     public static final DateTimeFormatter DartDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-    public static final DateTimeFormatter DartDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+    public static final DateTimeFormatter DartDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm:ss");
     public static final DateTimeFormatter DartDateTimeFormatterWithoutSecond = DateTimeFormatter.ofPattern(
             "yyyy.MM.dd HH:mm");
     public static final DateTimeFormatter YYMMDD_Formatter = DateTimeFormatter.ofPattern("yyMMdd");
