@@ -10,6 +10,7 @@ import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryTrackingNumberRequestDto;
 import com.tookscan.tookscan.order.repository.DeliveryRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,12 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
     public void execute(Long deliveryId, UpdateAdminOrderDeliveryTrackingNumberRequestDto requestDto) {
         Delivery delivery = deliveryRepository.findByIdWithOrderOrElseThrow(deliveryId);
 
-        orderService.validateOrderStatus(delivery.getOrder(), EOrderStatus.POST_WAITING,
+        List<EOrderStatus> validStatuses = List.of(
+                EOrderStatus.POST_WAITING,
+                EOrderStatus.ALL_COMPLETED
+        );
+
+        orderService.validateOrderStatuses(delivery.getOrder(), validStatuses,
                 ErrorCode.INVALID_ORDER_STATUS);
 
         // 트래킹 번호 하이픈 제거 후 업데이트
