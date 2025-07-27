@@ -19,12 +19,12 @@ public record CreateUserOrderRequestDto(
         @JsonProperty("documents")
         @Valid
         @NotEmpty(message = "문서를 1개 이상 입력해주세요.")
-        List<RequestDocument> documents,
+        List<CreateUserOrderRequestDocument> documents,
 
         @JsonProperty("delivery_info")
         @Valid
         @NotNull(message = "배송 정보를 입력해주세요.")
-        DeliveryInfo deliveryInfo,
+        CreateUserOrderDeliveryInfo deliveryInfo,
 
         @JsonProperty("coupon_id")
         Long couponId,
@@ -33,7 +33,7 @@ public record CreateUserOrderRequestDto(
         @NotNull(message = "원데이 스캔 여부를 입력해주세요.")
         Boolean isOneDayScan
 ) {
-    public record RequestDocument(
+        public record CreateUserOrderRequestDocument(
 
             @JsonProperty("name")
             @NotBlank(message = "문서 이름을 입력해주세요.")
@@ -60,7 +60,7 @@ public record CreateUserOrderRequestDto(
     ) {
     }
 
-    public record DeliveryInfo(
+        public record CreateUserOrderDeliveryInfo(
 
             @NotBlank(message = "받는 이를 입력해주세요.")
             @JsonProperty("receiver_name")

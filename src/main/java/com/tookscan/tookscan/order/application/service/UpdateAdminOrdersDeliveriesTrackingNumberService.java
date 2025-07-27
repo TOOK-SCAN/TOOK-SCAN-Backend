@@ -3,15 +3,19 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.ExcelUtils;
+import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;
+import com.tookscan.tookscan.order.domain.service.OrderService;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,8 +28,11 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
     private final OrderRepository orderRepository;
 
     private final DeliveryService deliveryService;
+    private final OrderService orderService;
 
     private final ExcelUtils excelUtils;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -75,7 +82,26 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
             String trackingNumber = rowData.trackingNumber();
 
             Order order = orderMap.get(orderNumber);
+            
+            // Order 상태 검증
+            orderService.validateOrderStatus(order, EOrderStatus.POST_WAITING,
+                    ErrorCode.INVALID_ORDER_STATUS);
+            
+            // 트래킹 번호 업데이트
             deliveryService.updateTrackingNumber(order.getDelivery(), trackingNumber);
+            
+            // 주문 완료 상태로 변경
+            orderService.allComplete(order);
+            
+            // 배송 알림 메시지 이벤트 발행
+            applicationEventPublisher.publishEvent(
+                    AnnounceDeliveryMessageEvent.of(
+                            order.getDocumentsDescription(),
+                            order.getDelivery().getTrackingNumber(),
+                            order.getOrderNumber(),
+                            order.getDelivery().getPhoneNumber()
+                    )
+            );
         }
     }
 

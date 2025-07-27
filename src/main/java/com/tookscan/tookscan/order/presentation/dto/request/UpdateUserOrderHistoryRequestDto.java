@@ -17,7 +17,7 @@ public record UpdateUserOrderHistoryRequestDto(
         @JsonProperty("documents")
         @Valid
         @NotEmpty(message = "문서를 1개 이상 입력해주세요.")
-        List<RequestDocument> documents,
+        List<HistoryRequestDocument> documents,
 
         @JsonProperty("is_one_day_scan")
         @NotNull(message = "원데이 스캔 여부를 입력해주세요.")
@@ -30,10 +30,9 @@ public record UpdateUserOrderHistoryRequestDto(
         @JsonProperty("delivery_request")
         String deliveryRequest
 ) {
-    public record RequestDocument(
+        public record HistoryRequestDocument(
 
             @JsonProperty("id")
-            @NotNull(message = "문서 ID를 입력해주세요.")
             Long id,
 
             @JsonProperty("name")

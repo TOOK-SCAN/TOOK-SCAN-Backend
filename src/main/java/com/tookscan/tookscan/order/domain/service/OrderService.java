@@ -148,8 +148,28 @@ public class OrderService {
         }
     }
 
+    public void validateOrderStatuses(Order order, List<EOrderStatus> statuses, ErrorCode errorCode, String message) {
+        if (!statuses.contains(order.getOrderStatus())) {
+            throw new CommonException(errorCode, message);
+        }
+    }
+
+    public void validateOrderStatuses(Order order, List<EOrderStatus> statuses, ErrorCode errorCode) {
+        if (!statuses.contains(order.getOrderStatus())) {
+            String message = String.format("주문 상태('%s')가 유효하지 않습니다. 허용되는 상태: %s",
+                    order.getOrderStatus(), statuses);
+            throw new CommonException(errorCode, message);
+        }
+    }
+
     public void validateUpdatableOrder(Order order) {
         if (!order.getOrderStatus().equals(EOrderStatus.APPLY_COMPLETED)) {
+            throw new CommonException(ErrorCode.NOT_UPDATABLE_ORDER);
+        }
+    }
+
+    public void validateUpdatableOrderInfo(Order order) {
+        if (order.getOrderStatus().getCode() > EOrderStatus.SCAN_COMPLETED.getCode()) {
             throw new CommonException(ErrorCode.NOT_UPDATABLE_ORDER);
         }
     }

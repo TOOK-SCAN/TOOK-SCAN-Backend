@@ -15,7 +15,7 @@ public class SmsListener {
 
     private final SmsUtil smsUtil;
 
-    @Async
+    @Async("notificationTaskExecutor")
     @EventListener(classes = {CompletePhoneNumberValidationEvent.class})
     public void handleCompletePhoneNumberValidationEvent(CompletePhoneNumberValidationEvent event) {
         log.info(

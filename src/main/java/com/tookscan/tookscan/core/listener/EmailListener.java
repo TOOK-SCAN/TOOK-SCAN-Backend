@@ -1,8 +1,8 @@
 package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.MailUtil;
-import com.tookscan.tookscan.mail.event.EmailEvent;
-import com.tookscan.tookscan.mail.event.SendPdfEmailEvent;
+import com.tookscan.tookscan.mail.domain.event.EmailEvent;
+import com.tookscan.tookscan.mail.domain.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.security.event.ChangePasswordBySystemEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class EmailListener {
 
     private final MailUtil mailUtil;
 
-    @Async
+    @Async("emailTaskExecutor")
     @EventListener(classes = {EmailEvent.class})
     public void handleSendTestEmailEvent(EmailEvent event) {
         try {
@@ -29,7 +29,7 @@ public class EmailListener {
         }
     }
 
-    @Async
+    @Async("emailTaskExecutor")
     @EventListener(classes = {SendPdfEmailEvent.class})
     public void handleSendPdfEmailEvent(SendPdfEmailEvent event) {
         try {
@@ -46,7 +46,7 @@ public class EmailListener {
     }
 
 
-    @Async
+    @Async("emailTaskExecutor")
     @EventListener(classes = {ChangePasswordBySystemEvent.class})
     public void handleChangePasswordBySystemEvent(ChangePasswordBySystemEvent event) {
         log.info(

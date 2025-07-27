@@ -14,7 +14,7 @@ import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto.RequestDocument;
+import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto.HistoryRequestDocument;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
@@ -59,17 +59,17 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
                 .collect(Collectors.toSet());
 
         // 요청으로 들어온 문서들을 신규 문서(id == null)와 기존 문서(id != null)로 분리
-        List<RequestDocument> newDocuments = requestDto.documents().stream()
+        List<HistoryRequestDocument> newDocuments = requestDto.documents().stream()
                 .filter(doc -> doc.id() == null)
                 .toList();
 
-        List<RequestDocument> existingDocuments = requestDto.documents().stream()
+        List<HistoryRequestDocument> existingDocuments = requestDto.documents().stream()
                 .filter(doc -> doc.id() != null)
                 .toList();
 
         // 기존 문서의 경우, 해당 주문에 속한 문서인지 검증
         List<Long> existingDocumentIds = existingDocuments.stream()
-                .map(RequestDocument::id)
+                .map(HistoryRequestDocument::id)
                 .toList();
 
         List<Long> invalidDocumentIds = existingDocumentIds.stream()

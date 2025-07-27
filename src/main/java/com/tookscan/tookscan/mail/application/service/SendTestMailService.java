@@ -2,11 +2,11 @@ package com.tookscan.tookscan.mail.application.service;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.mail.domain.mysql.TestMailStatus;
-import com.tookscan.tookscan.mail.presentation.dto.request.SendTestMailRequestDto;
 import com.tookscan.tookscan.mail.application.usecase.SendTestMailUseCase;
+import com.tookscan.tookscan.mail.domain.event.EmailEvent;
+import com.tookscan.tookscan.mail.domain.mysql.TestMailStatus;
 import com.tookscan.tookscan.mail.domain.redis.TestMailHistory;
-import com.tookscan.tookscan.mail.event.EmailEvent;
+import com.tookscan.tookscan.mail.presentation.dto.request.SendTestMailRequestDto;
 import com.tookscan.tookscan.mail.repository.TestMailHistoryRepository;
 import com.tookscan.tookscan.mail.repository.TestMailStatusRepository;
 import lombok.RequiredArgsConstructor;

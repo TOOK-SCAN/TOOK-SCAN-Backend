@@ -1,4 +1,4 @@
-package com.tookscan.tookscan.mail.event;
+package com.tookscan.tookscan.mail.domain.event;
 
 import lombok.Builder;
 import lombok.Getter;

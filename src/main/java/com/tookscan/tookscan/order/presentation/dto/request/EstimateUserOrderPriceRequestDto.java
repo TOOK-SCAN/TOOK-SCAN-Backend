@@ -16,7 +16,7 @@ public record EstimateUserOrderPriceRequestDto(
         @JsonProperty("documents")
         @Valid
         @NotEmpty(message = "문서를 1개 이상 입력해주세요.")
-        List<RequestDocument> documents,
+        List<EstimateUserOrderPriceRequestDocument> documents,
 
         @JsonProperty("coupon_id")
         Long couponId,
@@ -28,7 +28,7 @@ public record EstimateUserOrderPriceRequestDto(
         @JsonProperty("delivery_price")
         Integer deliveryPrice
 ) {
-    public record RequestDocument(
+        public record EstimateUserOrderPriceRequestDocument(
 
             @JsonProperty("name")
             @NotBlank(message = "문서 이름을 입력해주세요.")

@@ -29,7 +29,7 @@ public class UpdateUserOrderInfoService implements UpdateUserOrderInfoUseCase {
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
         orderService.validateOrderUser(order, user);
-        orderService.validateUpdatableOrder(order);
+        orderService.validateUpdatableOrderInfo(order);
 
         order.getDelivery().updateEmail(requestDto.email());
         Address address = addressService.createAddress(

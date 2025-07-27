@@ -42,6 +42,13 @@ spring:
       host: ${SPRING_REDIS_HOST}
       port: ${SPRING_REDIS_PORT}
 
+  # === 스레드 풀 설정 ===
+  task:
+    scheduling:
+      pool:
+        size: 5
+      thread-name-prefix: "scheduling-"
+
   # === OAuth2 Provider URI (공통) ===
   security:
     oauth2:
