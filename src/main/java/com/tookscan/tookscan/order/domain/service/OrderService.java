@@ -168,6 +168,12 @@ public class OrderService {
         }
     }
 
+    public void validateUpdatableOrderInfo(Order order) {
+        if (order.getOrderStatus().getCode() > EOrderStatus.SCAN_COMPLETED.getCode()) {
+            throw new CommonException(ErrorCode.NOT_UPDATABLE_ORDER);
+        }
+    }
+
     public void updatePaymentExpirationDate(Order order) {
         order.updatePaymentExpirationDate(LocalDateTime.now().plusDays(PAYMENT_EXPIRATION_PERIOD));
     }
