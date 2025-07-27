@@ -12,7 +12,6 @@ import com.tookscan.tookscan.order.application.usecase.ReadUserOrderOverviewUseC
 import com.tookscan.tookscan.order.application.usecase.ReadUserOrderSummaryUseCase;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.presentation.dto.request.EstimateUserOrderPriceRequestDto;
-import com.tookscan.tookscan.order.presentation.dto.response.EstimateUserOrderPriceResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderCouponDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDeliveryResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadUserOrderDetailResponseDto;
@@ -48,7 +47,8 @@ public class OrderUserQueryV1Controller {
     /**
      * 4.1.9 회원 스캔 가격 계산
      */
-    @Operation(summary = "회원 스캔 가격 계산", description = "회원이 스캔 가격을 계산합니다.")
+    @Operation(summary = "회원 스캔 가격 계산 (사용 중단)", description = "회원이 스캔 가격을 계산합니다. 더이상 사용되지 않습니다.")
+    @Deprecated
     @ApiErrorCode({
             ErrorCode.NOT_FOUND_PRICE_POLICY,
             ErrorCode.NOT_FOUND_COUPON,
@@ -58,10 +58,12 @@ public class OrderUserQueryV1Controller {
             ErrorCode.BAD_REQUEST_PARAMETER
     })
     @PostMapping(value = "/estimate")
-    public ResponseDto<EstimateUserOrderPriceResponseDto> estimateOrderPrice(
+//    public ResponseDto<EstimateUserOrderPriceResponseDto> estimateOrderPrice(
+    public ResponseDto<String> estimateOrderPrice(
             @RequestBody @Valid EstimateUserOrderPriceRequestDto requestDto
     ) {
-        return ResponseDto.ok(estimateUserOrderPriceUseCase.execute(requestDto));
+//        return ResponseDto.ok(estimateUserOrderPriceUseCase.execute(requestDto));
+        return ResponseDto.ok("관리자 회원가입은 더 이상 사용되지 않습니다.");
     }
 
     /**

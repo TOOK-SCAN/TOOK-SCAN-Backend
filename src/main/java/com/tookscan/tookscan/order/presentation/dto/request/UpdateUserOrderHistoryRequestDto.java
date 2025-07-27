@@ -33,7 +33,6 @@ public record UpdateUserOrderHistoryRequestDto(
     public record RequestDocument(
 
             @JsonProperty("id")
-            @NotNull(message = "문서 ID를 입력해주세요.")
             Long id,
 
             @JsonProperty("name")
