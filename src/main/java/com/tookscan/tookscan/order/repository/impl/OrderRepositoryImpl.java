@@ -419,8 +419,13 @@ public class OrderRepositoryImpl implements OrderRepository {
             case "order-number" -> predicate.and(order.orderNumber.containsIgnoreCase(search));
             case "name" -> predicate.and(order.user.name.containsIgnoreCase(search)
                     .or(order.delivery.receiverName.containsIgnoreCase(search)));
+            case "document-name" -> predicate.and(order.documents.any().name.containsIgnoreCase(search));
+            case "tracking-number" -> predicate.and(order.delivery.trackingNumber.containsIgnoreCase(search));
+            case "email" -> predicate.and(order.user.email.containsIgnoreCase(search)
+                    .or(order.delivery.email.containsIgnoreCase(search)));
             case "phone-number" -> predicate.and(order.user.phoneNumber.containsIgnoreCase(search)
                     .or(order.delivery.phoneNumber.containsIgnoreCase(search)));
+            case "memo" -> predicate.and(order.memo.containsIgnoreCase(search));
             case "address" -> predicate.and(order.delivery.address.addressName.containsIgnoreCase(search)
                     .or(order.delivery.address.region1DepthName.containsIgnoreCase(search))
                     .or(order.delivery.address.region2DepthName.containsIgnoreCase(search))
