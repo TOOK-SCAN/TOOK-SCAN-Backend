@@ -30,21 +30,6 @@ public class S3Util {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    @Value("${cloud.aws.s3.url}")
-    private String bucketUrl;
-
-    @Value("${cloud.aws.s3.pdf.expiration-seconds}")
-    private Long pdfExpirationSeconds;
-
-    @Value("${cloud.aws.cloudfront.domain}")
-    private String domain;
-
-    @Value("${cloud.aws.cloudfront.private-key-path}")
-    private String privateKeyPath;
-
-    @Value("${cloud.aws.cloudfront.key-id}")
-    private String keyId;
-
     @Value("${cloud.aws.s3.default-path}")
     private String s3DefaultPath;
 
