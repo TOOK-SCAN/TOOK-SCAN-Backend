@@ -140,18 +140,13 @@ cloud:
       static: ${AWS_REGION}
     s3:
       bucket: ${S3_BUCKET}
-      url: ${S3_URL}
       pdf:
         prefix: ${S3_PDF_PREFIX}
-        expiration-seconds: ${S3_PDF_EXPIRATION_SECONDS}
       mail-template-images:
         url: ${S3_MAIL_TEMPLATE_URL}
       default-path: ${S3_DEFAULT_PATH}
     cloudfront:
-      domain: ${CLOUDFRONT_DOMAIN}
       path: ${CLOUDFRONT_PATH}
-      private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
-      key-id: ${CLOUDFRONT_KEY_ID}
 
 # === NCP(SMS) 공통 설정 ===
 ncp:

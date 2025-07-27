@@ -86,6 +86,28 @@ public class AsyncConfig implements AsyncConfigurer {
         
         log.info("File Processing TaskExecutor initialized: core={}, max={}, queue={}", 
                 executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
+
+        return executor;
+    }
+
+    /**
+     * 스케줄러 전용 스레드 풀 - 스케줄러 작업 전담 - 장시간 실행 작업 고려
+     */
+    @Bean(name = "schedulerTaskExecutor")
+    public ThreadPoolTaskExecutor schedulerTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(PROCESSORS);
+        executor.setMaxPoolSize(PROCESSORS * 2);
+        executor.setQueueCapacity(10);
+        executor.setKeepAliveSeconds(300);
+        executor.setThreadNamePrefix("scheduler-async-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(120);
+        executor.initialize();
+
+        log.info("Scheduler TaskExecutor initialized: core={}, max={}, queue={}",
+                executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
         
         return executor;
     }
