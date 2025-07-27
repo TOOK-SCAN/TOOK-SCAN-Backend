@@ -1,0 +1,156 @@
+spring:
+  application:
+    name: "TOOK-SCAN Test Server API"
+  
+  # === H2 인메모리 데이터베이스 설정 ===
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    hikari:
+      pool-name: test-hikari-pool
+      maximum-pool-size: 1
+
+  # === JPA 테스트 설정 ===
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+    open-in-view: false
+
+  # === H2 콘솔 활성화 (테스트 시 디버깅용) ===
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # === Redis 테스트 설정 (임베디드 Redis 사용) ===
+  data:
+    redis:
+      host: localhost
+      port: 6370  # 테스트용 포트 (기본 6379와 충돌 방지)
+
+  # === 메일 테스트 설정 (Mock 사용) ===
+  mail:
+    host: localhost
+    port: 25
+    username: test@test.com
+    password: testpassword
+
+  # === 파일 업로드 테스트 설정 ===
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# === 테스트용 더미 설정 ===
+web-engine:
+  server-url: http://localhost:8080
+  client-url: http://localhost:3000
+  cookie-domain: localhost
+
+json-web-token:
+  secret-key: dGVzdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3Nlc09ubHlEb05vdFVzZUluUHJvZHVjdGlvbg==
+  temporary-token-expire-period: 300000
+  access-token-expire-period: 1800000
+  refresh-token-expire-period: 1209600000
+
+cloud:
+  aws:
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: test-bucket
+      url: https://test-bucket.s3.amazonaws.com
+      pdf:
+        prefix: test/pdf/
+        expiration-seconds: 3600
+      mail-template-images:
+        url: https://test-bucket.s3.amazonaws.com/mail-templates/
+      default-path: test/
+    cloudfront:
+      domain: test.cloudfront.net
+      path: /test/
+      private-key-path: /test/private-key.pem
+      key-id: test-key-id
+
+ncp:
+  access-key: test-ncp-access-key
+  secret-key: test-ncp-secret-key
+  sms:
+    url: https://test-sms.apigw.ntruss.com
+    service-id: test-service-id
+    sender: "01012345678"
+
+tookscan:
+  delivery:
+    picking-location: "테스트 픽업 장소"
+    sender-name: "테스트 발송자"
+    sender-phone-number: "01012345678"
+    sender-address: "서울시 테스트구 테스트동 123-45"
+    pickup-building-entry: "테스트 건물 출입법"
+
+toss:
+  payments:
+    secret-key: test-toss-secret-key
+    confirm-url: https://api.tosspayments.com/v1/payments/confirm
+    refund-url: https://api.tosspayments.com/v1/payments/cancel
+
+delivery-tracker:
+  client-id: test-delivery-tracker-client-id
+  client-secret: test-delivery-tracker-client-secret
+  url: https://test-delivery-tracker.com
+  carrier-id: "04"
+  carrier-name: "CJ대한통운"
+
+solapi:
+  api-key: test-solapi-api-key
+  api-secret: test-solapi-api-secret
+  url: https://api.coolsms.co.kr
+  pf-id: test-pf-id
+  template-id:
+    create-order: test-create-order-template
+    request-payment: test-request-payment-template
+    request-scan: test-request-scan-template
+    announce-scan-finish: test-announce-scan-finish-template
+    announce-delivery: test-announce-delivery-template
+  sender: "01012345678"
+  tip-url: https://test.com/tip
+  payment-url: https://test.com/payment
+  order-detail-url: https://test.com/order
+  order-waybill-url: https://test.com/waybill
+  user-post-way-1-url: https://test.com/post-way-1
+  user-post-way-2-url: https://test.com/post-way-2
+  post-price-url: https://test.com/post-price
+
+admin:
+  id: test-admin
+  password: test-password
+
+rest:
+  client:
+    connection-timeout: 1
+    read-timeout: 1
+
+slack:
+  webhook:
+    url: https://hooks.slack.com/services/test/test/test
+
+aes-key: test-aes-key-32-characters-long
+
+# === 로깅 설정 ===
+logging:
+  level:
+    com.tookscan.tookscan: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
