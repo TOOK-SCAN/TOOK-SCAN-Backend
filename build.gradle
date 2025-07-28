@@ -90,7 +90,7 @@ dependencies {
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 
 	// TSID
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-65:3.8.2'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.8.1'
 
 	// Apache POI
 	implementation 'org.apache.poi:poi:5.2.3'
@@ -107,7 +107,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// PDF
-	implementation("org.apache.pdfbox:pdfbox:3.0.4")
+	implementation("org.apache.pdfbox:pdfbox:3.0.4") {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
 	implementation("org.bouncycastle:bcprov-jdk18on:1.80")
 }
 

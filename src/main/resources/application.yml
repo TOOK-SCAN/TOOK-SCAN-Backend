@@ -27,7 +27,6 @@ spring:
     show-sql: ${SPRING_JPA_SHOW_SQL}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         default_batch_fetch_size: 100
         jdbc.batch_size: 20
