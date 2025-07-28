@@ -117,6 +117,25 @@ spring:
       max-file-size: 1000MB
       max-request-size: 1000MB
 
+  # === AWS 공통 설정 ===
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: ${AWS_REGION}
+      s3:
+        bucket: ${S3_BUCKET}
+        pdf:
+          prefix: ${S3_PDF_PREFIX}
+        mail-template-images:
+          url: ${S3_MAIL_TEMPLATE_URL}
+        default-path: ${S3_DEFAULT_PATH}
+        path-style-access-enabled: true
+      cloudfront:
+        path: ${CLOUDFRONT_PATH}
+
 # === Web-Engine 공통 설정 ===
 web-engine:
   server-url: ${WEB_ENGINE_SERVER_URL}
@@ -129,24 +148,6 @@ json-web-token:
   temporary-token-expire-period: ${JWT_TEMPORARY_TOKEN_EXPIRE_PERIOD}
   access-token-expire-period: ${JWT_ACCESS_TOKEN_EXPIRE_PERIOD}
   refresh-token-expire-period: ${JWT_REFRESH_TOKEN_EXPIRE_PERIOD}
-
-# === AWS 공통 설정 ===
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    region:
-      static: ${AWS_REGION}
-    s3:
-      bucket: ${S3_BUCKET}
-      pdf:
-        prefix: ${S3_PDF_PREFIX}
-      mail-template-images:
-        url: ${S3_MAIL_TEMPLATE_URL}
-      default-path: ${S3_DEFAULT_PATH}
-    cloudfront:
-      path: ${CLOUDFRONT_PATH}
 
 # === NCP(SMS) 공통 설정 ===
 ncp:

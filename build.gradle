@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
-	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'com.tookscan'
@@ -29,6 +29,12 @@ bootJar {
 
 jar {
 	enabled = false
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"
+	}
 }
 
 dependencies {
@@ -65,25 +71,26 @@ dependencies {
 	testRuntimeOnly 'com.h2database:h2'
 
 	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
 	// Swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
 
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// Logstash Logback Encoder for JSON Logging
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
 	// AWS
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-	implementation 'org.springframework.cloud:spring-cloud-aws-context:2.2.6.RELEASE'
-	implementation 'org.springframework.cloud:spring-cloud-aws-autoconfigure:2.2.6.RELEASE'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 
 	// TSID
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-65:3.8.2'
 
 	// Apache POI
 	implementation 'org.apache.poi:poi:5.2.3'
