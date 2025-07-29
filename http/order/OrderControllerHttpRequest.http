@@ -62,7 +62,7 @@ GET {{host_url}}/v1/admins/orders/732163380529619446/details
 
 ### 관리자 pdf 업로드
 //@no-log
-POST {{host_url}}/v1/admins/documents/732163380542202321/pdfs
+POST {{host_url}}/v1/admins/documents/738116895722729202/pdfs
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary

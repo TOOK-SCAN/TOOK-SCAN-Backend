@@ -9,14 +9,14 @@ public class AnnounceDeliveryMessageEvent {
 
     private final String orderName;
     private final String trackingNumber;
-    private final String orderNumber;
+    private final Long deliveryId;
     private final String phoneNumber;
 
-    public static AnnounceDeliveryMessageEvent of(String orderName, String trackingNumber, String orderNumber, String phoneNumber) {
+    public static AnnounceDeliveryMessageEvent of(String orderName, String trackingNumber, Long deliveryId, String phoneNumber) {
         return AnnounceDeliveryMessageEvent.builder()
                 .orderName(orderName)
                 .trackingNumber(trackingNumber)
-                .orderNumber(orderNumber)
+                .deliveryId(deliveryId)
                 .phoneNumber(phoneNumber)
                 .build();
     }
