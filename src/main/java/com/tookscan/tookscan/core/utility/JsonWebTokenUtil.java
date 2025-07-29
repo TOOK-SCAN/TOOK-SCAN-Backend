@@ -100,7 +100,7 @@ public class JsonWebTokenUtil implements InitializingBean {
         Date expiration = new Date(now.getTime() + expirePeriod);
 
         JwtBuilder builder = Jwts.builder()
-                .subject(identifier)
+                .claim(Constants.ACCOUNT_ID_CLAIM_NAME, identifier)
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(key);

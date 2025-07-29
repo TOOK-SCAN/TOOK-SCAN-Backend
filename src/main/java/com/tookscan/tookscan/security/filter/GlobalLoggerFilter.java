@@ -1,13 +1,14 @@
 package com.tookscan.tookscan.security.filter;
 
+import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
+import com.tookscan.tookscan.core.utility.StructuredLoggerUtil.MDCUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Slf4j
 public class GlobalLoggerFilter extends OncePerRequestFilter {
@@ -18,22 +19,28 @@ public class GlobalLoggerFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        log.info("[Global] HTTP Request Received! ({} {} {})",
-                request.getHeader("X-FORWARDED-FOR") != null ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr(),
-                request.getMethod(),
-                request.getRequestURI());
+        try {
+            MDCUtil.setupContext(request);
 
-        request.setAttribute("INTERCEPTOR_PRE_HANDLE_TIME",  System.currentTimeMillis());
+            StructuredLoggerUtil.info(log)
+                    .message("[Global] HTTP Request Received")
+                    .log();
 
-        filterChain.doFilter(request, response);
+            request.setAttribute("INTERCEPTOR_PRE_HANDLE_TIME", System.currentTimeMillis());
 
-        Long preHandleTime = (Long) request.getAttribute("INTERCEPTOR_PRE_HANDLE_TIME");
-        Long postHandleTime = System.currentTimeMillis();
+            filterChain.doFilter(request, response);
 
-        log.info("[Global] HTTP Request Has Been Processed! It Tokes {}ms. ({} {} {})",
-                postHandleTime - preHandleTime,
-                request.getHeader("X-FORWARDED-FOR") != null ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr(),
-                request.getMethod(),
-                request.getRequestURI());
+            Long preHandleTime = (Long) request.getAttribute("INTERCEPTOR_PRE_HANDLE_TIME");
+            Long postHandleTime = System.currentTimeMillis();
+            Long processingTime = postHandleTime - preHandleTime;
+
+            StructuredLoggerUtil.info(log)
+                    .message("[Global] HTTP Request Has Been Processed")
+                    .httpResponse(response.getStatus(), processingTime)
+                    .log();
+
+        } finally {
+            MDCUtil.clear();
+        }
     }
 }
