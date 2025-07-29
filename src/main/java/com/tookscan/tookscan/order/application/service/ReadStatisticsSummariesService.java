@@ -75,8 +75,11 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
                     , appliedCount, arrivedCount, completedCount, discardedCount, springCount, rawCount));
 
             // 다음 달로 이동
-            current = current.plusMonths(1);
+            current = current.minusMonths(1);
         }
+
+        // 6) 결과를 내림차순 정렬 (최신 월이 먼저 오도록)
+        result.sort((a, b) -> b.getYearMonth().compareTo(a.getYearMonth()));
 
         // 모든 달에 대한 통계를 구한 뒤 반환
         return ReadStatisticsSummariesResponseDto.from(result);

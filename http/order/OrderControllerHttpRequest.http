@@ -35,7 +35,6 @@ Content-Type: application/json
 ### 주문 조회
 //@no-log
 GET {{host_url}}/v1/users/orders/overviews?page=1&size=10&sort=createdAt
-Authorization: Bearer {{access_token}}
 
 ### 결제 요청
 //@no-log
@@ -44,17 +43,14 @@ PATCH {{host_url}}/v1/admins/orders/734276020051665347/payment-requests
 ### PDF 전송
 //@no-log
 POST {{host_url}}/v1/admins/orders/19/send-pdfs
-Authorization: Bearer {{access_token}}
 
 ### 관리자 주문 조회
 //@no-log
-GET {{host_url}}/v1/admins/orders/overviews?page=1&size=10&start-date=2025-02-12&end-date=2025-03-12&sort=order-date&direction=DESC
-Authorization: Bearer {{access_token}}
+GET {{host_url}}/v1/admins/orders/overviews?page=1&size=10&start-date=2025-06-01&end-date=2025-08-01&sort=order-date
 
 ### 관리자 결제 조회
 //@no-log
 GET {{host_url}}/v1/admins/orders/688623424943448498/payments/overviews
-Authorization: Bearer {{access_token}}
 
 ### 관리자 주문 상세 조회
 //@no-log
@@ -90,3 +86,7 @@ Content-Type: application/json
 {
   "tracking_number": "1234567890"
 }
+
+### 관리자 통계 조회
+//@no-log
+GET {{host_url}}/v1/admins/statistics/summaries?start-year-month=2025-06&end-year-month=2025-07
