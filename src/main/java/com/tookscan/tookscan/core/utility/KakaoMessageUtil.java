@@ -103,7 +103,7 @@ public class KakaoMessageUtil {
 
         variables.put("#{orderName}", orderName);
         variables.put("#{orderPrice}", String.valueOf(orderPrice));
-        variables.put("#{paymentUrl}", paymentUrl + orderId + "?order_number=" + orderNumber + "&payment_key=" + paymentKey + "&amount=" + orderPrice);
+        variables.put("#{paymentUrl}", paymentUrl + orderId + "?order-number=" + orderNumber + "&payment-key=" + paymentKey + "&amount=" + orderPrice);
         variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
 
         kakaoOption.setVariables(variables);
