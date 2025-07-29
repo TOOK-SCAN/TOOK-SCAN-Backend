@@ -13,6 +13,7 @@ import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseC
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
+import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
@@ -82,6 +83,7 @@ public class OrderAdminCommandV1Controller {
     private final ValidateAdminPdfUseCase validateAdminPdfUseCase;
     private final UpdateAdminOrdersStatusRecoveryOptionUseCase updateAdminOrdersStatusRecoveryOptionUseCase;
     private final DeleteAdminPdfUseCase deleteAdminPdfUseCase;
+    private final UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase updateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -402,6 +404,23 @@ public class OrderAdminCommandV1Controller {
             @PathVariable Long pdfId
     ) {
         deleteAdminPdfUseCase.execute(pdfId);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 관리자 결제 취소
+     */
+    @Operation(summary = "관리자 결제 취소", description = "관리자가 주문의 결제를 취소합니다.")
+    @ApiErrorCode({
+        ErrorCode.NOT_FOUND_ORDER,
+        ErrorCode.INVALID_ORDER_STATUS,
+        ErrorCode.ACCESS_DENIED
+    })
+    @PatchMapping(value = "/orders/{id}/cancel-payment")
+    public ResponseDto<Void> updateOrderStatusPaymentWaitingToCompanyArrived(
+            @PathVariable Long id
+    ) {
+        updateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase.execute(id);
         return ResponseDto.ok(null);
     }
 }
