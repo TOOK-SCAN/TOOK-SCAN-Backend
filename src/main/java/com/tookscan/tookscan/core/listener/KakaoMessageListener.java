@@ -3,6 +3,7 @@ package com.tookscan.tookscan.core.listener;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.message.domain.event.AnnounceScanFinishMessageEvent;
+import com.tookscan.tookscan.message.domain.event.CancelPaymentMessageEvent;
 import com.tookscan.tookscan.message.domain.event.CreateOrderMessageEvent;
 import com.tookscan.tookscan.message.domain.event.RequestPaymentMessageEvent;
 import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
@@ -26,13 +27,13 @@ public class KakaoMessageListener {
         log.info(
                 "\n----------------------------------\n[ 스캔 요청 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
                 "주문명: " + event.getOrderName(),
-                "주문번호: " + event.getOrderNumber()
+                "주문Id: " + event.getOrderId()
         );
 
         try {
             kakaoMessageUtil.sendRequestScanMessage(
                     event.getOrderName(),
-                    event.getOrderNumber(),
+                    event.getOrderId(),
                     event.getUserEmail(),
                     event.getPhoneNumber()
             );
@@ -95,6 +96,8 @@ public class KakaoMessageListener {
             kakaoMessageUtil.sendRequestPaymentMessage(
                     event.getOrderName(),
                     event.getOrderPrice(),
+                    event.getOrderId(),
+                    event.getPaymentKey(),
                     event.getOrderNumber(),
                     event.getPhoneNumber()
             );
@@ -108,7 +111,7 @@ public class KakaoMessageListener {
     public void handleAnnounceDeliveryMessageEvent(AnnounceDeliveryMessageEvent event) {
         log.info(
                 "\n----------------------------------\n[ 배송 안내 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "주문명: " + event.getOrderName(),
+                "배송 ID: " + event.getDeliveryId(),
                 "운송장번호: " + event.getTrackingNumber()
         );
 
@@ -116,7 +119,7 @@ public class KakaoMessageListener {
             kakaoMessageUtil.sendAnnounceDeliveryMessage(
                     event.getOrderName(),
                     event.getTrackingNumber(),
-                    event.getOrderNumber(),
+                    event.getDeliveryId(),
                     event.getPhoneNumber()
             );
         } catch (Exception e) {
@@ -125,12 +128,11 @@ public class KakaoMessageListener {
     }
 
     @Async("notificationTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {RequestScanMessageEvent.class})
-    public void handleCancelPaymentMessageEvent(RequestScanMessageEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {CancelPaymentMessageEvent.class})
+    public void handleCancelPaymentMessageEvent(CancelPaymentMessageEvent event) {
         log.info(
                 "\n----------------------------------\n[ 결제 취소 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "주문명: " + event.getOrderName(),
-                "주문번호: " + event.getOrderNumber()
+                "주문명: " + event.getOrderName()
         );
 
         try {

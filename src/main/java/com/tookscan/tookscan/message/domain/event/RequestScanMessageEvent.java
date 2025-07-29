@@ -8,14 +8,14 @@ import lombok.Getter;
 public class RequestScanMessageEvent {
 
     private final String orderName;
-    private final String orderNumber;
+    private final Long orderId;
     private final String userEmail;
     private final String phoneNumber;
 
-    public static RequestScanMessageEvent of(String orderName, String orderNumber, String userEmail, String phoneNumber) {
+    public static RequestScanMessageEvent of(String orderName, Long orderId, String userEmail, String phoneNumber) {
         return RequestScanMessageEvent.builder()
                 .orderName(orderName)
-                .orderNumber(orderNumber)
+                .orderId(orderId)
                 .userEmail(userEmail)
                 .phoneNumber(phoneNumber)
                 .build();
