@@ -209,6 +209,10 @@ public class OrderRepositoryImpl implements OrderRepository {
             }
         }
 
+        if (direction == null) {
+            direction = Direction.DESC; // 기본 정렬 방향
+        }
+
         // 데이터 조회
         List<Long> orderIds = jpaQueryFactory.select(order.id)
                 .from(order)
