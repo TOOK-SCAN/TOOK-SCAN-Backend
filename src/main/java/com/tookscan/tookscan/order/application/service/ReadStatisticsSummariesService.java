@@ -25,7 +25,7 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
     private final PaymentRepository paymentRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ReadStatisticsSummariesResponseDto execute(
             String startYearMonth,
             String endYearMonth,
