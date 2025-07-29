@@ -97,7 +97,6 @@ public class KakaoMessageListener {
                     event.getOrderName(),
                     event.getOrderPrice(),
                     event.getOrderId(),
-                    event.getPaymentKey(),
                     event.getOrderNumber(),
                     event.getPhoneNumber()
             );

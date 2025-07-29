@@ -37,7 +37,6 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                         order.getDocumentsDescription(),
                         order.getTotalAmount(),
                         order.getId(),
-                        order.getPayment().getPaymentKey(),
                         order.getOrderNumber(),
                         order.getDelivery().getPhoneNumber()
                 )
