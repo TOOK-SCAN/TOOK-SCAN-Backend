@@ -33,6 +33,9 @@ public class KakaoMessageUtil {
     @Value("${solapi.template-id.announce-delivery}")
     private String templateIdAnnounceDelivery;
 
+    @Value("${solapi.template-id.cancel-payment}")
+    private String templateIdCancelPayment;
+
     @Value("${solapi.sender}")
     private String sender;
 
@@ -176,6 +179,26 @@ public class KakaoMessageUtil {
 
         kakaoOption.setPfId(pfId);
         kakaoOption.setTemplateId(templateIdAnnounceDelivery);
+
+        Message message = new Message();
+        message.setTo(to);
+        message.setFrom(sender);
+        message.setKakaoOptions(kakaoOption);
+
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
+
+    public void sendCancelPaymentMessage(String orderName, String to) {
+
+        KakaoOption kakaoOption = new KakaoOption();
+
+        HashMap<String, String> variables = new HashMap<>();
+        variables.put("#{orderName}", orderName);
+
+        kakaoOption.setVariables(variables);
+
+        kakaoOption.setPfId(pfId);
+        kakaoOption.setTemplateId(templateIdCancelPayment);
 
         Message message = new Message();
         message.setTo(to);

@@ -194,6 +194,7 @@ solapi:
     request-scan: ${SOLAPI_TEMPLATE_REQUEST_SCAN}
     announce-scan-finish: ${SOLAPI_TEMPLATE_ANNOUNCE_SCAN_FINISH}
     announce-delivery: ${SOLAPI_TEMPLATE_ANNOUNCE_DELIVERY}
+    cancel-payment: ${SOLAPI_TEMPLATE_CANCEL_PAYMENT}
   sender: ${SOLAPI_SENDER}
   tip-url: ${SOLAPI_TIP_URL}
   payment-url: ${SOLAPI_PAYMENT_URL}

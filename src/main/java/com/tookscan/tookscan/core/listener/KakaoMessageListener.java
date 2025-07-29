@@ -123,4 +123,23 @@ public class KakaoMessageListener {
             log.error("배송 안내 메시지 발송 실패", e);
         }
     }
+
+    @Async("notificationTaskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {RequestScanMessageEvent.class})
+    public void handleCancelPaymentMessageEvent(RequestScanMessageEvent event) {
+        log.info(
+                "\n----------------------------------\n[ 결제 취소 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
+                "주문명: " + event.getOrderName(),
+                "주문번호: " + event.getOrderNumber()
+        );
+
+        try {
+            kakaoMessageUtil.sendCancelPaymentMessage(
+                    event.getOrderName(),
+                    event.getPhoneNumber()
+            );
+        } catch (Exception e) {
+            log.error("결제 취소 메시지 발송 실패", e);
+        }
+    }
 }
