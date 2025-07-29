@@ -101,7 +101,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             applicationEventPublisher.publishEvent(
                     RequestScanMessageEvent.of(
                             order.getDocumentsDescription(),
-                            order.getOrderNumber(),
+                            order.getId(),
                             order.getDelivery().getEmail(),
                             order.getDelivery().getPhoneNumber()
                     )

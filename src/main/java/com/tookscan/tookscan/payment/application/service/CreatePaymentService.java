@@ -49,7 +49,7 @@ public class CreatePaymentService implements CreatePaymentUseCase {
         applicationEventPublisher.publishEvent(
                 RequestScanMessageEvent.of(
                         order.getDocumentsDescription(),
-                        order.getOrderNumber(),
+                        order.getId(),
                         order.getDelivery().getEmail(),
                         order.getDelivery().getPhoneNumber()
                 )
