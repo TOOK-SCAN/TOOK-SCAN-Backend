@@ -200,7 +200,8 @@ solapi:
   payment-url: ${SOLAPI_PAYMENT_URL}
   order-detail-url: ${SOLAPI_ORDER_DETAIL_URL}
   order-waybill-url: ${SOLAPI_ORDER_WAYBILL_URL}
-  user-post-way-1-url: ${SOLAPI_USER_POST_WAY_1_URL}
+  user-post-way-pc-url: ${SOLAPI_USER_POST_WAY_PC_URL}
+  user-post-way-mobile-url: ${SOLAPI_USER_POST_WAY_MOBILE_URL}
   user-post-way-2-url: ${SOLAPI_USER_POST_WAY_2_URL}
   post-price-url: ${SOLAPI_POST_PRICE_URL}
 

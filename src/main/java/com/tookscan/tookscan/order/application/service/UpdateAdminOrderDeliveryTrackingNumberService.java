@@ -53,7 +53,7 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
                 AnnounceDeliveryMessageEvent.of(
                         delivery.getOrder().getDocumentsDescription(),
                         delivery.getTrackingNumber(),
-                        delivery.getOrder().getOrderNumber(),
+                        delivery.getId(),
                         delivery.getPhoneNumber()
                 )
         );

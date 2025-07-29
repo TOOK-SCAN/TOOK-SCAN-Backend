@@ -51,8 +51,11 @@ public class KakaoMessageUtil {
     @Value("${solapi.order-waybill-url}")
     private String orderWaybillUrl;
 
-    @Value("${solapi.user-post-way-1-url}")
-    private String userPostWay1Url;
+    @Value("${solapi.user-post-way-pc-url}")
+    private String userPostWayPcUrl;
+
+    @Value("${solapi.user-post-way-mobile-url}")
+    private String userPostWayMobileUrl;
 
     @Value("${solapi.user-post-way-2-url}")
     private String userPostWay2Url;
@@ -76,7 +79,8 @@ public class KakaoMessageUtil {
         variables.put("#{userName}", userName);
         variables.put("#{userPhone}", userPhone);
         variables.put("#{orderName}", orderName);
-        variables.put("#{userPostWay1}", userPostWay1Url);
+        variables.put("#{userPostWayPc}", userPostWayPcUrl);
+        variables.put("#{userPostWayMobile}", userPostWayMobileUrl);
         variables.put("#{userPostWay2}", userPostWay2Url);
         variables.put("#{postPrice}", postPriceUrl);
         variables.put("#{tipUrl}", tipUrl);
