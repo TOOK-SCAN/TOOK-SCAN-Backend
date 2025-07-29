@@ -29,7 +29,7 @@ public class ReadUserOrderDeliveryService implements ReadUserOrderDeliveryUseCas
     private final DeliveryTrackerUtil deliveryTrackerUtil;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ReadUserOrderDeliveryResponseDto execute(UUID accountId, Long orderId) {
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
