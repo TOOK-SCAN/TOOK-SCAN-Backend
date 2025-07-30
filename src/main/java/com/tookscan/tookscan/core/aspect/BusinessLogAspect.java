@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.core.aspect;
 
 import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.LinkedHashMap;
@@ -41,6 +42,9 @@ public class BusinessLogAspect {
         long startTime = System.currentTimeMillis();
 
         try {
+            // 컨텍스트 초기화
+            LogContext.clear();
+            
             logStart(joinPoint, businessLog, logger);
             Object result = joinPoint.proceed();
             long executionTime = System.currentTimeMillis() - startTime;
@@ -50,6 +54,9 @@ public class BusinessLogAspect {
             long executionTime = System.currentTimeMillis() - startTime;
             logEnd(joinPoint, businessLog, logger, null, executionTime, e);
             throw e;
+        } finally {
+            // 컨텍스트 정리 (메모리 누수 방지)
+            LogContext.clear();
         }
     }
 
@@ -58,7 +65,10 @@ public class BusinessLogAspect {
             EvaluationContext context = createEvaluationContext(joinPoint, businessLog, null);
             String startMessage = parseExpression(businessLog.startMessage(), context);
             Map<String, Object> startDetails = parseDetailsExpressions(businessLog.startDetails(), context);
-            logWithLevel(businessLog.level(), logger, startMessage, startDetails, null);
+
+            // details를 메시지에 포함
+            String finalMessage = buildMessageWithDetails(startMessage, startDetails);
+            logWithLevel(businessLog.level(), logger, finalMessage, startDetails, null);
         } catch (Exception e) {
             log.warn("Failed to log business process start for method: {}", joinPoint.getSignature().getName(), e);
         }
@@ -76,11 +86,17 @@ public class BusinessLogAspect {
             String endMessage = parseExpression(businessLog.endMessage(), context);
             Map<String, Object> endDetails = parseDetailsExpressions(businessLog.endDetails(), context);
 
+            // LogContext에서 추가된 컨텍스트 값들을 자동으로 포함
+            Map<String, Object> logContextValues = LogContext.getAll();
+            endDetails.putAll(logContextValues);
+
             if (businessLog.includeExecutionTime()) {
                 endDetails.put("execution_time_ms", executionTime);
             }
 
-            logWithLevel(businessLog.level(), logger, endMessage, endDetails, null);
+            // details를 메시지에 포함
+            String finalMessage = buildMessageWithDetails(endMessage, endDetails);
+            logWithLevel(businessLog.level(), logger, finalMessage, endDetails, null);
         } catch (Exception e) {
             log.warn("Failed to log business process end for method: {}", joinPoint.getSignature().getName(), e);
         }
@@ -165,8 +181,10 @@ public class BusinessLogAspect {
             case ERROR -> logger.atError();
         };
 
+        // details가 있고 비어있지 않은 경우에만 추가
         if (details != null && !details.isEmpty()) {
-            builder.addKeyValue("details", details);
+            // 각 detail을 개별 키-값으로 추가 (구조화된 로깅을 위함)
+            details.forEach(builder::addKeyValue);
         }
 
         if (throwable != null) {
@@ -174,6 +192,19 @@ public class BusinessLogAspect {
         }
 
         builder.log(message);
+    }
+
+    private String buildMessageWithDetails(String baseMessage, Map<String, Object> details) {
+        if (details == null || details.isEmpty()) {
+            return baseMessage;
+        }
+
+        StringBuilder messageBuilder = new StringBuilder(baseMessage);
+        for (Map.Entry<String, Object> entry : details.entrySet()) {
+            messageBuilder.append(". ").append(entry.getKey()).append(": ").append(entry.getValue());
+        }
+
+        return messageBuilder.toString();
     }
 
     private Logger getLogger(Class<?> clazz) {

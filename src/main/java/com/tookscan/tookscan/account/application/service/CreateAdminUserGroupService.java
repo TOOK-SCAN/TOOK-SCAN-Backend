@@ -10,22 +10,21 @@ import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminUserGro
 import com.tookscan.tookscan.account.repository.GroupRepository;
 import com.tookscan.tookscan.account.repository.UserGroupRepository;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(CreateAdminUserGroupService.class);
 
     private final UserGroupRepository userGroupRepository;
     private final GroupRepository groupRepository;
@@ -35,18 +34,14 @@ public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase 
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Account",
+        action = "create user group",
+        userType = "Admin"
+    )
     public void execute(CreateAdminUserGroupRequestDto requestDto) {
-        log.atInfo()
-            .addKeyValue("user_ids", requestDto.userIds())
-            .addKeyValue("group_ids", requestDto.groupIds())
-            .log("[Account] Admin create user group process started");
-
         // 사용자의 요청 중, 이미 등록된 UserGroup을 제외한 UserId, GroupId Pair 조회
         Set<Pair<UUID, Long>> objectPairs = userGroupRepository.findNotDuplicatedUserGroupInUserIdsAndGroupIds(requestDto.userIds(), requestDto.groupIds());
-
-        log.atDebug()
-            .addKeyValue("target_pair_count", objectPairs.size())
-            .log("[Account] Target pairs retrieved after excluding duplicates");
 
         List<UUID> userIds = objectPairs.stream()
                 .map(Pair::getLeft)
@@ -77,9 +72,6 @@ public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase 
 
         userGroupRepository.saveAll(userGroups);
 
-        log.atInfo()
-            .addKeyValue("user_group_ids", userGroups.stream().map(UserGroup::getId).toList())
-            .addKeyValue("user_group_count", userGroups.size())
-            .log("[Account] Admin user group created successfully");
+        LogContext.put("user_group_count", userGroups.size());
     }
 }

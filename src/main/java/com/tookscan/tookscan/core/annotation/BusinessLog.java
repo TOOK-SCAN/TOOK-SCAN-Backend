@@ -29,11 +29,11 @@ public @interface BusinessLog {
      * 사용자 구분 (Admin/User)
      * 기본값: "Admin"
      */
-    String userType() default "Admin";
+    String userType() default "Guest";
     
     /**
      * 시작 로그 메시지 템플릿 (SpEL 지원)
-     * 기본값: "[{domain}] {userType} {action} process started"
+     * 기본값: "[Service] {domain} - {userType} {action} process started"
      * 
      * SpEL 변수 사용 가능:
      * - #domain: 도메인 이름
@@ -42,13 +42,13 @@ public @interface BusinessLog {
      * - #args: 메서드 파라미터 배열
      * - #paramName: 파라미터명으로 직접 접근
      */
-    String startMessage() default "[#{#domain}] #{#userType} #{#action} process started";
+    String startMessage() default "[Service] #{#domain} - #{#userType} #{#action} process started";
     
     /**
      * 종료 로그 메시지 템플릿 (SpEL 지원)
-     * 기본값: "[{domain}] {userType} {action} completed successfully"
+     * 기본값: "[Service] {domain} - {userType} {action} completed successfully"
      */
-    String endMessage() default "[#{#domain}] #{#userType} #{#action} completed successfully";
+    String endMessage() default "[Service] #{#domain} - #{#userType} #{#action} completed successfully";
     
     /**
      * 시작 로그의 details에 포함할 파라미터 필드들 (SpEL 지원)
@@ -81,7 +81,7 @@ public @interface BusinessLog {
      * 기본값: INFO
      */
     LogLevel level() default LogLevel.INFO;
-    
+
     enum LogLevel {
         DEBUG, INFO, WARN, ERROR
     }

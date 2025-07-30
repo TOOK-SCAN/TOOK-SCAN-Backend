@@ -2,6 +2,8 @@ package com.tookscan.tookscan.account.application.service;
 
 import com.tookscan.tookscan.account.application.usecase.DeleteAdminGroupUseCase;
 import com.tookscan.tookscan.account.repository.GroupRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +16,15 @@ public class DeleteAdminGroupService implements DeleteAdminGroupUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Account",
+        action = "delete group",
+        userType = "Admin"
+    )
     public void execute(Long groupId) {
         groupRepository.deleteByIdOrElseThrow(groupId);
+
+        LogContext.put("group_id", groupId);
     }
 
 }

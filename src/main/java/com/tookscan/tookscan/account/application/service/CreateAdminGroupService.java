@@ -6,6 +6,7 @@ import com.tookscan.tookscan.account.domain.service.GroupService;
 import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminGroupRequestDto;
 import com.tookscan.tookscan.account.repository.GroupRepository;
 import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +24,9 @@ public class CreateAdminGroupService implements CreateAdminGroupUseCase {
     @BusinessLog(
         domain = "Account",
         action = "create group",
-        userType = "Admin",
-        startDetails = {"group_name: #requestDto.name()"},
-        endDetails = {"group_id: #group.getId()", "group_name: #group.getName()"}
+            userType = "Admin"
     )
-    public Group execute(CreateAdminGroupRequestDto requestDto) {
+    public void execute(CreateAdminGroupRequestDto requestDto) {
         // 중복 그룹명 체크
         boolean isExists = groupRepository.existsByName(requestDto.name());
 
@@ -36,6 +35,7 @@ public class CreateAdminGroupService implements CreateAdminGroupUseCase {
 
         groupRepository.save(group);
 
-        return group;
+        LogContext.put("group_id", group.getId());
+        LogContext.put("group_name", group.getName());
     }
 }

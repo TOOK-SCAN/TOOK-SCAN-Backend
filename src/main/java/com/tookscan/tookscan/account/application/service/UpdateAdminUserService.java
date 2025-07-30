@@ -6,10 +6,12 @@ import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.presentation.dto.request.UpdateAdminUserRequestDto;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.annotation.BusinessLog;
-import java.util.UUID;
+import com.tookscan.tookscan.core.util.LogContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +26,7 @@ public class UpdateAdminUserService implements UpdateAdminUserUseCase {
     @BusinessLog(
         domain = "Account",
         action = "update user",
-        userType = "Admin",
-        startDetails = {"user_id: #userId"},
-        endDetails = {"user_id: #user.getId()", "updated_name: #user.getName()"}
+        userType = "Admin"
     )
     public User execute(UpdateAdminUserRequestDto requestDto, UUID userId) {
         // 유저 정보 조회
@@ -43,6 +43,7 @@ public class UpdateAdminUserService implements UpdateAdminUserUseCase {
         );
         userRepository.save(user);
 
+        LogContext.put("user_id", user.getId());
         return user;
     }
 }
