@@ -67,26 +67,20 @@ public class BusinessLogAspect {
     private void logEnd(ProceedingJoinPoint joinPoint, BusinessLog businessLog, Logger logger,
                        Object result, long executionTime, Exception exception) {
         try {
-            EvaluationContext context = createEvaluationContext(joinPoint, businessLog, result);
-            String endMessage;
-            Map<String, Object> endDetails = new LinkedHashMap<>();
-
             if (exception != null) {
-                endMessage = parseExpression("[#{#domain}] #{#userType} #{#action} failed with exception", context);
-            } else {
-                endMessage = parseExpression(businessLog.endMessage(), context);
-                endDetails = parseDetailsExpressions(businessLog.endDetails(), context);
+                // 예외 발생 시 로깅하지 않음 - HttpGlobalExceptionHandler에서 중앙집중식 예외 로깅 처리
+                return;
             }
+
+            EvaluationContext context = createEvaluationContext(joinPoint, businessLog, result);
+            String endMessage = parseExpression(businessLog.endMessage(), context);
+            Map<String, Object> endDetails = parseDetailsExpressions(businessLog.endDetails(), context);
 
             if (businessLog.includeExecutionTime()) {
                 endDetails.put("execution_time_ms", executionTime);
             }
 
-            if (exception != null) {
-                logWithLevel(BusinessLog.LogLevel.ERROR, logger, endMessage, endDetails, exception);
-            } else {
-                logWithLevel(businessLog.level(), logger, endMessage, endDetails, null);
-            }
+            logWithLevel(businessLog.level(), logger, endMessage, endDetails, null);
         } catch (Exception e) {
             log.warn("Failed to log business process end for method: {}", joinPoint.getSignature().getName(), e);
         }

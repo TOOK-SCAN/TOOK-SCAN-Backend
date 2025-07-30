@@ -169,10 +169,21 @@ public class HttpGlobalExceptionHandler {
     // 개발자가 직접 정의한 예외
     @ExceptionHandler(value = {CommonException.class})
     public ResponseDto<?> handleApiException(CommonException e) {
-        log.atError()
-            .setCause(e)
-            .addKeyValue("error.code", e.getErrorCode().name())
-            .log("비즈니스 로직 예외 발생 - 요청 처리 실패");
+        ErrorCode errorCode = e.getErrorCode();
+        int httpStatusCode = errorCode.getHttpStatus().value();
+
+        // 5xx 서버 오류는 ERROR, 4xx 클라이언트 오류는 WARN으로 분리
+        if (httpStatusCode >= 500) {
+            log.atError()
+                    .setCause(e)
+                    .addKeyValue("error.code", errorCode.name())
+                    .log("비즈니스 로직 예외 발생 - 서버 측 오류");
+        } else {
+            log.atWarn()
+                    .setCause(e)
+                    .addKeyValue("error.code", errorCode.name())
+                    .log("비즈니스 로직 예외 발생 - 클라이언트 측 오류");
+        }
         sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
