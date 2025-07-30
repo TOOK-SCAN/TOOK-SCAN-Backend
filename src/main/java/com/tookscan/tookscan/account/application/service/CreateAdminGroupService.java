@@ -36,6 +36,6 @@ public class CreateAdminGroupService implements CreateAdminGroupUseCase {
 
         groupRepository.save(group);
 
-        return group; // 결과를 반환하여 endDetails에서 사용 가능하도록 함
+        return group;
     }
 }

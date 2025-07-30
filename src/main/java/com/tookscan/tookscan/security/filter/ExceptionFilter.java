@@ -61,8 +61,7 @@ public class ExceptionFilter extends OncePerRequestFilter {
     private void logError(Throwable throwable, ErrorCode errorCode) {
         StructuredLoggerUtil.error(log)
                 .message("FilterException " + throwable.getClass().getSimpleName() + " occurred")
-                .field("error_code", errorCode.name())
-                .exception(throwable)
+                .exception(throwable, errorCode)
                 .log();
     }
 

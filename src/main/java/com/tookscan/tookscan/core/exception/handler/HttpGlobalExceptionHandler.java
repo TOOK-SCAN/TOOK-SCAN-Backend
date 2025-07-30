@@ -36,7 +36,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         StructuredLoggerUtil.warn(log)
                 .message("HTTP 메시지 읽기 실패 - 비정상적인 요청 데이터")
-                .exception(e)
+                .exception(e, ErrorCode.BAD_REQUEST_JSON)
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.BAD_REQUEST_JSON));
@@ -48,7 +48,7 @@ public class HttpGlobalExceptionHandler {
         StructuredLoggerUtil.warn(log)
                 .message("지원되지 않는 미디어 타입 사용")
                 .field("supported_types", e.getSupportedMediaTypes())
-                .exception(e)
+                .exception(e, ErrorCode.UNSUPPORTED_MEDIA_TYPE)
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.UNSUPPORTED_MEDIA_TYPE));
@@ -61,7 +61,7 @@ public class HttpGlobalExceptionHandler {
                 .message("존재하지 않는 엔드포인트 요청")
                 .field("requested_url", e.getRequestURL())
                 .field("http_method", e.getHttpMethod())
-                .exception(e)
+                .exception(e, ErrorCode.METHOD_NOT_ALLOWED)
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.METHOD_NOT_ALLOWED));
@@ -74,7 +74,7 @@ public class HttpGlobalExceptionHandler {
                 .message("지원되지 않는 HTTP 메소드 사용")
                 .field("requested_method", e.getMethod())
                 .field("supported_methods", e.getSupportedMethods())
-                .exception(e)
+                .exception(e, ErrorCode.METHOD_NOT_ALLOWED)
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.METHOD_NOT_ALLOWED));
@@ -93,7 +93,7 @@ public class HttpGlobalExceptionHandler {
                 .field("validation_message", message)
                 .field("field_errors", e.getFieldErrorCount())
                 .field("global_errors", e.getGlobalErrorCount())
-                .exception(e)
+                .exception(e, ErrorCode.INVALID_ARGUMENT)
                 .log();
         sendSlackEvent(e);
 
@@ -167,8 +167,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleApiException(HttpSecurityException e) {
         StructuredLoggerUtil.error(log)
                 .message("보안 예외 발생 - 요청 처리 실패")
-                .field("error_code", e.getErrorCode().name())
-                .exception(e)
+                .exception(e, e.getErrorCode())
                 .log();
         return ResponseDto.fail(e);
     }
@@ -178,8 +177,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleApiException(CommonException e) {
         StructuredLoggerUtil.error(log)
                 .message("비즈니스 로직 예외 발생 - 요청 처리 실패")
-                .field("error_code", e.getErrorCode().name())
-                .exception(e)
+                .exception(e, e.getErrorCode())
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(e);
@@ -201,7 +199,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleSocketTimeoutException(SocketTimeoutException e) {
         StructuredLoggerUtil.error(log)
                 .message("외부 서버 연결 타임아웃 - 요청 처리 실패")
-                .exception(e)
+                .exception(e, ErrorCode.EXTERNAL_SERVER_ERROR)
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.EXTERNAL_SERVER_ERROR, "타임아웃이 발생했습니다."));
@@ -212,7 +210,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleException(Exception e) {
         StructuredLoggerUtil.error(log)
                 .message("예상치 못한 시스템 오류 발생 - 요청 처리 실패")
-                .exception(e)
+                .exception(e, ErrorCode.INTERNAL_SERVER_ERROR)
                 .log();
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));

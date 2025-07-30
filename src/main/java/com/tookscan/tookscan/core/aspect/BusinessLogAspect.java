@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
@@ -48,18 +49,27 @@ public class BusinessLogAspect {
         Logger logger = getLogger(targetClass);
         
         long startTime = System.currentTimeMillis();
+        String methodName = joinPoint.getSignature().getName();
         
-        // 시작 로그
-        logStart(joinPoint, businessLog, logger);
-        
-        // 실제 메서드 실행 (예외는 ExceptionHandler가 처리)
-        Object result = joinPoint.proceed();
-        
-        // 종료 로그 (정상 완료만)
-        long executionTime = System.currentTimeMillis() - startTime;
-        logEnd(joinPoint, businessLog, logger, result, executionTime);
-        
-        return result;
+        try {
+            // 시작 로그
+            logStart(joinPoint, businessLog, logger);
+            
+            // 실제 메서드 실행
+            Object result = joinPoint.proceed();
+            
+            // 종료 로그 (정상 완료)
+            long executionTime = System.currentTimeMillis() - startTime;
+            logEnd(joinPoint, businessLog, logger, result, executionTime, null);
+            
+            return result;
+            
+        } catch (Exception e) {
+            // 종료 로그 (예외 발생)
+            long executionTime = System.currentTimeMillis() - startTime;
+            logEnd(joinPoint, businessLog, logger, null, executionTime, e);
+            throw e;
+        }
     }
     
     /**
@@ -84,18 +94,26 @@ public class BusinessLogAspect {
     }
     
     /**
-     * 종료 로그 출력 (정상 완료만)
+     * 종료 로그 출력
      */
     private void logEnd(ProceedingJoinPoint joinPoint, BusinessLog businessLog, Logger logger, 
-                       Object result, long executionTime) {
+                       Object result, long executionTime, Exception exception) {
         try {
             EvaluationContext context = createEvaluationContext(joinPoint, businessLog, result);
             
-            // 정상 완료 메시지 생성
-            String endMessage = parseExpression(businessLog.endMessage(), context);
+            String endMessage;
+            Map<String, Object> endDetails = new LinkedHashMap<>();
             
-            // 종료 details 생성
-            Map<String, Object> endDetails = parseDetailsExpressions(businessLog.endDetails(), context);
+            if (exception != null) {
+                // 예외 발생 시
+                endMessage = parseExpression("[#{#domain}] #{#userType} #{#action} failed with exception", context);
+                endDetails.put("error_type", exception.getClass().getSimpleName());
+                endDetails.put("error_message", exception.getMessage());
+            } else {
+                // 정상 완료 시
+                endMessage = parseExpression(businessLog.endMessage(), context);
+                endDetails = parseDetailsExpressions(businessLog.endDetails(), context);
+            }
             
             // 실행 시간 포함
             if (businessLog.includeExecutionTime()) {
@@ -103,7 +121,15 @@ public class BusinessLogAspect {
             }
             
             // 로그 출력
-            logWithLevel(businessLog.level(), logger, endMessage, endDetails);
+            if (exception != null) {
+                StructuredLoggerUtil.error(logger)
+                    .message(endMessage)
+                    .details(endDetails)
+                    .exception(exception)
+                    .log();
+            } else {
+                logWithLevel(businessLog.level(), logger, endMessage, endDetails);
+            }
             
         } catch (Exception e) {
             log.warn("Failed to log business process end for method: {}", joinPoint.getSignature().getName(), e);
@@ -149,7 +175,7 @@ public class BusinessLogAspect {
     }
     
     /**
-     * SpEL 표현식 파싱 및 평가
+     * SpEL 표현식 파싱 및 평가 (템플릿 지원)
      */
     private String parseExpression(String expressionString, EvaluationContext context) {
         if (!StringUtils.hasText(expressionString)) {
@@ -158,7 +184,7 @@ public class BusinessLogAspect {
         
         try {
             Expression expression = expressionCache.computeIfAbsent(expressionString, 
-                key -> parser.parseExpression(key));
+                key -> parser.parseExpression(key, ParserContext.TEMPLATE_EXPRESSION));
             Object value = expression.getValue(context);
             return value != null ? value.toString() : "";
         } catch (Exception e) {

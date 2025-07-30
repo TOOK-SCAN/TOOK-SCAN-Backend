@@ -2,6 +2,7 @@ package com.tookscan.tookscan.core.utility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,6 +87,18 @@ public class StructuredLoggerUtil {
                 Map<String, Object> errorDetails = new HashMap<>();
                 errorDetails.put("type", throwable.getClass().getSimpleName());
                 errorDetails.put("message", throwable.getMessage());
+                eventBuilder.setCause(throwable);
+                return field("error", errorDetails);
+            }
+            return this;
+        }
+
+        public StructuredLogBuilder exception(Throwable throwable, ErrorCode errorCode) {
+            if (throwable != null) {
+                Map<String, Object> errorDetails = new HashMap<>();
+                errorDetails.put("type", throwable.getClass().getSimpleName());
+                errorDetails.put("message", throwable.getMessage());
+                errorDetails.put("error_code", errorCode.name());
                 eventBuilder.setCause(throwable);
                 return field("error", errorDetails);
             }
