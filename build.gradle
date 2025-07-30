@@ -101,6 +101,9 @@ dependencies {
 
 	// Slack Webhook
 	implementation 'com.slack.api:slack-api-client:1.30.0'
+	
+	// ECS Logging
+	implementation 'co.elastic.logging:logback-ecs-encoder:1.6.0'
 
 	// Testing Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
