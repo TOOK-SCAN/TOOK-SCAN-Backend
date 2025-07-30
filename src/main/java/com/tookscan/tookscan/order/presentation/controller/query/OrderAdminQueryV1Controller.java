@@ -123,11 +123,11 @@ public class OrderAdminQueryV1Controller {
     })
     @GetMapping("/statistics/summaries")
     public ResponseDto<ReadStatisticsSummariesResponseDto> readStatisticsSummaries(
-            @RequestParam(value = "start-year-month") String startYearMonth,
-            @RequestParam(value = "end-year-month") String endYearMonth,
+            @RequestParam(value = "start-year-month", required = false) String startYearMonth,
+            @RequestParam(value = "end-year-month", required = false) String endYearMonth,
             @RequestParam(value = "is-applied", required = false) Boolean isApplied,
-            @RequestParam(value = "is_arrived", required = false) Boolean isArrived,
-            @RequestParam(value = "is_completed", required = false) Boolean isCompleted
+            @RequestParam(value = "is-arrived", required = false) Boolean isArrived,
+            @RequestParam(value = "is-completed", required = false) Boolean isCompleted
     ) {
         return ResponseDto.ok(readStatisticsSummariesUseCase.execute(startYearMonth, endYearMonth,
                 isApplied, isArrived, isCompleted));

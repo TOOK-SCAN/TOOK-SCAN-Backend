@@ -67,6 +67,28 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Map<String, Integer> findMonthlySignUpCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        QUser user = QUser.user;
+        
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", user.createdAt),
+                        user.count().intValue()
+                )
+                .from(user)
+                .where(user.createdAt.between(startDate, endDate))
+                .groupBy(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", user.createdAt)
+                )
+                .fetch()
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        tuple -> tuple.get(0, String.class),
+                        tuple -> tuple.get(1, Integer.class)
+                ));
+    }
+
+    @Override
     public Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String status, String sort, Direction direction) {
         QUser user = QUser.user;
         QUserGroup userGroup = QUserGroup.userGroup;

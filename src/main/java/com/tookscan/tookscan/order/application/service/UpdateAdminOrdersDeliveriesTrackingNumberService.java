@@ -43,8 +43,8 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
 
         // 1) 엑셀 → (주문번호, 트래킹번호) 리스트
         List<MyOrderExcelRow> rowDataList = excelUtils.parseExcel(file, 1, (row, rowNum) -> {
-                    String orderNumber = excelUtils.getStringCellValue(row.getCell(0)); // A열
-                    String trackingNumber = excelUtils.getStringCellValue(row.getCell(5)); // F열
+                    String orderNumber = excelUtils.getStringCellValue(row.getCell(3)); // D열
+                    String trackingNumber = excelUtils.getStringCellValue(row.getCell(0)); // A열
                     if (orderNumber.isEmpty() && trackingNumber.isEmpty()) {
                         return null;
                     }

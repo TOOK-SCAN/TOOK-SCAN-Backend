@@ -2,12 +2,14 @@ package com.tookscan.tookscan.order.repository.impl;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.QOrder;
+import com.tookscan.tookscan.order.domain.QDocument;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -382,6 +384,84 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Integer countByCreatedAtBetweenAndRecoveryOption(LocalDateTime startDate, LocalDateTime endDate, ERecoveryOption recoveryOption) {
         return orderJpaRepository.countByCreatedAtBetweenAndRecoveryOption(startDate, endDate, recoveryOption);
+    }
+
+    @Override
+    public Map<String, Integer> findMonthlyOrderCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        order.count().intValue()
+                )
+                .from(order)
+                .where(order.createdAt.between(startDate, endDate))
+                .groupBy(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt)
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, String.class),
+                        tuple -> tuple.get(1, Integer.class)
+                ));
+    }
+
+    @Override
+    public Map<String, Map<EOrderStatus, Integer>> findMonthlyOrderStatusCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        order.orderStatus,
+                        order.count().intValue()
+                )
+                .from(order)
+                .where(order.createdAt.between(startDate, endDate))
+                .groupBy(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        order.orderStatus
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(0, String.class),
+                        Collectors.toMap(
+                                tuple -> tuple.get(1, EOrderStatus.class),
+                                tuple -> tuple.get(2, Integer.class)
+                        )
+                ));
+    }
+
+    @Override
+    public Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+        QDocument document = QDocument.document;
+        
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        document.recoveryOption,
+                        order.count().intValue()
+                )
+                .from(order)
+                .join(order.documents, document)
+                .where(order.createdAt.between(startDate, endDate))
+                .groupBy(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        document.recoveryOption
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(0, String.class),
+                        Collectors.toMap(
+                                tuple -> tuple.get(1, ERecoveryOption.class),
+                                tuple -> tuple.get(2, Integer.class)
+                        )
+                ));
     }
 
     @Override
