@@ -43,6 +43,9 @@ dependencies {
 	
 	// Spring Boot Default
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// Spring Boot AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 	// Spring Boot Mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'

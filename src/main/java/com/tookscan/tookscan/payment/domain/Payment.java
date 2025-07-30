@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.payment.domain;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;

@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.domain;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import jakarta.persistence.Column;

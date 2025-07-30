@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.domain;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import jakarta.persistence.CascadeType;

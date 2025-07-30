@@ -1,33 +1,39 @@
 package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
+import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.message.domain.event.AnnounceScanFinishMessageEvent;
 import com.tookscan.tookscan.message.domain.event.CreateOrderMessageEvent;
 import com.tookscan.tookscan.message.domain.event.RequestPaymentMessageEvent;
 import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class KakaoMessageListener {
 
+    private static final Logger log = LoggerFactory.getLogger(KakaoMessageListener.class);
     private final KakaoMessageUtil kakaoMessageUtil;
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {RequestScanMessageEvent.class})
     public void handleRequestScanMessageEvent(RequestScanMessageEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 스캔 요청 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "주문명: " + event.getOrderName(),
-                "주문번호: " + event.getOrderNumber()
-        );
+        StructuredLoggerUtil.info(log)
+                .message("[Kakao Message] Received request scan message event")
+                .details(Map.of(
+                        "order_name", event.getOrderName(),
+                        "order_number", event.getOrderNumber(),
+                        "phone_number", event.getPhoneNumber()
+                ))
+                .log();
 
         try {
             kakaoMessageUtil.sendRequestScanMessage(
@@ -36,19 +42,37 @@ public class KakaoMessageListener {
                     event.getUserEmail(),
                     event.getPhoneNumber()
             );
+            StructuredLoggerUtil.info(log)
+                    .message("[Kakao Message] Successfully sent request scan message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "order_number", event.getOrderNumber(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .log();
         } catch (Exception e) {
-            log.error("스캔 요청 메시지 발송 실패", e);
+            StructuredLoggerUtil.error(log)
+                    .message("[Kakao Message] Failed to send request scan message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "order_number", event.getOrderNumber(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .exception(e)
+                    .log();
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {AnnounceScanFinishMessageEvent.class})
     public void handleAnnounceScanFinishMessageEvent(AnnounceScanFinishMessageEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 스캔 완료 알림 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "사용자 이메일: " + event.getUserEmail(),
-                "주문명: " + event.getOrderName()
-        );
+        StructuredLoggerUtil.info(log)
+                .message("[Kakao Message] Received announce scan finish message event")
+                .details(Map.of(
+                        "order_name", event.getOrderName(),
+                        "phone_number", event.getPhoneNumber()
+                ))
+                .log();
 
         try {
             kakaoMessageUtil.sendAnnounceScanFinishMessage(
@@ -56,19 +80,34 @@ public class KakaoMessageListener {
                     event.getOrderName(),
                     event.getPhoneNumber()
             );
+            StructuredLoggerUtil.info(log)
+                    .message("[Kakao Message] Successfully sent announce scan finish message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .log();
         } catch (Exception e) {
-            log.error("스캔 완료 알림 메시지 발송 실패", e);
+            StructuredLoggerUtil.error(log)
+                    .message("[Kakao Message] Failed to send announce scan finish message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .exception(e)
+                    .log();
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {CreateOrderMessageEvent.class})
     public void handleCreateOrderMessageEvent(CreateOrderMessageEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 주문 생성 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "사용자명: " + event.getUserName(),
-                "주문명: " + event.getOrderName()
-        );
+        StructuredLoggerUtil.info(log)
+                .message("[Kakao Message] Received create order message event")
+                .details(Map.of(
+                        "order_name", event.getOrderName(),
+                        "phone_number", event.getPhoneNumber()
+                ));
 
         try {
             kakaoMessageUtil.sendCreateOrderMessage(
@@ -77,19 +116,35 @@ public class KakaoMessageListener {
                     event.getOrderName(),
                     event.getPhoneNumber()
             );
+            StructuredLoggerUtil.info(log)
+                    .message("[Kakao Message] Successfully sent create order message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .log();
         } catch (Exception e) {
-            log.error("주문 생성 메시지 발송 실패", e);
+            StructuredLoggerUtil.error(log)
+                    .message("[Kakao Message] Failed to send create order message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .exception(e)
+                    .log();
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {RequestPaymentMessageEvent.class})
     public void handleRequestPaymentMessageEvent(RequestPaymentMessageEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 결제 요청 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "주문명: " + event.getOrderName(),
-                "주문 금액: " + event.getOrderPrice()
-        );
+        StructuredLoggerUtil.info(log)
+                .message("[Kakao Message] Received request payment message event")
+                .details(Map.of(
+                        "order_name", event.getOrderName(),
+                        "order_number", event.getOrderNumber(),
+                        "phone_number", event.getPhoneNumber()
+                ));
 
         try {
             kakaoMessageUtil.sendRequestPaymentMessage(
@@ -98,19 +153,37 @@ public class KakaoMessageListener {
                     event.getOrderNumber(),
                     event.getPhoneNumber()
             );
+            StructuredLoggerUtil.info(log)
+                    .message("[Kakao Message] Successfully sent request payment message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "order_number", event.getOrderNumber(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .log();
         } catch (Exception e) {
-            log.error("결제 요청 메시지 발송 실패", e);
+            StructuredLoggerUtil.error(log)
+                    .message("[Kakao Message] Failed to send request payment message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "order_number", event.getOrderNumber(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .exception(e)
+                    .log();
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {AnnounceDeliveryMessageEvent.class})
     public void handleAnnounceDeliveryMessageEvent(AnnounceDeliveryMessageEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 배송 안내 메시지 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                "주문명: " + event.getOrderName(),
-                "운송장번호: " + event.getTrackingNumber()
-        );
+        StructuredLoggerUtil.info(log)
+                .message("[Kakao Message] Received announce delivery message event")
+                .details(Map.of(
+                        "order_name", event.getOrderName(),
+                        "order_number", event.getOrderNumber(),
+                        "phone_number", event.getPhoneNumber()
+                ));
 
         try {
             kakaoMessageUtil.sendAnnounceDeliveryMessage(
@@ -120,7 +193,15 @@ public class KakaoMessageListener {
                     event.getPhoneNumber()
             );
         } catch (Exception e) {
-            log.error("배송 안내 메시지 발송 실패", e);
+            StructuredLoggerUtil.error(log)
+                    .message("[Kakao Message] Failed to send announce delivery message")
+                    .details(Map.of(
+                            "order_name", event.getOrderName(),
+                            "order_number", event.getOrderNumber(),
+                            "phone_number", event.getPhoneNumber()
+                    ))
+                    .exception(e)
+                    .log();
         }
     }
 }

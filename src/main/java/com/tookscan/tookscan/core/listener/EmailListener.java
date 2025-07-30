@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.MailUtil;
+import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import com.tookscan.tookscan.mail.domain.event.EmailEvent;
 import com.tookscan.tookscan.mail.domain.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.security.event.ChangePasswordBySystemEvent;
@@ -10,9 +11,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class EmailListener {
 
     private final MailUtil mailUtil;
@@ -25,7 +26,11 @@ public class EmailListener {
                     event.getEmail()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            StructuredLoggerUtil.error(log)
+                    .message("[Email] Failed to send test email")
+                    .field("email", event.getEmail())
+                    .exception(e)
+                    .log();
         }
     }
 
@@ -41,7 +46,12 @@ public class EmailListener {
                     event.getPdfUrl()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            StructuredLoggerUtil.error(log)
+                    .message("[Email] Failed to send PDF email")
+                    .field("email", event.getEmail())
+                    .field("order_number", event.getOrderNumber())
+                    .exception(e)
+                    .log();
         }
     }
 
@@ -49,19 +59,17 @@ public class EmailListener {
     @Async("emailTaskExecutor")
     @EventListener(classes = {ChangePasswordBySystemEvent.class})
     public void handleChangePasswordBySystemEvent(ChangePasswordBySystemEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 임시 비밀번호 발급 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                event.receiverAddress() + "님의 임시 비밀번호가 발급되었습니다.",
-                "임시 비밀번호는 " + event.temporaryPassword() + " 입니다."
-        );
-
         try {
             mailUtil.sendTemporaryPassword(
                     event.receiverAddress(),
                     event.temporaryPassword()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            StructuredLoggerUtil.error(log)
+                    .message("[Email] Failed to send temporary password email")
+                    .field("email", event.receiverAddress())
+                    .exception(e)
+                    .log();
         }
     }
 }

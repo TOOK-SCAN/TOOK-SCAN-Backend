@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.message.domain;
 
 import com.tookscan.tookscan.account.domain.Group;
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;

@@ -4,6 +4,11 @@ import com.slack.api.Slack;
 import com.slack.api.webhook.WebhookResponse;
 import com.tookscan.tookscan.core.dto.SendSlackErrorDto;
 import com.tookscan.tookscan.core.utility.JsonParseUtil;
+import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,14 +16,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SlackListener {
 
     @Value("${slack.webhook.url}")
@@ -61,7 +61,11 @@ public class SlackListener {
             );
             System.out.println(response);
         } catch (IOException e) {
-            log.error("slack 메시지 발송 중 문제가 발생했습니다.");
+            StructuredLoggerUtil.error(log)
+                    .message("[Slack] Failed to send error message")
+                    .field("error_message", e.getMessage())
+                    .exception(e)
+                    .log();
             throw new RuntimeException(e);
         }
     }

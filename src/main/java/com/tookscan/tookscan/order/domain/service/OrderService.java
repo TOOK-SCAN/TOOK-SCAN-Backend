@@ -3,7 +3,7 @@ package com.tookscan.tookscan.order.domain.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.core.infrastructure.TsidFactory;
+import com.tookscan.tookscan.core.utility.TsidFactory;
 import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.InitialDocument;

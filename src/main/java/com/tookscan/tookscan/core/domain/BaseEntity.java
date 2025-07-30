@@ -1,6 +1,6 @@
-package com.tookscan.tookscan.core.dto;
+package com.tookscan.tookscan.core.domain;
 
-import com.tookscan.tookscan.core.infrastructure.TsidFactory;
+import com.tookscan.tookscan.core.utility.TsidFactory;
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;

@@ -49,6 +49,13 @@ public class StructuredLoggerUtil {
             return this;
         }
 
+        public StructuredLogBuilder details(Map<String, Object> details) {
+            if (details != null && !details.isEmpty()) {
+                return field("details", details);
+            }
+            return this;
+        }
+
         public StructuredLogBuilder field(String key, Object value) {
             if (value != null) {
                 eventBuilder.addKeyValue(key, value);
@@ -98,6 +105,12 @@ public class StructuredLoggerUtil {
             Map<String, Object> requestDetails = new HashMap<>();
             requestDetails.put("method", request.getMethod());
             requestDetails.put("uri", request.getRequestURI());
+
+            String userAgent = request.getHeader("User-Agent");
+            if (userAgent != null) {
+                requestDetails.put("user_agent", userAgent);
+            }
+
             MDC.put("http_request", safeWriteValueAsString(requestDetails));
 
             String clientIp = request.getHeader("X-FORWARDED-FOR") != null ?

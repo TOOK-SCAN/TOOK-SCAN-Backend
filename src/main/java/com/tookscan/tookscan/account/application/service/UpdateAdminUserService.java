@@ -1,15 +1,15 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.presentation.dto.request.UpdateAdminUserRequestDto;
 import com.tookscan.tookscan.account.application.usecase.UpdateAdminUserUseCase;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;
+import com.tookscan.tookscan.account.presentation.dto.request.UpdateAdminUserRequestDto;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +21,14 @@ public class UpdateAdminUserService implements UpdateAdminUserUseCase {
 
     @Override
     @Transactional
-    public void execute(UpdateAdminUserRequestDto requestDto, UUID userId) {
+    @BusinessLog(
+        domain = "Account",
+        action = "update user",
+        userType = "Admin",
+        startDetails = {"user_id: #userId"},
+        endDetails = {"user_id: #user.getId()", "updated_name: #user.getName()"}
+    )
+    public User execute(UpdateAdminUserRequestDto requestDto, UUID userId) {
         // 유저 정보 조회
         User user = userRepository.findByIdOrElseThrow(userId);
 
@@ -35,5 +42,7 @@ public class UpdateAdminUserService implements UpdateAdminUserUseCase {
                 requestDto.memo()
         );
         userRepository.save(user);
+
+        return user;
     }
 }

@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.message.domain;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import com.tookscan.tookscan.message.domain.type.EMessageStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

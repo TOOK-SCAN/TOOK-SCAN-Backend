@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.mail.domain.mysql;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
