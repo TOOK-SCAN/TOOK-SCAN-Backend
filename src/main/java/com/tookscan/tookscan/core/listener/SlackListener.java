@@ -4,7 +4,6 @@ import com.slack.api.Slack;
 import com.slack.api.webhook.WebhookResponse;
 import com.tookscan.tookscan.core.dto.SendSlackErrorDto;
 import com.tookscan.tookscan.core.utility.JsonParseUtil;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -61,11 +60,10 @@ public class SlackListener {
             );
             System.out.println(response);
         } catch (IOException e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Slack] Failed to send error message")
-                    .field("error_message", e.getMessage())
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("error_message", e.getMessage())
+                .log("[Slack] Failed to send error message");
             throw new RuntimeException(e);
         }
     }

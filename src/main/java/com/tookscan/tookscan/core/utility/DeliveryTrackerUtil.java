@@ -94,45 +94,33 @@ public class DeliveryTrackerUtil {
             try {
                 response = restClientUtil.sendPost(API_URL, headers, jsonBody);
             } catch (Exception e) {
-                StructuredLoggerUtil.error(log)
-                        .message("Delivery tracking request failed")
-                        .details(Map.of(
-                                "tracking_number", trackingNumber
-                        ))
-                        .exception(e)
-                        .log();
+                log.atError()
+                    .setCause(e)
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking request failed");
                 break;
             }
 
             if (response == null) {
-                StructuredLoggerUtil.error(log)
-                        .message("Delivery tracking response is null")
-                        .details(Map.of(
-                                "tracking_number", trackingNumber
-                        ))
-                        .log();
+                log.atError()
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking response is null");
                 break;
             }
 
             // 응답 파싱
             Map<String, Object> data = (Map<String, Object>) response.get("data");
             if (data == null) {
-                StructuredLoggerUtil.error(log)
-                        .message("Delivery tracking response data field is null")
-                        .details(Map.of(
-                                "tracking_number", trackingNumber
-                        ))
-                        .log();
+                log.atError()
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking response data field is null");
                 break;
             }
             Map<String, Object> track = (Map<String, Object>) data.get("track");
             if (track == null) {
-                StructuredLoggerUtil.error(log)
-                        .message("Delivery tracking response track field is null")
-                        .details(Map.of(
-                                "tracking_number", trackingNumber
-                        ))
-                        .log();
+                log.atError()
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking response track field is null");
                 break;
             }
             Map<String, Object> eventsObj = (Map<String, Object>) track.get("events");

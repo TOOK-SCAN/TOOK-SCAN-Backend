@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.MailUtil;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import com.tookscan.tookscan.mail.domain.event.EmailEvent;
 import com.tookscan.tookscan.mail.domain.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.security.event.ChangePasswordBySystemEvent;
@@ -26,11 +25,10 @@ public class EmailListener {
                     event.getEmail()
             );
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Email] Failed to send test email")
-                    .field("email", event.getEmail())
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("email", event.getEmail())
+                .log("[Email] Failed to send test email");
         }
     }
 
@@ -46,12 +44,11 @@ public class EmailListener {
                     event.getPdfUrl()
             );
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Email] Failed to send PDF email")
-                    .field("email", event.getEmail())
-                    .field("order_number", event.getOrderNumber())
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("email", event.getEmail())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .log("[Email] Failed to send PDF email");
         }
     }
 
@@ -65,11 +62,10 @@ public class EmailListener {
                     event.temporaryPassword()
             );
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Email] Failed to send temporary password email")
-                    .field("email", event.receiverAddress())
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("email", event.receiverAddress())
+                .log("[Email] Failed to send temporary password email");
         }
     }
 }

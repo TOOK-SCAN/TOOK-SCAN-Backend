@@ -183,18 +183,18 @@ public class CreateUserService {
     private static final Logger log = LoggerFactory.getLogger(CreateUserService.class);
     
     public void execute(CreateUserRequestDto requestDto) {
-        StructuredLoggerUtil.info(log)
-            .message("[Account] Admin create user process started")
-            .details(Map.of("email", requestDto.email()))
-            .log();
+        // StructuredLoggerUtil.info(log)
+        //     .message("[Account] Admin create user process started")
+        //     .details(Map.of("email", requestDto.email()))
+        //     .log();
             
         // 비즈니스 로직
         User user = createUser(requestDto);
         
-        StructuredLoggerUtil.info(log)
-            .message("[Account] Admin user created successfully")
-            .details(Map.of("user_id", user.getId(), "email", user.getEmail()))
-            .log();
+        // StructuredLoggerUtil.info(log)
+        //     .message("[Account] Admin user created successfully")
+        //     .details(Map.of("user_id", user.getId(), "email", user.getEmail()))
+        //     .log();
     }
 }
 ```

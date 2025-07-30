@@ -10,7 +10,6 @@ import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminUserGro
 import com.tookscan.tookscan.account.repository.GroupRepository;
 import com.tookscan.tookscan.account.repository.UserGroupRepository;
 import com.tookscan.tookscan.account.repository.UserRepository;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,21 +36,17 @@ public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase 
     @Override
     @Transactional
     public void execute(CreateAdminUserGroupRequestDto requestDto) {
-        StructuredLoggerUtil.info(log)
-                .message("[Account] Admin create user group process started")
-                .details(Map.of(
-                        "user_ids", requestDto.userIds(),
-                        "group_ids", requestDto.groupIds()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("user_ids", requestDto.userIds())
+            .addKeyValue("group_ids", requestDto.groupIds())
+            .log("[Account] Admin create user group process started");
 
         // 사용자의 요청 중, 이미 등록된 UserGroup을 제외한 UserId, GroupId Pair 조회
         Set<Pair<UUID, Long>> objectPairs = userGroupRepository.findNotDuplicatedUserGroupInUserIdsAndGroupIds(requestDto.userIds(), requestDto.groupIds());
 
-        StructuredLoggerUtil.debug(log)
-                .message("[Account] Target pairs retrieved after excluding duplicates")
-                .field("target_pair_count", objectPairs.size())
-                .log();
+        log.atDebug()
+            .addKeyValue("target_pair_count", objectPairs.size())
+            .log("[Account] Target pairs retrieved after excluding duplicates");
 
         List<UUID> userIds = objectPairs.stream()
                 .map(Pair::getLeft)
@@ -82,12 +77,9 @@ public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase 
 
         userGroupRepository.saveAll(userGroups);
 
-        StructuredLoggerUtil.info(log)
-                .message("[Account] Admin user group created successfully")
-                .details(Map.of(
-                        "user_group_ids", userGroups.stream().map(UserGroup::getId).toList(),
-                        "user_group_count", userGroups.size()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("user_group_ids", userGroups.stream().map(UserGroup::getId).toList())
+            .addKeyValue("user_group_count", userGroups.size())
+            .log("[Account] Admin user group created successfully");
     }
 }

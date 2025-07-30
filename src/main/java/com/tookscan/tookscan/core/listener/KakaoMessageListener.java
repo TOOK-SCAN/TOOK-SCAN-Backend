@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.message.domain.event.AnnounceScanFinishMessageEvent;
 import com.tookscan.tookscan.message.domain.event.CreateOrderMessageEvent;
@@ -26,14 +25,11 @@ public class KakaoMessageListener {
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {RequestScanMessageEvent.class})
     public void handleRequestScanMessageEvent(RequestScanMessageEvent event) {
-        StructuredLoggerUtil.info(log)
-                .message("[Kakao Message] Received request scan message event")
-                .details(Map.of(
-                        "order_name", event.getOrderName(),
-                        "order_number", event.getOrderNumber(),
-                        "phone_number", event.getPhoneNumber()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("order_name", event.getOrderName())
+            .addKeyValue("order_number", event.getOrderNumber())
+            .addKeyValue("phone_number", event.getPhoneNumber())
+            .log("[Kakao Message] Received request scan message event");
 
         try {
             kakaoMessageUtil.sendRequestScanMessage(
@@ -42,37 +38,28 @@ public class KakaoMessageListener {
                     event.getUserEmail(),
                     event.getPhoneNumber()
             );
-            StructuredLoggerUtil.info(log)
-                    .message("[Kakao Message] Successfully sent request scan message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "order_number", event.getOrderNumber(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .log();
+            log.atInfo()
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Successfully sent request scan message");
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Kakao Message] Failed to send request scan message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "order_number", event.getOrderNumber(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Failed to send request scan message");
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {AnnounceScanFinishMessageEvent.class})
     public void handleAnnounceScanFinishMessageEvent(AnnounceScanFinishMessageEvent event) {
-        StructuredLoggerUtil.info(log)
-                .message("[Kakao Message] Received announce scan finish message event")
-                .details(Map.of(
-                        "order_name", event.getOrderName(),
-                        "phone_number", event.getPhoneNumber()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("order_name", event.getOrderName())
+            .addKeyValue("phone_number", event.getPhoneNumber())
+            .log("[Kakao Message] Received announce scan finish message event");
 
         try {
             kakaoMessageUtil.sendAnnounceScanFinishMessage(
@@ -80,34 +67,26 @@ public class KakaoMessageListener {
                     event.getOrderName(),
                     event.getPhoneNumber()
             );
-            StructuredLoggerUtil.info(log)
-                    .message("[Kakao Message] Successfully sent announce scan finish message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .log();
+            log.atInfo()
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Successfully sent announce scan finish message");
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Kakao Message] Failed to send announce scan finish message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Failed to send announce scan finish message");
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {CreateOrderMessageEvent.class})
     public void handleCreateOrderMessageEvent(CreateOrderMessageEvent event) {
-        StructuredLoggerUtil.info(log)
-                .message("[Kakao Message] Received create order message event")
-                .details(Map.of(
-                        "order_name", event.getOrderName(),
-                        "phone_number", event.getPhoneNumber()
-                ));
+        log.atInfo()
+            .addKeyValue("order_name", event.getOrderName())
+            .addKeyValue("phone_number", event.getPhoneNumber())
+            .log("[Kakao Message] Received create order message event");
 
         try {
             kakaoMessageUtil.sendCreateOrderMessage(
@@ -116,35 +95,27 @@ public class KakaoMessageListener {
                     event.getOrderName(),
                     event.getPhoneNumber()
             );
-            StructuredLoggerUtil.info(log)
-                    .message("[Kakao Message] Successfully sent create order message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .log();
+            log.atInfo()
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Successfully sent create order message");
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Kakao Message] Failed to send create order message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Failed to send create order message");
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {RequestPaymentMessageEvent.class})
     public void handleRequestPaymentMessageEvent(RequestPaymentMessageEvent event) {
-        StructuredLoggerUtil.info(log)
-                .message("[Kakao Message] Received request payment message event")
-                .details(Map.of(
-                        "order_name", event.getOrderName(),
-                        "order_number", event.getOrderNumber(),
-                        "phone_number", event.getPhoneNumber()
-                ));
+        log.atInfo()
+            .addKeyValue("order_name", event.getOrderName())
+            .addKeyValue("order_number", event.getOrderNumber())
+            .addKeyValue("phone_number", event.getPhoneNumber())
+            .log("[Kakao Message] Received request payment message event");
 
         try {
             kakaoMessageUtil.sendRequestPaymentMessage(
@@ -153,37 +124,29 @@ public class KakaoMessageListener {
                     event.getOrderNumber(),
                     event.getPhoneNumber()
             );
-            StructuredLoggerUtil.info(log)
-                    .message("[Kakao Message] Successfully sent request payment message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "order_number", event.getOrderNumber(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .log();
+            log.atInfo()
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Successfully sent request payment message");
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Kakao Message] Failed to send request payment message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "order_number", event.getOrderNumber(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Failed to send request payment message");
         }
     }
 
     @Async("notificationTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = {AnnounceDeliveryMessageEvent.class})
     public void handleAnnounceDeliveryMessageEvent(AnnounceDeliveryMessageEvent event) {
-        StructuredLoggerUtil.info(log)
-                .message("[Kakao Message] Received announce delivery message event")
-                .details(Map.of(
-                        "order_name", event.getOrderName(),
-                        "order_number", event.getOrderNumber(),
-                        "phone_number", event.getPhoneNumber()
-                ));
+        log.atInfo()
+            .addKeyValue("order_name", event.getOrderName())
+            .addKeyValue("order_number", event.getOrderNumber())
+            .addKeyValue("phone_number", event.getPhoneNumber())
+            .log("[Kakao Message] Received announce delivery message event");
 
         try {
             kakaoMessageUtil.sendAnnounceDeliveryMessage(
@@ -193,15 +156,12 @@ public class KakaoMessageListener {
                     event.getPhoneNumber()
             );
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[Kakao Message] Failed to send announce delivery message")
-                    .details(Map.of(
-                            "order_name", event.getOrderName(),
-                            "order_number", event.getOrderNumber(),
-                            "phone_number", event.getPhoneNumber()
-                    ))
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("order_name", event.getOrderName())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .addKeyValue("phone_number", event.getPhoneNumber())
+                .log("[Kakao Message] Failed to send announce delivery message");
         }
     }
 }

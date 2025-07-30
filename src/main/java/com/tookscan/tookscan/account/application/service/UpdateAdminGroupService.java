@@ -5,7 +5,6 @@ import com.tookscan.tookscan.account.domain.Group;
 import com.tookscan.tookscan.account.domain.service.GroupService;
 import com.tookscan.tookscan.account.presentation.dto.request.UpdateAdminGroupRequestDto;
 import com.tookscan.tookscan.account.repository.GroupRepository;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +23,9 @@ public class UpdateAdminGroupService implements UpdateAdminGroupUseCase {
     @Override
     @Transactional
     public void execute(UpdateAdminGroupRequestDto requestDto, Long groupId) {
-        StructuredLoggerUtil.info(log)
-                .message("[Account] Admin update group name process started")
-                .details(Map.of(
-                        "group_id", groupId
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("group_id", groupId)
+            .log("[Account] Admin update group name process started");
 
         // 그룹 조회
         Group group = groupRepository.findByIdOrElseThrow(groupId);
@@ -42,11 +38,8 @@ public class UpdateAdminGroupService implements UpdateAdminGroupUseCase {
         group = groupService.updateGroupName(group, requestDto.name(), isExists);
         groupRepository.save(group);
 
-        StructuredLoggerUtil.info(log)
-                .message("[Account] Admin group name updated successfully")
-                .details(Map.of(
-                        "group_id", group.getId()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("group_id", group.getId())
+            .log("[Account] Admin group name updated successfully");
     }
 }

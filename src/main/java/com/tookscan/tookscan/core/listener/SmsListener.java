@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.SmsUtil;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import com.tookscan.tookscan.security.event.CompletePhoneNumberValidationEvent;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -20,37 +19,29 @@ public class SmsListener {
     @Async("notificationTaskExecutor")
     @EventListener(classes = {CompletePhoneNumberValidationEvent.class})
     public void handleCompletePhoneNumberValidationEvent(CompletePhoneNumberValidationEvent event) {
-        StructuredLoggerUtil.debug(log)
-                .message("[SMS] 휴대폰 인증 완료 이벤트 수신")
-                .field("receiver_address", event.receiverAddress())
-                .field("authentication_code", event.authenticationCode())
-                .log();
+        log.atDebug()
+            .addKeyValue("receiver_address", event.receiverAddress())
+            .addKeyValue("authentication_code", event.authenticationCode())
+            .log("[SMS] 휴대폰 인증 완료 이벤트 수신");
 
         try {
-            StructuredLoggerUtil.info(log)
-                    .message("[SMS] phone number validation authentication code sent process started")
-                    .details(Map.of(
-                            "receiver_address", event.receiverAddress()
-                    ))
-                    .log();
+            log.atInfo()
+                .addKeyValue("receiver_address", event.receiverAddress())
+                .log("[SMS] phone number validation authentication code sent process started");
 
             smsUtil.sendAuthenticationCode(
                     event.receiverAddress(),
                     event.authenticationCode()
             );
 
-            StructuredLoggerUtil.info(log)
-                    .message("[SMS] phone number validation authentication code sent successfully")
-                    .details(Map.of(
-                            "receiver_address", event.receiverAddress()
-                    ))
-                    .log();
+            log.atInfo()
+                .addKeyValue("receiver_address", event.receiverAddress())
+                .log("[SMS] phone number validation authentication code sent successfully");
         } catch (Exception e) {
-            StructuredLoggerUtil.error(log)
-                    .message("[SMS] phone number validation authentication code sending failed")
-                    .field("receiver_address", event.receiverAddress())
-                    .exception(e)
-                    .log();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("receiver_address", event.receiverAddress())
+                .log("[SMS] phone number validation authentication code sending failed");
         }
     }
 }

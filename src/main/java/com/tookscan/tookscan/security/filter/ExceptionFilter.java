@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,10 +58,10 @@ public class ExceptionFilter extends OncePerRequestFilter {
      * 구조화된 에러 로그를 기록하는 역할
      */
     private void logError(Throwable throwable, ErrorCode errorCode) {
-        StructuredLoggerUtil.error(log)
-                .message("FilterException " + throwable.getClass().getSimpleName() + " occurred")
-                .exception(throwable, errorCode)
-                .log();
+        log.atError()
+            .setCause(throwable)
+            .addKeyValue("error.code", errorCode.name())
+            .log("FilterException {} occurred", throwable.getClass().getSimpleName());
     }
 
     /**

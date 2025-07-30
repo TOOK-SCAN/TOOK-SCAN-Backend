@@ -1,6 +1,5 @@
 package com.tookscan.tookscan.core.config;
 
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -37,14 +36,11 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
-        StructuredLoggerUtil.info(log)
-                .message("[Async Thread] Email TaskExecutor initialized")
-                .details(Map.of(
-                        "corePoolSize", executor.getCorePoolSize(),
-                        "maxPoolSize", executor.getMaxPoolSize(),
-                        "queueCapacity", executor.getQueueCapacity()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] Email TaskExecutor initialized");
 
         return executor;
     }
@@ -67,14 +63,11 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
 
-        StructuredLoggerUtil.info(log)
-                .message("[Async Thread] Notification TaskExecutor initialized")
-                .details(Map.of(
-                        "corePoolSize", executor.getCorePoolSize(),
-                        "maxPoolSize", executor.getMaxPoolSize(),
-                        "queueCapacity", executor.getQueueCapacity()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] Notification TaskExecutor initialized");
         
         return executor;
     }
@@ -97,14 +90,11 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setAwaitTerminationSeconds(60);
         executor.initialize();
 
-        StructuredLoggerUtil.info(log)
-                .message("[Async Thread] File Processing TaskExecutor initialized")
-                .details(Map.of(
-                        "corePoolSize", executor.getCorePoolSize(),
-                        "maxPoolSize", executor.getMaxPoolSize(),
-                        "queueCapacity", executor.getQueueCapacity()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] File Processing TaskExecutor initialized");
 
         return executor;
     }
@@ -125,14 +115,11 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setAwaitTerminationSeconds(120);
         executor.initialize();
 
-        StructuredLoggerUtil.info(log)
-                .message("[Async Thread] Scheduler TaskExecutor initialized")
-                .details(Map.of(
-                        "corePoolSize", executor.getCorePoolSize(),
-                        "maxPoolSize", executor.getMaxPoolSize(),
-                        "queueCapacity", executor.getQueueCapacity()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] Scheduler TaskExecutor initialized");
 
         return executor;
     }
@@ -154,14 +141,11 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
 
-        StructuredLoggerUtil.info(log)
-                .message("[Async Thread] Default TaskExecutor initialized")
-                .details(Map.of(
-                        "corePoolSize", executor.getCorePoolSize(),
-                        "maxPoolSize", executor.getMaxPoolSize(),
-                        "queueCapacity", executor.getQueueCapacity()
-                ))
-                .log();
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] Default TaskExecutor initialized");
 
         return executor;
     }
@@ -184,14 +168,11 @@ public class AsyncConfig implements AsyncConfigurer {
             
             // 파라미터 정보 로깅
             if (params != null && params.length > 0) {
-                StructuredLoggerUtil.error(log)
-                        .message("[Async Error] Uncaught exception in async method")
-                        .details(Map.of(
-                                "method", method.getName(),
-                                "params", params
-                        ))
-                        .exception(ex)
-                        .log();
+                log.atError()
+                    .setCause(ex)
+                    .addKeyValue("method", method.getName())
+                    .addKeyValue("params", params)
+                    .log("[Async Error] Uncaught exception in async method");
             }
         }
     }

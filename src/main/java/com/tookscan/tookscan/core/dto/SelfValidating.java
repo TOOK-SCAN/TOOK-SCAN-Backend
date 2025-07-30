@@ -2,7 +2,6 @@ package com.tookscan.tookscan.core.dto;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -33,19 +32,16 @@ public abstract class SelfValidating<T> {
     protected void validateSelf() {
         Set<ConstraintViolation<T>> violations = validator.validate((T) this);
         if (!violations.isEmpty()) {
-            StructuredLoggerUtil.error(log)
-                    .message("Validation failed for object")
-                    .details(Map.of(
-                            "violation_count", violations.size(),
-                            "violations", violations.stream()
-                                    .map(violation -> Map.of(
-                                            "property", violation.getPropertyPath().toString(),
-                                            "message", violation.getMessage(),
-                                            "invalid_value", violation.getInvalidValue()
-                                    ))
-                                    .toList()
+            log.atError()
+                .addKeyValue("violation_count", violations.size())
+                .addKeyValue("violations", violations.stream()
+                    .map(violation -> Map.of(
+                        "property", violation.getPropertyPath().toString(),
+                        "message", violation.getMessage(),
+                        "invalid_value", violation.getInvalidValue()
                     ))
-                    .log();
+                    .toList())
+                .log("Validation failed for object");
             throw new CommonException(ErrorCode.INTERNAL_DATA_ERROR);
         }
     }

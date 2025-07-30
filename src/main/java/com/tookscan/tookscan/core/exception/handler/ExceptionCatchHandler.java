@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.core.exception.handler;
 
 import com.tookscan.tookscan.core.dto.SendSlackErrorDto;
-import com.tookscan.tookscan.core.utility.StructuredLoggerUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +18,10 @@ public class ExceptionCatchHandler {
     public void registerUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
 
-            StructuredLoggerUtil.error(log)
-                    .message("[Global] Uncaught exception occurred in thread")
-                    .field("thread_name", thread.getName())
-                    .exception(throwable)
-                    .log();
+            log.atError()
+                .setCause(throwable)
+                .addKeyValue("thread_name", thread.getName())
+                .log("[Global] Uncaught exception occurred in thread");
 
             applicationEventPublisher.publishEvent(
                     SendSlackErrorDto.of(
