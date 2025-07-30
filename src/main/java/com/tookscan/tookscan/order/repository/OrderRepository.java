@@ -71,6 +71,12 @@ public interface OrderRepository {
 
     Integer countByCreatedAtBetweenAndRecoveryOption(LocalDateTime startDate, LocalDateTime endDate, ERecoveryOption recoveryOption);
 
+    Map<String, Integer> findMonthlyOrderCounts(LocalDateTime startDate, LocalDateTime endDate);
+
+    Map<String, Map<EOrderStatus, Integer>> findMonthlyOrderStatusCounts(LocalDateTime startDate, LocalDateTime endDate);
+
+    Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate);
+
     Order findByIdWithDocumentsOrElseThrow(Long id);
 
     Order findByIdWithDocumentsAndDeliveryOrElseThrow(Long id);
