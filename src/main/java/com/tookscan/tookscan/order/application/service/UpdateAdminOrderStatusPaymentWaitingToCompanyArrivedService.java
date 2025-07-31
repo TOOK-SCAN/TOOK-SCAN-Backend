@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.message.domain.event.CancelPaymentMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.domain.Order;
@@ -20,6 +22,11 @@ public class UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedService impleme
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
+    @BusinessLog(
+            domain = "Order",
+            action = "update order status from payment waiting to company arrived",
+            userType = "Admin"
+    )
     public void execute(Long orderId) {
         // 주문 조회
         Order order = orderRepository.findByIdOrElseThrow(orderId);
@@ -42,5 +49,6 @@ public class UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedService impleme
                         order.getDelivery().getPhoneNumber()
                 )
         );
+        LogContext.put("order_id", orderId);
     }
 }

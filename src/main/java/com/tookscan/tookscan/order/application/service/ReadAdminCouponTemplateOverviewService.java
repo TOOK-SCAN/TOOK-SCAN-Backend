@@ -6,13 +6,13 @@ import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponTemplateOverviewResponseDto;
 import com.tookscan.tookscan.order.repository.CouponTemplateRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class ReadAdminCouponTemplateOverviewService implements ReadAdminCouponTe
     private final CouponTemplateRepository couponTemplateRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ReadAdminCouponTemplateOverviewResponseDto execute(
             ECouponFormat format,
             ECouponType type,

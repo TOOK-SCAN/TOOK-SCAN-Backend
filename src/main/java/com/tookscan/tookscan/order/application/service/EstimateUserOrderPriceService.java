@@ -2,8 +2,6 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.domain.Address;
-import com.tookscan.tookscan.core.annotation.BusinessLog;
-import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.TsidFactory;
 import com.tookscan.tookscan.order.application.usecase.EstimateUserOrderPriceUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -43,11 +41,6 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
 
     @Override
     @Transactional
-    @BusinessLog(
-        domain = "Order",
-        action = "estimate order price",
-        userType = "User"
-    )
     public EstimateUserOrderPriceResponseDto execute(EstimateUserOrderPriceRequestDto requestDto) {
         // 가격 정책 조회
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
@@ -136,8 +129,6 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         });
 
         order.calculateTotalAmount();
-
-        LogContext.put("estimated_total_amount", order.getTotalAmount());
 
         return EstimateUserOrderPriceResponseDto.of(order, unCheckedDocuments);
     }
