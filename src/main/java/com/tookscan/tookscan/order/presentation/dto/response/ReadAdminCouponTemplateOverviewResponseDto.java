@@ -152,10 +152,10 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                             .stream()
                             .mapToInt(IssuedCoupon::getMaxUsedCount)
                             .sum())
-                    .startAt(couponTemplate.getStartDateTime().toString())
-                    .endAt(couponTemplate.getEndDateTime().toString())
+                    .startAt(couponTemplate.getStartDateTime() != null ? couponTemplate.getStartDateTime().toString() : null)
+                    .endAt(couponTemplate.getEndDateTime() != null ? couponTemplate.getEndDateTime().toString() : null)
                     .createdAt(couponTemplate.getCreatedAt().toString())
-                    .updatedAt(couponTemplate.getUpdatedAt().toString())
+                    .updatedAt(couponTemplate.getUpdatedAt() != null ? couponTemplate.getUpdatedAt().toString() : null)
                     .build();
         }
     }
