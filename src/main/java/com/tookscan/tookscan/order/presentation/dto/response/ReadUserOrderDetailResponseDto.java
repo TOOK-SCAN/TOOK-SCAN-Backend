@@ -312,7 +312,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .couponName(couponName)
                 .couponId(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getId().toString() : null)
                 .couponType(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getType() : null)
-                .couponPercentage(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getDiscountPercent() : null)
+                .couponPercentage(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
