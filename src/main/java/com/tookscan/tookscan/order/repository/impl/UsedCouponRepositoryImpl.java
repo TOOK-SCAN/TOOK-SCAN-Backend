@@ -56,6 +56,11 @@ public class UsedCouponRepositoryImpl implements UsedCouponRepository {
 
         List<UsedCoupon> usedCoupons = jpaQueryFactory
                 .selectFrom(usedCoupon)
+                .join(usedCoupon.issuedCoupon).fetchJoin()
+                .join(usedCoupon.order).fetchJoin()
+                .join(usedCoupon.order.documents).fetchJoin()
+                .join(usedCoupon.order.delivery).fetchJoin()
+                .join(usedCoupon.issuedCoupon.couponTemplate).fetchJoin()
                 .where(usedCoupon.issuedCoupon.couponTemplate.id.eq(couponTemplateId).and(predicate))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
