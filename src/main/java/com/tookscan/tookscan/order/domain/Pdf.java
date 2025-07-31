@@ -26,11 +26,11 @@ public class Pdf extends BaseEntity {
     /* -------------------------------------------- */
     /* Information Column ------------------------- */
     /* -------------------------------------------- */
-    @Column(name = "pdf_url")
+    @Column(name = "pdf_url", nullable = false, length = 2048)
     private String pdfUrl;
 
-    @Column(name = "pdf_created_at")
-    private LocalDateTime pdfCreatedAt;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "is_checked", nullable = false)
     private boolean isChecked;
@@ -49,13 +49,12 @@ public class Pdf extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Pdf(String pdfUrl, LocalDateTime pdfCreatedAt, boolean isChecked, Document document) {
+    public Pdf(String pdfUrl, String name, boolean isChecked, Document document) {
         this.pdfUrl = pdfUrl;
-        this.pdfCreatedAt = pdfCreatedAt;
+        this.name = name;
         this.isChecked = isChecked;
         this.document = document;
     }
-
     public void updateExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
     }
@@ -63,4 +62,5 @@ public class Pdf extends BaseEntity {
     public void updatePdfUrl(String pdfUrl) {
         this.pdfUrl = pdfUrl;
     }
+
 }

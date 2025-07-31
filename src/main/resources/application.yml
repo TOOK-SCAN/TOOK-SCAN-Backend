@@ -134,7 +134,10 @@ spring:
         default-path: ${S3_DEFAULT_PATH}
         path-style-access-enabled: true
       cloudfront:
-        path: ${CLOUDFRONT_PATH}
+        domain: ${CLOUDFRONT_DOMAIN}
+        key-pair-id: ${CLOUDFRONT_KEY_ID}
+        private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
+
 
 # === Web-Engine 공통 설정 ===
 web-engine:

@@ -13,12 +13,12 @@ import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.Pdf;
 import com.tookscan.tookscan.order.domain.service.OrderService;
+import com.tookscan.tookscan.order.domain.service.PdfService;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PdfRepository;
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,6 +39,7 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
     private final PdfRepository pdfRepository;
 
     private final OrderService orderService;
+    private final PdfService pdfService;
 
     private final S3Util s3Util;
 
@@ -50,6 +51,7 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
             UserRepository userRepository,
             PdfRepository pdfRepository,
             OrderService orderService,
+            PdfService pdfService,
             S3Util s3Util,
             @Qualifier("fileProcessingTaskExecutor") Executor fileProcessingExecutor) {
         this.documentRepository = documentRepository;
@@ -57,6 +59,7 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         this.userRepository = userRepository;
         this.pdfRepository = pdfRepository;
         this.orderService = orderService;
+        this.pdfService = pdfService;
         this.s3Util = s3Util;
         this.fileProcessingExecutor = fileProcessingExecutor;
     }
@@ -90,20 +93,37 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
 
         // DB 저장 및 S3 업로드 (트랜잭션 내에서)
         for (MultipartFile file : files) {
+            // 원본 파일명 추출
+            String fileName = file.getOriginalFilename();
+            if (fileName == null || fileName.trim().isEmpty()) {
+                fileName = "unnamed.pdf";
+            }
+
+            // Document 내에서 파일명 중복 검증 (중복 시 예외 발생)
+            pdfService.validateUniqueFilename(document, fileName);
+
+            File watermarkedPdf = PdfWatermarkUtil.embedWatermark(
+                    file,
+                    userName,
+                    userPhone,
+                    orderNumber,
+                    orderCreatedAt,
+                    aesKeyString.getBytes()
+            );
+
+            System.out.println(fileName);
+
+            String pdfUrl = s3Util.uploadAndGetPublicUrl(document, watermarkedPdf, fileName);
+
             Pdf pdf = Pdf.builder()
-                    .pdfUrl("temp") // 임시 URL, 실제 업로드 후 업데이트
-                    .pdfCreatedAt(LocalDateTime.now())
+                    .pdfUrl(pdfUrl)
+                    .name(fileName)
+                    .isChecked(false)
                     .document(document)
                     .build();
 
-            // PDF 엔티티를 먼저 저장하여 ID 생성
             pdfRepository.save(pdf);
             document.getPdfs().add(pdf);
-
-            // PDF ID를 이용하여 실제 S3 업로드 및 URL 업데이트
-            String pdfUrl = processFileToUrlWithPdfId(document, file, pdf.getId(), userName, userPhone, orderNumber,
-                    orderCreatedAt);
-            pdf.updatePdfUrl(pdfUrl);
         }
 
         updateOrderStatusBasedOnPdfStorage(order);
@@ -113,20 +133,6 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         LogContext.put("uploaded_files_count", files.size());
     }
 
-    private String processFileToUrlWithPdfId(Document document, MultipartFile file, Long pdfId,
-                                             String userName, String userPhone, String orderNumber,
-                                             String orderCreatedAt) {
-        File watermarkedPdf = PdfWatermarkUtil.embedWatermark(
-                file,
-                userName,
-                userPhone,
-                orderNumber,
-                orderCreatedAt,
-                aesKeyString.getBytes()
-        );
-
-        return s3Util.uploadPdf(document, watermarkedPdf, pdfId);
-    }
 
     private void updateOrderStatusBasedOnPdfStorage(Order order) {
         boolean hasAnyPdf = order.getDocuments().stream()
