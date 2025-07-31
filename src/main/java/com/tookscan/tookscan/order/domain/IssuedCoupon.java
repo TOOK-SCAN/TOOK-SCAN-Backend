@@ -50,6 +50,12 @@ public class IssuedCoupon extends BaseEntity {
     @JoinColumn(name = "coupon_template_id", nullable = false)
     private CouponTemplate couponTemplate;
 
+    /* -------------------------------------------- */
+    /* One To Many Mapping ------------------------ */
+    /* -------------------------------------------- */
+    @OneToMany(mappedBy = "issuedCoupon")
+    private List<UsedCoupon> usedCoupons = new ArrayList<>();
+
     @Builder
     public IssuedCoupon(String code, Integer usedCount, Integer maxUsedCount,
                         CouponTemplate couponTemplate) {

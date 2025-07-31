@@ -41,6 +41,9 @@ public class CouponTemplate extends BaseEntity {
     @Column(name = "format", nullable = false)
     private ECouponFormat format;
 
+    @Column(name = "tag")
+    private String tag;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private ECouponType type;
@@ -75,11 +78,12 @@ public class CouponTemplate extends BaseEntity {
     private List<IssuedCoupon> issuedCoupons;
 
     @Builder
-    public CouponTemplate(String name, ECouponFormat format, ECouponType type, Integer discountPrice,
+    public CouponTemplate(String name, ECouponFormat format, String tag, ECouponType type, Integer discountPrice,
                           Integer discountPercent, Integer maxDiscountPrice, Integer minOrderPrice,
                           Integer maxUsedPerUserCount, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.name = name;
         this.format = format;
+        this.tag = tag;
         this.type = type;
         this.discountPrice = discountPrice;
         this.discountPercent = discountPercent;
@@ -102,7 +106,7 @@ public class CouponTemplate extends BaseEntity {
         } else if (type == ECouponType.DELIVERY_PRICE_FREE) {
             return deliveryPrice;
         }
-        
+
         return 0;
     }
 }

@@ -6,6 +6,8 @@ import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.repository.IssuedCouponRepository;
 import com.tookscan.tookscan.order.repository.mysql.IssuedCouponJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +28,11 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     public IssuedCoupon findByCodeOrElseThrow(String couponCode) {
         return issuedCouponJpaRepository.findByCode(couponCode)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ISSUED_COUPON, "쿠폰 코드: " + couponCode));
+    }
+
+    @Override
+    public Page<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId, Pageable pageable) {
+        return issuedCouponJpaRepository.findByCouponTemplateId(couponTemplateId, pageable);
     }
 
     @Override
