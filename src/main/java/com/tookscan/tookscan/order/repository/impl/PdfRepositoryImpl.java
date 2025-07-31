@@ -21,8 +21,8 @@ public class PdfRepositoryImpl implements PdfRepository {
     }
 
     @Override
-    public void save(Pdf pdf) {
-        pdfJpaRepository.save(pdf);
+    public Pdf save(Pdf pdf) {
+        return pdfJpaRepository.save(pdf);
     }
 
     @Override

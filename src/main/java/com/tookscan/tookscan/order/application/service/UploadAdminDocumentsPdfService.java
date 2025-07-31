@@ -20,7 +20,6 @@ import com.tookscan.tookscan.order.repository.PdfRepository;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,19 +88,22 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         String orderNumber = order.getOrderNumber();
         String orderCreatedAt = DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt());
 
-        // 병렬로 워터마킹 및 S3 업로드 처리 (트랜잭션 외부에서 실행)
-        List<String> pdfUrls = processFilesInParallel(document, files, userName, userPhone, orderNumber, orderCreatedAt);
-
-        // DB 저장은 순차적으로 (트랜잭션 내에서)
-        for (String pdfUrl : pdfUrls) {
+        // DB 저장 및 S3 업로드 (트랜잭션 내에서)
+        for (MultipartFile file : files) {
             Pdf pdf = Pdf.builder()
-                    .pdfUrl(pdfUrl)
+                    .pdfUrl("temp") // 임시 URL, 실제 업로드 후 업데이트
                     .pdfCreatedAt(LocalDateTime.now())
                     .document(document)
                     .build();
-            
+
+            // PDF 엔티티를 먼저 저장하여 ID 생성
             pdfRepository.save(pdf);
             document.getPdfs().add(pdf);
+
+            // PDF ID를 이용하여 실제 S3 업로드 및 URL 업데이트
+            String pdfUrl = processFileToUrlWithPdfId(document, file, pdf.getId(), userName, userPhone, orderNumber,
+                    orderCreatedAt);
+            pdf.updatePdfUrl(pdfUrl);
         }
 
         updateOrderStatusBasedOnPdfStorage(order);
@@ -111,23 +113,9 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         LogContext.put("uploaded_files_count", files.size());
     }
 
-    private List<String> processFilesInParallel(Document document, List<MultipartFile> files, 
-                                               String userName, String userPhone, String orderNumber, String orderCreatedAt) {
-        // 전용 스레드풀에서 병렬로 워터마킹 및 S3 업로드 처리
-        List<CompletableFuture<String>> futures = files.stream()
-                .map(file -> CompletableFuture.supplyAsync(() ->
-                                processFileToUrl(document, file, userName, userPhone, orderNumber, orderCreatedAt),
-                        fileProcessingExecutor))
-                .toList();
-
-        // 모든 병렬 작업 완료 대기
-        return futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
-    }
-
-    private String processFileToUrl(Document document, MultipartFile file, 
-                                   String userName, String userPhone, String orderNumber, String orderCreatedAt) {
+    private String processFileToUrlWithPdfId(Document document, MultipartFile file, Long pdfId,
+                                             String userName, String userPhone, String orderNumber,
+                                             String orderCreatedAt) {
         File watermarkedPdf = PdfWatermarkUtil.embedWatermark(
                 file,
                 userName,
@@ -137,7 +125,7 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
                 aesKeyString.getBytes()
         );
 
-        return s3Util.uploadPdf(document, watermarkedPdf);
+        return s3Util.uploadPdf(document, watermarkedPdf, pdfId);
     }
 
     private void updateOrderStatusBasedOnPdfStorage(Order order) {

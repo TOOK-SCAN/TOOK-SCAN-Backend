@@ -5,15 +5,15 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
 import java.io.File;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -54,15 +54,17 @@ public class S3Util {
 
     /**
      * Document에 해당하는 PDF 파일을 S3에 업로드 (SDK v2 방식)
+     * PDF ID 기반 폴더 구조: orders/{orderId}/documents/{documentId}/pdfs/{pdfId}/{fileName}
      *
      * @param document 업로드할 PDF 파일에 대한 정보를 가진 Document 객체
      * @param file     업로드할 File 객체
+     * @param pdfId    생성된 PDF 엔티티의 ID
      * @return CloudFront URL
      */
-    public String uploadPdf(Document document, File file) {
-        String fileName = generateUniqueFileName(document);
+    public String uploadPdf(Document document, File file, Long pdfId) {
+        String fileName = document.getName() + ".pdf";
         String finalKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
+                + document.getOrder().getId() + '/' + document.getId() + "/pdfs/" + pdfId + '/'
                 + fileName;
 
         try {
@@ -82,95 +84,38 @@ public class S3Util {
     }
 
     /**
-     * 중복되지 않는 고유한 파일명을 생성하는 메서드
-     *
-     * @param document PDF 파일이 속할 Document 객체
-     * @return 중복되지 않는 파일명 (예: "document.pdf", "document (1).pdf", "document (2).pdf")
-     */
-    private String generateUniqueFileName(Document document) {
-        String baseName = document.getName();
-        String extension = ".pdf";
-
-        // 기존 PDF 파일명들을 수집
-        Set<String> existingFileNames = document.getPdfs().stream()
-                .map(pdf -> {
-                    String url = pdf.getPdfUrl();
-                    // URL에서 파일명 추출 (마지막 '/' 이후의 부분)
-                    int lastSlashIndex = url.lastIndexOf('/');
-                    return lastSlashIndex != -1 ? url.substring(lastSlashIndex + 1) : url;
-                })
-                .collect(java.util.stream.Collectors.toSet());
-
-        String fileName = baseName + extension;
-
-        // 중복되지 않는 파일명이 될 때까지 번호를 증가시킴
-        int counter = 1;
-        while (existingFileNames.contains(fileName)) {
-            fileName = baseName + " (" + counter + ")" + extension;
-            counter++;
-        }
-
-        return fileName;
-    }
-
-    /**
-     * S3에서 객체의 파일명을 변경하고 새로운 URL을 반환하는 메서드 (복사 후 삭제)
-     *
-     * @param document    PDF가 속한 Document 객체
-     * @param oldUrl      기존 PDF URL
-     * @param newFileName 새로운 파일명
-     * @return 변경된 파일의 새로운 URL
-     */
-    public String renameS3ObjectAndGetUrl(Document document, String oldUrl, String newFileName) {
-        String oldKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
-                + extractFileNameFromUrl(oldUrl);
-
-        String newKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
-                + newFileName;
-
-        try {
-            // 1. 객체 복사
-            CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
-                    .sourceBucket(bucketName)
-                    .sourceKey(oldKey)
-                    .destinationBucket(bucketName)
-                    .destinationKey(newKey)
-                    .build();
-            s3Client.copyObject(copyObjectRequest);
-
-            // 2. 기존 객체 삭제
-            deleteObject(oldKey);
-
-            // 3. 새로운 URL 반환
-            String directUrl = getS3ObjectUrl(newKey);
-            return directUrl.replace(s3DefaultPath, cloudFrontPath);
-        } catch (Exception e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "S3 파일 이름 변경 중 오류가 발생했습니다.");
-        }
-    }
-
-    /**
-     * URL에서 파일명을 추출하는 메서드
-     */
-    private String extractFileNameFromUrl(String url) {
-        int lastSlashIndex = url.lastIndexOf('/');
-        return lastSlashIndex != -1 ? url.substring(lastSlashIndex + 1) : url;
-    }
-
-    /**
      * PDF 파일을 S3에서 삭제하는 메서드
      *
      * @param pdf 삭제할 PDF 객체
      */
     public void deletePdfFromS3(Pdf pdf) {
         String url = pdf.getPdfUrl();
-        String fileName = extractFileNameFromUrl(url);
+        String pdfId = String.valueOf(pdf.getId());
         String key = PDF_CONTENT_PREFIX
-                + pdf.getDocument().getOrder().getId() + '/' + pdf.getDocument().getId() + '/'
-                + fileName;
+                + pdf.getDocument().getOrder().getId() + '/' + pdf.getDocument().getId() + "/pdfs/" + pdfId + '/'
+                + pdf.getDocument().getName() + ".pdf";
         deleteObject(key);
+    }
+
+    /**
+     * S3 객체 존재 여부를 확인하는 메서드
+     *
+     * @param key 확인할 S3 객체 키
+     * @return 객체가 존재하면 true, 존재하지 않으면 false
+     */
+    private boolean objectExists(String key) {
+        try {
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            s3Client.headObject(headObjectRequest);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        } catch (S3Exception e) {
+            return false;
+        }
     }
 
     /**
