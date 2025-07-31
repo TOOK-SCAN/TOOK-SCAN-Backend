@@ -3,12 +3,16 @@ package com.tookscan.tookscan.order.presentation.controller.query;
 import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
+import com.tookscan.tookscan.order.domain.type.ECouponFormat;
+import com.tookscan.tookscan.order.domain.type.ECouponType;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponOverviewResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDocumentsPdfsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto;
@@ -37,13 +41,14 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminOrderOverviewsUseCase readAdminOrderOverviewsUseCase;
     private final ReadStatisticsSummariesUseCase readStatisticsSummariesUseCase;
     private final ReadAdminDocumentsPdfsUseCase readAdminDocumentsPdfsUseCase;
+    private final ReadAdminCouponOverviewUseCase readAdminCouponOverviewUseCase;
 
     /**
      * 4.2.5 관리자 주문 요약 정보 조회
      */
     @Operation(summary = "관리자 주문 요약 정보 조회", description = "관리자가 주문 요약 정보를 조회합니다.")
     @ApiErrorCode({
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.ACCESS_DENIED
     })
     @GetMapping("/orders/briefs")
     public ResponseDto<ReadAdminOrderBriefsResponseDto> readOrderBriefs() {
@@ -55,8 +60,8 @@ public class OrderAdminQueryV1Controller {
      */
     @Operation(summary = "관리자 스캔 PDF 파일 다운로드", description = "관리자가 주문의 스캔 PDF 파일을 다운로드합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_DOCUMENT,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_DOCUMENT,
+            ErrorCode.ACCESS_DENIED
     })
     @GetMapping("/documents/{documentId}/pdfs")
     public ResponseDto<ReadAdminDocumentsPdfsResponseDto> downloadScanFile(
@@ -70,8 +75,8 @@ public class OrderAdminQueryV1Controller {
      */
     @Operation(summary = "관리자 주문 상세 조회", description = "관리자가 주문 상세 내역을 조회합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.ACCESS_DENIED
     })
     @GetMapping("/orders/{orderId}/details")
     public ResponseDto<ReadAdminOrderDetailResponseDto> readOrderDocumentsOverviews(
@@ -86,9 +91,9 @@ public class OrderAdminQueryV1Controller {
      */
     @Operation(summary = "관리자 주문 리스트 조회", description = "관리자가 주문 리스트를 조회합니다.")
     @ApiErrorCode({
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @GetMapping("/orders/overviews")
     public ResponseDto<ReadAdminOrderOverviewsResponseDto> readOrderOverviews(
@@ -107,7 +112,7 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "is-in-progress", required = false) Boolean isInProgress
     ) {
         return ResponseDto.ok(
-                readAdminOrderOverviewsUseCase.execute(page, size, startDate, endDate, search, 
+                readAdminOrderOverviewsUseCase.execute(page, size, startDate, endDate, search,
                         searchType, sort, direction, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress, isInProgress));
     }
 
@@ -117,9 +122,9 @@ public class OrderAdminQueryV1Controller {
      */
     @Operation(summary = "관리자 통계 조회", description = "관리자가 통계 정보를 조회합니다.")
     @ApiErrorCode({
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @GetMapping("/statistics/summaries")
     public ResponseDto<ReadStatisticsSummariesResponseDto> readStatisticsSummaries(
@@ -133,4 +138,22 @@ public class OrderAdminQueryV1Controller {
                 isApplied, isArrived, isCompleted));
     }
 
+
+    /**
+     * 5.2.2 관리자 쿠폰 요약 정보 조회
+     */
+    @Operation(summary = "관리자 쿠폰 요약 정보 조회", description = "관리자가 쿠폰 요약 정보를 조회합니다.")
+    @GetMapping("/coupons/overviews")
+    public ResponseDto<ReadAdminCouponOverviewResponseDto> readAdminCouponOverview(
+            @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "format", required = false) ECouponFormat format,
+            @RequestParam(value = "type", required = false) ECouponType type
+    ) {
+        return ResponseDto.ok(readAdminCouponOverviewUseCase.execute(
+                        format, type, status, page, size
+                )
+        );
+    }
 }

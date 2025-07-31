@@ -59,8 +59,8 @@ public class IssuedCoupon extends BaseEntity {
         this.couponTemplate = couponTemplate;
     }
 
-    public Integer getDiscountPrice(Integer originalPrice) {
-        return couponTemplate.calculateDiscountPrice(originalPrice);
+    public Integer getDiscountPrice(Integer originalPrice, Integer ocrPrice, Integer deliveryPrice) {
+        return couponTemplate.calculateDiscountPrice(originalPrice, ocrPrice, deliveryPrice);
     }
 
     public void useCoupon() {

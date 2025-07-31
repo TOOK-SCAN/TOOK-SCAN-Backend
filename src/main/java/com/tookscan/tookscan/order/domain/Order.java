@@ -18,9 +18,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -215,6 +217,7 @@ public class Order extends BaseEntity {
     public void updateIsOneDayScan(Boolean isOneDayScan) {
         this.isOneDayScan = isOneDayScan;
     }
+
     public void updatePdfSendDate(LocalDateTime pdfSendDate) {
         this.pdfSendDate = pdfSendDate;
     }
@@ -304,13 +307,6 @@ public class Order extends BaseEntity {
         return orderStatus.getCode() >= EOrderStatus.COMPANY_ARRIVED.getCode();
     }
 
-    public int getDiscountAmount() {
-        if (usedCoupon == null) {
-            return 0;
-        }
-        return usedCoupon.getIssuedCoupon().getDiscountPrice(getDocumentsTotalAmount());
-    }
-
     public boolean isDelivery() {
         return documents.stream()
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
@@ -336,8 +332,7 @@ public class Order extends BaseEntity {
                             if (pdfs.size() > 1) {
                                 content += "<li>└ \uD83D\uDCC4<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + " (" + pdfCount + ")" + "</a></li>";
                                 pdfCount++;
-                            }
-                            else {
+                            } else {
                                 content += "<li>└ \uD83D\uDCC4<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + "</a></li>";
                             }
                         } else {
@@ -358,7 +353,14 @@ public class Order extends BaseEntity {
         int total = getDocumentsTotalAmount();
 
         if (usedCoupon != null) {
-            total = total - usedCoupon.getIssuedCoupon().getDiscountPrice(total);
+            total = total - usedCoupon.getIssuedCoupon().getDiscountPrice(
+                    total,
+                    this.getDocuments().stream()
+                            .map(Document::getOcrPrice)
+                            .reduce(Integer::sum)
+                            .orElse(0),
+                    delivery.getDeliveryPrice()
+            );
         }
 
         if (isDelivery()) {

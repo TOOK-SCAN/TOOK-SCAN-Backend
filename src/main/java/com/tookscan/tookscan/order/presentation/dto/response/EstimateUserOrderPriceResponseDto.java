@@ -193,7 +193,7 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
-                .couponPrice(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : 0)
+                .couponPrice(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), ocrPriceSum, order.getDelivery().getDeliveryPrice()) : 0)
                 .paymentTotal(order.getTotalAmount())
                 .build();
     }

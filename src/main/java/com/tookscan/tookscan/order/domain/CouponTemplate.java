@@ -5,10 +5,12 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,6 +21,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -65,6 +68,12 @@ public class CouponTemplate extends BaseEntity {
     @Column(name = "end_date")
     private LocalDateTime endDateTime;
 
+    /* -------------------------------------------- */
+    /* One To Many Column ------------------------- */
+    /* -------------------------------------------- */
+    @OneToMany(mappedBy = "couponTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IssuedCoupon> issuedCoupons;
+
     @Builder
     public CouponTemplate(String name, ECouponFormat format, ECouponType type, Integer discountPrice,
                           Integer discountPercent, Integer maxDiscountPrice, Integer minOrderPrice,
@@ -81,14 +90,19 @@ public class CouponTemplate extends BaseEntity {
         this.endDateTime = endDateTime;
     }
 
-    public Integer calculateDiscountPrice(Integer originalPrice) {
+    public Integer calculateDiscountPrice(Integer originalPrice, Integer ocrPrice, Integer deliveryPrice) {
 
         if (type == ECouponType.AMOUNT) {
             return Math.min(discountPrice, maxDiscountPrice != null ? maxDiscountPrice : Integer.MAX_VALUE);
         } else if (type == ECouponType.PERCENTAGE) {
             int discount = (int) (originalPrice * (discountPercent / 100.0));
             return Math.min(discount, maxDiscountPrice != null ? maxDiscountPrice : Integer.MAX_VALUE);
+        } else if (type == ECouponType.OCR) {
+            return ocrPrice;
+        } else if (type == ECouponType.DELIVERY_PRICE_FREE) {
+            return deliveryPrice;
         }
+        
         return 0;
     }
 }

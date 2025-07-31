@@ -526,7 +526,7 @@ public class ReadAdminOrderDetailResponseDto extends
                         .deliveryPrice(order.getDeliveryPrice())
                         .couponName(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName() : null)
                         .couponDiscount(order.getUsedCoupon() != null ?
-                                order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : 0)
+                                order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), order.getInitialDocuments().stream().mapToInt(InitialDocument::getOcrPrice).sum(), order.getDeliveryPrice()) : 0)
                         .totalPrice(order.getTotalAmount())
                         .build();
             }
@@ -597,7 +597,7 @@ public class ReadAdminOrderDetailResponseDto extends
                         .deliveryPrice(order.getDelivery().getDeliveryPrice())
                         .couponName(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName() : null)
                         .couponDiscount(order.getUsedCoupon() != null ?
-                                order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : 0)
+                                order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), order.getDocuments().stream().mapToInt(Document::getOcrPrice).sum(), order.getDelivery().getDeliveryPrice()) : 0)
                         .totalPrice(order.getTotalAmount())
                         .build();
             }
