@@ -97,4 +97,12 @@ public class CouponTemplateRepositoryImpl implements CouponTemplateRepository {
     public void save(CouponTemplate couponTemplate) {
         couponTemplateJpaRepository.save(couponTemplate);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        if (!couponTemplateJpaRepository.existsById(id)) {
+            throw new CommonException(ErrorCode.NOT_FOUND_COUPON_TEMPLATE, "쿠폰 템플릿 ID: " + id);
+        }
+        couponTemplateJpaRepository.deleteById(id);
+    }
 }
