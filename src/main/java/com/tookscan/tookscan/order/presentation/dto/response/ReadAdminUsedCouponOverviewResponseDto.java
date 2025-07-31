@@ -137,7 +137,9 @@ public class ReadAdminUsedCouponOverviewResponseDto {
             description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
         }
 
-        name += description;
+        if (description != null) {
+            name += " " + description;
+        }
 
         List<UsedCouponOverviewDto> usedCouponOverviews = usedCoupons.stream()
                 .map(UsedCouponOverviewDto::fromEntity)

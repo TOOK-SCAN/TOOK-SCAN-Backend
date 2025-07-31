@@ -143,11 +143,16 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
             description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
         }
 
+        String name = couponTemplate.getName();
+        if (description != null) {
+            name += " " + description;
+        }
+
         return ReadAdminIssuedCouponOverviewResponseDto.builder()
                 .pageInfoDto(pageInfoDto)
                 .issuedCouponOverviewDto(issuedCouponOverviewDto)
                 .tag(couponTemplate.getTag() != null ? couponTemplate.getTag() : "랜덤 생성")
-                .name(couponTemplate.getName() + description)
+                .name(name)
                 .build();
     }
 }
