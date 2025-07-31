@@ -139,7 +139,7 @@ public class OrderAdminCommandV1Controller {
             ErrorCode.BAD_REQUEST_PARAMETER,
             ErrorCode.ACCESS_DENIED,
     })
-    @PostMapping(value = "/orders/coupons")
+    @PostMapping(value = "/coupons")
     public ResponseDto<CreateAdminOrderCouponRequestDto> createCoupon(
             @RequestBody @Valid CreateAdminOrderCouponRequestDto requestDto
     ) {
