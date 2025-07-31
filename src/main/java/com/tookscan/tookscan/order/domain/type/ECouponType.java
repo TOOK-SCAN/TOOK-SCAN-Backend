@@ -11,7 +11,7 @@ public enum ECouponType {
     DELIVERY_PRICE_FREE("배송비 무료"),
     PERCENTAGE("퍼센트 금액 할인"),
     AMOUNT("지정 금액 할인"),
-    OCR_FREE("OCR_FREE 무료"),
+    OCR_FREE("OCR 무료"),
     ;
 
     private final String description;
