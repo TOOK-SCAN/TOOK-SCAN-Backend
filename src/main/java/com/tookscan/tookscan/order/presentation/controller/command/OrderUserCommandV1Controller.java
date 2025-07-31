@@ -117,7 +117,8 @@ public class OrderUserCommandV1Controller {
             ErrorCode.NOT_UPDATABLE_ORDER,
             ErrorCode.INVALID_ARGUMENT,
             ErrorCode.BAD_REQUEST_PARAMETER,
-            ErrorCode.ACCESS_DENIED
+            ErrorCode.ACCESS_DENIED,
+            ErrorCode.NOT_ENOUGH_ORDER_PRICE_FOR_COUPON
     })
     @PatchMapping(value = "/{orderId}/history")
     public ResponseDto<Void> updateOrderHistory(

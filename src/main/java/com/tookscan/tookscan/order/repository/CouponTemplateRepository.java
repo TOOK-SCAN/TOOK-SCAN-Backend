@@ -22,4 +22,6 @@ public interface CouponTemplateRepository {
     List<CouponTemplate> findAllWithIssuedCouponsByIdIn(List<Long> ids);
 
     void save(CouponTemplate couponTemplate);
+
+    void deleteById(Long id);
 }

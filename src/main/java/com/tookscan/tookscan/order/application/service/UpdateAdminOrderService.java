@@ -133,7 +133,7 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
         }
         deliveryService.updateDeliveryPrice(order.getDelivery(), requestDto.deliveryPrice());
 
-        orderService.calculateTotalAmount(order);
+        order.calculateTotalAmount();
         orderRepository.save(order);
     }
 }

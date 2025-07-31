@@ -370,4 +370,10 @@ public class Order extends BaseEntity {
         this.totalAmount = total;
     }
 
+    public Integer getTotalAmountWithoutCouponAndDelivery() {
+        documents.forEach(Document::calculateTotalAmount);
+
+        return getDocumentsTotalAmount();
+    }
+
 }
