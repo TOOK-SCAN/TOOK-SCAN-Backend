@@ -33,6 +33,9 @@ public class KakaoMessageUtil {
     @Value("${solapi.template-id.announce-delivery}")
     private String templateIdAnnounceDelivery;
 
+    @Value("${solapi.template-id.cancel-payment}")
+    private String templateIdCancelPayment;
+
     @Value("${solapi.sender}")
     private String sender;
 
@@ -48,8 +51,11 @@ public class KakaoMessageUtil {
     @Value("${solapi.order-waybill-url}")
     private String orderWaybillUrl;
 
-    @Value("${solapi.user-post-way-1-url}")
-    private String userPostWay1Url;
+    @Value("${solapi.user-post-way-pc-url}")
+    private String userPostWayPcUrl;
+
+    @Value("${solapi.user-post-way-mobile-url}")
+    private String userPostWayMobileUrl;
 
     @Value("${solapi.user-post-way-2-url}")
     private String userPostWay2Url;
@@ -73,7 +79,8 @@ public class KakaoMessageUtil {
         variables.put("#{userName}", userName);
         variables.put("#{userPhone}", userPhone);
         variables.put("#{orderName}", orderName);
-        variables.put("#{userPostWay1}", userPostWay1Url);
+        variables.put("#{userPostWayPc}", userPostWayPcUrl);
+        variables.put("#{userPostWayMobile}", userPostWayMobileUrl);
         variables.put("#{userPostWay2}", userPostWay2Url);
         variables.put("#{postPrice}", postPriceUrl);
         variables.put("#{tipUrl}", tipUrl);
@@ -92,7 +99,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestPaymentMessage(String orderName, Integer orderPrice, String orderNumber, String to) {
+    public void sendRequestPaymentMessage(String orderName, Integer orderPrice, Long orderId, String orderNumber, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -100,8 +107,8 @@ public class KakaoMessageUtil {
 
         variables.put("#{orderName}", orderName);
         variables.put("#{orderPrice}", String.valueOf(orderPrice));
-        variables.put("#{paymentUrl}", paymentUrl + orderNumber);
-        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
+        variables.put("#{paymentUrl}", paymentUrl + orderId + "?order-number=" + orderNumber + "&amount=" + orderPrice);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
 
         kakaoOption.setVariables(variables);
 
@@ -117,7 +124,7 @@ public class KakaoMessageUtil {
 
     }
 
-    public void sendRequestScanMessage(String orderName, String orderNumber, String userEmail, String to) {
+    public void sendRequestScanMessage(String orderName, Long orderId, String userEmail, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
@@ -125,7 +132,7 @@ public class KakaoMessageUtil {
 
         variables.put("#{orderName}", orderName);
         variables.put("#{userEmail}", userEmail);
-        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + orderId);
 
         kakaoOption.setVariables(variables);
 
@@ -160,22 +167,42 @@ public class KakaoMessageUtil {
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void sendAnnounceDeliveryMessage(String orderName, String orderWaybill, String orderNumber, String to) {
+    public void sendAnnounceDeliveryMessage(String orderName, String orderWaybill, Long deliveryId, String to) {
 
         KakaoOption kakaoOption = new KakaoOption();
 
-        String waybillUrl = orderWaybillUrl.replace("{orderNumber}", orderNumber);
+        String waybillUrl = orderWaybillUrl.replace("{deliveryId}", String.valueOf(deliveryId));
 
         HashMap<String, String> variables = new HashMap<>();
         variables.put("#{orderName}", orderName);
         variables.put("#{orderWaybill}", orderWaybill);
-        variables.put("#{orderDetailUrl}", orderDetailUrl + orderNumber);
+        variables.put("#{orderDetailUrl}", orderDetailUrl + deliveryId);
         variables.put("#{orderWaybillUrl}", waybillUrl);
 
         kakaoOption.setVariables(variables);
 
         kakaoOption.setPfId(pfId);
         kakaoOption.setTemplateId(templateIdAnnounceDelivery);
+
+        Message message = new Message();
+        message.setTo(to);
+        message.setFrom(sender);
+        message.setKakaoOptions(kakaoOption);
+
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
+
+    public void sendCancelPaymentMessage(String orderName, String to) {
+
+        KakaoOption kakaoOption = new KakaoOption();
+
+        HashMap<String, String> variables = new HashMap<>();
+        variables.put("#{orderName}", orderName);
+
+        kakaoOption.setVariables(variables);
+
+        kakaoOption.setPfId(pfId);
+        kakaoOption.setTemplateId(templateIdCancelPayment);
 
         Message message = new Message();
         message.setTo(to);

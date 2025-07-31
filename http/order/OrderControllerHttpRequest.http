@@ -29,13 +29,13 @@ Content-Type: application/json
       "address2": "강남빌딩 5층"
     }
   },
+  "coupon_id": 738696461230371637,
   "is_one_day_scan": false
 }
 
 ### 주문 조회
 //@no-log
 GET {{host_url}}/v1/users/orders/overviews?page=1&size=10&sort=createdAt
-Authorization: Bearer {{access_token}}
 
 ### 결제 요청
 //@no-log
@@ -44,17 +44,14 @@ PATCH {{host_url}}/v1/admins/orders/734276020051665347/payment-requests
 ### PDF 전송
 //@no-log
 POST {{host_url}}/v1/admins/orders/19/send-pdfs
-Authorization: Bearer {{access_token}}
 
 ### 관리자 주문 조회
 //@no-log
-GET {{host_url}}/v1/admins/orders/overviews?page=1&size=10&start-date=2025-02-12&end-date=2025-03-12&sort=order-date&direction=DESC
-Authorization: Bearer {{access_token}}
+GET {{host_url}}/v1/admins/orders/overviews?page=1&size=10&start-date=2025-06-01&end-date=2025-08-01&sort=order-date
 
 ### 관리자 결제 조회
 //@no-log
 GET {{host_url}}/v1/admins/orders/688623424943448498/payments/overviews
-Authorization: Bearer {{access_token}}
 
 ### 관리자 주문 상세 조회
 //@no-log
@@ -62,7 +59,7 @@ GET {{host_url}}/v1/admins/orders/732163380529619446/details
 
 ### 관리자 pdf 업로드
 //@no-log
-POST {{host_url}}/v1/admins/documents/732163380542202321/pdfs
+POST {{host_url}}/v1/admins/documents/738116895722729202/pdfs
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -90,3 +87,46 @@ Content-Type: application/json
 {
   "tracking_number": "1234567890"
 }
+
+### 관리자 통계 조회
+//@no-log
+GET {{host_url}}/v1/admins/statistics/summaries?start-year-month=2025-06&end-year-month=2025-07
+
+### 관리자 자동생성 쿠폰 등록
+//@no-log
+POST {{host_url}}/v1/admins/coupons
+Content-Type: application/json
+
+{
+  "name": "여름 할인 쿠폰",
+  "format": "AUTO_GENERATED",
+  "auto_generated_count": 10,
+  "auto_generated_tag": "JDK",
+  "type": "AMOUNT",
+  "discount_price": 5000
+}
+
+### 관리자 수동 쿠폰 등록
+//@no-log
+POST {{host_url}}/v1/admins/coupons
+Content-Type: application/json
+
+{
+  "name": "수동 쿠폰",
+  "format": "DEFINED",
+  "defined_code": "TEST12345",
+  "defined_max_used_count": 10,
+  "type": "OCR_FREE"
+}
+
+### 관리자 쿠폰 템플릿 요약 조회
+//@no-log
+GET {{host_url}}/v1/admins/coupon-templates/overviews?page=1&size=10
+
+### 관리자 발행 쿠폰 요약 조회
+//@no-log
+GET {{host_url}}/v1/admins/coupon-templates/738695615050511029/issued-coupons/overviews
+
+### 관리자 사용 쿠폰 요약 조회
+//@no-log
+GET {{host_url}}/v1/admins/coupon-templates/738696461221983066/used-coupons/overviews

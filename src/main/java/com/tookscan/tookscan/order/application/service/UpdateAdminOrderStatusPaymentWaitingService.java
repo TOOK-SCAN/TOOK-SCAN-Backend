@@ -43,6 +43,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                 RequestPaymentMessageEvent.of(
                         order.getDocumentsDescription(),
                         order.getTotalAmount(),
+                        order.getId(),
                         order.getOrderNumber(),
                         order.getDelivery().getPhoneNumber()
                 )

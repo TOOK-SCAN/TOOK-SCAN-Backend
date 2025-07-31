@@ -13,6 +13,7 @@ spring:
     hikari:
       pool-name: jpa-hikari-pool
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE}
+      leak-detection-threshold: 10000
       jdbc-url: ${spring.datasource.url}
       username: ${spring.datasource.username}
       password: ${spring.datasource.password}
@@ -194,12 +195,14 @@ solapi:
     request-scan: ${SOLAPI_TEMPLATE_REQUEST_SCAN}
     announce-scan-finish: ${SOLAPI_TEMPLATE_ANNOUNCE_SCAN_FINISH}
     announce-delivery: ${SOLAPI_TEMPLATE_ANNOUNCE_DELIVERY}
+    cancel-payment: ${SOLAPI_TEMPLATE_CANCEL_PAYMENT}
   sender: ${SOLAPI_SENDER}
   tip-url: ${SOLAPI_TIP_URL}
   payment-url: ${SOLAPI_PAYMENT_URL}
   order-detail-url: ${SOLAPI_ORDER_DETAIL_URL}
   order-waybill-url: ${SOLAPI_ORDER_WAYBILL_URL}
-  user-post-way-1-url: ${SOLAPI_USER_POST_WAY_1_URL}
+  user-post-way-pc-url: ${SOLAPI_USER_POST_WAY_PC_URL}
+  user-post-way-mobile-url: ${SOLAPI_USER_POST_WAY_MOBILE_URL}
   user-post-way-2-url: ${SOLAPI_USER_POST_WAY_2_URL}
   post-price-url: ${SOLAPI_POST_PRICE_URL}
 

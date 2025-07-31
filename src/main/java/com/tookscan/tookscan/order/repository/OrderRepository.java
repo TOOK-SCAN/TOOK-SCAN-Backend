@@ -21,6 +21,8 @@ public interface OrderRepository {
 
     Order findByIdOrElseThrow(Long id);
 
+    Order findWithUsedCouponByIdOrElseThrow(Long id);
+
     List<Order> findAllByIdOrElseThrow(List<Long> ids);
 
     List<Order> findAllByOrderStatusDateBetweenOrElseThrow(LocalDateTime startDate, LocalDateTime endDate,
@@ -70,6 +72,12 @@ public interface OrderRepository {
     Integer countByCreatedAtBetweenAndOrderStatus(LocalDateTime startDate, LocalDateTime endDate, EOrderStatus orderStatus);
 
     Integer countByCreatedAtBetweenAndRecoveryOption(LocalDateTime startDate, LocalDateTime endDate, ERecoveryOption recoveryOption);
+
+    Map<String, Integer> findMonthlyOrderCounts(LocalDateTime startDate, LocalDateTime endDate);
+
+    Map<String, Map<EOrderStatus, Integer>> findMonthlyOrderStatusCounts(LocalDateTime startDate, LocalDateTime endDate);
+
+    Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate);
 
     Order findByIdWithDocumentsOrElseThrow(Long id);
 

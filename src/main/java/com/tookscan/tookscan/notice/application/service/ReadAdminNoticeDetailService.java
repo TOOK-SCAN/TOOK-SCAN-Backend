@@ -15,7 +15,7 @@ public class ReadAdminNoticeDetailService implements ReadAdminNoticeDetailUseCas
     private final NoticeRepository noticeRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ReadAdminNoticeDetailResponseDto execute(Long noticeId) {
         Notice notice = noticeRepository.findByIdOrElseThrow(noticeId);
         return ReadAdminNoticeDetailResponseDto.fromEntity(notice);

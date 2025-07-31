@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,6 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
     private final PaymentRepository paymentRepository;
 
     @Override
-    @Transactional
     public ReadStatisticsSummariesResponseDto execute(
             String startYearMonth,
             String endYearMonth,
@@ -33,52 +33,84 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
             Boolean isArrived,
             Boolean isCompleted
     ) {
-        LocalDate start = LocalDate.parse(startYearMonth + "-01");
-        LocalDate end = LocalDate.parse(endYearMonth + "-01");
-        // 결과를 담을 리스트
-        List<MonthlyStatisticsDto> result = new ArrayList<>();
-
-        // 2) start부터 end까지 월단위로 반복
-        LocalDate current = start;
-        while (!current.isAfter(end)) {
-            // 예: current = 2023-01-01 → 해당 월의 시작 시각
-            LocalDateTime monthStart = current.atStartOfDay();
-            // 다음 달 1일 자정
-            LocalDateTime monthEnd = current.plusMonths(1).atStartOfDay();
-
-            // 3) 각 달별로 회원가입 수, 주문 수, 총 결제액 조회
-            Integer signUpCount = userRepository.countByCreatedAtBetween(monthStart, monthEnd);
-            Integer orderCount = orderRepository.countByCreatedAtBetween(monthStart, monthEnd);
-            Integer totalAmount = paymentRepository.sumTotalAmountByCreatedAtBetween(monthStart, monthEnd);
-
-            // NPE 방지 (DB가 null 반환할 수 있으므로)
-            if (totalAmount == null) {
-                totalAmount = 0;
-            }
-
-            // 4) yearMonth 형식 문자열 구성
-            String yearMonth = String.format("%04d-%02d", current.getYear(), current.getMonthValue());
-
-            // TODO: page view count, visitant count 추가
-            Integer pageViewCount = 0;
-            Integer visitantCount = 0;
-            Integer appliedCount = orderRepository.countByCreatedAtBetweenAndOrderStatus(monthStart, monthEnd, EOrderStatus.APPLY_COMPLETED);
-            Integer arrivedCount = orderRepository.countByCreatedAtBetweenAndOrderStatus(monthStart, monthEnd, EOrderStatus.COMPANY_ARRIVED);
-            Integer completedCount = orderRepository.countByCreatedAtBetweenAndOrderStatus(monthStart, monthEnd, EOrderStatus.ALL_COMPLETED);
-
-            Integer discardedCount = orderRepository.countByCreatedAtBetweenAndRecoveryOption(monthStart, monthEnd, ERecoveryOption.DISCARD);
-            Integer springCount = orderRepository.countByCreatedAtBetweenAndRecoveryOption(monthStart, monthEnd, ERecoveryOption.SPRING);
-            Integer rawCount = orderRepository.countByCreatedAtBetweenAndRecoveryOption(monthStart, monthEnd, ERecoveryOption.RAW);
-
-            // 5) DTO에 담아서 결과 리스트에 추가
-            result.add(MonthlyStatisticsDto.of(yearMonth, pageViewCount, visitantCount, signUpCount, orderCount
-                    , appliedCount, arrivedCount, completedCount, discardedCount, springCount, rawCount));
-
-            // 다음 달로 이동
-            current = current.plusMonths(1);
+        // null인 경우 최근 6개월 기본값 설정
+        LocalDate now = LocalDate.now();
+        LocalDate start;
+        LocalDate end;
+        
+        if (startYearMonth == null || endYearMonth == null) {
+            end = now.withDayOfMonth(1);
+            start = end.minusMonths(5); // 6개월 (현재 월 포함)
+        } else {
+            start = LocalDate.parse(startYearMonth + "-01");
+            end = LocalDate.parse(endYearMonth + "-01");
         }
 
-        // 모든 달에 대한 통계를 구한 뒤 반환
-        return ReadStatisticsSummariesResponseDto.from(result);
+        // 1. 트랜잭션 내에서 모든 DB 조회 결과만 수집
+        List<MonthlyStatisticsDto> statistics = loadStatistics(start, end);
+
+        // 2. 트랜잭션 밖에서 정렬 처리
+        statistics.sort((a, b) -> b.getYearMonth().compareTo(a.getYearMonth()));
+
+        // 3. 최종 응답 객체 구성
+        return ReadStatisticsSummariesResponseDto.from(statistics);
+    }
+
+    @Transactional(readOnly = true)
+    protected List<MonthlyStatisticsDto> loadStatistics(LocalDate start, LocalDate end) {
+        LocalDateTime periodStart = start.atStartOfDay();
+        LocalDateTime periodEnd = end.plusMonths(1).atStartOfDay();
+        
+        // 배치 쿼리로 전체 기간의 데이터를 한 번에 조회
+        Map<String, Integer> signUpCounts = userRepository.findMonthlySignUpCounts(periodStart, periodEnd);
+        Map<String, Integer> orderCounts = orderRepository.findMonthlyOrderCounts(periodStart, periodEnd);
+        Map<String, Integer> paymentAmounts = paymentRepository.findMonthlyPaymentAmounts(periodStart, periodEnd);
+        Map<String, Map<EOrderStatus, Integer>> orderStatusCounts = orderRepository.findMonthlyOrderStatusCounts(periodStart, periodEnd);
+        Map<String, Map<ERecoveryOption, Integer>> recoveryOptionCounts = orderRepository.findMonthlyRecoveryOptionCounts(periodStart, periodEnd);
+        
+        List<MonthlyStatisticsDto> result = new ArrayList<>();
+        LocalDate current = start;
+        
+        while (!current.isAfter(end)) {
+            String yearMonth = String.format("%04d-%02d", current.getYear(), current.getMonthValue());
+            
+            Integer signUpCount = signUpCounts.getOrDefault(yearMonth, 0);
+            Integer orderCount = orderCounts.getOrDefault(yearMonth, 0);
+            Integer totalAmount = paymentAmounts.getOrDefault(yearMonth, 0);
+            
+            // 주문 상태별 통계
+            Map<EOrderStatus, Integer> statusMap = orderStatusCounts.getOrDefault(yearMonth, Map.of());
+            Integer appliedCount = statusMap.getOrDefault(EOrderStatus.APPLY_COMPLETED, 0);
+            Integer arrivedCount = statusMap.getOrDefault(EOrderStatus.COMPANY_ARRIVED, 0);
+            Integer completedCount = statusMap.getOrDefault(EOrderStatus.ALL_COMPLETED, 0);
+            
+            // 복구 옵션별 통계
+            Map<ERecoveryOption, Integer> recoveryMap = recoveryOptionCounts.getOrDefault(yearMonth, Map.of());
+            Integer discardedCount = recoveryMap.getOrDefault(ERecoveryOption.DISCARD, 0);
+            Integer springCount = recoveryMap.getOrDefault(ERecoveryOption.SPRING, 0);
+            Integer rawCount = recoveryMap.getOrDefault(ERecoveryOption.RAW, 0);
+            
+            // 현재는 하드코딩된 값 (추후 구글 애널리틱스 연동 시 수정)
+            Integer pageViewCount = 0;
+            Integer visitantCount = 0;
+            
+            result.add(MonthlyStatisticsDto.of(
+                    yearMonth,
+                    pageViewCount,
+                    visitantCount,
+                    signUpCount,
+                    orderCount,
+                    appliedCount,
+                    arrivedCount,
+                    completedCount,
+                    discardedCount,
+                    springCount,
+                    rawCount
+            ));
+            
+            current = current.plusMonths(1);
+        }
+        
+        return result;
     }
 }

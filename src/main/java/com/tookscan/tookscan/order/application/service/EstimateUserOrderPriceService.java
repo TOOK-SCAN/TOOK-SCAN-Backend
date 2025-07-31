@@ -4,23 +4,25 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.util.LogContext;
+import com.tookscan.tookscan.core.utility.TsidFactory;
 import com.tookscan.tookscan.order.application.usecase.EstimateUserOrderPriceUseCase;
-import com.tookscan.tookscan.order.domain.Coupon;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.PricePolicy;
-import com.tookscan.tookscan.order.domain.service.CouponService;
+import com.tookscan.tookscan.order.domain.UsedCoupon;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
-import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.presentation.dto.request.EstimateUserOrderPriceRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.response.EstimateUserOrderPriceResponseDto;
-import com.tookscan.tookscan.order.repository.CouponRepository;
+import com.tookscan.tookscan.order.repository.IssuedCouponRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseCase {
 
     private final PricePolicyRepository pricePolicyRepository;
-    private final CouponRepository couponRepository;
+    private final IssuedCouponRepository issuedCouponRepository;
 
-    private final OrderService orderService;
     private final DocumentService documentService;
     private final DeliveryService deliveryService;
-    private final CouponService couponService;
+
+    private static final Integer DELIVERY_EXPIRATION_PERIOD = 14;
 
     @Override
     @Transactional
@@ -51,12 +53,6 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
                 LocalDate.now(), LocalDate.now());
 
-        Coupon coupon = null;
-
-        // 쿠폰 조회
-        if (requestDto.couponId() != null) {
-            coupon = couponRepository.findByIdOrElseThrow(requestDto.couponId());
-        }
         User user = null;
         Address address = null;
 
@@ -78,13 +74,43 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         );
 
         // 주문 생성
-        Order order = orderService.createOrder(user, delivery, coupon, requestDto.isOneDayScan(),
-                pricePolicy.getAdditionalPriceForOneDayScan());
+        String orderNumber = TsidFactory.getFactory().generate().toString();
 
-        // 쿠폰 적용
-        if (coupon != null) {
-            couponService.applyCoupon(coupon, order);
+        Order order = Order.builder()
+                .orderNumber(orderNumber)
+                .orderStatus(EOrderStatus.APPLY_COMPLETED)
+                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD))
+                .scanCopyrightComplianceAgreed(LocalDateTime.now())
+                .illegalDistributionProhibitionAgreed(LocalDateTime.now())
+                .cuttingAgreed(LocalDateTime.now())
+                .serviceProvisionPeriodAcknowledged(LocalDateTime.now())
+                .user(user)
+                .delivery(delivery)
+                .isOneDayScan(requestDto.isOneDayScan())
+                .isAsInProgress(false)
+                .additionalPriceForOneDayScan(pricePolicy.getAdditionalPriceForOneDayScan())
+                .totalAmount(0)
+                .build();
+
+        UsedCoupon usedCoupon = null;
+
+        // 사용 요청받은 쿠폰 조회
+        if (requestDto.couponId() != null) {
+            IssuedCoupon issuedCoupon = issuedCouponRepository.findByIdOrElseThrow(requestDto.couponId());
+
+            // 쿠폰 적용
+            usedCoupon = UsedCoupon.builder()
+                    .issuedCoupon(issuedCoupon)
+                    .user(user)
+                    .initialOrder(null)
+                    .order(order)
+                    .build();
+
+            issuedCoupon.useCoupon();
         }
+
+        // 쿠폰 저장
+        order.updateUsedCoupon(usedCoupon);
 
         // 문서 생성
         List<Document> unCheckedDocuments = new ArrayList<>();
@@ -109,8 +135,8 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
             }
         });
 
-        orderService.calculateTotalAmount(order);
-        
+        order.calculateTotalAmount();
+
         LogContext.put("estimated_total_amount", order.getTotalAmount());
 
         return EstimateUserOrderPriceResponseDto.of(order, unCheckedDocuments);

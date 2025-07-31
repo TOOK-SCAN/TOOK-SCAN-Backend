@@ -62,10 +62,9 @@ public class InitialOrder extends BaseEntity {
     /* -------------------------------------------- */
     /* Many To One Mapping ------------------------ */
     /* -------------------------------------------- */
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
+    @JoinColumn(name = "used_coupon_id")
+    private UsedCoupon usedCoupon;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
@@ -76,20 +75,27 @@ public class InitialOrder extends BaseEntity {
             Integer additionalPriceForOneDayScan,
             Integer totalAmount,
             Order order,
-            Coupon coupon,
+            UsedCoupon usedCoupon,
             Integer deliveryPrice
     ) {
         this.isOneDayScan = isOneDayScan;
         this.additionalPriceForOneDayScan = additionalPriceForOneDayScan;
         this.totalAmount = totalAmount;
         this.order = order;
-        this.coupon = coupon;
+        this.usedCoupon = usedCoupon;
         this.deliveryPrice = deliveryPrice;
     }
 
     public Integer getDocumentsPrice() {
         return initialDocuments.stream()
-                .map(InitialDocument::getDocumentPrice)
+                .map(InitialDocument::getDocumentsPrice)
+                .reduce(Integer::sum)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
+    }
+
+    public Integer getDocumentsTotalAmount() {
+        return initialDocuments.stream()
+                .map(InitialDocument::getTotalAmount)
                 .reduce(Integer::sum)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }

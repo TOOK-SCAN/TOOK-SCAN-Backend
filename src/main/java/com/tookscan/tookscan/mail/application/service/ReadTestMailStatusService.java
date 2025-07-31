@@ -6,6 +6,7 @@ import com.tookscan.tookscan.mail.domain.mysql.TestMailStatus;
 import com.tookscan.tookscan.mail.repository.TestMailStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +15,7 @@ public class ReadTestMailStatusService implements ReadTestMailStatusUseCase {
     private final TestMailStatusRepository testMailStatusRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ReadTestMailStatusResponseDto execute(String email) {
         TestMailStatus testMailStatus = testMailStatusRepository.findByEmailOrElseNull(email);
 

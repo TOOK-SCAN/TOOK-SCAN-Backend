@@ -73,7 +73,7 @@ GET {{host_url}}/v1/auth/existence/phone-number?phone-number=01012341234
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "764510"
+@authentication_code = "755530"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 

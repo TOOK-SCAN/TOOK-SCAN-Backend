@@ -102,7 +102,7 @@ public class InitialDocument extends BaseEntity {
         return pageCount * initialOrder.getAdditionalPriceForOneDayScan();
     }
 
-    public int getDocumentPrice() {
+    public int getDocumentsPrice() {
         int pricePerPage = defaultPricePerPage
                 + (isOcrEnabled ? additionalPriceForOcr : 0);
         return pricePerPage * pageCount + recoveryOptionPrice;
@@ -114,13 +114,5 @@ public class InitialDocument extends BaseEntity {
         }
 
         return pageCount * additionalPriceForOcr;
-    }
-
-    public void calculateTotalAmount() {
-        int pricePerPage = defaultPricePerPage
-                + (isOcrEnabled ? additionalPriceForOcr : 0)
-                + (initialOrder.getIsOneDayScan() ? initialOrder.getAdditionalPriceForOneDayScan(): 0);
-
-        this.totalAmount = cuttingPrice + pricePerPage * pageCount + recoveryOptionPrice;
     }
 }

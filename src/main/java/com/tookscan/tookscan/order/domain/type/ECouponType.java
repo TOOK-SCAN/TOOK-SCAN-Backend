@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ECouponType {
     DELIVERY_PRICE_FREE("배송비 무료"),
-    PERCENTAGE("퍼센트"),
-    AMOUNT("금액");
+    PERCENTAGE("퍼센트 금액 할인"),
+    AMOUNT("지정 금액 할인"),
+    OCR_FREE("OCR 무료"),
+    ;
 
     private final String description;
 
@@ -19,6 +21,7 @@ public enum ECouponType {
             case "DELIVERY_PRICE_FREE" -> DELIVERY_PRICE_FREE;
             case "PERCENTAGE" -> PERCENTAGE;
             case "AMOUNT" -> AMOUNT;
+            case "OCR_FREE" -> OCR_FREE;
             default -> throw new CommonException(ErrorCode.INVALID_ENUM_TYPE);
         };
     }

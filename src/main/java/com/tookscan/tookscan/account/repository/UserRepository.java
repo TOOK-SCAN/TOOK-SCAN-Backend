@@ -25,4 +25,6 @@ public interface UserRepository {
     Page<UUID> findUserIdsByFilters(String searchType, String search, Long groupId, ESecurityProvider provider, LocalDate startDate, LocalDate endDate, Pageable pageable, String status, String sort, Direction direction);
 
     Integer countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    java.util.Map<String, Integer> findMonthlySignUpCounts(LocalDateTime startDate, LocalDateTime endDate);
 }
