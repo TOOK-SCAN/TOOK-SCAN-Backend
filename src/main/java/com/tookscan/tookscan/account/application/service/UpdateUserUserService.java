@@ -1,18 +1,21 @@
 package com.tookscan.tookscan.account.application.service;
 
-import com.tookscan.tookscan.account.presentation.dto.request.UpdateUserUserRequestDto;
 import com.tookscan.tookscan.account.application.usecase.UpdateUserUserUseCase;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;
+import com.tookscan.tookscan.account.presentation.dto.request.UpdateUserUserRequestDto;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,11 @@ public class UpdateUserUserService implements UpdateUserUserUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Account",
+        action = "update user",
+        userType = "User"
+    )
     public void execute(UUID accountId, UpdateUserUserRequestDto requestDto) {
 
         // User 조회
@@ -59,5 +67,7 @@ public class UpdateUserUserService implements UpdateUserUserUseCase {
 
         // 인증번호 발급 이력 삭제
         authenticationCodeHistoryRepository.deleteById(requestDto.phoneNumber());
+
+        LogContext.put("user_id", user.getId());
     }
 }

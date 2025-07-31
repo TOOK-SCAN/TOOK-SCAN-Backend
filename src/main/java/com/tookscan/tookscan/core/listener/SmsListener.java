@@ -2,15 +2,16 @@ package com.tookscan.tookscan.core.listener;
 
 import com.tookscan.tookscan.core.utility.SmsUtil;
 import com.tookscan.tookscan.security.event.CompletePhoneNumberValidationEvent;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SmsListener {
 
     private final SmsUtil smsUtil;
@@ -18,19 +19,29 @@ public class SmsListener {
     @Async("notificationTaskExecutor")
     @EventListener(classes = {CompletePhoneNumberValidationEvent.class})
     public void handleCompletePhoneNumberValidationEvent(CompletePhoneNumberValidationEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 휴대폰 인증 완료 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                event.receiverAddress() + "님의 휴대폰 인증이 완료되었습니다.",
-                "인증코드는 " + event.authenticationCode() + " 입니다."
-        );
+        log.atDebug()
+            .addKeyValue("receiver_address", event.receiverAddress())
+            .addKeyValue("authentication_code", event.authenticationCode())
+            .log("[SMS] 휴대폰 인증 완료 이벤트 수신");
 
         try {
+            log.atInfo()
+                .addKeyValue("receiver_address", event.receiverAddress())
+                .log("[SMS] phone number validation authentication code sent process started");
+
             smsUtil.sendAuthenticationCode(
                     event.receiverAddress(),
                     event.authenticationCode()
             );
+
+            log.atInfo()
+                .addKeyValue("receiver_address", event.receiverAddress())
+                .log("[SMS] phone number validation authentication code sent successfully");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("receiver_address", event.receiverAddress())
+                .log("[SMS] phone number validation authentication code sending failed");
         }
     }
 }

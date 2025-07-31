@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.domain;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import jakarta.persistence.Column;
@@ -10,6 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,9 +19,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

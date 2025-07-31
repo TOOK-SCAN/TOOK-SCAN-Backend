@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.security.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.security.presentation.dto.request.ReissuePasswordRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.response.ReissuePasswordResponseDto;
 import com.tookscan.tookscan.security.application.usecase.ReissuePasswordUseCase;
@@ -9,12 +11,11 @@ import com.tookscan.tookscan.security.domain.service.AccountService;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
+import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.SecureRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,11 @@ public class ReissuePasswordService implements ReissuePasswordUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Security",
+        action = "reissue password",
+        userType = "User"
+    )
     public ReissuePasswordResponseDto execute(ReissuePasswordRequestDto requestDto) {
 
         // 인증 코드 조회
@@ -50,6 +56,8 @@ public class ReissuePasswordService implements ReissuePasswordUseCase {
 
         // 비밀번호 변경
         accountService.changePassword(account, encodedPassword);
+        
+        LogContext.put("account_id", account.getId());
 
         return ReissuePasswordResponseDto.of(newPassword);
     }

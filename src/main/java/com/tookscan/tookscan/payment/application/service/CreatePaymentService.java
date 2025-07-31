@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.payment.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
@@ -27,6 +29,11 @@ public class CreatePaymentService implements CreatePaymentUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Payment",
+        action = "create payment (manual)",
+        userType = "Admin"
+    )
     public void execute(CreatePaymentRequestDto requestDto) {
         Order order = orderRepository.findByIdOrElseThrow(requestDto.orderId());
 
@@ -54,5 +61,8 @@ public class CreatePaymentService implements CreatePaymentUseCase {
                         order.getDelivery().getPhoneNumber()
                 )
         );
+        
+        LogContext.put("payment_id", payment.getId());
+        LogContext.put("order_id", order.getId());
     }
 }

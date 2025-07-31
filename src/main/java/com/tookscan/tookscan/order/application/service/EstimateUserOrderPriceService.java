@@ -2,7 +2,7 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.domain.Address;
-import com.tookscan.tookscan.core.infrastructure.TsidFactory;
+import com.tookscan.tookscan.core.utility.TsidFactory;
 import com.tookscan.tookscan.order.application.usecase.EstimateUserOrderPriceUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.Document;
@@ -19,14 +19,13 @@ import com.tookscan.tookscan.order.presentation.dto.request.EstimateUserOrderPri
 import com.tookscan.tookscan.order.presentation.dto.response.EstimateUserOrderPriceResponseDto;
 import com.tookscan.tookscan.order.repository.IssuedCouponRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +72,7 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .orderStatus(EOrderStatus.APPLY_COMPLETED)
-                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD))
+                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD + 1).withHour(0).withMinute(0).withSecond(0).withNano(0))
                 .scanCopyrightComplianceAgreed(LocalDateTime.now())
                 .illegalDistributionProhibitionAgreed(LocalDateTime.now())
                 .cuttingAgreed(LocalDateTime.now())

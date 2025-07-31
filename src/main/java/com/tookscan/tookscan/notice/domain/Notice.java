@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.notice.domain;
 
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

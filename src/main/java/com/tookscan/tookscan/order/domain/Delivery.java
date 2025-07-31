@@ -1,7 +1,7 @@
 package com.tookscan.tookscan.order.domain;
 
 import com.tookscan.tookscan.address.domain.Address;
-import com.tookscan.tookscan.core.dto.BaseEntity;
+import com.tookscan.tookscan.core.domain.BaseEntity;
 import com.tookscan.tookscan.order.domain.type.EDeliveryStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

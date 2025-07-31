@@ -4,9 +4,11 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.core.infrastructure.TsidFactory;
+import com.tookscan.tookscan.core.util.LogContext;
+import com.tookscan.tookscan.core.utility.TsidFactory;
 import com.tookscan.tookscan.message.domain.event.CreateOrderMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -29,15 +31,14 @@ import com.tookscan.tookscan.order.repository.IssuedCouponRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import com.tookscan.tookscan.order.repository.UsedCouponRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +63,11 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "create order",
+        userType = "User"
+    )
     public CreateUserOrderResponseDto execute(UUID accountId, CreateUserOrderRequestDto requestDto) {
         // 계정 조회
         User user = userRepository.findByIdOrElseThrow(accountId);
@@ -106,7 +112,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .orderStatus(EOrderStatus.APPLY_COMPLETED)
-                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD))
+                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD + 1).withHour(0).withMinute(0).withSecond(0).withNano(0))
                 .scanCopyrightComplianceAgreed(LocalDateTime.now())
                 .illegalDistributionProhibitionAgreed(LocalDateTime.now())
                 .cuttingAgreed(LocalDateTime.now())
@@ -170,6 +176,9 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                 )
         );
 
+        LogContext.put("order_id", order.getId());
+        LogContext.put("order_number", order.getOrderNumber());
+
         return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber())
                 .orderId(order.getId().toString()).build();
     }
@@ -178,7 +187,8 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
     public void validateCouponExpiration(UUID accountId, IssuedCoupon issuedCoupon, Integer totalAmount) {
 
         // 쿠폰의 사용 기간 확인
-        if (issuedCoupon.getCouponTemplate().getStartDateTime() != null && issuedCoupon.getCouponTemplate().getEndDateTime() != null) {
+        if (issuedCoupon.getCouponTemplate().getStartDateTime() != null
+                && issuedCoupon.getCouponTemplate().getEndDateTime() != null) {
             if (issuedCoupon.getCouponTemplate().getStartDateTime().isAfter(LocalDate.now().atStartOfDay())) {
                 throw new CommonException(ErrorCode.NOT_AVAILABLE_COUPON);
             }
@@ -188,7 +198,10 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         }
 
         // 한 사용자당 쿠폰 사용 횟수를 넘겼는지 확인
-        if (issuedCoupon.getCouponTemplate().getMaxUsedPerUserCount() != null && usedCouponRepository.countByUserIdAndCouponTemplateId(accountId, issuedCoupon.getCouponTemplate().getId()) > issuedCoupon.getCouponTemplate().getMaxUsedPerUserCount()) {
+        if (issuedCoupon.getCouponTemplate().getMaxUsedPerUserCount() != null &&
+                usedCouponRepository.countByUserIdAndCouponTemplateId(accountId,
+                        issuedCoupon.getCouponTemplate().getId()) > issuedCoupon.getCouponTemplate()
+                        .getMaxUsedPerUserCount()) {
             throw new CommonException(ErrorCode.EXCEEDED_MAX_USED_COUPON_PER_USER);
 
         }
@@ -199,7 +212,8 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         }
 
         // 쿠폰이 최소 주문 금액을 만족하는지 확인
-        if (issuedCoupon.getCouponTemplate().getMinOrderPrice() != null && issuedCoupon.getCouponTemplate().getMinOrderPrice() > totalAmount) {
+        if (issuedCoupon.getCouponTemplate().getMinOrderPrice() != null
+                && issuedCoupon.getCouponTemplate().getMinOrderPrice() > totalAmount) {
             throw new CommonException(ErrorCode.NOT_ENOUGH_ORDER_PRICE_FOR_COUPON);
         }
     }

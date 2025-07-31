@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.mail.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.mail.application.usecase.SendTestMailUseCase;
 import com.tookscan.tookscan.mail.domain.event.EmailEvent;
 import com.tookscan.tookscan.mail.domain.mysql.TestMailStatus;
@@ -12,6 +14,7 @@ import com.tookscan.tookscan.mail.repository.TestMailStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,12 @@ public class SendTestMailService implements SendTestMailUseCase {
     private final TestMailStatusRepository testMailStatusRepository;
 
     @Override
+    @Transactional
+    @BusinessLog(
+        domain = "Mail",
+        action = "send test mail",
+        userType = "User"
+    )
     public void execute(SendTestMailRequestDto requestDto) {
 
         TestMailHistory testMailHistory = testMailHistoryRepository.findByIdOrElseNull(requestDto.email());
@@ -53,5 +62,7 @@ public class SendTestMailService implements SendTestMailUseCase {
                     .build();
             testMailStatusRepository.save(testMailStatus);
         }
+        
+        LogContext.put("test_mail_status_id", testMailStatus.getId());
     }
 }

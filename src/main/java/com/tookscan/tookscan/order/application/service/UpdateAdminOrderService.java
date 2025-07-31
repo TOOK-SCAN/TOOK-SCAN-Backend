@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
@@ -37,6 +39,11 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update order by admin",
+        userType = "Admin"
+    )
     public void execute(Long orderId, UpdateAdminOrderRequestDto requestDto) {
         // 가격 정책 조회
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
@@ -118,7 +125,6 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
         Set<Long> toDeleteIds = orderDocumentIds.stream()
                 .filter(id -> !requestExistingIds.contains(id))
                 .collect(Collectors.toSet());
-        System.out.println("toDeleteIds = " + toDeleteIds);
         // 삭제 처리 (필요하다면 Order 엔티티에서도 해당 Document를 제거)
         order.getDocuments().removeIf(doc -> toDeleteIds.contains(doc.getId()));
         toDeleteIds.forEach(documentRepository::deleteByIdOrElseThrow);
@@ -135,5 +141,10 @@ public class UpdateAdminOrderService implements UpdateAdminOrderUseCase {
 
         order.calculateTotalAmount();
         orderRepository.save(order);
+        
+        LogContext.put("order_id", orderId);
+        LogContext.put("updated_documents_count", existingDocuments.size());
+        LogContext.put("new_documents_count", newDocuments.size());
+        LogContext.put("deleted_documents_count", toDeleteIds.size());
     }
 }

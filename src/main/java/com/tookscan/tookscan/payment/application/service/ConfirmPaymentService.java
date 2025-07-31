@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.payment.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.dto.PaymentDto;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
@@ -18,11 +20,8 @@ import com.tookscan.tookscan.payment.domain.type.EPaymentStatus;
 import com.tookscan.tookscan.payment.presentation.dto.request.ConfirmPaymentRequestDto;
 import com.tookscan.tookscan.payment.presentation.dto.response.ConfirmPaymentResponseDto;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
-
 import java.time.OffsetDateTime;
-
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ConfirmPaymentService implements ConfirmPaymentUseCase {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
@@ -44,6 +42,11 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Payment",
+        action = "confirm payment",
+        userType = "User"
+    )
     public ConfirmPaymentResponseDto execute(ConfirmPaymentRequestDto requestDto) {
 
         String tossConfirmApiUrl = tossPaymentUtil.getTossConfirmRequestUrl();
@@ -64,6 +67,11 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             String tossInfoApiUrl = tossPaymentUtil.getTossInfoRequestUrl(requestDto.paymentKey());
             HttpHeaders infoHeaders = tossPaymentUtil.getTossInfoRequestHeaders();
             response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendGet(tossInfoApiUrl, infoHeaders));
+            
+            LogContext.put("payment_confirm_failed", true);
+            LogContext.put("payment_key", requestDto.paymentKey());
+            LogContext.put("error_message", e.getMessage());
+            
             return ConfirmPaymentResponseDto.of(
                     false,
                     response.orderId(),
@@ -107,6 +115,10 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                     )
             );
         }
+
+        LogContext.put("payment_id", payment.getId());
+        LogContext.put("order_id", order.getId());
+        LogContext.put("payment_status", payment.getStatus().name());
 
         return ConfirmPaymentResponseDto.of(
                 true,

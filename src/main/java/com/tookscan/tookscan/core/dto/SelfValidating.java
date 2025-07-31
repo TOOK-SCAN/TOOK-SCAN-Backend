@@ -6,9 +6,9 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import lombok.extern.slf4j.Slf4j;
-
+import java.util.Map;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SelfValidating 을 상속받아서 사용하는 클래스는
@@ -32,7 +32,16 @@ public abstract class SelfValidating<T> {
     protected void validateSelf() {
         Set<ConstraintViolation<T>> violations = validator.validate((T) this);
         if (!violations.isEmpty()) {
-            log.error("Validation error occurred: {}", violations);
+            log.atError()
+                .addKeyValue("violation_count", violations.size())
+                .addKeyValue("violations", violations.stream()
+                    .map(violation -> Map.of(
+                        "property", violation.getPropertyPath().toString(),
+                        "message", violation.getMessage(),
+                        "invalid_value", violation.getInvalidValue()
+                    ))
+                    .toList())
+                .log("Validation failed for object");
             throw new CommonException(ErrorCode.INTERNAL_DATA_ERROR);
         }
     }

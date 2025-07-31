@@ -7,7 +7,7 @@ import java.util.List;
 public interface PdfRepository {
 
     List<Pdf> findAllByDocumentId(Long documentId);
-    void save(Pdf pdf);
+    Pdf save(Pdf pdf);
 
     void deleteByIdOrElseThrow(Long pdfId);
 

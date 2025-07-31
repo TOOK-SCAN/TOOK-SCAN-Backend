@@ -7,17 +7,22 @@ import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.dto.OauthJsonWebTokenDto;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import java.util.UUID;
+import javax.crypto.SecretKey;
 import lombok.Getter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import java.util.Date;
-import java.util.UUID;
 
 @Component
 public class JsonWebTokenUtil implements InitializingBean {
@@ -34,7 +39,7 @@ public class JsonWebTokenUtil implements InitializingBean {
     @Value("${json-web-token.refresh-token-expire-period}")
     private Long refreshTokenExpirePeriod;
 
-    private Key key;
+    private SecretKey key;
 
     @Override
     public void afterPropertiesSet() {
@@ -67,11 +72,11 @@ public class JsonWebTokenUtil implements InitializingBean {
 
     public Claims validateToken(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
+            return Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (MalformedJwtException e) {
             throw new HttpSecurityException(e.getMessage(), ErrorCode.TOKEN_MALFORMED_ERROR);
         } catch (IllegalArgumentException e) {
@@ -87,20 +92,23 @@ public class JsonWebTokenUtil implements InitializingBean {
         }
     }
 
+    /**
+     * 토큰 생성 메서드 (최신 API 적용)
+     */
     private String generateToken(String identifier, ESecurityRole role, Long expirePeriod) {
-        Claims claims = Jwts.claims();
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + expirePeriod);
 
-        claims.put(Constants.ACCOUNT_ID_CLAIM_NAME, identifier);
+        JwtBuilder builder = Jwts.builder()
+                .claim(Constants.ACCOUNT_ID_CLAIM_NAME, identifier)
+                .issuedAt(now)
+                .expiration(expiration)
+                .signWith(key);
 
-        if (role != null)
-            claims.put(Constants.ACCOUNT_ROLE_CLAIM_NAME, role);
+        if (role != null) {
+            builder.claim(Constants.ACCOUNT_ROLE_CLAIM_NAME, role.name()); // claim 추가
+        }
 
-        return Jwts.builder()
-                .setHeaderParam(Header.JWT_TYPE, Header.JWT_TYPE)
-                .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirePeriod))
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
+        return builder.compact();
     }
 }

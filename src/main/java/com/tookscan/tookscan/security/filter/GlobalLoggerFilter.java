@@ -4,10 +4,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
 public class GlobalLoggerFilter extends OncePerRequestFilter {
@@ -18,22 +19,30 @@ public class GlobalLoggerFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        log.info("[Global] HTTP Request Received! ({} {} {})",
-                request.getHeader("X-FORWARDED-FOR") != null ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr(),
-                request.getMethod(),
-                request.getRequestURI());
+        try {
+            MDC.put("trace.id", UUID.randomUUID().toString());
+            MDC.put("http.request.method", request.getMethod());
+            MDC.put("url.path", request.getRequestURI());
+            MDC.put("user_agent.original", request.getHeader("User-Agent"));
+            MDC.put("client.ip", request.getRemoteAddr());
 
-        request.setAttribute("INTERCEPTOR_PRE_HANDLE_TIME",  System.currentTimeMillis());
+            log.atInfo().log("[Global] HTTP Request Received");
 
-        filterChain.doFilter(request, response);
+            request.setAttribute("INTERCEPTOR_PRE_HANDLE_TIME", System.currentTimeMillis());
 
-        Long preHandleTime = (Long) request.getAttribute("INTERCEPTOR_PRE_HANDLE_TIME");
-        Long postHandleTime = System.currentTimeMillis();
+            filterChain.doFilter(request, response);
 
-        log.info("[Global] HTTP Request Has Been Processed! It Tokes {}ms. ({} {} {})",
-                postHandleTime - preHandleTime,
-                request.getHeader("X-FORWARDED-FOR") != null ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr(),
-                request.getMethod(),
-                request.getRequestURI());
+            Long preHandleTime = (Long) request.getAttribute("INTERCEPTOR_PRE_HANDLE_TIME");
+            Long postHandleTime = System.currentTimeMillis();
+            Long processingTime = postHandleTime - preHandleTime;
+
+            log.atInfo()
+                .addKeyValue("http.response.status_code", response.getStatus())
+                .addKeyValue("event.duration", processingTime * 1_000_000) // nanoseconds
+                .log("[Global] HTTP Request Has Been Processed");
+
+        } finally {
+            MDC.clear();
+        }
     }
 }

@@ -3,6 +3,8 @@ package com.tookscan.tookscan.security.application.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
@@ -39,6 +41,11 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Security",
+        action = "default sign up",
+        userType = "User"
+    )
     public DefaultJsonWebTokenDto execute(SignUpDefaultRequestDto requestDto) {
 
         // 중복된 아이디인지 확인
@@ -78,6 +85,9 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
         // Refresh Token 저장
         refreshTokenRepository.save(refreshTokenService.createRefreshToken(savedUser.getId(), tokenDto.getRefreshToken()));
 
+        LogContext.put("user_id", savedUser.getId());
+        LogContext.put("account_id", savedUser.getId());
+        
         return tokenDto;
     }
 }

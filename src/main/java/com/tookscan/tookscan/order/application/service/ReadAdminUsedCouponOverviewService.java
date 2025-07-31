@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class ReadAdminUsedCouponOverviewService implements ReadAdminUsedCouponOv
     private final CouponTemplateRepository couponTemplateRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ReadAdminUsedCouponOverviewResponseDto execute(Long id, String search, String searchType, Integer page, Integer size) {
 
         Pageable pageable = PageRequest.of(page-1, size);

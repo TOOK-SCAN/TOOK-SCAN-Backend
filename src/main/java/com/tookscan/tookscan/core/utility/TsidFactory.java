@@ -1,4 +1,4 @@
-package com.tookscan.tookscan.core.infrastructure;
+package com.tookscan.tookscan.core.utility;
 
 import io.hypersistence.tsid.TSID;
 import io.hypersistence.tsid.TSID.Factory;

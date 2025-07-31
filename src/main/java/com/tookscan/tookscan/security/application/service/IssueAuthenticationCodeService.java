@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.security.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.PasswordUtil;
 import com.tookscan.tookscan.security.presentation.dto.request.IssueAuthenticationCodeRequestDto;
 import com.tookscan.tookscan.security.presentation.dto.response.IssueAuthenticationCodeResponseDto;
@@ -31,6 +33,11 @@ public class IssueAuthenticationCodeService implements IssueAuthenticationCodeUs
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Security",
+        action = "issue authentication code",
+        userType = "User" 
+    )
     public IssueAuthenticationCodeResponseDto execute(IssueAuthenticationCodeRequestDto requestDto) {
 
         // 인증코드 발급 이력 조회
@@ -60,6 +67,8 @@ public class IssueAuthenticationCodeService implements IssueAuthenticationCodeUs
         }
 
         applicationEventPublisher.publishEvent(CompletePhoneNumberValidationEvent.of(requestDto.phoneNumber(), code));
+        
+        LogContext.put("issue_auth_code_success", true);
 
         return IssueAuthenticationCodeResponseDto.fromEntity(history);
     }

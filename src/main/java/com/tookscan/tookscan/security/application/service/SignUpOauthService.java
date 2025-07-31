@@ -3,7 +3,9 @@ package com.tookscan.tookscan.security.application.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.service.UserService;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.constant.Constants;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
@@ -17,12 +19,11 @@ import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryReposi
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
 import com.tookscan.tookscan.security.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,11 @@ public class SignUpOauthService implements SignUpOauthUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Security",
+        action = "oauth sign up",
+        userType = "User"
+    )
     public DefaultJsonWebTokenDto execute(String temporaryToken, SignUpOauthRequestDto requestDto) {
 
         // temporary Token 파싱
@@ -90,6 +96,9 @@ public class SignUpOauthService implements SignUpOauthUseCase {
         // Refresh Token 저장
         refreshTokenRepository.save(refreshTokenService.createRefreshToken(savedUser.getId(), tokenDto.getRefreshToken()));
 
+        LogContext.put("user_id", savedUser.getId());
+        LogContext.put("account_id", savedUser.getId());
+        
         return tokenDto;
     }
 }

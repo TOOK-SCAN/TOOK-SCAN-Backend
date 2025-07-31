@@ -8,18 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DeliveryTrackerUtil {
-
-    private static final Logger log = LoggerFactory.getLogger(DeliveryTrackerUtil.class);
 
     private final RestClientUtil restClientUtil;
 
@@ -96,24 +94,33 @@ public class DeliveryTrackerUtil {
             try {
                 response = restClientUtil.sendPost(API_URL, headers, jsonBody);
             } catch (Exception e) {
-                log.error("Error sending POST request. Request Body: {}. Error: {}", jsonBody, e.getMessage(), e);
+                log.atError()
+                    .setCause(e)
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking request failed");
                 break;
             }
 
             if (response == null) {
-                log.error("Response is null. Request Body: {}", jsonBody);
+                log.atError()
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking response is null");
                 break;
             }
 
             // 응답 파싱
             Map<String, Object> data = (Map<String, Object>) response.get("data");
             if (data == null) {
-                log.error("Response 'data' field is null. Full response: {}", response);
+                log.atError()
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking response data field is null");
                 break;
             }
             Map<String, Object> track = (Map<String, Object>) data.get("track");
             if (track == null) {
-                log.error("Response 'track' field is null. Full response: {}", response);
+                log.atError()
+                    .addKeyValue("tracking_number", trackingNumber)
+                    .log("Delivery tracking response track field is null");
                 break;
             }
             Map<String, Object> eventsObj = (Map<String, Object>) track.get("events");

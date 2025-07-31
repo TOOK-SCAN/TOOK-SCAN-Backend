@@ -10,9 +10,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class EmailListener {
 
     private final MailUtil mailUtil;
@@ -25,7 +25,10 @@ public class EmailListener {
                     event.getEmail()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("email", event.getEmail())
+                .log("[Email] Failed to send test email");
         }
     }
 
@@ -41,7 +44,11 @@ public class EmailListener {
                     event.getPdfUrl()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("email", event.getEmail())
+                .addKeyValue("order_number", event.getOrderNumber())
+                .log("[Email] Failed to send PDF email");
         }
     }
 
@@ -49,19 +56,16 @@ public class EmailListener {
     @Async("emailTaskExecutor")
     @EventListener(classes = {ChangePasswordBySystemEvent.class})
     public void handleChangePasswordBySystemEvent(ChangePasswordBySystemEvent event) {
-        log.info(
-                "\n----------------------------------\n[ 임시 비밀번호 발급 이벤트 처리 ]\n{}\n{}\n----------------------------------",
-                event.receiverAddress() + "님의 임시 비밀번호가 발급되었습니다.",
-                "임시 비밀번호는 " + event.temporaryPassword() + " 입니다."
-        );
-
         try {
             mailUtil.sendTemporaryPassword(
                     event.receiverAddress(),
                     event.temporaryPassword()
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.atError()
+                .setCause(e)
+                .addKeyValue("email", event.receiverAddress())
+                .log("[Email] Failed to send temporary password email");
         }
     }
 }

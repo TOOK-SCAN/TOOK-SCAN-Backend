@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MailUtil {
 
-    @Value("${cloud.aws.s3.mail-template-images.url}")
+    @Value("${spring.cloud.aws.s3.mail-template-images.url}")
     private String mailTemplateImagesUrl;
 
     private static final String TEST_EMAIL_TEMPLATE = """

@@ -2,6 +2,8 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderCancelUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
@@ -21,6 +23,11 @@ public class UpdateUserOrderCancelService implements UpdateUserOrderCancelUseCas
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "cancel order",
+        userType = "User"
+    )
     public void execute(UUID accountId, Long orderId) {
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
@@ -29,5 +36,8 @@ public class UpdateUserOrderCancelService implements UpdateUserOrderCancelUseCas
         orderService.cancelOrder(order, "사용자 요청에 의한 주문 취소");
 
         orderRepository.save(order);
+        
+        LogContext.put("order_id", orderId);
+        LogContext.put("user_id", user.getId());
     }
 }

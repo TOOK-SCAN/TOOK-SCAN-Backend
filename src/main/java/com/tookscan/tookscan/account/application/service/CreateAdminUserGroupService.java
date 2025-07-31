@@ -1,15 +1,17 @@
 package com.tookscan.tookscan.account.application.service;
 
 import com.nimbusds.jose.util.Pair;
-import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminUserGroupRequestDto;
 import com.tookscan.tookscan.account.application.usecase.CreateAdminUserGroupUseCase;
 import com.tookscan.tookscan.account.domain.Group;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.domain.UserGroup;
 import com.tookscan.tookscan.account.domain.service.UserGroupService;
+import com.tookscan.tookscan.account.presentation.dto.request.CreateAdminUserGroupRequestDto;
 import com.tookscan.tookscan.account.repository.GroupRepository;
 import com.tookscan.tookscan.account.repository.UserGroupRepository;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +34,12 @@ public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase 
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Account",
+        action = "create user group",
+        userType = "Admin"
+    )
     public void execute(CreateAdminUserGroupRequestDto requestDto) {
-
         // 사용자의 요청 중, 이미 등록된 UserGroup을 제외한 UserId, GroupId Pair 조회
         Set<Pair<UUID, Long>> objectPairs = userGroupRepository.findNotDuplicatedUserGroupInUserIdsAndGroupIds(requestDto.userIds(), requestDto.groupIds());
 
@@ -65,5 +71,7 @@ public class CreateAdminUserGroupService implements CreateAdminUserGroupUseCase 
                 .toList();
 
         userGroupRepository.saveAll(userGroups);
+
+        LogContext.put("user_group_count", userGroups.size());
     }
 }

@@ -4,7 +4,8 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,50 +24,21 @@ public class PdfService {
     }
 
     /**
-     * Document에 속한 PDF 파일들의 파일명을 재정렬하는 메서드
-     * PDF 삭제 후 파일명 순서를 다시 정렬합니다.
+     * Document 내에서 파일명 중복을 확인하는 메서드 중복된 파일명이 있으면 예외를 발생시킵니다.
      *
-     * @param document    재정렬할 PDF들이 속한 Document 객체
-     * @param s3Renamer   S3에서 파일명을 변경하고 새 URL을 반환하는 함수 (document, oldUrl, newFileName) -> newUrl
+     * @param document Document 객체
+     * @param fileName 원본 파일명
+     * @throws CommonException 중복된 파일명이 존재할 경우
      */
-    public void reorderPdfFileNames(Document document, TriFunction<Document, String, String, String> s3Renamer) {
-        List<Pdf> pdfs = document.getPdfs();
-        if (pdfs.isEmpty()) {
-            return;
+    public void validateUniqueFilename(Document document, String fileName) {
+        // 현재 Document에 속한 모든 PDF의 원본 파일명 수집
+        Set<String> existingFilenames = document.getPdfs().stream()
+                .map(Pdf::getName)
+                .collect(Collectors.toSet());
+
+        // 파일명이 중복되면 예외 발생
+        if (existingFilenames.contains(fileName)) {
+            throw new CommonException(ErrorCode.DUPLICATE_PDF_FILENAME, "파일명: " + fileName);
         }
-
-        String baseName = document.getName();
-        String extension = ".pdf";
-
-        for (int i = 0; i < pdfs.size(); i++) {
-            Pdf pdf = pdfs.get(i);
-            String oldUrl = pdf.getPdfUrl();
-            
-            // 새로운 파일명 생성
-            String newFileName = i == 0 ? baseName + extension : baseName + " (" + i + ")" + extension;
-            
-            // 기존 파일명과 새 파일명이 다른 경우에만 URL 업데이트
-            String currentFileName = extractFileNameFromUrl(oldUrl);
-            if (!currentFileName.equals(newFileName)) {
-                String newUrl = s3Renamer.apply(document, oldUrl, newFileName);
-                updatePdfUrl(pdf, newUrl);
-            }
-        }
-    }
-
-    /**
-     * 함수형 인터페이스: 3개의 매개변수를 받는 함수
-     */
-    @FunctionalInterface
-    public interface TriFunction<T, U, V, R> {
-        R apply(T t, U u, V v);
-    }
-
-    /**
-     * URL에서 파일명을 추출하는 메서드
-     */
-    private String extractFileNameFromUrl(String url) {
-        int lastSlashIndex = url.lastIndexOf('/');
-        return lastSlashIndex != -1 ? url.substring(lastSlashIndex + 1) : url;
     }
 }

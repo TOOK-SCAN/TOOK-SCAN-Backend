@@ -3,9 +3,6 @@ package com.tookscan.tookscan.order.domain.service;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
-import com.tookscan.tookscan.core.infrastructure.TsidFactory;
-import com.tookscan.tookscan.order.domain.CouponTemplate;
-import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.InitialDocument;
 import com.tookscan.tookscan.order.domain.InitialOrder;
 import com.tookscan.tookscan.order.domain.Order;
@@ -152,6 +149,8 @@ public class OrderService {
     }
 
     public void updatePaymentExpirationDate(Order order) {
-        order.updatePaymentExpirationDate(LocalDateTime.now().plusDays(PAYMENT_EXPIRATION_PERIOD));
+        order.updatePaymentExpirationDate(
+                LocalDateTime.now().plusDays(PAYMENT_EXPIRATION_PERIOD + 1).withHour(0).withMinute(0).withSecond(0)
+                        .withNano(0));
     }
 }

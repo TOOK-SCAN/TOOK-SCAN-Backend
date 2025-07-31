@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
@@ -22,6 +24,11 @@ public class UpdateAdminOrdersStatusService implements UpdateAdminOrdersStatusUs
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update orders status",
+        userType = "Admin"
+    )
     public void execute(UpdateAdminOrdersStatusRequestDto requestDto) {
 
         if (requestDto.status().equals(EOrderStatus.PAYMENT_WAITING) ||
@@ -39,6 +46,9 @@ public class UpdateAdminOrdersStatusService implements UpdateAdminOrdersStatusUs
         );
 
         orderRepository.saveAll(orders);
+        
+        LogContext.put("updated_orders_count", orders.size());
+        LogContext.put("new_status", requestDto.status().name());
     }
 
 }

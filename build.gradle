@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
-	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'com.tookscan'
@@ -31,12 +31,21 @@ jar {
 	enabled = false
 }
 
+dependencyManagement {
+	imports {
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0"
+	}
+}
+
 dependencies {
 	// Health Check
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	
 	// Spring Boot Default
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// Spring Boot AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 	// Spring Boot Mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -65,25 +74,25 @@ dependencies {
 	testRuntimeOnly 'com.h2database:h2'
 
 	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
 	// Swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
 
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	// AWS
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-	implementation 'org.springframework.cloud:spring-cloud-aws-context:2.2.6.RELEASE'
-	implementation 'org.springframework.cloud:spring-cloud-aws-autoconfigure:2.2.6.RELEASE'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+	implementation 'software.amazon.awssdk:cloudfront'
+	implementation 'software.amazon.awssdk:s3-transfer-manager'
 
 	// TSID
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.8.1'
 
 	// Apache POI
 	implementation 'org.apache.poi:poi:5.2.3'
@@ -94,13 +103,18 @@ dependencies {
 
 	// Slack Webhook
 	implementation 'com.slack.api:slack-api-client:1.30.0'
+	
+	// ECS Logging
+	implementation 'co.elastic.logging:logback-ecs-encoder:1.6.0'
 
 	// Testing Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// PDF
-	implementation("org.apache.pdfbox:pdfbox:3.0.4")
+	implementation("org.apache.pdfbox:pdfbox:3.0.4") {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
 	implementation("org.bouncycastle:bcprov-jdk18on:1.80")
 }
 

@@ -1,214 +1,202 @@
 package com.tookscan.tookscan.core.utility;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
-import com.tookscan.tookscan.core.dto.PdfFileDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Set;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.cloudfront.CloudFrontUtilities;
+import software.amazon.awssdk.services.cloudfront.model.CannedSignerRequest;
+import software.amazon.awssdk.services.cloudfront.url.SignedUrl;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.transfer.s3.S3TransferManager;
+import software.amazon.awssdk.transfer.s3.model.FileUpload;
+import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
 
+@Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class S3Util {
-    private final AmazonS3Client amazonS3Client;
 
-    private final String IMAGE_CONTENT_PREFIX = "image/";
+    private final S3Client s3Client;
+    private final CloudFrontUtilities cloudFrontUtilities;
+    private final S3TransferManager s3TransferManager;
 
-    @Value("${cloud.aws.s3.pdf.prefix}")
-    private String PDF_CONTENT_PREFIX;
+    private final String pdfContentPrefix;
+    private final String bucketName;
+    private final String cloudFrontDomain;
+    private final String cloudFrontKeyPairId;
+    private final URI privateKeyUri;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
+    private static final Integer PDF_EXPIRATION_DATE = 30;
 
-    @Value("${cloud.aws.s3.default-path}")
-    private String s3DefaultPath;
-
-    @Value("${cloud.aws.cloudfront.path}")
-    private String cloudFrontPath;
-
-    /**
-     * S3 key를 전달받아 해당 객체의 최종 URL을 반환 (AmazonS3Client가 제공하는 기본 메서드를 사용)
-     *
-     * @param key S3 객체 키 (예: 'folder/subfolder/filename.png')
-     * @return 해당 객체에 접근 가능한 URL
-     */
-    public String getS3ObjectUrl(String key) {
-        return amazonS3Client.getUrl(bucketName, key).toString();
+    public S3Util(
+            S3Client s3Client,
+            S3TransferManager s3TransferManager,
+            @Value("${spring.cloud.aws.s3.pdf.prefix}") String pdfContentPrefix,
+            @Value("${spring.cloud.aws.s3.bucket}") String bucketName,
+            @Value("${spring.cloud.aws.cloudfront.domain}") String cloudFrontDomain,
+            @Value("${spring.cloud.aws.cloudfront.key-pair-id}") String cloudFrontKeyPairId,
+            @Value("${spring.cloud.aws.cloudfront.private-key-path}") URI privateKeyUri) {
+        this.s3Client = s3Client;
+        this.s3TransferManager = s3TransferManager;
+        this.pdfContentPrefix = pdfContentPrefix;
+        this.bucketName = bucketName;
+        this.cloudFrontDomain = cloudFrontDomain;
+        this.cloudFrontKeyPairId = cloudFrontKeyPairId;
+        this.privateKeyUri = privateKeyUri;
+        this.cloudFrontUtilities = CloudFrontUtilities.create();
     }
 
     /**
-     * 이미지 경로를 prefix(IMAGE_CONTENT_PREFIX)로 묶어 최종 접근 가능한 URL을 반환
+     * PDF 파일을 S3에 업로드하고 서명되지 않은 일반 CloudFront URL을 반환합니다. ❕ 중요: 이 URL로 파일에 접근하려면 해당 경로의 CloudFront 동작(Behavior) 설정에서
+     * '뷰어 액세스 제한(Restrict Viewer Access)'이 '아니요(No)'로 설정되어 있어야 합니다.
      *
-     * @param imageName 실제 이미지 파일 이름 (예: 'myphoto.png')
-     * @return 이미지 객체에 접근 가능한 URL
+     * @param document       업로드할 파일의 메타데이터
+     * @param file           업로드할 실제 파일
+     * @param uniqueFileName S3에 저장될 고유 파일명 (확장자 포함)
+     * @return 생성된 일반 CloudFront URL
      */
-    public String getImageUrl(String imageName) {
-        // 예: "image/myphoto.png"
-        String finalKey = IMAGE_CONTENT_PREFIX + imageName;
-        return amazonS3Client.getUrl(bucketName, finalKey).toString();
-    }
-
-    /**
-     * PDF 경로를 prefix(PDF_CONTENT_PREFIX)로 묶어 최종 접근 가능한 URL을 반환
-     *
-     * @param document PDF 파일을 가지고 있는 Document 객체
-     * @return PDF 객체에 접근 가능한 URL
-     */
-    public PdfFileDto downloadPdfFile(Document document) {
-        // 존재하지 않는 PDF 파일인 경우
-        if (!doesObjectExist(document)) {
-            throw new CommonException(ErrorCode.NOT_FOUND_PDF_FILE);
-        }
-        String finalKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
-                + document.getName() + ".pdf";
-
-        S3Object s3Object = amazonS3Client.getObject(bucketName, finalKey);
-
-        try (InputStream inputStream = s3Object.getObjectContent()) {
-            byte[] fileBytes = inputStream.readAllBytes();
-            String fileName = document.getName() + "_" + document.getId() + ".pdf";
-            return new PdfFileDto(fileName, fileBytes, "application/pdf");
-        } catch (IOException e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public boolean doesObjectExist(Document doc) {
-        String key = PDF_CONTENT_PREFIX + doc.getOrder().getId() + '/' + doc.getName() + '_' + doc.getId() + ".pdf";
-        return amazonS3Client.doesObjectExist(bucketName, key);
-    }
-
-
-    /**
-     * Document에 해당하는 PDF 파일을 S3에 업로드하는 메서드
-     *
-     * @param document 업로드할 PDF 파일에 대한 정보를 가진 Document 객체
-     * @param file     업로드할 MultipartFile
-     */
-    public String uploadPdf(Document document, File file) {
-        String fileName = generateUniqueFileName(document);
-
-        String finalKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
-                + fileName;
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(file.length());
-            metadata.setContentType("application/pdf");
-
-            try (InputStream inputStream = new FileInputStream(file)) {
-                amazonS3Client.putObject(bucketName, finalKey, inputStream, metadata);
-            }
-
-            String directUrl = amazonS3Client.getUrl(bucketName, finalKey).toString();
-            return directUrl.replace(s3DefaultPath, cloudFrontPath);
-        } catch (IOException e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * 중복되지 않는 고유한 파일명을 생성하는 메서드
-     *
-     * @param document PDF 파일이 속할 Document 객체
-     * @return 중복되지 않는 파일명 (예: "document.pdf", "document (1).pdf", "document (2).pdf")
-     */
-    private String generateUniqueFileName(Document document) {
-        String baseName = document.getName();
-        String extension = ".pdf";
-
-        // 기존 PDF 파일명들을 수집
-        Set<String> existingFileNames = document.getPdfs().stream()
-                .map(pdf -> {
-                    String url = pdf.getPdfUrl();
-                    // URL에서 파일명 추출 (마지막 '/' 이후의 부분)
-                    int lastSlashIndex = url.lastIndexOf('/');
-                    return lastSlashIndex != -1 ? url.substring(lastSlashIndex + 1) : url;
-                })
-                .collect(java.util.stream.Collectors.toSet());
-
-        String fileName = baseName + extension;
-
-        // 중복되지 않는 파일명이 될 때까지 번호를 증가시킴
-        int counter = 1;
-        while (existingFileNames.contains(fileName)) {
-            fileName = baseName + " (" + counter + ")" + extension;
-            counter++;
-        }
-
-        return fileName;
-    }
-
-    /**
-     * S3에서 객체의 파일명을 변경하고 새로운 URL을 반환하는 메서드 (복사 후 삭제)
-     *
-     * @param document    PDF가 속한 Document 객체
-     * @param oldUrl      기존 PDF URL
-     * @param newFileName 새로운 파일명
-     * @return 변경된 파일의 새로운 URL
-     */
-    public String renameS3ObjectAndGetUrl(Document document, String oldUrl, String newFileName) {
-        String oldKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
-                + extractFileNameFromUrl(oldUrl);
-
-        // 새로운 S3 키 생성
-        String newKey = PDF_CONTENT_PREFIX
-                + document.getOrder().getId() + '/' + document.getId() + '/'
-                + newFileName;
+    public String uploadAndGetPublicUrl(Document document, File file, String uniqueFileName) {
+        String s3Key = buildPdfS3Key(document, uniqueFileName);
 
         try {
-            // S3에서 객체 복사
-            amazonS3Client.copyObject(bucketName, oldKey, bucketName, newKey);
+            // 1. S3에 파일 업로드
+            UploadFileRequest uploadFileRequest = UploadFileRequest.builder()
+                    .putObjectRequest(b -> b.bucket(bucketName).key(s3Key))
+                    .source(file)
+                    .build();
 
-            // 기존 객체 삭제
-            amazonS3Client.deleteObject(bucketName, oldKey);
+            FileUpload fileUpload = s3TransferManager.uploadFile(uploadFileRequest);
 
-            // 새로운 URL 반환
-            String directUrl = amazonS3Client.getUrl(bucketName, newKey).toString();
-            return directUrl.replace(s3DefaultPath, cloudFrontPath);
+            fileUpload.completionFuture().join();
+
+            log.info("Public PDF uploaded to S3. S3 Key: {}", s3Key);
+
+            // 2. 서명되지 않은 단순 CloudFront URL 생성하여 반환
+            return String.format("https://%s/%s", cloudFrontDomain, s3Key);
+
         } catch (Exception e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+            log.error("Public PDF 업로드 실패. S3 Key: {}", s3Key, e);
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "공개 PDF 업로드 중 오류가 발생했습니다." + e.getMessage());
         }
     }
 
     /**
-     * URL에서 파일명을 추출하는 메서드
+     * PDF 파일을 S3에 업로드하고 CloudFront Signed URL을 반환합니다.
+     *
+     * @param document       업로드할 파일의 메타데이터
+     * @param file           업로드할 실제 파일
+     * @param uniqueFileName S3에 저장될 고유 파일명 (확장자 포함, 예: "uuid.pdf")
+     * @return 생성된 CloudFront Signed URL
      */
-    private String extractFileNameFromUrl(String url) {
-        int lastSlashIndex = url.lastIndexOf('/');
-        return lastSlashIndex != -1 ? url.substring(lastSlashIndex + 1) : url;
+    public String uploadPdfAndGetSignedUrl(Document document, File file, String uniqueFileName) {
+        String s3Key = buildPdfS3Key(document, uniqueFileName);
+
+        try {
+            // 1. S3에 파일 업로드
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(s3Key)
+                    .contentType("application/pdf")
+                    .build();
+            s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
+
+            log.atInfo()
+                    .log("Upload PDF to S3 success.");
+
+            // 2. CloudFront Signed URL 생성 (30일 유효)
+            return generateCloudFrontSignedUrl(s3Key, PDF_EXPIRATION_DATE);
+        } catch (Exception e) {
+            throw new CommonException(ErrorCode.EXTERNAL_SERVER_ERROR,
+                    "PDF 업로드 및 URL 생성 중 오류가 발생했습니다." + e.getMessage());
+        }
     }
 
     /**
-     * PDF 파일을 S3에서 삭제하는 메서드
+     * PDF 파일을 S3에서 삭제합니다.
      *
-     * @param pdf 삭제할 PDF 객체
+     * @param pdf 삭제할 PDF 엔티티 (DB에 저장된 고유 파일명을 포함해야 함)
      */
     public void deletePdfFromS3(Pdf pdf) {
+        // 중요: pdf.getName() 대신 DB에 저장된 고유 파일명(storedFileName)을 사용해야 안전합니다.
+        // 여기서는 pdf.getName()이 그 역할을 한다고 가정합니다.
+        if (pdf.getName() == null || pdf.getName().isBlank()) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "삭제할 파일의 S3 고유 파일명 정보가 없습니다.");
+        }
+        String s3Key = buildPdfS3Key(pdf.getDocument(), pdf.getName());
+        deleteObject(s3Key);
+    }
+
+    private String buildPdfS3Key(Document document, String uniqueFileName) {
+        return pdfContentPrefix
+                + document.getOrder().getId() + '/'
+                + document.getId() + '/'
+                + uniqueFileName;
+    }
+
+    /**
+     * CloudFront Signed URL을 생성합니다. (공식 문서의 간결한 방식 사용)
+     *
+     * @param objectKey    S3 객체 키 (CloudFront 경로)
+     * @param daysToExpire URL 만료 기한 (일 단위)
+     * @return 생성된 Signed URL
+     */
+    private String generateCloudFrontSignedUrl(String objectKey, long daysToExpire) {
         try {
-            String url = pdf.getPdfUrl();
-            String fileName = extractFileNameFromUrl(url);
+            URI uri = new URI("https", cloudFrontDomain, "/" + objectKey, null);
+            String resourceUrl = uri.toASCIIString();
+            Path privateKeyPath = Paths.get(privateKeyUri);
+            Instant expirationTime = Instant.now().plus(daysToExpire, ChronoUnit.DAYS);
+            log.debug(resourceUrl);
 
-            String key = PDF_CONTENT_PREFIX
-                    + pdf.getDocument().getOrder().getId() + '/' + pdf.getDocument().getId() + '/'
-                    + fileName;
+            // CannedSignerRequest를 사용하여 서명 요청을 빌드합니다.
+            CannedSignerRequest request = CannedSignerRequest.builder()
+                    .resourceUrl(resourceUrl)
+                    .privateKey(privateKeyPath)
+                    .keyPairId(cloudFrontKeyPairId)
+                    .expirationDate(expirationTime)
+                    .build();
 
-            // S3에서 객체 삭제
-            amazonS3Client.deleteObject(bucketName, key);
+            // 유틸리티 클래스를 사용하여 서명된 URL을 가져옵니다.
+            SignedUrl signedUrl = cloudFrontUtilities.getSignedUrlWithCannedPolicy(request);
+
+            log.atInfo()
+                    .log("CloudFront Signed URL이 생성되었습니다.");
+            return signedUrl.url();
+
         } catch (Exception e) {
-            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new CommonException(ErrorCode.EXTERNAL_SERVER_ERROR,
+                    "CloudFront Signed URL 생성 중 오류가 발생했습니다." + e.getMessage());
+        }
+    }
+
+    /**
+     * S3 객체를 삭제하는 내부 헬퍼 메서드
+     *
+     * @param key 삭제할 S3 객체 키
+     */
+    private void deleteObject(String key) {
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            s3Client.deleteObject(deleteObjectRequest);
+        } catch (S3Exception e) {
+            log.error("S3 객체 삭제 중 오류 발생. S3 Key: {}, Error: {}", key, e.getMessage());
+            throw new CommonException(ErrorCode.EXPIRED_TOKEN_ERROR, "S3 객체 삭제 중 오류가 발생했습니다." + e.getMessage());
         }
     }
 }
