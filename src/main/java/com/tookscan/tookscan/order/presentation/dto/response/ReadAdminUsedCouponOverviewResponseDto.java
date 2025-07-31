@@ -3,47 +3,50 @@ package com.tookscan.tookscan.order.presentation.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.PageInfoDto;
 import com.tookscan.tookscan.order.domain.CouponTemplate;
-import com.tookscan.tookscan.order.domain.IssuedCoupon;
+import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.UsedCoupon;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 @Getter
-public class ReadAdminIssuedCouponOverviewResponseDto {
+public class ReadAdminUsedCouponOverviewResponseDto {
 
     @JsonProperty("page_info")
-    private PageInfoDto pageInfoDto;
+    private PageInfoDto pageInfo;
 
-    @JsonProperty("issued_coupons")
-    private IssuedCouponOverviewDto issuedCouponOverviewDto;
-
-    @JsonProperty("tag")
-    private String tag;
+    @JsonProperty("used_coupons")
+    private List<UsedCouponOverviewDto> usedCoupons;
 
     @JsonProperty("name")
     private String name;
 
     @Getter
-    public static class IssuedCouponOverviewDto {
+    public static class UsedCouponOverviewDto {
         @JsonProperty("id")
         private String id;
+
+        @JsonProperty("issued_at")
+        private String issuedAt;
+
+        @JsonProperty("used_at")
+        private String usedAt;
+
+        @JsonProperty("order")
+        private UsedCouponOrderDto order;
+
+        @JsonProperty("discount_amount")
+        private Integer discountAmount;
 
         @JsonProperty("code")
         private String code;
 
-        @JsonProperty("created_at")
-        private String createdAt;
-
-        @JsonProperty("is_used")
-        private Boolean isUsed;
-
-        @JsonProperty("order")
-        private IssuedCouponOrderDto order;
-
         @Getter
-        public static class IssuedCouponOrderDto {
+        public static class UsedCouponOrderDto {
             @JsonProperty("id")
             private String id;
 
@@ -51,18 +54,13 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
             private String orderNumber;
 
             @Builder
-            public IssuedCouponOrderDto(String id, String orderNumber) {
+            public UsedCouponOrderDto(String id, String orderNumber) {
                 this.id = id;
                 this.orderNumber = orderNumber;
             }
 
-            public static IssuedCouponOrderDto fromEntity(Order order) {
-
-                if (order == null) {
-                    return null;
-                }
-
-                return IssuedCouponOrderDto.builder()
+            public static UsedCouponOrderDto fromEntity(Order order) {
+                return UsedCouponOrderDto.builder()
                         .id(order.getId().toString())
                         .orderNumber(order.getOrderNumber())
                         .build();
@@ -70,41 +68,37 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
         }
 
         @Builder
-        public IssuedCouponOverviewDto(String id, String code, String createdAt, Boolean isUsed, IssuedCouponOrderDto order) {
+        public UsedCouponOverviewDto(String id, String issuedAt, String usedAt, UsedCouponOrderDto order, Integer discountAmount, String code) {
             this.id = id;
-            this.code = code;
-            this.createdAt = createdAt;
-            this.isUsed = isUsed;
+            this.issuedAt = issuedAt;
+            this.usedAt = usedAt;
             this.order = order;
+            this.discountAmount = discountAmount;
+            this.code = code;
         }
 
-        public static IssuedCouponOverviewDto fromEntity(IssuedCoupon issuedCoupon) {
-            return IssuedCouponOverviewDto.builder()
-                    .id(issuedCoupon.getId().toString())
-                    .code(issuedCoupon.getCode())
-                    .createdAt(issuedCoupon.getCreatedAt().toString())
-                    .isUsed(issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount())
-                    .order(IssuedCouponOrderDto.fromEntity(issuedCoupon.getUsedCoupons().size() != 1 ? null :
-                                    issuedCoupon.getUsedCoupons().get(0).getOrder()))
+        public static UsedCouponOverviewDto fromEntity(UsedCoupon usedCoupon) {
+            return UsedCouponOverviewDto.builder()
+                    .id(usedCoupon.getId().toString())
+                    .issuedAt(usedCoupon.getIssuedCoupon().getCreatedAt().toString())
+                    .usedAt(usedCoupon.getCreatedAt().toString())
+                    .order(UsedCouponOrderDto.fromEntity(usedCoupon.getOrder()))
+                    .discountAmount(usedCoupon.getIssuedCoupon().getDiscountPrice(usedCoupon.getOrder().getDocumentsTotalAmount(),
+                            usedCoupon.getOrder().getDocuments().stream().mapToInt(Document::getOcrPrice).sum(), usedCoupon.getOrder().getDelivery().getDeliveryPrice()))
+                    .code(usedCoupon.getIssuedCoupon().getCode())
                     .build();
         }
     }
-
     @Builder
-    public ReadAdminIssuedCouponOverviewResponseDto(PageInfoDto pageInfoDto, IssuedCouponOverviewDto issuedCouponOverviewDto, String tag, String name) {
-        this.pageInfoDto = pageInfoDto;
-        this.issuedCouponOverviewDto = issuedCouponOverviewDto;
-        this.tag = tag;
+    public ReadAdminUsedCouponOverviewResponseDto(PageInfoDto pageInfo, List<UsedCouponOverviewDto> usedCoupons, String name) {
+        this.pageInfo = pageInfo;
+        this.usedCoupons = usedCoupons;
         this.name = name;
     }
 
-    public static ReadAdminIssuedCouponOverviewResponseDto of(Page<IssuedCoupon> issuedCouponPage, CouponTemplate couponTemplate) {
-        PageInfoDto pageInfoDto = PageInfoDto.fromEntity(issuedCouponPage);
+    public static ReadAdminUsedCouponOverviewResponseDto of(Page<UsedCoupon> usedCoupons, CouponTemplate couponTemplate) {
 
-        IssuedCouponOverviewDto issuedCouponOverviewDto = issuedCouponPage.stream()
-                .map(IssuedCouponOverviewDto::fromEntity)
-                .findFirst()
-                .orElse(null);
+        String name = couponTemplate.getName();
 
         String description = null;
 
@@ -143,11 +137,17 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
             description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
         }
 
-        return ReadAdminIssuedCouponOverviewResponseDto.builder()
-                .pageInfoDto(pageInfoDto)
-                .issuedCouponOverviewDto(issuedCouponOverviewDto)
-                .tag(couponTemplate.getTag() != null ? couponTemplate.getTag() : "랜덤 생성")
-                .name(couponTemplate.getName() + description)
+        name += description;
+
+        List<UsedCouponOverviewDto> usedCouponOverviews = usedCoupons.stream()
+                .map(UsedCouponOverviewDto::fromEntity)
+                .toList();
+        PageInfoDto pageInfo = PageInfoDto.fromEntity(usedCoupons);
+
+        return ReadAdminUsedCouponOverviewResponseDto.builder()
+                .pageInfo(pageInfo)
+                .usedCoupons(usedCouponOverviews)
+                .name(name)
                 .build();
     }
 }

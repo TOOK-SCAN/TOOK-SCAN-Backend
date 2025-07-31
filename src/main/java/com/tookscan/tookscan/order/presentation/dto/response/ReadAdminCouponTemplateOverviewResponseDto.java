@@ -125,8 +125,8 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                 } else {
                     description = String.format("%d원 할인", amount);
                 }
-            } else if (couponTemplate.getType().equals(ECouponType.OCR)) {
-                description = ECouponType.OCR.getDescription();
+            } else if (couponTemplate.getType().equals(ECouponType.OCR_FREE)) {
+                description = ECouponType.OCR_FREE.getDescription();
             } else if (couponTemplate.getType().equals(ECouponType.DELIVERY_PRICE_FREE)) {
                 description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
             }

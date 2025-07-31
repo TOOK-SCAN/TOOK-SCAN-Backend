@@ -1,8 +1,6 @@
 package com.tookscan.tookscan.order.domain;
 
 import com.tookscan.tookscan.core.dto.BaseEntity;
-import com.tookscan.tookscan.core.exception.error.ErrorCode;
-import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import jakarta.persistence.CascadeType;
@@ -101,7 +99,7 @@ public class CouponTemplate extends BaseEntity {
         } else if (type == ECouponType.PERCENTAGE) {
             int discount = (int) (originalPrice * (discountPercent / 100.0));
             return Math.min(discount, maxDiscountPrice != null ? maxDiscountPrice : Integer.MAX_VALUE);
-        } else if (type == ECouponType.OCR) {
+        } else if (type == ECouponType.OCR_FREE) {
             return ocrPrice;
         } else if (type == ECouponType.DELIVERY_PRICE_FREE) {
             return deliveryPrice;

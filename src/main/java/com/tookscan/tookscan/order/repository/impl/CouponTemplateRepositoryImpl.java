@@ -44,7 +44,7 @@ public class CouponTemplateRepositoryImpl implements CouponTemplateRepository {
     ) {
         QCouponTemplate couponTemplate = QCouponTemplate.couponTemplate;
 
-        BooleanExpression predicate = Expressions.asBoolean(true).isTrue(); // 초기화
+        BooleanExpression predicate = Expressions.asBoolean(true).isTrue();
 
         if (format != null) {
             predicate = predicate.and(couponTemplate.format.eq(format));

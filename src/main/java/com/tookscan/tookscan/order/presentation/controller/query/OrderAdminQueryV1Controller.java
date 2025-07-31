@@ -9,6 +9,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadAdminIssuedCouponOver
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminUsedCouponOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
@@ -19,6 +20,7 @@ import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminIssuedCoup
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderOverviewsResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminUsedCouponOverviewResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,6 +47,7 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminDocumentsPdfsUseCase readAdminDocumentsPdfsUseCase;
     private final ReadAdminCouponTemplateOverviewUseCase readAdminCouponTemplateOverviewUseCase;
     private final ReadAdminIssuedCouponOverviewUseCase readAdminIssuedCouponOverviewUseCase;
+    private final ReadAdminUsedCouponOverviewUseCase readAdminUsedCouponOverviewUseCase;
 
     /**
      * 4.2.5 관리자 주문 요약 정보 조회
@@ -150,9 +153,9 @@ public class OrderAdminQueryV1Controller {
     public ResponseDto<ReadAdminCouponTemplateOverviewResponseDto> readAdminCouponOverview(
             @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "format", required = false) ECouponFormat format,
-            @RequestParam(value = "type", required = false) ECouponType type
+            @Parameter(description = "상태 필터 (WAITING, ACTIVE, INACTIVE, ALL)") @RequestParam(value = "status", required = false) String status,
+            @Parameter(description = "쿠폰 형식 (DEFINED, AUTO_GENERATED)") @RequestParam(value = "format", required = false) ECouponFormat format,
+            @Parameter(description = "쿠폰 종류 (DELIVERY_PRICE_FREE, PERCENTAGE, AMOUNT, OCR_FREE)")@RequestParam(value = "type", required = false) ECouponType type
     ) {
         return ResponseDto.ok(readAdminCouponTemplateOverviewUseCase.execute(
                         format, type, status, page, size
@@ -171,6 +174,21 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size
     ) {
         return ResponseDto.ok(readAdminIssuedCouponOverviewUseCase.execute(id, page, size));
+    }
+
+    /**
+     * 관리자 사용 쿠폰 요약 정보 조회
+     */
+    @Operation(summary = "관리자 사용 쿠폰 요약 정보 조회", description = "관리자가 사용 쿠폰 요약 정보를 조회합니다.")
+    @GetMapping("coupon-templates/{id}/used-coupons/overviews")
+    public ResponseDto<ReadAdminUsedCouponOverviewResponseDto> readAdminUsedCouponOverview(
+            @PathVariable Long id,
+            @Parameter(description = "검색 인풋값") @RequestParam(value = "search", required = false) String search,
+            @Parameter(description = "검색 종류 (USER_NAME, ORDER_NUMBER, COUPON_CODE)") @RequestParam(value = "search-type", required = false) String searchType,
+            @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size
+    ) {
+        return ResponseDto.ok(readAdminUsedCouponOverviewUseCase.execute(id, search, searchType, page, size));
     }
 
 }
