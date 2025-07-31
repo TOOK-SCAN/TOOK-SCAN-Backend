@@ -3,7 +3,7 @@ package com.tookscan.tookscan.order.presentation.controller.query;
 import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
-import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponOverviewUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
@@ -12,7 +12,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUs
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
-import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponOverviewResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponTemplateOverviewResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDocumentsPdfsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto;
@@ -41,7 +41,7 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminOrderOverviewsUseCase readAdminOrderOverviewsUseCase;
     private final ReadStatisticsSummariesUseCase readStatisticsSummariesUseCase;
     private final ReadAdminDocumentsPdfsUseCase readAdminDocumentsPdfsUseCase;
-    private final ReadAdminCouponOverviewUseCase readAdminCouponOverviewUseCase;
+    private final ReadAdminCouponTemplateOverviewUseCase readAdminCouponTemplateOverviewUseCase;
 
     /**
      * 4.2.5 관리자 주문 요약 정보 조회
@@ -143,15 +143,15 @@ public class OrderAdminQueryV1Controller {
      * 5.2.2 관리자 쿠폰 요약 정보 조회
      */
     @Operation(summary = "관리자 쿠폰 요약 정보 조회", description = "관리자가 쿠폰 요약 정보를 조회합니다.")
-    @GetMapping("/coupons/overviews")
-    public ResponseDto<ReadAdminCouponOverviewResponseDto> readAdminCouponOverview(
+    @GetMapping("/coupon-templates/overviews")
+    public ResponseDto<ReadAdminCouponTemplateOverviewResponseDto> readAdminCouponOverview(
             @RequestParam(value = "page", defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다") Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "format", required = false) ECouponFormat format,
             @RequestParam(value = "type", required = false) ECouponType type
     ) {
-        return ResponseDto.ok(readAdminCouponOverviewUseCase.execute(
+        return ResponseDto.ok(readAdminCouponTemplateOverviewUseCase.execute(
                         format, type, status, page, size
                 )
         );

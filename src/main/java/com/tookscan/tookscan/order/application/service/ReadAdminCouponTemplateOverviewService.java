@@ -1,10 +1,10 @@
 package com.tookscan.tookscan.order.application.service;
 
-import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponOverviewUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateOverviewUseCase;
 import com.tookscan.tookscan.order.domain.CouponTemplate;
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
-import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponOverviewResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponTemplateOverviewResponseDto;
 import com.tookscan.tookscan.order.repository.CouponTemplateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,12 +16,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReadAdminCouponOverviewService implements ReadAdminCouponOverviewUseCase {
+public class ReadAdminCouponTemplateOverviewService implements ReadAdminCouponTemplateOverviewUseCase {
 
     private final CouponTemplateRepository couponTemplateRepository;
 
     @Override
-    public ReadAdminCouponOverviewResponseDto execute(
+    public ReadAdminCouponTemplateOverviewResponseDto execute(
             ECouponFormat format,
             ECouponType type,
             String status,
@@ -36,7 +36,7 @@ public class ReadAdminCouponOverviewService implements ReadAdminCouponOverviewUs
         List<CouponTemplate> couponTemplates =
                 couponTemplateRepository.findAllWithIssuedCouponsByIdIn(couponTemplateIdPages.getContent());
 
-        return ReadAdminCouponOverviewResponseDto.of(
+        return ReadAdminCouponTemplateOverviewResponseDto.of(
                 couponTemplates,
                 couponTemplateIdPages
         );

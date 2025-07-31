@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class ReadAdminCouponOverviewResponseDto {
+public class ReadAdminCouponTemplateOverviewResponseDto {
 
     @JsonProperty("page_info")
     private PageInfoDto pageInfo;
@@ -161,7 +161,7 @@ public class ReadAdminCouponOverviewResponseDto {
     }
 
     @Builder
-    public ReadAdminCouponOverviewResponseDto(PageInfoDto pageInfo, List<CouponOverviewDto> coupons, Integer totalCount, Integer waitingCount, Integer activeCount, Integer inactiveCount) {
+    public ReadAdminCouponTemplateOverviewResponseDto(PageInfoDto pageInfo, List<CouponOverviewDto> coupons, Integer totalCount, Integer waitingCount, Integer activeCount, Integer inactiveCount) {
         this.pageInfo = pageInfo;
         this.coupons = coupons;
         this.totalCount = totalCount;
@@ -170,12 +170,12 @@ public class ReadAdminCouponOverviewResponseDto {
         this.inactiveCount = inactiveCount;
     }
 
-    public static ReadAdminCouponOverviewResponseDto of(List<CouponTemplate> couponTemplates, Page<Long> pageInfo) {
+    public static ReadAdminCouponTemplateOverviewResponseDto of(List<CouponTemplate> couponTemplates, Page<Long> pageInfo) {
         List<CouponOverviewDto> couponOverviews = couponTemplates.stream()
                 .map(CouponOverviewDto::fromEntity)
                 .toList();
 
-        return ReadAdminCouponOverviewResponseDto.builder()
+        return ReadAdminCouponTemplateOverviewResponseDto.builder()
                 .pageInfo(PageInfoDto.fromEntity(pageInfo))
                 .coupons(couponOverviews)
                 .totalCount(couponOverviews.size())
