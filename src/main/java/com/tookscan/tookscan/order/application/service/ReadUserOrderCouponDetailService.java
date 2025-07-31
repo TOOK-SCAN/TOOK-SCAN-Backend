@@ -42,12 +42,13 @@ public class ReadUserOrderCouponDetailService implements ReadUserOrderCouponDeta
         }
 
         // 한 사용자당 쿠폰 사용 횟수를 넘겼는지 확인
-        if (usedCouponRepository.countByUserIdAndCouponTemplateId(accountId, issuedCoupon.getCouponTemplate().getId()) > issuedCoupon.getCouponTemplate().getMaxUsedPerUserCount()) {
+        if (issuedCoupon.getCouponTemplate().getMaxUsedPerUserCount() != null && usedCouponRepository.countByUserIdAndCouponTemplateId(accountId, issuedCoupon.getCouponTemplate().getId()) > issuedCoupon.getCouponTemplate().getMaxUsedPerUserCount()) {
             throw new CommonException(ErrorCode.EXCEEDED_MAX_USED_COUPON_PER_USER);
+
         }
 
         // 전체 사용자의 쿠폰 사용 횟수를 넘겼는지 확인
-        if (issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount()) {
+        if (issuedCoupon.getMaxUsedCount() != null && issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount()) {
             throw new CommonException(ErrorCode.EXCEEDED_MAX_USED_COUPON);
         }
     }
