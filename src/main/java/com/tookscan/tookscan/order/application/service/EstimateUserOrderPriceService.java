@@ -72,7 +72,7 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .orderStatus(EOrderStatus.APPLY_COMPLETED)
-                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD))
+                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD + 1).withHour(0).withMinute(0).withSecond(0).withNano(0))
                 .scanCopyrightComplianceAgreed(LocalDateTime.now())
                 .illegalDistributionProhibitionAgreed(LocalDateTime.now())
                 .cuttingAgreed(LocalDateTime.now())
