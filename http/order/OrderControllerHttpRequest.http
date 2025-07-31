@@ -90,3 +90,42 @@ Content-Type: application/json
 ### 관리자 통계 조회
 //@no-log
 GET {{host_url}}/v1/admins/statistics/summaries?start-year-month=2025-06&end-year-month=2025-07
+
+### 관리자 자동생성 쿠폰 등록
+//@no-log
+POST {{host_url}}/v1/admins/coupons
+Content-Type: application/json
+
+{
+  "name": "여름 할인 쿠폰",
+  "format": "AUTO_GENERATED",
+  "auto_generated_count": 10,
+  "auto_generated_tag": "JDK",
+  "type": "AMOUNT",
+  "discount_price": 5000
+}
+
+### 관리자 수동 쿠폰 등록
+//@no-log
+POST {{host_url}}/v1/admins/coupons
+Content-Type: application/json
+
+{
+  "name": "수동 쿠폰",
+  "format": "DEFINED",
+  "defined_code": "TEST12345",
+  "defined_max_used_count": 10,
+  "type": "OCR_FREE"
+}
+
+### 관리자 쿠폰 템플릿 요약 조회
+//@no-log
+GET {{host_url}}/v1/admins/coupon-templates/overviews?page=1&size=10
+
+### 관리자 발행 쿠폰 요약 조회
+//@no-log
+GET {{host_url}}/v1/admins/coupon-templates/738695615050511029/issued-coupons/overviews
+
+### 관리자 사용 쿠폰 요약 조회
+//@no-log
+GET {{host_url}}/v1/admins/coupon-templates/738695615050511029/used-coupons/overviews
