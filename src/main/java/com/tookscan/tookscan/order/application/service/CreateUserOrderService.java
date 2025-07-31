@@ -121,28 +121,6 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
 
         orderRepository.save(order);
 
-        UsedCoupon usedCoupon = null;
-
-        // 사용 요청받은 쿠폰 조회
-        if (requestDto.couponId() != null) {
-            IssuedCoupon issuedCoupon = issuedCouponRepository.findByIdOrElseThrow(requestDto.couponId());
-
-            // 쿠폰 유효성 검증
-            this.validateCouponExpiration(accountId, issuedCoupon);
-
-            // 쿠폰 적용
-            usedCoupon = UsedCoupon.builder()
-                    .issuedCoupon(issuedCoupon)
-                    .user(user)
-                    .initialOrder(null)
-                    .order(order)
-                    .build();
-            usedCouponRepository.save(usedCoupon);
-
-            issuedCoupon.useCoupon();
-            issuedCouponRepository.save(issuedCoupon);
-        }
-
         // 문서 생성
         requestDto.documents().forEach(doc -> {
             Document document = documentService.createDocument(
@@ -159,7 +137,29 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
             documentRepository.save(document);
         });
 
-        orderService.calculateTotalAmount(order);
+        order.calculateTotalAmount();
+
+        UsedCoupon usedCoupon = null;
+
+        // 사용 요청받은 쿠폰 조회
+        if (requestDto.couponId() != null) {
+            IssuedCoupon issuedCoupon = issuedCouponRepository.findByIdOrElseThrow(requestDto.couponId());
+
+            // 쿠폰 유효성 검증
+            this.validateCouponExpiration(accountId, issuedCoupon, order.getTotalAmountWithoutCouponAndDelivery());
+
+            // 쿠폰 적용
+            usedCoupon = UsedCoupon.builder()
+                    .issuedCoupon(issuedCoupon)
+                    .user(user)
+                    .initialOrder(null)
+                    .order(order)
+                    .build();
+            usedCouponRepository.save(usedCoupon);
+
+            issuedCoupon.useCoupon();
+            issuedCouponRepository.save(issuedCoupon);
+        }
 
         applicationEventPublisher.publishEvent(
                 CreateOrderMessageEvent.of(
@@ -175,7 +175,7 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
     }
 
 
-    public void validateCouponExpiration(UUID accountId, IssuedCoupon issuedCoupon) {
+    public void validateCouponExpiration(UUID accountId, IssuedCoupon issuedCoupon, Integer totalAmount) {
 
         // 쿠폰의 사용 기간 확인
         if (issuedCoupon.getCouponTemplate().getStartDateTime() != null && issuedCoupon.getCouponTemplate().getEndDateTime() != null) {
@@ -196,6 +196,11 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         // 전체 사용자의 쿠폰 사용 횟수를 넘겼는지 확인
         if (issuedCoupon.getMaxUsedCount() != null && issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount()) {
             throw new CommonException(ErrorCode.EXCEEDED_MAX_USED_COUPON);
+        }
+
+        // 쿠폰이 최소 주문 금액을 만족하는지 확인
+        if (issuedCoupon.getCouponTemplate().getMinOrderPrice() != null && issuedCoupon.getCouponTemplate().getMinOrderPrice() > totalAmount) {
+            throw new CommonException(ErrorCode.NOT_ENOUGH_ORDER_PRICE_FOR_COUPON);
         }
     }
 }

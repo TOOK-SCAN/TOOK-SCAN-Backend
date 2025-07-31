@@ -7,6 +7,7 @@ import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderMemoUseCase;
+import com.tookscan.tookscan.order.application.usecase.DeleteAdminCouponTemplateUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
@@ -86,6 +87,7 @@ public class OrderAdminCommandV1Controller {
     private final UpdateAdminOrdersStatusRecoveryOptionUseCase updateAdminOrdersStatusRecoveryOptionUseCase;
     private final DeleteAdminPdfUseCase deleteAdminPdfUseCase;
     private final UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase updateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase;
+    private final DeleteAdminCouponTemplateUseCase deleteAdminCouponTemplateUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -425,6 +427,23 @@ public class OrderAdminCommandV1Controller {
             @PathVariable Long id
     ) {
         updateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase.execute(id);
+        return ResponseDto.ok(null);
+    }
+
+    /**
+     * 관리자 쿠폰 템플릿 삭제
+     */
+    @Operation(summary = "관리자 쿠폰 템플릿 삭제", description = "관리자가 쿠폰 템플릿을 삭제합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_COUPON_TEMPLATE,
+            ErrorCode.ACCESS_DENIED,
+            ErrorCode.ALREADY_USED_COUPON
+    })
+    @DeleteMapping(value = "/coupon-templates/{id}")
+    public ResponseDto<Void> deleteCouponTemplate(
+            @PathVariable Long id
+    ) {
+        deleteAdminCouponTemplateUseCase.execute(id);
         return ResponseDto.ok(null);
     }
 }

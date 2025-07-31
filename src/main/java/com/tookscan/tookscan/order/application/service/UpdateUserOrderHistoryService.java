@@ -8,14 +8,17 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderHistoryUseCase;
 import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.PricePolicy;
+import com.tookscan.tookscan.order.domain.UsedCoupon;
 import com.tookscan.tookscan.order.domain.service.DeliveryService;
 import com.tookscan.tookscan.order.domain.service.DocumentService;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateUserOrderHistoryRequestDto.HistoryRequestDocument;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
+import com.tookscan.tookscan.order.repository.IssuedCouponRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PricePolicyRepository;
 import java.time.LocalDate;
@@ -25,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.tookscan.tookscan.order.repository.UsedCouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +40,7 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final DocumentRepository documentRepository;
+    private final UsedCouponRepository usedCouponRepository;
 
     private final PricePolicyRepository pricePolicyRepository;
 
@@ -151,7 +157,23 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
             deliveryService.updateDeliveryPrice(order.getDelivery(), 0);
         }
 
-        orderService.calculateTotalAmount(order);
+        order.calculateTotalAmount();
         orderRepository.save(order);
+
+        if (order.getUsedCoupon() != null) {
+            UsedCoupon usedCoupon = usedCouponRepository.findWithIssuedCouponByOrderIdOrElseThrow(order.getId());
+            IssuedCoupon issuedCoupon = usedCoupon.getIssuedCoupon();
+
+            this.validateCouponExpiration(issuedCoupon, order.getTotalAmountWithoutCouponAndDelivery());
+        }
+
+    }
+
+    public void validateCouponExpiration(IssuedCoupon issuedCoupon, Integer totalAmount) {
+
+        // 쿠폰이 최소 주문 금액을 만족하는지 확인
+        if (issuedCoupon.getCouponTemplate().getMinOrderPrice() != null && issuedCoupon.getCouponTemplate().getMinOrderPrice() > totalAmount) {
+            throw new CommonException(ErrorCode.NOT_ENOUGH_ORDER_PRICE_FOR_COUPON);
+        }
     }
 }

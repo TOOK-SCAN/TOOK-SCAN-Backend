@@ -3,6 +3,8 @@ package com.tookscan.tookscan.order.repository.impl;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.QUsedCoupon;
 import com.tookscan.tookscan.order.domain.UsedCoupon;
 import com.tookscan.tookscan.order.repository.UsedCouponRepository;
@@ -27,7 +29,7 @@ public class UsedCouponRepositoryImpl implements UsedCouponRepository {
     @Override
     public UsedCoupon findByIdOrElseThrow(Long id) {
         return usedCouponJpaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("UsedCoupon not found with ID: " + id));
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USED_COUPON, "사용된 쿠폰 ID: " + id));
     }
 
     @Override
@@ -78,8 +80,19 @@ public class UsedCouponRepositoryImpl implements UsedCouponRepository {
     }
 
     @Override
+    public UsedCoupon findWithIssuedCouponByOrderIdOrElseThrow(Long orderId) {
+        return usedCouponJpaRepository.findWithIssuedCouponByOrderId(orderId)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USED_COUPON));
+    }
+
+    @Override
     public int countByUserIdAndCouponTemplateId(UUID userId, Long couponTemplateId) {
         return usedCouponJpaRepository.countByUserIdAndCouponTemplateId(userId, couponTemplateId);
+    }
+
+    @Override
+    public boolean existsByCouponTemplateId(Long couponTemplateId) {
+        return usedCouponJpaRepository.existsByCouponTemplateId(couponTemplateId);
     }
 
     @Override
