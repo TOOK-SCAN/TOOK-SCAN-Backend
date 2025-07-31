@@ -18,9 +18,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -153,9 +155,11 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
+    /* -------------------------------------------- */
+    /* One To One Mapping ------------------------- */
+    /* -------------------------------------------- */
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UsedCoupon usedCoupon;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
@@ -171,7 +175,6 @@ public class Order extends BaseEntity {
             LocalDateTime serviceProvisionPeriodAcknowledged,
             User user,
             Delivery delivery,
-            Coupon coupon,
             Boolean isOneDayScan,
             Boolean isAsInProgress,
             LocalDateTime arrivedAt,
@@ -187,7 +190,6 @@ public class Order extends BaseEntity {
         this.serviceProvisionPeriodAcknowledged = serviceProvisionPeriodAcknowledged;
         this.user = user;
         this.delivery = delivery;
-        this.coupon = coupon;
         this.isOneDayScan = isOneDayScan;
         this.isAsInProgress = isAsInProgress;
         this.arrivedAt = arrivedAt;
@@ -215,6 +217,7 @@ public class Order extends BaseEntity {
     public void updateIsOneDayScan(Boolean isOneDayScan) {
         this.isOneDayScan = isOneDayScan;
     }
+
     public void updatePdfSendDate(LocalDateTime pdfSendDate) {
         this.pdfSendDate = pdfSendDate;
     }
@@ -263,6 +266,10 @@ public class Order extends BaseEntity {
         this.recoveryStartedAt = recoveryStartedAt;
     }
 
+    public void updateUsedCoupon(UsedCoupon usedCoupon) {
+        this.usedCoupon = usedCoupon;
+    }
+
     public String getDocumentsDescription() {
         String documentName;
 
@@ -300,13 +307,6 @@ public class Order extends BaseEntity {
         return orderStatus.getCode() >= EOrderStatus.COMPANY_ARRIVED.getCode();
     }
 
-    public int getDiscountAmount() {
-        if (coupon == null) {
-            return 0;
-        }
-        return coupon.getDiscountPrice(getDocumentsTotalAmount());
-    }
-
     public boolean isDelivery() {
         return documents.stream()
                 .anyMatch(document -> document.getRecoveryOption() != ERecoveryOption.DISCARD);
@@ -332,8 +332,7 @@ public class Order extends BaseEntity {
                             if (pdfs.size() > 1) {
                                 content += "<li>└ \uD83D\uDCC4<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + " (" + pdfCount + ")" + "</a></li>";
                                 pdfCount++;
-                            }
-                            else {
+                            } else {
                                 content += "<li>└ \uD83D\uDCC4<a href=\"" + pdf.getPdfUrl() + "\" style=\"color:#1a73e8; text-decoration:none;\">" + pdf.getDocument().getName() + "</a></li>";
                             }
                         } else {
@@ -353,8 +352,15 @@ public class Order extends BaseEntity {
 
         int total = getDocumentsTotalAmount();
 
-        if (coupon != null) {
-            total = coupon.calculatePrice(total);
+        if (usedCoupon != null) {
+            total = total - usedCoupon.getIssuedCoupon().getDiscountPrice(
+                    total,
+                    this.getDocuments().stream()
+                            .map(Document::getOcrPrice)
+                            .reduce(Integer::sum)
+                            .orElse(0),
+                    delivery.getDeliveryPrice()
+            );
         }
 
         if (isDelivery()) {

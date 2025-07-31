@@ -39,8 +39,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -90,8 +92,8 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 배송 리스트 내보내기", description = "관리자가 배송 리스트를 내보냅니다.")
     @ApiErrorCode({
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
             ErrorCode.ACCESS_DENIED,
             ErrorCode.NOT_POST_WAITING_ORDER
     })
@@ -130,12 +132,14 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 쿠폰 등록", description = "관리자가 쿠폰을 등록합니다.")
     @ApiErrorCode({
-        ErrorCode.ALREADY_EXIST_RESOURCE,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.DUPLICATE_COUPON_CODE,
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            ErrorCode.ALREADY_EXIST_RESOURCE,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED,
     })
-    @PostMapping(value = "/orders/coupons")
+    @PostMapping(value = "/coupons")
     public ResponseDto<CreateAdminOrderCouponRequestDto> createCoupon(
             @RequestBody @Valid CreateAdminOrderCouponRequestDto requestDto
     ) {
@@ -148,10 +152,10 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 pdf 파일 업로드", description = "관리자가 pdf 파일을 업로드합니다. 단일 파일 또는 다중 파일 업로드를 지원합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_DOCUMENT,
-        ErrorCode.UNSUPPORTED_MEDIA_TYPE,
-        ErrorCode.UPLOAD_FILE_ERROR,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_DOCUMENT,
+            ErrorCode.UNSUPPORTED_MEDIA_TYPE,
+            ErrorCode.UPLOAD_FILE_ERROR,
+            ErrorCode.ACCESS_DENIED
     })
     @PostMapping(value = "/documents/{documentId}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDto<Void> uploadPdf(
@@ -176,7 +180,7 @@ public class OrderAdminCommandV1Controller {
     })
     @PostMapping(value = "/orders/status")
     public ResponseDto<Void> updateOrderStatus(
-         @RequestBody @Valid UpdateAdminOrdersStatusRequestDto requestDto
+            @RequestBody @Valid UpdateAdminOrdersStatusRequestDto requestDto
     ) {
         updateAdminOrdersStatusUseCase.execute(requestDto);
         return ResponseDto.ok(null);
@@ -207,10 +211,10 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 배송지 정보 수정", description = "관리자가 주문의 배송지 정보를 수정합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_DELIVERY,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_DELIVERY,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PutMapping(value = "/deliveries/{deliveryId}")
     public ResponseDto<Void> updateOrderAddress(
@@ -226,9 +230,9 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 파일 전송", description = "관리자가 주문의 파일을 전송합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.INVALID_ORDER_STATUS,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.INVALID_ORDER_STATUS,
+            ErrorCode.ACCESS_DENIED
     })
     @PostMapping(value = "/orders/{id}/send-pdfs")
     public ResponseDto<Void> sendPdf(
@@ -243,9 +247,9 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 결제 요청", description = "관리자가 주문에 대해 결제를 요청합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.INVALID_ORDER_STATUS,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.INVALID_ORDER_STATUS,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/orders/{id}/payment-requests")
     public ResponseDto<Void> requestPayment(
@@ -260,10 +264,10 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 운송장 번호 등록", description = "관리자가 주문에 운송장 번호를 등록합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_DELIVERY,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_DELIVERY,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/deliveries/{deliveryId}/tracking-number")
     public ResponseDto<Void> updateOrderTrackingNumber(
@@ -279,11 +283,11 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 운송장 번호 일괄 등록", description = "관리자가 여러 주문의 운송장 번호를 일괄 등록합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_DELIVERY,
-        ErrorCode.UNSUPPORTED_MEDIA_TYPE,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_DELIVERY,
+            ErrorCode.UNSUPPORTED_MEDIA_TYPE,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PostMapping(value = "/deliveries/tracking-number", consumes = "multipart/form-data")
     public ResponseDto<Void> updateOrderTrackingNumber(
@@ -298,11 +302,11 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 주문 상세 상품 수정", description = "관리자가 주문의 상세 상품을 수정합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.NOT_FOUND_PRICE_POLICY,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_FOUND_PRICE_POLICY,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PutMapping(value = "orders/{orderId}")
     public ResponseDto<Void> updateOrderDocuments(
@@ -318,10 +322,10 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 주문 일괄 취소", description = "관리자가 여러 주문을 취소합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/orders/cancel")
     public ResponseDto<Void> deleteOrders(
@@ -336,10 +340,10 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 상품 일괄 삭제", description = "관리자가 여러 상품을 삭제합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_DOCUMENT,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_DOCUMENT,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @DeleteMapping(value = "/documents")
     public ResponseDto<Void> deleteDocuments(
@@ -354,12 +358,12 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 주문 일괄 복원 완료", description = "관리자가 여러 주문의 복원 작업을 완료합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ACCOUNT,
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.NOT_RECOVERY_IN_PROGRESS,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_RECOVERY_IN_PROGRESS,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/orders/recovery-completed")
     public ResponseDto<Void> updateOrdersRecoveryCompleted(
@@ -375,11 +379,11 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 주문 일괄 업체 도착 상태 변경", description = "관리자가 여러 주문의 상태를 업체 도착으로 일괄 변경합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.NOT_PAYMENT_COMPLETED,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_PAYMENT_COMPLETED,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/orders/company-arrived")
     public ResponseDto<Void> updateOrdersStatusCompanyArrived(
@@ -412,9 +416,9 @@ public class OrderAdminCommandV1Controller {
      */
     @Operation(summary = "관리자 결제 취소", description = "관리자가 주문의 결제를 취소합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.INVALID_ORDER_STATUS,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.INVALID_ORDER_STATUS,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/orders/{id}/cancel-payment")
     public ResponseDto<Void> updateOrderStatusPaymentWaitingToCompanyArrived(

@@ -55,7 +55,7 @@ public record CreateUserOrderRequestDto(
             ERecoveryOption recoveryOption,
 
             @JsonProperty("is_ocr_enabled")
-            @NotNull(message = "OCR 여부를 입력해주세요.")
+            @NotNull(message = "OCR_FREE 여부를 입력해주세요.")
             Boolean isOcrEnabled
     ) {
     }

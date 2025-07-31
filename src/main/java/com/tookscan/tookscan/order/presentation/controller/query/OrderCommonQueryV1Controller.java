@@ -28,7 +28,7 @@ public class OrderCommonQueryV1Controller {
     @Operation(summary = "스캔 가격 계산", description = "스캔 가격을 계산합니다.")
     @ApiErrorCode({
             ErrorCode.NOT_FOUND_PRICE_POLICY,
-            ErrorCode.NOT_FOUND_COUPON,
+            ErrorCode.NOT_FOUND_COUPON_TEMPLATE,
             ErrorCode.NOT_AVAILABLE_COUPON,
             ErrorCode.USED_COUPON,
             ErrorCode.INVALID_ARGUMENT,

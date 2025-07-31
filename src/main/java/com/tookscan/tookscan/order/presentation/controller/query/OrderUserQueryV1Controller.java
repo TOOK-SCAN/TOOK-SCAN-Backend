@@ -51,7 +51,7 @@ public class OrderUserQueryV1Controller {
     @Deprecated
     @ApiErrorCode({
             ErrorCode.NOT_FOUND_PRICE_POLICY,
-            ErrorCode.NOT_FOUND_COUPON,
+            ErrorCode.NOT_FOUND_COUPON_TEMPLATE,
             ErrorCode.NOT_AVAILABLE_COUPON,
             ErrorCode.USED_COUPON,
             ErrorCode.INVALID_ARGUMENT,
@@ -153,7 +153,7 @@ public class OrderUserQueryV1Controller {
      */
     @Operation(summary = "회원 쿠폰 정보 조회", description = "회원이 쿠폰 정보를 조회합니다.")
     @ApiErrorCode({
-            ErrorCode.NOT_FOUND_COUPON,
+            ErrorCode.NOT_FOUND_COUPON_TEMPLATE,
             ErrorCode.NOT_AVAILABLE_COUPON,
             ErrorCode.USED_COUPON,
             ErrorCode.INVALID_ARGUMENT

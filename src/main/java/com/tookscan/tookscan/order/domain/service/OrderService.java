@@ -4,7 +4,7 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.infrastructure.TsidFactory;
-import com.tookscan.tookscan.order.domain.Coupon;
+import com.tookscan.tookscan.order.domain.CouponTemplate;
 import com.tookscan.tookscan.order.domain.Delivery;
 import com.tookscan.tookscan.order.domain.InitialDocument;
 import com.tookscan.tookscan.order.domain.InitialOrder;
@@ -21,29 +21,6 @@ import org.springframework.stereotype.Service;
 public class OrderService {
     private static final Integer DELIVERY_EXPIRATION_PERIOD = 14;
     private static final Integer PAYMENT_EXPIRATION_PERIOD = 14;
-
-    public Order createOrder(User user, Delivery delivery, Coupon coupon, Boolean isOneDayScan,
-                             Integer additionalPriceForOneDayScan) {
-        String orderNumber = TsidFactory.getFactory().generate().toString();
-        Order order = Order.builder()
-                .orderNumber(orderNumber)
-                .orderStatus(EOrderStatus.APPLY_COMPLETED)
-                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD))
-                .scanCopyrightComplianceAgreed(LocalDateTime.now())
-                .illegalDistributionProhibitionAgreed(LocalDateTime.now())
-                .cuttingAgreed(LocalDateTime.now())
-                .serviceProvisionPeriodAcknowledged(LocalDateTime.now())
-                .user(user)
-                .delivery(delivery)
-                .coupon(coupon)
-                .isOneDayScan(isOneDayScan)
-                .isAsInProgress(false)
-                .additionalPriceForOneDayScan(additionalPriceForOneDayScan)
-                .totalAmount(0)
-                .build();
-
-        return order;
-    }
 
     public void updateOrderStatus(Order order, EOrderStatus newOrderStatus) {
         order.updateOrderStatus(newOrderStatus);
@@ -78,7 +55,7 @@ public class OrderService {
                 .isOneDayScan(order.getIsOneDayScan())
                 .additionalPriceForOneDayScan(order.getAdditionalPriceForOneDayScan())
                 .totalAmount(order.getTotalAmount())
-                .coupon(order.getCoupon())
+                .usedCoupon(order.getUsedCoupon())
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .build();
 
