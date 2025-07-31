@@ -63,7 +63,7 @@ public class CouponTemplate extends BaseEntity {
     @Column(name = "max_used_per_user_count")
     private Integer maxUsedPerUserCount;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "start_date")
     private LocalDateTime startDateTime;
 
     @Column(name = "end_date")
