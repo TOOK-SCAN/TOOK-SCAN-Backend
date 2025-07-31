@@ -30,7 +30,7 @@ public class UsedCoupon extends BaseEntity {
     private IssuedCoupon issuedCoupon;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initial_order_id", nullable = false)
+    @JoinColumn(name = "initial_order_id")
     private InitialOrder initialOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)

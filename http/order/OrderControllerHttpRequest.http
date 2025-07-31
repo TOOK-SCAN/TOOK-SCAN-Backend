@@ -29,6 +29,7 @@ Content-Type: application/json
       "address2": "강남빌딩 5층"
     }
   },
+  "coupon_id": 738696461230371637,
   "is_one_day_scan": false
 }
 
@@ -128,4 +129,4 @@ GET {{host_url}}/v1/admins/coupon-templates/738695615050511029/issued-coupons/ov
 
 ### 관리자 사용 쿠폰 요약 조회
 //@no-log
-GET {{host_url}}/v1/admins/coupon-templates/738695615050511029/used-coupons/overviews
+GET {{host_url}}/v1/admins/coupon-templates/738696461221983066/used-coupons/overviews
