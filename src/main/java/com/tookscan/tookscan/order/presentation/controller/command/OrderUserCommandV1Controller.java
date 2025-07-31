@@ -16,7 +16,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,15 +42,16 @@ public class OrderUserCommandV1Controller {
      */
     @Operation(summary = "회원 스캔 주문", description = "회원이 주문을 생성합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ACCOUNT,
-        ErrorCode.NOT_FOUND_PRICE_POLICY,
-        ErrorCode.NOT_FOUND_COUPON,
-        ErrorCode.NOT_AVAILABLE_COUPON,
-        ErrorCode.USED_COUPON,
-        ErrorCode.USER_ONLY_COUPON,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_PRICE_POLICY,
+            ErrorCode.NOT_FOUND_COUPON_TEMPLATE,
+            ErrorCode.NOT_AVAILABLE_COUPON,
+            ErrorCode.USED_COUPON,
+            ErrorCode.USER_ONLY_COUPON,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED,
+            ErrorCode.EXCEEDED_MAX_USED_COUPON_PER_USER
     })
     @PostMapping()
     public ResponseDto<CreateUserOrderResponseDto> createOrder(
@@ -64,11 +67,11 @@ public class OrderUserCommandV1Controller {
      */
     @Operation(summary = "회원 주문 취소하기", description = "회원이 주문을 취소합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ACCOUNT,
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.NOT_MATCH_ORDER_USER,
-        ErrorCode.NOT_UPDATABLE_ORDER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_MATCH_ORDER_USER,
+            ErrorCode.NOT_UPDATABLE_ORDER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/{orderId}/cancel")
     public ResponseDto<Void> updateOrderCancel(
@@ -84,13 +87,13 @@ public class OrderUserCommandV1Controller {
      */
     @Operation(summary = "회원 주문 정보 수정하기", description = "회원이 주문 정보를 수정합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ACCOUNT,
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.NOT_MATCH_ORDER_USER,
-        ErrorCode.NOT_UPDATABLE_ORDER,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_MATCH_ORDER_USER,
+            ErrorCode.NOT_UPDATABLE_ORDER,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/{orderId}/info")
     public ResponseDto<Void> updateOrderInfo(
@@ -107,14 +110,14 @@ public class OrderUserCommandV1Controller {
      */
     @Operation(summary = "회원 주문 내역 수정하기", description = "회원이 주문 내역을 수정합니다.")
     @ApiErrorCode({
-        ErrorCode.NOT_FOUND_ACCOUNT,
-        ErrorCode.NOT_FOUND_ORDER,
-        ErrorCode.NOT_FOUND_PRICE_POLICY,
-        ErrorCode.NOT_MATCH_ORDER_USER,
-        ErrorCode.NOT_UPDATABLE_ORDER,
-        ErrorCode.INVALID_ARGUMENT,
-        ErrorCode.BAD_REQUEST_PARAMETER,
-        ErrorCode.ACCESS_DENIED
+            ErrorCode.NOT_FOUND_ACCOUNT,
+            ErrorCode.NOT_FOUND_ORDER,
+            ErrorCode.NOT_FOUND_PRICE_POLICY,
+            ErrorCode.NOT_MATCH_ORDER_USER,
+            ErrorCode.NOT_UPDATABLE_ORDER,
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
     })
     @PatchMapping(value = "/{orderId}/history")
     public ResponseDto<Void> updateOrderHistory(

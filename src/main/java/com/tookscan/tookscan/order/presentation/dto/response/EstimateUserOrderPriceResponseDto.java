@@ -185,15 +185,15 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
 
         return EstimateUserOrderPriceResponseDto.builder()
                 .documents(allDocs)
-                .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
-                .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
+                .couponType(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getType() : null)
+                .couponPercentage(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
                 .ocrPrice(ocrPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
-                .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : 0)
+                .couponPrice(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : 0)
                 .paymentTotal(order.getTotalAmount())
                 .build();
     }

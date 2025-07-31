@@ -153,9 +153,11 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id")
-    private Coupon coupon;
+    /* -------------------------------------------- */
+    /* One To One Mapping ------------------------- */
+    /* -------------------------------------------- */
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UsedCoupon usedCoupon;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
@@ -171,7 +173,6 @@ public class Order extends BaseEntity {
             LocalDateTime serviceProvisionPeriodAcknowledged,
             User user,
             Delivery delivery,
-            Coupon coupon,
             Boolean isOneDayScan,
             Boolean isAsInProgress,
             LocalDateTime arrivedAt,
@@ -187,7 +188,6 @@ public class Order extends BaseEntity {
         this.serviceProvisionPeriodAcknowledged = serviceProvisionPeriodAcknowledged;
         this.user = user;
         this.delivery = delivery;
-        this.coupon = coupon;
         this.isOneDayScan = isOneDayScan;
         this.isAsInProgress = isAsInProgress;
         this.arrivedAt = arrivedAt;
@@ -263,6 +263,10 @@ public class Order extends BaseEntity {
         this.recoveryStartedAt = recoveryStartedAt;
     }
 
+    public void updateUsedCoupon(UsedCoupon usedCoupon) {
+        this.usedCoupon = usedCoupon;
+    }
+
     public String getDocumentsDescription() {
         String documentName;
 
@@ -301,10 +305,10 @@ public class Order extends BaseEntity {
     }
 
     public int getDiscountAmount() {
-        if (coupon == null) {
+        if (usedCoupon == null) {
             return 0;
         }
-        return coupon.getDiscountPrice(getDocumentsTotalAmount());
+        return usedCoupon.getIssuedCoupon().getDiscountPrice(getDocumentsTotalAmount());
     }
 
     public boolean isDelivery() {
@@ -353,8 +357,8 @@ public class Order extends BaseEntity {
 
         int total = getDocumentsTotalAmount();
 
-        if (coupon != null) {
-            total = coupon.calculatePrice(total);
+        if (usedCoupon != null) {
+            total = total - usedCoupon.getIssuedCoupon().getDiscountPrice(total);
         }
 
         if (isDelivery()) {

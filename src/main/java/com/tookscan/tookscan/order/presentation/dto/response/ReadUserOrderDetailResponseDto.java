@@ -284,8 +284,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .mapToInt(DocumentInfoDto::getRecoveryPrice)
                 .sum();
 
-        String couponName = order.getCoupon() != null
-                ? order.getCoupon().getName()
+        String couponName = order.getUsedCoupon() != null
+                ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName()
                 : null;
 
         return ReadUserOrderDetailResponseDto.builder()
@@ -310,16 +310,16 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .documents(docs)
                 .isOneDayScan(order.getIsOneDayScan())
                 .couponName(couponName)
-                .couponId(order.getCoupon() != null ? order.getCoupon().getId().toString() : null)
-                .couponType(order.getCoupon() != null ? order.getCoupon().getType() : null)
-                .couponPercentage(order.getCoupon() != null ? order.getCoupon().getDiscountPercent() : null)
+                .couponId(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getId().toString() : null)
+                .couponType(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getType() : null)
+                .couponPercentage(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getDiscountPercent() : null)
                 .documentsPrice(docsPriceSum)
                 .oneDayScanPrice(oneDayScanPriceSum)
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
                 .ocrPrice(ocrPriceSum)
-                .couponPrice(order.getCoupon() != null ? order.getCoupon().getDiscountPrice() : null)
+                .couponPrice(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : null)
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
                 .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
                 .build();

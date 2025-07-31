@@ -457,7 +457,7 @@ public class ReadAdminOrderDetailResponseDto extends
                         .recoveryOptionPrice(document.getRecoveryOptionPrice())
                         .isOcrEnabled(document.getIsOcrEnabled())
                         .ocrPrice(document.getOcrPrice())
-                        .totalPrice(document.getDocumentPrice())
+                        .totalPrice(document.getDocumentsPrice())
                         .build();
             }
         }
@@ -524,9 +524,9 @@ public class ReadAdminOrderDetailResponseDto extends
                                 .map(InitialDocument::getOneDayScanPrice)
                                 .reduce(0, Integer::sum))
                         .deliveryPrice(order.getDeliveryPrice())
-                        .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
-                        .couponDiscount(order.getCoupon() != null ?
-                                order.getCoupon().getDiscountPrice(order.getTotalAmount()) : 0)
+                        .couponName(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName() : null)
+                        .couponDiscount(order.getUsedCoupon() != null ?
+                                order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : 0)
                         .totalPrice(order.getTotalAmount())
                         .build();
             }
@@ -595,9 +595,9 @@ public class ReadAdminOrderDetailResponseDto extends
                                 .map(Document::getOneDayScanPrice)
                                 .reduce(0, Integer::sum))
                         .deliveryPrice(order.getDelivery().getDeliveryPrice())
-                        .couponName(order.getCoupon() != null ? order.getCoupon().getName() : null)
-                        .couponDiscount(order.getCoupon() != null ?
-                                order.getCoupon().getDiscountPrice(order.getTotalAmount()) : 0)
+                        .couponName(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName() : null)
+                        .couponDiscount(order.getUsedCoupon() != null ?
+                                order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount()) : 0)
                         .totalPrice(order.getTotalAmount())
                         .build();
             }

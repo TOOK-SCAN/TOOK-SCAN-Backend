@@ -2,7 +2,8 @@ package com.tookscan.tookscan.order.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.SelfValidating;
-import com.tookscan.tookscan.order.domain.Coupon;
+import com.tookscan.tookscan.order.domain.CouponTemplate;
+import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import lombok.Builder;
 
@@ -26,31 +27,25 @@ public class ReadUserOrderCouponDetailResponseDto extends SelfValidating<ReadUse
     @JsonProperty("discount_percent")
     private final Integer discountPercent;
 
-    @JsonProperty("expiration_date")
-    private final String expirationDate;
-
     @Builder
     public ReadUserOrderCouponDetailResponseDto(String id, String name, String description, ECouponType type,
-                                                Integer discountPrice, Integer discountPercent, String expirationDate) {
+                                                Integer discountPrice, Integer discountPercent) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.type = type;
         this.discountPrice = discountPrice;
         this.discountPercent = discountPercent;
-        this.expirationDate = expirationDate;
         this.validateSelf();
     }
 
-    public static ReadUserOrderCouponDetailResponseDto fromEntity(Coupon coupon) {
+    public static ReadUserOrderCouponDetailResponseDto fromEntity(IssuedCoupon issuedCoupon) {
         return ReadUserOrderCouponDetailResponseDto.builder()
-                .id(coupon.getId().toString())
-                .name(coupon.getName())
-                .description(coupon.getDescription())
-                .type(coupon.getType())
-                .discountPrice(coupon.getDiscountPrice())
-                .discountPercent(coupon.getDiscountPercent())
-                .expirationDate(coupon.getExpirationDate())
+                .id(issuedCoupon.getId().toString())
+                .name(issuedCoupon.getCouponTemplate().getName())
+                .type(issuedCoupon.getCouponTemplate().getType())
+                .discountPrice(issuedCoupon.getCouponTemplate().getDiscountPrice())
+                .discountPercent(issuedCoupon.getCouponTemplate().getDiscountPercent())
                 .build();
     }
 }
