@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -28,6 +30,11 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update tracking number",
+        userType = "Admin"
+    )
     public void execute(Long deliveryId, UpdateAdminOrderDeliveryTrackingNumberRequestDto requestDto) {
         Delivery delivery = deliveryRepository.findByIdWithOrderOrElseThrow(deliveryId);
 
@@ -57,6 +64,9 @@ public class UpdateAdminOrderDeliveryTrackingNumberService implements UpdateAdmi
                         delivery.getPhoneNumber()
                 )
         );
+        
+        LogContext.put("delivery_id", deliveryId);
+        LogContext.put("order_id", delivery.getOrder().getId());
     }
 
     /**

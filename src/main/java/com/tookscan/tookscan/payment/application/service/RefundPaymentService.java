@@ -1,6 +1,8 @@
 package com.tookscan.tookscan.payment.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.dto.PaymentRefundDto;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
@@ -24,6 +26,11 @@ public class RefundPaymentService implements RefundPaymentUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Payment",
+        action = "refund payment",
+        userType = "User" 
+    )
     public void execute(Long paymentId) {
 
         Payment payment = paymentRepository.findByIdOrElseThrow(paymentId);
@@ -41,6 +48,9 @@ public class RefundPaymentService implements RefundPaymentUseCase {
             payment.getOrder().updateOrderStatus(EOrderStatus.CANCEL);
 
             paymentRepository.save(payment);
+            
+            LogContext.put("payment_id", payment.getId());
+            LogContext.put("order_id", payment.getOrder().getId());
         } else {
             throw new RuntimeException("환불 실패");
         }

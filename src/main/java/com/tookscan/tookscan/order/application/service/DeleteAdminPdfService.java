@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.S3Util;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
@@ -19,6 +21,11 @@ public class DeleteAdminPdfService implements DeleteAdminPdfUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "delete pdf",
+        userType = "Admin"
+    )
     public void execute(Long pdfId) {
         Pdf pdf = pdfRepository.findByIdOrElseThrow(pdfId);
         Document document = pdf.getDocument();
@@ -31,5 +38,8 @@ public class DeleteAdminPdfService implements DeleteAdminPdfUseCase {
         
         // PDF 삭제 후 해당 Document의 PDF 파일명들을 재정렬
         pdfService.reorderPdfFileNames(document, s3Util::renameS3ObjectAndGetUrl);
+        
+        LogContext.put("pdf_id", pdfId);
+        LogContext.put("document_id", document.getId());
     }
 }

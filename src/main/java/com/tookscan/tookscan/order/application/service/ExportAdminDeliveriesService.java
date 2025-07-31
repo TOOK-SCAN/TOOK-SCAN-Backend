@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.ExcelUtils;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
 import com.tookscan.tookscan.order.domain.Order;
@@ -22,6 +24,11 @@ public class ExportAdminDeliveriesService implements ExportAdminDeliveriesUseCas
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "export deliveries",
+        userType = "Admin"
+    )
     public byte[] execute(ExportAdminDeliveriesRequestDto requestDto) {
         List<Order> orders = orderRepository.findAllByIdOrElseThrow(requestDto.orderIds());
 
@@ -32,6 +39,8 @@ public class ExportAdminDeliveriesService implements ExportAdminDeliveriesUseCas
             }
         });
 
+        LogContext.put("exported_orders_count", orders.size());
+        
         return excelUtils.writeDeliveries(orders);
     }
 }

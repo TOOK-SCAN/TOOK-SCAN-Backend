@@ -4,8 +4,10 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderHistoryUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
@@ -45,6 +47,11 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update order history",
+        userType = "User"
+    )
     public void execute(UUID accountId, Long orderId, UpdateUserOrderHistoryRequestDto requestDto) {
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
@@ -153,5 +160,11 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
 
         orderService.calculateTotalAmount(order);
         orderRepository.save(order);
+        
+        LogContext.put("order_id", orderId);
+        LogContext.put("user_id", accountId);
+        LogContext.put("updated_documents_count", existingDocuments.size());
+        LogContext.put("new_documents_count", newDocuments.size());
+        LogContext.put("deleted_documents_count", toDeleteIds.size());
     }
 }

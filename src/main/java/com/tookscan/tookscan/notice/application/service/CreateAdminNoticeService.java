@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.notice.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.notice.application.usecase.CreateAdminNoticeUseCase;
 import com.tookscan.tookscan.notice.domain.Notice;
 import com.tookscan.tookscan.notice.domain.service.NoticeService;
@@ -19,6 +21,11 @@ public class CreateAdminNoticeService implements CreateAdminNoticeUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Notice",
+        action = "create notice",
+        userType = "Admin"
+    )
     public void execute(CreateAdminNoticeRequestDto requestDto) {
         Notice notice = noticeService.createNotice(
                 requestDto.getTitle(),
@@ -26,5 +33,6 @@ public class CreateAdminNoticeService implements CreateAdminNoticeUseCase {
                 requestDto.getIsPublic()
         );
         noticeRepository.save(notice);
+        LogContext.put("notice_id", notice.getId());
     }
-} 
+}

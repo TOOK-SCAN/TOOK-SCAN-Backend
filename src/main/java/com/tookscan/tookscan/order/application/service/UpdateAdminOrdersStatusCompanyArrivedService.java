@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusCompanyArrivedUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
@@ -19,10 +21,17 @@ public class UpdateAdminOrdersStatusCompanyArrivedService implements UpdateAdmin
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update orders status to company arrived",
+        userType = "Admin"
+    )
     public void execute(UpdateAdminOrdersStatusCompanyArrivedRequestDto requestDto) {
         List<Order> orders = orderRepository.findAllByIdOrElseThrow(requestDto.orderIds());
 
         orders.forEach(orderService::arriveCompany);
         orderRepository.saveAll(orders);
+        
+        LogContext.put("updated_orders_count", orders.size());
     }
 }

@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
 import com.tookscan.tookscan.order.application.usecase.CreateAdminOrderCouponUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
@@ -21,6 +23,11 @@ public class CreateAdminOrderCouponService implements CreateAdminOrderCouponUseC
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "create coupon",
+        userType = "Admin"
+    )
     public void execute(CreateAdminOrderCouponRequestDto requestDto) {
         int count = 1;
 
@@ -36,6 +43,9 @@ public class CreateAdminOrderCouponService implements CreateAdminOrderCouponUseC
                     requestDto.endDateTime(), requestDto.isPossibleDuplicatedApply(), requestDto.isUserOnly());
             couponRepository.save(coupon);
         }
+        
+        LogContext.put("created_coupon_count", count);
+        LogContext.put("coupon_name", requestDto.name());
     }
 
     private String createUniqueCouponCode(String tag) {

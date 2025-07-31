@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.ExcelUtils;
 import com.tookscan.tookscan.message.domain.event.AnnounceDeliveryMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersDeliveriesTrackingNumberUseCase;
@@ -36,6 +38,11 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update tracking numbers from excel",
+        userType = "Admin"
+    )
     public void execute(MultipartFile file) {
         if (file.isEmpty()) {
             throw new CommonException(ErrorCode.INVALID_ARGUMENT, "파일이 비어있습니다.");
@@ -105,6 +112,8 @@ public class UpdateAdminOrdersDeliveriesTrackingNumberService implements
                     )
             );
         }
+        
+        LogContext.put("updated_orders_count", orders.size());
     }
 
     /**

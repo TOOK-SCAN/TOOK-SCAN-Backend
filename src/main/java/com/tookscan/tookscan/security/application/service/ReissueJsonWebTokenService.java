@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.security.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.ReissueJsonWebTokenUseCase;
@@ -8,11 +10,10 @@ import com.tookscan.tookscan.security.domain.redis.RefreshToken;
 import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
 import com.tookscan.tookscan.security.repository.AccountRepository;
 import com.tookscan.tookscan.security.repository.RefreshTokenRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,11 @@ public class ReissueJsonWebTokenService implements ReissueJsonWebTokenUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Security",
+        action = "reissue token",
+        userType = "User" // Or Admin
+    )
     public DefaultJsonWebTokenDto execute(String refreshTokenValue) {
 
         // refresh Token 검증. Redis에 있는 토큰인지 확인 -> accountId 추출
@@ -45,6 +51,8 @@ public class ReissueJsonWebTokenService implements ReissueJsonWebTokenUseCase {
 
         // Refresh Token 갱신
         refreshTokenRepository.save(refreshTokenService.createRefreshToken(account.getId(), defaultJsonWebTokenDto.getRefreshToken()));
+        
+        LogContext.put("account_id", account.getId());
 
         return defaultJsonWebTokenDto;
     }

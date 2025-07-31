@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.mail.domain.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.message.domain.event.AnnounceScanFinishMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
@@ -29,6 +31,11 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "send pdf",
+        userType = "Admin"
+    )
     public void execute(Long orderId) {
 
         Order order = orderRepository.findByIdWithDocumentsAndDeliveryOrElseThrow(orderId);
@@ -71,6 +78,7 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             orderService.startRecovery(order);
             orderRepository.save(order);
         }
-
+        
+        LogContext.put("order_id", orderId);
     }
 }

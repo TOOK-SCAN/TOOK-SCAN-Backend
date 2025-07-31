@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.presentation.dto.request.DeleteAdminDocumentsRequestDto;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
@@ -14,7 +16,13 @@ public class DeleteAdminDocumentsService implements DeleteAdminDocumentsUseCase 
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "delete documents",
+        userType = "Admin"
+    )
     public void execute(DeleteAdminDocumentsRequestDto requestDto) {
         requestDto.documentIds().forEach(documentRepository::deleteByIdOrElseThrow);
+        LogContext.put("deleted_documents_count", requestDto.documentIds().size());
     }
 }

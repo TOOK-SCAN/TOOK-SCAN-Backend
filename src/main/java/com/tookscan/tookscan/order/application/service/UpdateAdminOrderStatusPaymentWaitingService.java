@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.message.domain.event.RequestPaymentMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderStatusPaymentWaitingUseCase;
 import com.tookscan.tookscan.order.domain.Order;
@@ -23,6 +25,11 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update order status to payment waiting",
+        userType = "Admin"
+    )
     public void execute(Long orderId) {
 
         Order order = orderRepository.findByIdOrElseThrow(orderId);
@@ -40,5 +47,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                         order.getDelivery().getPhoneNumber()
                 )
         );
+        
+        LogContext.put("order_id", orderId);
     }
 }

@@ -4,6 +4,8 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.message.domain.event.CreateOrderMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.CreateUserOrderUseCase;
 import com.tookscan.tookscan.order.domain.Coupon;
@@ -53,6 +55,11 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "create order",
+        userType = "User"
+    )
     public CreateUserOrderResponseDto execute(UUID accountId, CreateUserOrderRequestDto requestDto) {
         // 계정 조회
         User user = userRepository.findByIdOrElseThrow(accountId);
@@ -136,6 +143,9 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
                         order.getDelivery().getPhoneNumber()
                 )
         );
+
+        LogContext.put("order_id", order.getId());
+        LogContext.put("order_number", order.getOrderNumber());
 
         return CreateUserOrderResponseDto.builder().orderNumber(order.getOrderNumber())
                 .orderId(order.getId().toString()).build();

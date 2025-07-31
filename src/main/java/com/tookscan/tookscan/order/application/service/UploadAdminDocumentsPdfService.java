@@ -2,7 +2,9 @@ package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.core.utility.PdfWatermarkUtil;
 import com.tookscan.tookscan.core.utility.S3Util;
@@ -20,14 +22,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-@Slf4j
 @Service
 public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUseCase {
 
@@ -64,6 +64,11 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "upload pdfs",
+        userType = "Admin"
+    )
     public void execute(Long documentId, List<MultipartFile> files) {
         Document document = documentRepository.findByIdOrElseThrow(documentId);
         Order order = orderRepository.findByIdOrElseThrow(document.getOrder().getId());
@@ -100,6 +105,10 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         }
 
         updateOrderStatusBasedOnPdfStorage(order);
+        
+        LogContext.put("document_id", documentId);
+        LogContext.put("order_id", order.getId());
+        LogContext.put("uploaded_files_count", files.size());
     }
 
     private List<String> processFilesInParallel(Document document, List<MultipartFile> files, 

@@ -4,6 +4,8 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.address.domain.service.AddressService;
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.application.usecase.UpdateUserOrderInfoUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
@@ -25,6 +27,11 @@ public class UpdateUserOrderInfoService implements UpdateUserOrderInfoUseCase {
 
     @Override
     @Transactional
+    @BusinessLog(
+        domain = "Order",
+        action = "update order info",
+        userType = "User"
+    )
     public void execute(UUID accountId, Long orderId, UpdateUserOrderInfoRequestDto requestDto) {
         User user = userRepository.findByIdOrElseThrow(accountId);
         Order order = orderRepository.findByIdOrElseThrow(orderId);
@@ -50,5 +57,8 @@ public class UpdateUserOrderInfoService implements UpdateUserOrderInfoUseCase {
         order.getDelivery().updateAddress(address);
         order.getDelivery().updateRequest(requestDto.deliveryRequest());
         orderRepository.save(order);
+        
+        LogContext.put("order_id", orderId);
+        LogContext.put("user_id", accountId);
     }
 }

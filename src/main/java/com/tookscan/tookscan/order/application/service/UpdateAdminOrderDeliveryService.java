@@ -1,5 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
+import com.tookscan.tookscan.core.annotation.BusinessLog;
+import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrderDeliveryRequestDto;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
 import com.tookscan.tookscan.order.domain.Delivery;
@@ -18,6 +20,11 @@ public class UpdateAdminOrderDeliveryService implements UpdateAdminOrderDelivery
     private final DeliveryService deliveryService;
 
     @Override
+    @BusinessLog(
+        domain = "Order",
+        action = "update delivery info",
+        userType = "Admin"
+    )
     public void execute(Long deliveryId, UpdateAdminOrderDeliveryRequestDto requestDto) {
         Delivery delivery = deliveryRepository.findByIdOrElseThrow(deliveryId);
 
@@ -30,5 +37,7 @@ public class UpdateAdminOrderDeliveryService implements UpdateAdminOrderDelivery
                 requestDto.trackingNumber(),
                 requestDto.email()
         );
+        
+        LogContext.put("delivery_id", deliveryId);
     }
 }
