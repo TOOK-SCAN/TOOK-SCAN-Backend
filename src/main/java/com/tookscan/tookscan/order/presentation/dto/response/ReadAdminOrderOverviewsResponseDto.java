@@ -144,9 +144,7 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
                             : DateTimeUtil.convertLocalDateTimeToDartString(
                                     order.getPayment().getApprovedAt()))
                     .documents(DocumentsDto.fromEntities(order.getDocuments()))
-                    .predictedPrice(order.getIsAdminChecked()
-                            ? order.getInitialOrder().getTotalAmount()
-                            : order.getTotalAmount())
+                    .predictedPrice(order.getTotalAmount())
                     .pdfSendDate(order.getPdfSendDate() == null ? null
                             : DateTimeUtil.convertLocalDateTimeToDartString(
                                     order.getPdfSendDate()))
