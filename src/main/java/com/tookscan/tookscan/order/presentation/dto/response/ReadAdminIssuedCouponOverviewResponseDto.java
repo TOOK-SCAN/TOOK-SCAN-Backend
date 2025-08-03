@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 @Getter
 public class ReadAdminIssuedCouponOverviewResponseDto {
 
@@ -17,7 +19,7 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
     private PageInfoDto pageInfoDto;
 
     @JsonProperty("issued_coupons")
-    private IssuedCouponOverviewDto issuedCouponOverviewDto;
+    private List<IssuedCouponOverviewDto> issuedCouponOverviewDto;
 
     @JsonProperty("tag")
     private String tag;
@@ -91,7 +93,7 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
     }
 
     @Builder
-    public ReadAdminIssuedCouponOverviewResponseDto(PageInfoDto pageInfoDto, IssuedCouponOverviewDto issuedCouponOverviewDto, String tag, String name) {
+    public ReadAdminIssuedCouponOverviewResponseDto(PageInfoDto pageInfoDto, List<IssuedCouponOverviewDto> issuedCouponOverviewDto, String tag, String name) {
         this.pageInfoDto = pageInfoDto;
         this.issuedCouponOverviewDto = issuedCouponOverviewDto;
         this.tag = tag;
@@ -101,10 +103,9 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
     public static ReadAdminIssuedCouponOverviewResponseDto of(Page<IssuedCoupon> issuedCouponPage, CouponTemplate couponTemplate) {
         PageInfoDto pageInfoDto = PageInfoDto.fromEntity(issuedCouponPage);
 
-        IssuedCouponOverviewDto issuedCouponOverviewDto = issuedCouponPage.stream()
+        List<IssuedCouponOverviewDto> issuedCouponOverviewDto = issuedCouponPage.getContent().stream()
                 .map(IssuedCouponOverviewDto::fromEntity)
-                .findFirst()
-                .orElse(null);
+                .toList();
 
         String description = null;
 
