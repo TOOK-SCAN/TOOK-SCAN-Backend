@@ -96,8 +96,8 @@ jobs:
             ${{ secrets.PROD_GATEWAY_SSH_USERNAME }}@${{ secrets.PROD_GATEWAY_SSH_HOST }} \
             "readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green'")
           if [ -z "$ACTIVE" ]; then
-            echo "❌ Failed to detect active slot" >&2
-            exit 1
+            echo "⚠️ Failed to detect active slot. Assuming initial deployment. Setting ACTIVE to green."
+            ACTIVE="green"
           fi
           NEXT=$(if [ "$ACTIVE" = "blue" ]; then echo green; else echo blue; fi)
           echo "Detected ACTIVE=$ACTIVE, NEXT=$NEXT"
