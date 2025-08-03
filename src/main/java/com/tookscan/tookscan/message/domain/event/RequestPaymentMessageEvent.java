@@ -12,14 +12,18 @@ public class RequestPaymentMessageEvent {
     private final Long orderId;
     private final String orderNumber;
     private final String phoneNumber;
+    private final String email;
+    private final String userName;
 
-    public static RequestPaymentMessageEvent of(String orderName, Integer orderPrice, Long orderId, String orderNumber, String phoneNumber) {
+    public static RequestPaymentMessageEvent of(String orderName, Integer orderPrice, Long orderId, String orderNumber, String phoneNumber, String email, String userName) {
         return RequestPaymentMessageEvent.builder()
                 .orderName(orderName)
                 .orderPrice(orderPrice)
                 .orderId(orderId)
                 .orderNumber(orderNumber)
                 .phoneNumber(phoneNumber)
+                .email(email)
+                .userName(userName)
                 .build();
     }
 }

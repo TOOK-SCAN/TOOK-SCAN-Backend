@@ -32,7 +32,7 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
     )
     public void execute(Long orderId) {
 
-        Order order = orderRepository.findByIdOrElseThrow(orderId);
+        Order order = orderRepository.findWithUserById(orderId);
 
         order.updateOrderStatus(EOrderStatus.PAYMENT_WAITING);
         orderService.updatePaymentExpirationDate(order);
@@ -45,7 +45,9 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                         order.getTotalAmount(),
                         order.getId(),
                         order.getOrderNumber(),
-                        order.getDelivery().getPhoneNumber()
+                        order.getUser().getPhoneNumber(),
+                        order.getUser().getEmail(),
+                        order.getUser().getName()
                 )
         );
         

@@ -122,6 +122,8 @@ public class KakaoMessageListener {
                     event.getOrderPrice(),
                     event.getOrderId(),
                     event.getOrderNumber(),
+                    event.getEmail(),
+                    event.getUserName(),
                     event.getPhoneNumber()
             );
             log.atInfo()

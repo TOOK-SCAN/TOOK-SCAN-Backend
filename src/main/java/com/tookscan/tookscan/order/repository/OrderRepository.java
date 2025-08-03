@@ -21,6 +21,8 @@ public interface OrderRepository {
 
     Order findByIdOrElseThrow(Long id);
 
+    Order findWithUserById(Long id);
+
     Order findWithUsedCouponByIdOrElseThrow(Long id);
 
     List<Order> findAllByIdOrElseThrow(List<Long> ids);
