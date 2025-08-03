@@ -30,6 +30,9 @@ public class ReadAdminUsedCouponOverviewResponseDto {
         @JsonProperty("id")
         private String id;
 
+        @JsonProperty("user_info")
+        private String userInfo;
+
         @JsonProperty("issued_at")
         private String issuedAt;
 
@@ -68,8 +71,9 @@ public class ReadAdminUsedCouponOverviewResponseDto {
         }
 
         @Builder
-        public UsedCouponOverviewDto(String id, String issuedAt, String usedAt, UsedCouponOrderDto order, Integer discountAmount, String code) {
+        public UsedCouponOverviewDto(String id, String userInfo, String issuedAt, String usedAt, UsedCouponOrderDto order, Integer discountAmount, String code) {
             this.id = id;
+            this.userInfo = userInfo;
             this.issuedAt = issuedAt;
             this.usedAt = usedAt;
             this.order = order;
@@ -78,8 +82,12 @@ public class ReadAdminUsedCouponOverviewResponseDto {
         }
 
         public static UsedCouponOverviewDto fromEntity(UsedCoupon usedCoupon) {
+
+            String userInfo = usedCoupon.getUser().getName() + " (" + (usedCoupon.getUser().getEmail() != null ? usedCoupon.getUser().getEmail() : "이메일 없음") + ")";
+
             return UsedCouponOverviewDto.builder()
                     .id(usedCoupon.getId().toString())
+                    .userInfo(userInfo)
                     .issuedAt(usedCoupon.getIssuedCoupon().getCreatedAt().toString())
                     .usedAt(usedCoupon.getCreatedAt().toString())
                     .order(UsedCouponOrderDto.fromEntity(usedCoupon.getOrder()))
