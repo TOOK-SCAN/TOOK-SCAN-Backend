@@ -32,11 +32,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      ### application.yml 설정
-      - name: Set YML
-        run: |
-          echo "${{ secrets.APPLICATION_PROD_YML }}" | base64 --decode > ./src/main/resources/application-prod.yml
-
+      ### private_key 설정
       - name: Set private_key
         run: |
           echo "${{ secrets.AWS_EX_PRIVATE_KEY }}" > ./src/main/resources/aws/aws_ex_private_key.pem
@@ -71,16 +67,18 @@ jobs:
           file: ./prod.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
-
-  # closed에 대한 server deploy
   CD:
     if: github.event.pull_request.merged == true
     needs: [CI]
     runs-on: ubuntu-22.04
-
     steps:
-      ### SSH Connect and Docker Image Pull and Container Run
       - name: Docker Image Pull and Container Run
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+
+      # .env 파일 생성
+      - name: Create .env.dev on remote
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.PROD_SSH_HOST }}
@@ -88,11 +86,99 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           port: ${{ secrets.PROD_SSH_PORT }}
           script: |
-            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            docker stop api-server
-            docker rm api-server
-            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
-            docker run -d -p 8080:8080 -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --name api-server --network ${{secrets.DOCKER_NETWORKNAME}} -v /home/ubuntu/aws:/app/aws ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
+            echo "${{secrets.ENV_PROD_FILE_CONTENT}}" > /home/ubuntu/.env.prod
+            chmod 600 /home/ubuntu/.env.prod
+
+      - name: Determine and set slots
+        run: |
+          ACTIVE=$(ssh -o StrictHostKeyChecking=no \
+            -p ${{ secrets.PROD_SSH_PORT }} \
+            ${{ secrets.PROD_GATEWAY_SSH_USERNAME }}@${{ secrets.PROD_GATEWAY_SSH_HOST }} \
+            "readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green'")
+          if [ -z "$ACTIVE" ]; then
+            echo "❌ Failed to detect active slot" >&2
+            exit 1
+          fi
+          NEXT=$(if [ "$ACTIVE" = "blue" ]; then echo green; else echo blue; fi)
+          echo "Detected ACTIVE=$ACTIVE, NEXT=$NEXT"
+          echo "ACTIVE=$ACTIVE" >> $GITHUB_ENV
+          echo "NEXT=$NEXT"   >> $GITHUB_ENV
+
+
+      - name: Deploy to Backend Host
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          ACTIVE: ${{ env.ACTIVE }}
+          NEXT: ${{ env.NEXT }}
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT }}
+          envs: ACTIVE,NEXT
+          script: |
+            if [ "$NEXT" = "blue" ]; then
+              PORT=8080
+            else
+              PORT=8081
+            fi
+            docker rm -f api-$NEXT  || true
             
-            # 사용되지 않는 이미지 정리
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
+            docker run -d \
+              --name api-$NEXT \
+              --env-file /home/ubuntu/.env.dev \
+              -p $PORT:8080 \
+              -v /etc/localtime:/etc/localtime:ro \
+              -v /etc/timezone:/etc/timezone:ro \
+              --network ${{ secrets.DOCKER_NETWORKNAME }} \
+              -v /home/ubuntu/aws:/app/aws \
+              --stop-timeout 10 \
+              --log-driver=awslogs \
+              --log-opt awslogs-region=${{ secrets.AWS_REGION }} \
+              --log-opt awslogs-group=${{ secrets.PROD_AWS_LOG_GROUP }} \
+              --log-opt awslogs-stream=${{ secrets.PROD_AWS_LOG_STREAM }} \
+              ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
+            
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:$PORT/actuator/health; then
+                echo "🟢 $NEXT is healthy"
+                break
+              else
+                echo "⏳ waiting for health ($i/30)…"
+                sleep 2
+              fi
+            done
+            if [ "$i" -ge 30 ]; then
+              echo "❌ health check failed"; exit 1
+            fi
+            
+            sleep 5
+
+      - name: Update Nginx on Gateway Host
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PROD_GATEWAY_SSH_HOST }}
+          username: ${{ secrets.PROD_GATEWAY_SSH_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT }}
+          envs: NEXT
+          script: |
+            sudo ln -sf /etc/nginx/sites-available/api-$NEXT.conf \
+                        /etc/nginx/sites-enabled/default
+            sudo nginx -t
+            sudo systemctl reload nginx
+
+      - name: Cleanup old container
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT }}
+          envs: ACTIVE
+          script: |
+            docker stop -t 10 api-$ACTIVE || true
+            docker rm      api-$ACTIVE || true
             docker image prune -f
