@@ -93,7 +93,7 @@ jobs:
         run: |
           ACTIVE=$(ssh -o StrictHostKeyChecking=no \
             -p ${{ secrets.DEV_SSH_PORT }} \
-            ${{ secrets.DEV_GATEWAY_SSH_USERNAME }}@${{ secrets.DEV_GATEWAY_SSH_HOST }} \
+            ${{ secrets.DEV_SSH_USERNAME }}@${{ secrets.DEV_SSH_HOST }} \
             "readlink /etc/nginx/sites-enabled/default | grep -Eo 'blue|green'")
           if [ -z "$ACTIVE" ]; then
             echo "❌ Failed to detect active slot" >&2
@@ -158,8 +158,8 @@ jobs:
       - name: Update Nginx on Gateway Host
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.DEV_GATEWAY_SSH_HOST }}
-          username: ${{ secrets.DEV_GATEWAY_SSH_USERNAME }}
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USERNAME }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.DEV_SSH_PORT }}
           envs: NEXT
