@@ -40,7 +40,7 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
     private static final Integer DELIVERY_EXPIRATION_PERIOD = 14;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public EstimateUserOrderPriceResponseDto execute(EstimateUserOrderPriceRequestDto requestDto) {
         // 가격 정책 조회
         PricePolicy pricePolicy = pricePolicyRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrElseThrow(
