@@ -130,3 +130,7 @@ GET {{host_url}}/v1/admins/coupon-templates/738695615050511029/issued-coupons/ov
 ### 관리자 사용 쿠폰 요약 조회
 //@no-log
 GET {{host_url}}/v1/admins/coupon-templates/738696461221983066/used-coupons/overviews
+
+### 관리자 쿠폰 템플릿 삭제
+//@no-log
+DELETE {{host_url}}/v1/admins/coupon-templates/738695615050511029
