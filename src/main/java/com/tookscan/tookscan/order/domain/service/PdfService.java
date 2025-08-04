@@ -19,8 +19,8 @@ public class PdfService {
      * @param pdf    업데이트할 Pdf 객체
      * @param newUrl 새로운 URL
      */
-    public void updatePdfUrl(Pdf pdf, String newUrl) {
-        pdf.updatePdfUrl(newUrl);
+    public void updatePdfUrlForAdmin(Pdf pdf, String newUrl) {
+        pdf.updatePdfUrlForAdmin(newUrl);
     }
 
     /**

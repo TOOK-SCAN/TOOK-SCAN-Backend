@@ -20,11 +20,13 @@ import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PdfRepository;
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -93,14 +95,17 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
 
         // DB 저장 및 S3 업로드 (트랜잭션 내에서)
         for (MultipartFile file : files) {
-            // 원본 파일명 추출
-            String fileName = file.getOriginalFilename();
-            if (fileName == null || fileName.trim().isEmpty()) {
-                fileName = "unnamed.pdf";
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                originalFileName = "unnamed.pdf";
             }
 
-            // Document 내에서 파일명 중복 검증 (중복 시 예외 발생)
-            pdfService.validateUniqueFilename(document, fileName);
+            // Document 내에서 "원본 파일명" 중복 검증
+            pdfService.validateUniqueFilename(document, originalFileName);
+
+            // 2. S3에 저장할 고유 파일명 생성 (UUID + 확장자)
+            String extension = StringUtils.getFilenameExtension(originalFileName);
+            String storedFileName = UUID.randomUUID() + "." + extension;
 
             File watermarkedPdf = PdfWatermarkUtil.embedWatermark(
                     file,
@@ -111,13 +116,13 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
                     aesKeyString.getBytes()
             );
 
-            System.out.println(fileName);
-
-            String pdfUrl = s3Util.uploadAndGetPublicUrl(document, watermarkedPdf, fileName);
+            String pdfUrl = s3Util.uploadPdfAndGetSignedUrlForAdmin(document, watermarkedPdf, storedFileName,
+                    originalFileName);
 
             Pdf pdf = Pdf.builder()
-                    .pdfUrl(pdfUrl)
-                    .name(fileName)
+                    .pdfUrlForAdmin(pdfUrl)
+                    .name(originalFileName)
+                    .storedFileName(storedFileName)
                     .isChecked(false)
                     .document(document)
                     .build();

@@ -346,7 +346,7 @@ public class ReadAdminOrderDetailResponseDto extends
 
             public static PdfDto fromEntity(Pdf pdf) {
                 return PdfDto.builder()
-                        .pdfUrl(pdf.getPdfUrl())
+                        .pdfUrl(pdf.getPdfUrlForAdmin())
                         .isExpired(pdf.getExpiredAt() != null)
                         .expiredAt(pdf.getExpiredAt() != null
                                 ? DateTimeUtil.convertLocalDateTimeToDartString(pdf.getExpiredAt()) : null)

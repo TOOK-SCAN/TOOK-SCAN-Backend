@@ -26,11 +26,17 @@ public class Pdf extends BaseEntity {
     /* -------------------------------------------- */
     /* Information Column ------------------------- */
     /* -------------------------------------------- */
-    @Column(name = "pdf_url", nullable = false, length = 2048)
-    private String pdfUrl;
+    @Column(name = "pdf_url_for_admin", nullable = false, length = 2048)
+    private String pdfUrlForAdmin;
+
+    @Column(name = "pdf_url_for_user", length = 2048)
+    private String pdfUrlForUser;
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "stored_file_name", nullable = false)
+    private String storedFileName;
 
     @Column(name = "is_checked", nullable = false)
     private boolean isChecked;
@@ -49,18 +55,23 @@ public class Pdf extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Pdf(String pdfUrl, String name, boolean isChecked, Document document) {
-        this.pdfUrl = pdfUrl;
+    public Pdf(String pdfUrlForAdmin, String name, boolean isChecked, Document document, String storedFileName) {
+        this.pdfUrlForAdmin = pdfUrlForAdmin;
         this.name = name;
         this.isChecked = isChecked;
         this.document = document;
+        this.storedFileName = storedFileName;
     }
     public void updateExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
     }
 
-    public void updatePdfUrl(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
+    public void updatePdfUrlForAdmin(String pdfUrlForAdmin) {
+        this.pdfUrlForAdmin = pdfUrlForAdmin;
+    }
+
+    public void updatePdfUrlForUser(String pdfUrlForUser) {
+        this.pdfUrlForUser = pdfUrlForUser;
     }
 
 }
