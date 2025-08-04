@@ -121,7 +121,7 @@ Content-Type: application/json
 
 ### 관리자 쿠폰 템플릿 요약 조회
 //@no-log
-GET {{host_url}}/v1/admins/coupon-templates/overviews?page=1&size=10
+GET {{host_url}}/v1/admins/coupon-templates/overviews?page=1&size=10&sort=end-date&direction=DESC
 
 ### 관리자 발행 쿠폰 요약 조회
 //@no-log

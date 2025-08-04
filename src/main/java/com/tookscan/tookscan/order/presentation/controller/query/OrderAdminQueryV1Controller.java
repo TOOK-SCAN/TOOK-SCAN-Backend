@@ -158,10 +158,12 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "size", defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") Integer size,
             @Parameter(description = "상태 필터 (WAITING, ACTIVE, INACTIVE, ALL)") @RequestParam(value = "status", required = false) String status,
             @Parameter(description = "쿠폰 형식 (DEFINED, AUTO_GENERATED)") @RequestParam(value = "format", required = false) ECouponFormat format,
-            @Parameter(description = "쿠폰 종류 (DELIVERY_PRICE_FREE, PERCENTAGE, AMOUNT, OCR_FREE)")@RequestParam(value = "type", required = false) ECouponType type
+            @Parameter(description = "쿠폰 종류 (DELIVERY_PRICE_FREE, PERCENTAGE, AMOUNT, OCR_FREE)")@RequestParam(value = "type", required = false) ECouponType type,
+            @Parameter(description = "정렬 기준 (end-date, issued-at)") @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "direction", defaultValue = "DESC") Direction direction
     ) {
         return ResponseDto.ok(readAdminCouponTemplateOverviewUseCase.execute(
-                        format, type, status, page, size
+                        format, type, status, page, size, sort, direction
                 )
         );
     }
