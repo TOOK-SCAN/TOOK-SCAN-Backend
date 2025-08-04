@@ -80,6 +80,11 @@ public class UsedCouponRepositoryImpl implements UsedCouponRepository {
     }
 
     @Override
+    public List<UsedCoupon> findByCouponTemplateId(Long couponTemplateId) {
+        return usedCouponJpaRepository.findByCouponTemplateId(couponTemplateId);
+    }
+
+    @Override
     public UsedCoupon findWithIssuedCouponByOrderIdOrElseThrow(Long orderId) {
         return usedCouponJpaRepository.findWithIssuedCouponByOrderId(orderId)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USED_COUPON));

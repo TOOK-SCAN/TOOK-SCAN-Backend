@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +15,15 @@ public interface UsedCouponJpaRepository extends JpaRepository<UsedCoupon, Long>
 
     @EntityGraph(attributePaths = {"issuedCoupon"})
     Optional<UsedCoupon> findWithIssuedCouponByOrderId(Long orderId);
+
+    @Query("SELECT uc FROM UsedCoupon uc " +
+            "JOIN FETCH uc.issuedCoupon ic " +
+            "JOIN FETCH ic.couponTemplate ct " +
+            "JOIN FETCH uc.order o " +
+            "JOIN FETCH o.delivery d " +
+            "JOIN FETCH o.documents doc " +
+            "WHERE ct.id = :couponTemplateId ")
+    List<UsedCoupon> findByCouponTemplateId(@Param("couponTemplateId") Long couponTemplateId);
 
     @Query("SELECT COUNT(uc) FROM UsedCoupon uc " +
             "JOIN  uc.issuedCoupon.couponTemplate ct " +
