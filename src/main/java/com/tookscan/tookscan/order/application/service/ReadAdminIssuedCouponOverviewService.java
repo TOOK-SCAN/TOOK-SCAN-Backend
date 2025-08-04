@@ -25,7 +25,7 @@ public class ReadAdminIssuedCouponOverviewService implements ReadAdminIssuedCoup
 
         Pageable pageable = PageRequest.of(page-1, size);
 
-        Page<IssuedCoupon> issuedCouponPages = issuedCouponRepository.findByCouponTemplateId(id, pageable);
+        Page<IssuedCoupon> issuedCouponPages = issuedCouponRepository.findByCouponTemplateIdPage(id, pageable);
 
         CouponTemplate couponTemplate = couponTemplateRepository.findByIdOrElseThrow(id);
 

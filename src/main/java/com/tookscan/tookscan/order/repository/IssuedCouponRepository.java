@@ -18,5 +18,9 @@ public interface IssuedCouponRepository {
 
     boolean existsByCouponCode(String couponCode);
 
-    Page<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId, Pageable pageable);
+    Page<IssuedCoupon> findByCouponTemplateIdPage(Long couponTemplateId, Pageable pageable);
+
+    List<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId);
+
+    int countByCouponTemplateId(Long couponTemplateId);
 }
