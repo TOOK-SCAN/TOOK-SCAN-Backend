@@ -137,7 +137,7 @@ jobs:
               --log-driver=awslogs \
               --log-opt awslogs-region=${{ secrets.AWS_REGION }} \
               --log-opt awslogs-group=${{ secrets.DEV_AWS_LOG_GROUP }} \
-              --log-opt awslogs-stream=${{ secrets.DEV_AWS_LOG_STREAM }} \
+              --log-opt awslogs-stream=api-$NEXT \
               ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_DEV_REPONAME }}:latest
             
             for i in $(seq 1 30); do
