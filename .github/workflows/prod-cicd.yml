@@ -66,8 +66,8 @@ jobs:
     needs: [CI]
     runs-on: ubuntu-22.04
     steps:
-      - name: Docker Image Pull and Container Run
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
 
