@@ -31,8 +31,13 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     }
 
     @Override
-    public Page<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId, Pageable pageable) {
+    public Page<IssuedCoupon> findByCouponTemplateIdPage(Long couponTemplateId, Pageable pageable) {
         return issuedCouponJpaRepository.findByCouponTemplateId(couponTemplateId, pageable);
+    }
+
+    @Override
+    public List<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId) {
+        return issuedCouponJpaRepository.findByCouponTemplateId(couponTemplateId);
     }
 
     @Override
@@ -48,5 +53,10 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     @Override
     public boolean existsByCouponCode(String couponCode) {
         return issuedCouponJpaRepository.existsByCode(couponCode);
+    }
+
+    @Override
+    public int countByCouponTemplateId(Long couponTemplateId) {
+        return issuedCouponJpaRepository.countByCouponTemplateId(couponTemplateId);
     }
 }

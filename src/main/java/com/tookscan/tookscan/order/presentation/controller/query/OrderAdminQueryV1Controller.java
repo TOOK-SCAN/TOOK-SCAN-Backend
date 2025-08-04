@@ -3,6 +3,7 @@ package com.tookscan.tookscan.order.presentation.controller.query;
 import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminIssuedCouponOverviewUseCase;
@@ -14,6 +15,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUs
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponTemplateDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminCouponTemplateOverviewResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminDocumentsPdfsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminIssuedCouponOverviewResponseDto;
@@ -48,6 +50,7 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminCouponTemplateOverviewUseCase readAdminCouponTemplateOverviewUseCase;
     private final ReadAdminIssuedCouponOverviewUseCase readAdminIssuedCouponOverviewUseCase;
     private final ReadAdminUsedCouponOverviewUseCase readAdminUsedCouponOverviewUseCase;
+    private final ReadAdminCouponTemplateDetailUseCase readAdminCouponTemplateDetailUseCase;
 
     /**
      * 4.2.5 관리자 주문 요약 정보 조회
@@ -191,4 +194,18 @@ public class OrderAdminQueryV1Controller {
         return ResponseDto.ok(readAdminUsedCouponOverviewUseCase.execute(id, search, searchType, page, size));
     }
 
+    /**
+     * 관리자 쿠폰 템플릿 상세 정보 조회
+     */
+    @Operation(summary = "관리자 쿠폰 템플릿 상세 정보 조회", description = "관리자가 쿠폰 템플릿 상세 정보를 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_COUPON_TEMPLATE,
+            ErrorCode.ACCESS_DENIED
+    })
+    @GetMapping("/coupon-templates/{id}/details")
+    public ResponseDto<ReadAdminCouponTemplateDetailResponseDto> readAdminCouponTemplateDetail(
+            @PathVariable Long id
+    ) {
+        return ResponseDto.ok(readAdminCouponTemplateDetailUseCase.execute(id));
+    }
 }
