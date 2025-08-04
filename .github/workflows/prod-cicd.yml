@@ -1,13 +1,8 @@
 name: Renewal Main Server Develop Server CI/CD
 
 on:
-  pull_request:
-    branches: [ "main" ]
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - closed
+  release:
+    types: [ published ]
 
 jobs:
   CI:
@@ -49,26 +44,25 @@ jobs:
 
       ### Docker Image Build and Push
       - name: Login to Docker Hub
-        if: github.event.pull_request.merged == true
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Set up Docker Buildx
-        if: github.event.pull_request.merged == true
         uses: docker/setup-buildx-action@v2
 
-      - name: Build and push
-        if: github.event.pull_request.merged == true
+      - name: Build and push with release tag
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./prod.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
+
   CD:
-    if: github.event.pull_request.merged == true
     needs: [CI]
     runs-on: ubuntu-22.04
     steps:
@@ -110,12 +104,13 @@ jobs:
         env:
           ACTIVE: ${{ env.ACTIVE }}
           NEXT: ${{ env.NEXT }}
+          RELEASE_TAG: ${{ github.ref_name }}
         with:
           host: ${{ secrets.PROD_SSH_HOST }}
           username: ${{ secrets.PROD_SSH_USERNAME }}
           key: ${{ secrets.PROD_SSH_KEY }}
           port: ${{ secrets.PROD_SSH_PORT }}
-          envs: ACTIVE,NEXT
+          envs: ACTIVE,NEXT,RELEASE_TAG
           script: |
             if [ "$NEXT" = "blue" ]; then
               PORT=8080
@@ -125,7 +120,7 @@ jobs:
             docker rm -f api-$NEXT  || true
             
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:$RELEASE_TAG
             docker run -d \
               --name api-$NEXT \
               --env-file /home/ubuntu/.env.prod \
@@ -139,7 +134,7 @@ jobs:
               --log-opt awslogs-region=${{ secrets.AWS_REGION }} \
               --log-opt awslogs-group=${{ secrets.PROD_AWS_LOG_GROUP }} \
               --log-opt awslogs-stream=api-$NEXT \
-              ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:$RELEASE_TAG
             
             for i in $(seq 1 30); do
               if curl -sf http://localhost:$PORT/actuator/health; then
