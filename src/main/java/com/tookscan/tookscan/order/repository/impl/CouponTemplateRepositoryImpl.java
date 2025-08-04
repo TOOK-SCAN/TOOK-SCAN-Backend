@@ -1,6 +1,6 @@
 package com.tookscan.tookscan.order.repository.impl;
 
-import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -40,6 +41,8 @@ public class CouponTemplateRepositoryImpl implements CouponTemplateRepository {
             ECouponFormat format,
             ECouponType type,
             String status,
+            String sort,
+            Direction direction,
             Pageable pageable
     ) {
         QCouponTemplate couponTemplate = QCouponTemplate.couponTemplate;
@@ -67,11 +70,19 @@ public class CouponTemplateRepositoryImpl implements CouponTemplateRepository {
             }
         }
 
-        List<Long> couponTemplateIds = jpaQueryFactory
+        var query = jpaQueryFactory
                 .select(couponTemplate.id)
                 .from(couponTemplate)
-                .where(predicate)
-                .orderBy(couponTemplate.createdAt.desc())
+                .where(predicate);
+
+        // 정렬 조건 설정
+        if (sort != null && !sort.isEmpty() && direction != null) {
+            query = query.orderBy(this.resolveCouponTemplateSort(couponTemplate, sort, direction));
+        } else {
+            query = query.orderBy(couponTemplate.createdAt.desc());
+        }
+
+        List<Long> couponTemplateIds = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -104,5 +115,21 @@ public class CouponTemplateRepositoryImpl implements CouponTemplateRepository {
             throw new CommonException(ErrorCode.NOT_FOUND_COUPON_TEMPLATE, "쿠폰 템플릿 ID: " + id);
         }
         couponTemplateJpaRepository.deleteById(id);
+    }
+
+    private OrderSpecifier<?> resolveCouponTemplateSort(QCouponTemplate couponTemplate, String sort, Direction direction) {
+        if (direction.isAscending()) {
+            return switch (sort) {
+                case "end-date" -> couponTemplate.endDateTime.asc();
+                case "issued-at" -> couponTemplate.createdAt.asc();
+                default -> throw new CommonException(ErrorCode.INVALID_ARGUMENT, "sort 값이 유효하지 않습니다.");
+            };
+        } else {
+            return switch (sort) {
+                case "end-date" -> couponTemplate.endDateTime.desc();
+                case "issued-at" -> couponTemplate.createdAt.desc();
+                default -> throw new CommonException(ErrorCode.INVALID_ARGUMENT, "sort 값이 유효하지 않습니다.");
+            };
+        }
     }
 }
