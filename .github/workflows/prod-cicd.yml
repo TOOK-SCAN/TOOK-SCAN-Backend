@@ -78,7 +78,7 @@ jobs:
           ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
 
       # .env 파일 생성
-      - name: Create .env.dev on remote
+      - name: Create .env.prod on remote
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.PROD_SSH_HOST }}
@@ -128,7 +128,7 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
             docker run -d \
               --name api-$NEXT \
-              --env-file /home/ubuntu/.env.dev \
+              --env-file /home/ubuntu/.env.prod \
               -p $PORT:8080 \
               -v /etc/localtime:/etc/localtime:ro \
               -v /etc/timezone:/etc/timezone:ro \
@@ -138,7 +138,7 @@ jobs:
               --log-driver=awslogs \
               --log-opt awslogs-region=${{ secrets.AWS_REGION }} \
               --log-opt awslogs-group=${{ secrets.PROD_AWS_LOG_GROUP }} \
-              --log-opt awslogs-stream=${{ secrets.PROD_AWS_LOG_STREAM }} \
+              --log-opt awslogs-stream=api-$NEXT \
               ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_PROD_REPONAME }}:latest
             
             for i in $(seq 1 30); do
