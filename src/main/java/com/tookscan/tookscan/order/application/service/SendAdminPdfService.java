@@ -4,11 +4,13 @@ import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.util.LogContext;
+import com.tookscan.tookscan.core.utility.S3Util;
 import com.tookscan.tookscan.mail.domain.event.SendPdfEmailEvent;
 import com.tookscan.tookscan.message.domain.event.AnnounceScanFinishMessageEvent;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
+import com.tookscan.tookscan.order.domain.Pdf;
 import com.tookscan.tookscan.order.domain.service.OrderService;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -28,6 +30,8 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
     private final OrderService orderService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final S3Util s3Util;
 
     @Override
     @Transactional
@@ -55,7 +59,17 @@ public class SendAdminPdfService implements SendAdminPdfUseCase {
             throw new CommonException(ErrorCode.NOT_FOUND_DOCUMENT);
         }
 
-        String pdfUrls = order.getPdfUrls();
+        for (Document document : documents) {
+            if (document.getPdfs().isEmpty()) {
+                throw new CommonException(ErrorCode.NOT_FOUND_PDF);
+            }
+            // PDF 파일이 S3에 저장되어 있는지 확인
+            for (Pdf pdf : document.getPdfs()) {
+                pdf.updatePdfUrlForUser(s3Util.getSignedUrlForUser(pdf));
+            }
+        }
+
+        String pdfUrls = order.getPdfPresignedUrls();
 
         applicationEventPublisher.publishEvent(
                 SendPdfEmailEvent.of(

@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class ReadAdminDocumentsPdfsResponseDto extends SelfValidating<ReadAdminDocumentsPdfsResponseDto> {
@@ -23,7 +22,7 @@ public class ReadAdminDocumentsPdfsResponseDto extends SelfValidating<ReadAdminD
 
     public static ReadAdminDocumentsPdfsResponseDto fromEntity(Document document) {
         List<String> pdfUrls = document.getPdfs().stream()
-                .map(Pdf::getPdfUrl)
+                .map(Pdf::getPdfUrlForAdmin)
                 .toList();
 
         return ReadAdminDocumentsPdfsResponseDto.builder()
