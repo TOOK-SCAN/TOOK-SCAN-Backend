@@ -11,6 +11,8 @@ import com.tookscan.tookscan.order.application.usecase.DeleteAdminCouponTemplate
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminDocumentsUseCase;
 import com.tookscan.tookscan.order.application.usecase.DeleteAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.ExportAdminDeliveriesUseCase;
+import com.tookscan.tookscan.order.application.usecase.ExportAdminIssuedCouponExcelUseCase;
+import com.tookscan.tookscan.order.application.usecase.ExportAdminUsedCouponExcelUseCase;
 import com.tookscan.tookscan.order.application.usecase.SendAdminPdfUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryTrackingNumberUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrderDeliveryUseCase;
@@ -40,10 +42,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
-import java.util.List;
-import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -62,6 +60,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Order", description = "Order 관련 API 입니다.")
 @RestController
@@ -88,6 +89,8 @@ public class OrderAdminCommandV1Controller {
     private final DeleteAdminPdfUseCase deleteAdminPdfUseCase;
     private final UpdateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase updateAdminOrderStatusPaymentWaitingToCompanyArrivedUseCase;
     private final DeleteAdminCouponTemplateUseCase deleteAdminCouponTemplateUseCase;
+    private final ExportAdminIssuedCouponExcelUseCase exportAdminIssuedCouponExcelUseCase;
+    private final ExportAdminUsedCouponExcelUseCase exportAdminUsedCouponExcelUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -445,5 +448,61 @@ public class OrderAdminCommandV1Controller {
     ) {
         deleteAdminCouponTemplateUseCase.execute(id);
         return ResponseDto.ok(null);
+    }
+
+    /**
+     * 관리자 발행 쿠폰 엑셀 다운로드
+     */
+    @Operation(summary = "관리자 발행 쿠폰 엑셀 다운로드", description = "관리자가 발행한 쿠폰을 엑셀 파일로 다운로드합니다.")
+    @ApiErrorCode({
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
+    })
+    @PostMapping(value = "/coupon-templates/{id}/issued-coupons/export")
+    public ResponseEntity<Resource> exportAdminIssuedCoupon(
+            @Parameter(description = "쿠폰 템플릿 ID", required = true)
+            @PathVariable Long id
+    ) {
+        // 1) 서비스/UseCase를 호출해 "엑셀 파일(바이트배열)"을 생성
+        byte[] excelBytes = exportAdminIssuedCouponExcelUseCase.execute(id);
+
+        // 2) 스프링에서 파일 다운로드를 위한 HTTP 응답 헤더 설정
+        String fileName = "issued-coupon.xlsx";
+        ByteArrayResource resource = new ByteArrayResource(excelBytes);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(excelBytes.length)
+                .body(resource);
+    }
+
+    /**
+     * 관리자 사용 쿠폰 엑셀 다운로드
+     */
+    @Operation(summary = "관리자 사용 쿠폰 엑셀 다운로드", description = "관리자가 사용한 쿠폰을 엑셀 파일로 다운로드합니다.")
+    @ApiErrorCode({
+            ErrorCode.INVALID_ARGUMENT,
+            ErrorCode.BAD_REQUEST_PARAMETER,
+            ErrorCode.ACCESS_DENIED
+    })
+    @PostMapping(value = "/coupon-templates/{id}/used-coupons/export")
+    public ResponseEntity<Resource> exportAdminUsedCoupon(
+            @Parameter(description = "쿠폰 템플릿 ID", required = true)
+            @PathVariable Long id
+    ) {
+        // 1) 서비스/UseCase를 호출해 "엑셀 파일(바이트배열)"을 생성
+        byte[] excelBytes = exportAdminUsedCouponExcelUseCase.execute(id);
+
+        // 2) 스프링에서 파일 다운로드를 위한 HTTP 응답 헤더 설정
+        String fileName = "used-coupon.xlsx";
+        ByteArrayResource resource = new ByteArrayResource(excelBytes);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(excelBytes.length)
+                .body(resource);
     }
 }

@@ -2,11 +2,15 @@ package com.tookscan.tookscan.core.utility;
 
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
+import com.tookscan.tookscan.order.domain.Document;
+import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.domain.Order;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.tookscan.tookscan.order.domain.UsedCoupon;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -126,6 +130,72 @@ public class ExcelUtils {
             return outputStream.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("엑셀 파일 생성 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    public byte[] writeIssuedCoupons(List<IssuedCoupon> issuedCoupons) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Issued Coupons");
+
+            // 헤더 작성
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"쿠폰 번호", "발행일", "만료일", "사용 여부", "주문 번호"};
+
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+
+            // 데이터 작성
+            int rowNum = 1;
+            for (IssuedCoupon issuedCoupon : issuedCoupons) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(issuedCoupon.getCode());
+                row.createCell(1).setCellValue(DateTimeUtil.convertLocalDateTimeToString(issuedCoupon.getCreatedAt()));
+                row.createCell(2).setCellValue(issuedCoupon.getCouponTemplate().getEndDateTime() != null ? DateTimeUtil.convertLocalDateTimeToString(issuedCoupon.getCouponTemplate().getEndDateTime()) : "N/A");
+                row.createCell(3).setCellValue(issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount() ? "사용됨" : "미사용");
+                row.createCell(4).setCellValue(issuedCoupon.getUsedCoupons().size() != 1 ? "N/A" :
+                        issuedCoupon.getUsedCoupons().get(0).getOrder().getOrderNumber());
+            }
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "쿠폰 엑셀 파일을 생성하는 중 오류가 발생했습니다.");
+        }
+    }
+
+    public byte[] writeUsedCoupons(List<UsedCoupon> usedCoupons) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Used Coupons");
+
+            // 헤더 작성
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"이름(계정)", "발행일", "만료일", "사용일", "주문 번호", "할인 금액", "쿠폰 번호"};
+
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+
+            // 데이터 작성
+            int rowNum = 1;
+            for (UsedCoupon usedCoupon : usedCoupons) {
+                String email = usedCoupon.getUser().getEmail() != null ? usedCoupon.getUser().getEmail() : "이메일 없음";
+
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(usedCoupon.getUser().getName() + " ("  + email + ")");
+                row.createCell(1).setCellValue(DateTimeUtil.convertLocalDateTimeToString(usedCoupon.getIssuedCoupon().getCreatedAt()));
+                row.createCell(2).setCellValue(usedCoupon.getIssuedCoupon().getCouponTemplate().getEndDateTime() != null ? DateTimeUtil.convertLocalDateTimeToString(usedCoupon.getIssuedCoupon().getCouponTemplate().getEndDateTime()) : "N/A");
+                row.createCell(3).setCellValue(DateTimeUtil.convertLocalDateTimeToString(usedCoupon.getCreatedAt()));
+                row.createCell(4).setCellValue(usedCoupon.getOrder().getOrderNumber());
+                row.createCell(5).setCellValue(usedCoupon.getIssuedCoupon().getDiscountPrice(usedCoupon.getOrder().getDocumentsTotalAmount(),
+                        usedCoupon.getOrder().getDocuments().stream().mapToInt(Document::getOcrPrice).sum(), usedCoupon.getOrder().getDelivery().getDeliveryPrice()));
+                row.createCell(6).setCellValue(usedCoupon.getIssuedCoupon().getCode());
+            }
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "사용된 쿠폰 엑셀 파일을 생성하는 중 오류가 발생했습니다.");
         }
     }
 }
