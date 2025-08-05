@@ -109,7 +109,7 @@ public class S3Util {
         String s3Key = buildPdfS3Key(document, uniqueFileName);
 
         try {
-            String contentDisposition = "attachment; filename*=UTF-8''" + java.net.URLEncoder.encode(originalFileName,
+            String contentDisposition = "inline; filename*=UTF-8''" + java.net.URLEncoder.encode(originalFileName,
                     java.nio.charset.StandardCharsets.UTF_8);
 
             // 1. S3에 파일 업로드
