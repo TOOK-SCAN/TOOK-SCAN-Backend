@@ -37,7 +37,6 @@ public class HttpGlobalExceptionHandler {
             .setCause(e)
             .addKeyValue("error.code", ErrorCode.BAD_REQUEST_JSON.name())
             .log("HTTP 메시지 읽기 실패 - 비정상적인 요청 데이터");
-        sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.BAD_REQUEST_JSON));
     }
 
@@ -49,7 +48,6 @@ public class HttpGlobalExceptionHandler {
             .addKeyValue("error.code", ErrorCode.UNSUPPORTED_MEDIA_TYPE.name())
             .addKeyValue("supported_types", e.getSupportedMediaTypes())
             .log("지원되지 않는 미디어 타입 사용");
-        sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.UNSUPPORTED_MEDIA_TYPE));
     }
 
@@ -62,7 +60,6 @@ public class HttpGlobalExceptionHandler {
             .addKeyValue("requested_url", e.getRequestURL())
             .addKeyValue("http_method", e.getHttpMethod())
             .log("존재하지 않는 엔드포인트 요청");
-        sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.METHOD_NOT_ALLOWED));
     }
 
@@ -75,7 +72,6 @@ public class HttpGlobalExceptionHandler {
             .addKeyValue("requested_method", e.getMethod())
             .addKeyValue("supported_methods", e.getSupportedMethods())
             .log("지원되지 않는 HTTP 메소드 사용");
-        sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.METHOD_NOT_ALLOWED));
     }
 
@@ -94,7 +90,6 @@ public class HttpGlobalExceptionHandler {
             .addKeyValue("field_errors", e.getFieldErrorCount())
             .addKeyValue("global_errors", e.getGlobalErrorCount())
             .log("요청 데이터 유효성 검증 실패 - 비정상적인 입력값");
-        sendSlackEvent(e);
 
         return ResponseDto.fail(new CommonException(ErrorCode.INVALID_ARGUMENT, message, true));
     }
@@ -106,7 +101,6 @@ public class HttpGlobalExceptionHandler {
         log.atWarn()
             .setCause(e)
             .log("메소드 매개변수 유효성 검증 실패 - 비정상적인 입력값");
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
@@ -117,7 +111,6 @@ public class HttpGlobalExceptionHandler {
             .setCause(e)
             .addKeyValue("violation_count", e.getConstraintViolations().size())
             .log("제약 조건 위반 - 비정상적인 입력값");
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
@@ -127,7 +120,6 @@ public class HttpGlobalExceptionHandler {
         log.atWarn()
             .setCause(e)
             .log("예상치 못한 타입 사용 - 비정상적인 입력값");
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
@@ -140,7 +132,6 @@ public class HttpGlobalExceptionHandler {
             .addKeyValue("invalid_value", e.getValue())
             .addKeyValue("required_type", e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "unknown")
             .log("메소드 인자 타입 불일치 - 비정상적인 입력값");
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
@@ -152,14 +143,13 @@ public class HttpGlobalExceptionHandler {
             .addKeyValue("parameter_name", e.getParameterName())
             .addKeyValue("parameter_type", e.getParameterType())
             .log("필수 요청 파라미터 누락 - 비정상적인 입력값");
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
     // 개발자가 직접 정의한 예외
     @ExceptionHandler(value = {HttpSecurityException.class})
     public ResponseDto<?> handleApiException(HttpSecurityException e) {
-        log.atError()
+        log.atWarn()
             .setCause(e)
             .addKeyValue("error.code", e.getErrorCode().name())
             .log("보안 예외 발생 - 요청 처리 실패");
@@ -178,13 +168,13 @@ public class HttpGlobalExceptionHandler {
                     .setCause(e)
                     .addKeyValue("error.code", errorCode.name())
                     .log("비즈니스 로직 예외 발생 - 서버 측 오류");
+            sendSlackEvent(e);
         } else {
             log.atWarn()
                     .setCause(e)
                     .addKeyValue("error.code", errorCode.name())
                     .log("비즈니스 로직 예외 발생 - 클라이언트 측 오류");
         }
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
@@ -194,7 +184,6 @@ public class HttpGlobalExceptionHandler {
         log.atWarn()
             .setCause(e)
             .log("비정상적인 인자 전달 - 비정상적인 입력값");
-        sendSlackEvent(e);
         return ResponseDto.fail(e);
     }
 
