@@ -8,10 +8,9 @@ import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUserDetailResponseDto> {
@@ -75,6 +74,10 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
     @Schema(description = "출생년도", example = "1990년")
     private final String birth;
 
+    @JsonProperty("is_deleted")
+    @Schema(description = "탈퇴 여부", example = "true")
+    private final Boolean isDeleted;
+
     @JsonProperty("deleted_at")
     @Schema(description = "탈퇴 날짜", example = "yyyy.MM.dd HH:mm")
     private final String deletedAt;
@@ -91,7 +94,8 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                                           String email, AddressResponseDto address, String deliveryRequest, String memo,
                                           Integer totalPaymentAmount, Integer totalOrderCount,
                                           Integer totalOrderDocumentCount,
-                                          String gender, String birth, LocalDateTime deletedAt, String reasonDeletion
+                                          String gender, String birth, LocalDateTime deletedAt, String reasonDeletion,
+                                          Boolean isDeleted
                                           ) {
         this.signUpDate = signUpDate;
         this.serialId = serialId;
@@ -107,6 +111,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
         this.totalOrderDocumentCount = totalOrderDocumentCount;
         this.gender = gender != null ? gender : " - ";
         this.birth = birth != null ? birth : " - ";
+        this.isDeleted = isDeleted;
         this.deletedAt = deletedAt != null ? DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(deletedAt) : " - ";
         this.reasonDeletion = reasonDeletion != null ? reasonDeletion : " - ";
         this.validateSelf();
@@ -138,6 +143,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                         .sum())
                 .gender(user.getGender())
                 .birth(user.getBirth())
+                .isDeleted(user.getDeletedAt() != null)
                 .deletedAt(user.getDeletedAt())
                 .reasonDeletion(user.getReasonDeletion())
                 .build();

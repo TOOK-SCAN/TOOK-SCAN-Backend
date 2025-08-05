@@ -7,17 +7,24 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.exception.type.HttpSecurityException;
 import com.tookscan.tookscan.core.utility.CookieUtil;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
-import com.tookscan.tookscan.security.presentation.dto.response.ReadAccountBriefResponseDto;
 import com.tookscan.tookscan.security.application.usecase.AuthenticateJsonWebTokenUseCase;
 import com.tookscan.tookscan.security.application.usecase.ReadAccountBriefUseCase;
+import com.tookscan.tookscan.security.application.usecase.ReissueJsonWebTokenUseCase;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import com.tookscan.tookscan.security.info.CustomUserPrincipal;
-import io.jsonwebtoken.*;
+import com.tookscan.tookscan.security.presentation.dto.response.ReadAccountBriefResponseDto;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,19 +32,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
 @RequiredArgsConstructor
 public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticateJsonWebTokenUseCase authenticateJsonWebTokenUseCase;
     private final ReadAccountBriefUseCase readAccountBriefUseCase;
+    private final ReissueJsonWebTokenUseCase reissueJsonWebTokenUseCase;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
+
+    @Value("${web-engine.cookie-domain}")
+    private String cookieDomain;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -52,21 +57,25 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        Optional<String> tokenOptional = CookieUtil.refineCookie(request, Constants.ACCESS_TOKEN);
+        Optional<String> accessTokenOptional = CookieUtil.refineCookie(request, Constants.ACCESS_TOKEN);
 
         if (AUTH_BRIEFS_URL.equals(requestURI)) {
-            if (tokenOptional.isEmpty()) {
+            if (accessTokenOptional.isEmpty()) {
                 writeGuestResponse(response);
                 return;
             }
 
             try {
-                Claims claims = jsonWebTokenUtil.validateToken(tokenOptional.get());
+                Claims claims = jsonWebTokenUtil.validateToken(accessTokenOptional.get());
                 UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
                 ReadAccountBriefResponseDto responseDto = readAccountBriefUseCase.execute(accountId);
                 writeAccountBriefResponse(response, responseDto);
                 return;
             } catch (HttpSecurityException e) {
+                // 유효하지 않은 토큰인 경우 쿠키 삭제
+                if (isTokenInvalidError(e.getErrorCode())) {
+                    clearTokenCookies(request, response);
+                }
                 throw e;
             } catch (Exception e) {
                 writeGuestResponse(response);
@@ -74,35 +83,52 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        String token = tokenOptional.orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
+        String accessToken = accessTokenOptional.orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
 
-        Claims claims = jsonWebTokenUtil.validateToken(token);
+        try {
+            // 액세스 토큰 검증
+            Claims claims = jsonWebTokenUtil.validateToken(accessToken);
 
-        UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
-        ESecurityRole role = ESecurityRole.fromString(claims.get(Constants.ACCOUNT_ROLE_CLAIM_NAME, String.class));
+            UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
+            ESecurityRole role = ESecurityRole.fromString(claims.get(Constants.ACCOUNT_ROLE_CLAIM_NAME, String.class));
 
-        CustomUserPrincipal principal = authenticateJsonWebTokenUseCase.execute(accountId);
+            CustomUserPrincipal principal = authenticateJsonWebTokenUseCase.execute(accountId);
 
-        if (!role.equals(principal.getRole())) {
-            throw new CommonException(ErrorCode.ACCESS_DENIED);
+            if (!role.equals(principal.getRole())) {
+                throw new CommonException(ErrorCode.ACCESS_DENIED);
+            }
+
+            // AuthenticationToken 생성
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    principal,
+                    null,
+                    principal.getAuthorities()
+            );
+
+            // SecurityContext에 AuthenticationToken 저장
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authenticationToken);
+            SecurityContextHolder.setContext(context);
+
+            // 다음 필터로 전달
+            filterChain.doFilter(request, response);
+
+        } catch (HttpSecurityException e) {
+            if (e.getErrorCode() == ErrorCode.EXPIRED_TOKEN_ERROR) {
+                // 액세스 토큰 만료 시 자동 재발급 시도
+                if (tryRefreshToken(request, response, filterChain)) {
+                    return; // 재발급 성공 시 요청 계속 처리
+                }
+                // 재발급 실패 시 쿠키 삭제 후 401 반환 (리프레시 토큰도 만료됨)
+                clearTokenCookies(request, response);
+            } else if (isTokenInvalidError(e.getErrorCode())) {
+                // 유효하지 않은 토큰인 경우 쿠키 삭제
+                clearTokenCookies(request, response);
+            }
+            throw e;
         }
-
-        // AuthenticationToken 생성
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                principal,
-                null,
-                principal.getAuthorities()
-        );
-
-        // SecurityContext에 AuthenticationToken 저장
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authenticationToken);
-        SecurityContextHolder.setContext(context);
-
-        // 다음 필터로 전달
-        filterChain.doFilter(request, response);
     }
 
     /**
@@ -146,6 +172,76 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
         objectMapper.writeValue(response.getWriter(), responseMap);
     }
+
+    /**
+     * 리프레시 토큰을 이용한 액세스 토큰 재발급 시도
+     */
+    private boolean tryRefreshToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        try {
+            Optional<String> refreshTokenOptional = CookieUtil.refineCookie(request, Constants.REFRESH_TOKEN);
+            if (refreshTokenOptional.isEmpty()) {
+                return false; // 리프레시 토큰이 없으면 재발급 불가
+            }
+
+            // 리프레시 토큰으로 새 토큰 발급
+            String refreshToken = refreshTokenOptional.get();
+            var newTokens = reissueJsonWebTokenUseCase.execute(refreshToken);
+
+            // 새로운 액세스 토큰으로 쿠키 설정
+            CookieUtil.addCookie(response, cookieDomain, Constants.ACCESS_TOKEN, newTokens.getAccessToken());
+            CookieUtil.addSecureCookie(response, cookieDomain, Constants.REFRESH_TOKEN, newTokens.getRefreshToken(),
+                    (int) (jsonWebTokenUtil.getRefreshTokenExpirePeriod() / 1000L));
+
+            // 새 액세스 토큰으로 인증 처리
+            Claims claims = jsonWebTokenUtil.validateToken(newTokens.getAccessToken());
+            UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
+            ESecurityRole role = ESecurityRole.fromString(claims.get(Constants.ACCOUNT_ROLE_CLAIM_NAME, String.class));
+
+            CustomUserPrincipal principal = authenticateJsonWebTokenUseCase.execute(accountId);
+
+            if (!role.equals(principal.getRole())) {
+                return false;
+            }
+
+            // AuthenticationToken 생성 및 SecurityContext 설정
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    principal, null, principal.getAuthorities());
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authenticationToken);
+            SecurityContextHolder.setContext(context);
+
+            // 다음 필터로 전달
+            filterChain.doFilter(request, response);
+            return true;
+
+        } catch (Exception e) {
+            // 리프레시 토큰도 만료되었거나 유효하지 않음
+            return false;
+        }
+    }
+
+    /**
+     * 토큰 관련 쿠키 삭제
+     */
+    private void clearTokenCookies(HttpServletRequest request, HttpServletResponse response) {
+        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.ACCESS_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.REFRESH_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.TEMPORARY_TOKEN);
+    }
+
+    /**
+     * 토큰이 유효하지 않은 오류인지 확인
+     */
+    private boolean isTokenInvalidError(ErrorCode errorCode) {
+        return errorCode == ErrorCode.TOKEN_MALFORMED_ERROR ||
+                errorCode == ErrorCode.TOKEN_TYPE_ERROR ||
+                errorCode == ErrorCode.TOKEN_UNSUPPORTED_ERROR ||
+                errorCode == ErrorCode.TOKEN_UNKNOWN_ERROR;
+    }
+
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
