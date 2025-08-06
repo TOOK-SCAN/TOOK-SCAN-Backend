@@ -2,6 +2,7 @@ package com.tookscan.tookscan.payment.application.service;
 
 import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.util.LogContext;
+import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
@@ -43,8 +44,8 @@ public class CreatePaymentService implements CreatePaymentUseCase {
                 .method(requestDto.method())
                 .totalAmount(requestDto.totalAmount())
                 .status(EPaymentStatus.DONE)
-                .requestedAt(requestDto.approvedAt())
-                .approvedAt(requestDto.approvedAt())
+                .requestedAt(DateTimeUtil.convertDartStringToLocalDateTimeWithoutSecond(requestDto.approvedAt()))
+                .approvedAt(DateTimeUtil.convertDartStringToLocalDateTimeWithoutSecond(requestDto.approvedAt()))
                 .order(order)
                 .build();
 
