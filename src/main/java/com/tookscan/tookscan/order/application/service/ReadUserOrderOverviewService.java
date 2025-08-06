@@ -54,7 +54,7 @@ public class ReadUserOrderOverviewService implements ReadUserOrderOverviewUseCas
                 EOrderStatus.getScanStatusList(EScanStatus.COMPLETED));
 
         return ReadUserOrderOverviewResponseDto.of(orders, scanWaitingCount, scanInProgressCount,
-                scanCompletedCount);
+                scanCompletedCount, accountId);
     }
 
 }

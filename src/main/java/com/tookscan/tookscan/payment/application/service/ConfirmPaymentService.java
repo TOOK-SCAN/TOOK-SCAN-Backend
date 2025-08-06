@@ -5,7 +5,6 @@ import com.tookscan.tookscan.core.dto.PaymentDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.util.LogContext;
-import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
 import com.tookscan.tookscan.core.utility.RestClientUtil;
 import com.tookscan.tookscan.core.utility.TossPaymentUtil;
 import com.tookscan.tookscan.message.domain.event.RequestScanMessageEvent;
@@ -69,7 +68,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             if (e.getErrorCode().equals(ErrorCode.ALREADY_PROCESSED_PAYMENT)) {
                 Payment payment = paymentRepository.findByPaymentKeyOrElseThrow(requestDto.paymentKey());
 
-                Order order = orderRepository.findWithDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
+                Order order = orderRepository.findWithUserAndDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
 
                 // 이미 처리된 결제의 경우, 결제 정보와 주문 정보를 반환
                 return ConfirmPaymentResponseDto.of(
@@ -79,9 +78,12 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                         payment.getMethod() != null ? payment.getMethod() : null,
                         payment.getEasyPaymentProvider() != null ? payment.getEasyPaymentProvider() : null,
                         payment.getTotalAmount(),
-                        null
+                        null,
+                        order.getUser().getId()
                 );
             }
+
+            Order order = orderRepository.findWithUserAndDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
 
             String tossInfoApiUrl = tossPaymentUtil.getTossInfoRequestUrl(requestDto.paymentKey());
             HttpHeaders infoHeaders = tossPaymentUtil.getTossInfoRequestHeaders();
@@ -98,11 +100,12 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                     response.method() != null ? EPaymentMethod.fromString(response.method()) : null,
                     response.easyPay() != null ? EEasyPaymentProvider.fromString(response.easyPay().provider()) : null,
                     response.totalAmount(),
-                    e.getMessage()
+                    e.getMessage(),
+                    order.getUser().getId()
             );
         }
 
-        Order order = orderRepository.findWithDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
+        Order order = orderRepository.findWithUserAndDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
 
         Payment payment = paymentService.createPayment(
                 response.paymentKey(),
@@ -146,7 +149,8 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 payment.getMethod() != null ? payment.getMethod() : null,
                 payment.getEasyPaymentProvider() != null ? payment.getEasyPaymentProvider() : null,
                 payment.getTotalAmount(),
-                null
+                null,
+                order.getUser().getId()
         );
     }
 }
