@@ -176,8 +176,10 @@ public class RestClientUtil {
                 throw new CommonException(ErrorCode.EXTERNAL_SERVER_TIMEOUT);
             }
             throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+        } catch (CommonException ec) {
+            throw ec;
         } catch (Exception e) {
-            throw new CommonException(ErrorCode.REST_CLIENT_ERROR);
+            throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
     /**

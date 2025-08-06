@@ -13,6 +13,8 @@ import com.tookscan.tookscan.payment.domain.Payment;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -108,6 +110,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
     @JsonProperty("receipt_url")
     private final String receiptUrl;
+
+    @JsonProperty("customer_key")
+    private final UUID customerKey;
 
     @Getter
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
@@ -220,7 +225,8 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             Integer paymentTotal,
             String receiptUrl,
             String couponName,
-            Integer ocrPrice
+            Integer ocrPrice,
+            UUID customerKey
     ) {
         this.id = id;
         this.orderNumber = orderNumber;
@@ -249,10 +255,11 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.receiptUrl = receiptUrl;
         this.couponName = couponName;
         this.ocrPrice = ocrPrice;
+        this.customerKey = customerKey;
         this.validateSelf();
     }
 
-    public static ReadUserOrderDetailResponseDto fromEntity(Order order) {
+    public static ReadUserOrderDetailResponseDto of(Order order, UUID customerKey) {
         Optional<Payment> paymentOpt = Optional.ofNullable(order.getPayment());
 
         String paymentDate = paymentOpt
@@ -322,6 +329,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .couponPrice(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), ocrPriceSum, order.getDelivery().getDeliveryPrice()) : null)
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
                 .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
+                .customerKey(customerKey)
                 .build();
     }
 }

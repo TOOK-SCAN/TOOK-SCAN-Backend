@@ -55,7 +55,7 @@ public interface OrderRepository {
 
     Order findByOrderNumberOrElseThrow(String orderNumber);
 
-    Order findWithDeliveryByOrderNumberOrElseThrow(String orderNumber);
+    Order findWithUserAndDeliveryByOrderNumberOrElseThrow(String orderNumber);
 
     List<Order> findAllByUserIds(List<UUID> userIds);
 

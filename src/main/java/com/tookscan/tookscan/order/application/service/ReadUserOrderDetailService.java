@@ -23,9 +23,9 @@ public class ReadUserOrderDetailService implements ReadUserOrderDetailUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadUserOrderDetailResponseDto execute(UUID accountID, Long orderId) {
+    public ReadUserOrderDetailResponseDto execute(UUID accountId, Long orderId) {
         // 사용자 조회
-        User user = userRepository.findByIdOrElseThrow(accountID);
+        User user = userRepository.findByIdOrElseThrow(accountId);
 
         // 주문 조회
         Order order = orderRepository.findByIdOrElseThrow(orderId);
@@ -33,6 +33,6 @@ public class ReadUserOrderDetailService implements ReadUserOrderDetailUseCase {
         // 주문자 확인
         orderService.validateOrderUser(order, user);
 
-        return ReadUserOrderDetailResponseDto.fromEntity(order);
+        return ReadUserOrderDetailResponseDto.of(order, accountId);
     }
 }

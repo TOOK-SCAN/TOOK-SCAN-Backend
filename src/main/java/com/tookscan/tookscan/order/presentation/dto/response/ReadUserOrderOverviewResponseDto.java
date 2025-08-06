@@ -11,6 +11,8 @@ import com.tookscan.tookscan.payment.domain.Payment;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,10 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
     @JsonProperty("orders")
     @NotNull
     private final List<OrderInfoDto> orders;
+
+    @JsonProperty("customer_key")
+    @NotNull
+    private final UUID customerKey;
 
     @JsonProperty("page_info")
     @NotNull
@@ -199,15 +205,17 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
     @Builder
     public ReadUserOrderOverviewResponseDto(StatusCountDto statusCount,
                                             List<OrderInfoDto> orders,
+                                            UUID customerKey,
                                             PageInfoDto pageInfo) {
         this.statusCount = statusCount;
         this.orders = orders;
+        this.customerKey = customerKey;
         this.pageInfo = pageInfo;
         this.validateSelf();
     }
 
     public static ReadUserOrderOverviewResponseDto of(Page<Order> orders, Integer scanWaitingCount,
-                                                      Integer scanInProgressCount, Integer scanCompletedCount) {
+                                                      Integer scanInProgressCount, Integer scanCompletedCount, UUID customerKey) {
 
         StatusCountDto statusCount = StatusCountDto.builder()
                 .scanWaiting(scanWaitingCount)
@@ -222,6 +230,7 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
         return ReadUserOrderOverviewResponseDto.builder()
                 .statusCount(statusCount)
                 .orders(orderDtos)
+                .customerKey(customerKey)
                 .pageInfo(PageInfoDto.fromEntity(orders))
                 .build();
     }
