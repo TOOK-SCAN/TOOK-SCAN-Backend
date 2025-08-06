@@ -177,7 +177,7 @@ public class KakaoMessageUtil {
         variables.put("#{orderName}", orderName);
         variables.put("#{orderWaybill}", orderWaybill);
         variables.put("#{orderDetailUrl}", orderDetailUrl + deliveryId);
-        variables.put("#{orderWaybillUrl}", waybillUrl);
+        variables.put("#{orderWaybillUrl}", waybillUrl + orderWaybill);
 
         kakaoOption.setVariables(variables);
 
