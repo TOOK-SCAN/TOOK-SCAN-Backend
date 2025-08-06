@@ -23,4 +23,6 @@ public interface PaymentJpaRepository extends JpaRepository<Payment, Long> {
             "JOIN FETCH p.order o " +
             "WHERE o.orderNumber = :orderNumber")
     Optional<Payment> findByOrderNumber(@Param("orderNumber") String orderNumber);
+
+    Optional<Payment> findByPaymentKey(String paymentKey);
 }

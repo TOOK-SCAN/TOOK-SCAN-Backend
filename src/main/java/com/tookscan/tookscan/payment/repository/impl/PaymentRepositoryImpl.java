@@ -47,6 +47,13 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                         tuple -> tuple.get(1, Integer.class)
                 ));
     }
+
+    @Override
+    public Payment findByPaymentKeyOrElseThrow(String paymentKey) {
+        return paymentJpaRepository.findByPaymentKey(paymentKey)
+                .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_RESOURCE, "Payment with key: " + paymentKey + " not found"));
+    }
+
     @Override
     public Payment saveAndReturn(Payment payment) {
         return paymentJpaRepository.save(payment);

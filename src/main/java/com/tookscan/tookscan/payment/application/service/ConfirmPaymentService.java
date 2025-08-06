@@ -2,6 +2,7 @@ package com.tookscan.tookscan.payment.application.service;
 
 import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.dto.PaymentDto;
+import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.KakaoMessageUtil;
@@ -64,6 +65,24 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
         try {
             response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendPost(tossConfirmApiUrl, requestHeaders, payload));
         } catch (CommonException e) {
+
+            if (e.getErrorCode().equals(ErrorCode.ALREADY_PROCESSED_PAYMENT)) {
+                Payment payment = paymentRepository.findByPaymentKeyOrElseThrow(requestDto.paymentKey());
+
+                Order order = orderRepository.findWithDeliveryByOrderNumberOrElseThrow(requestDto.orderNumber());
+
+                // 이미 처리된 결제의 경우, 결제 정보와 주문 정보를 반환
+                return ConfirmPaymentResponseDto.of(
+                        true,
+                        order.getOrderNumber(),
+                        payment.getApprovedAt() != null ? payment.getApprovedAt().toString() : null,
+                        payment.getMethod() != null ? payment.getMethod() : null,
+                        payment.getEasyPaymentProvider() != null ? payment.getEasyPaymentProvider() : null,
+                        payment.getTotalAmount(),
+                        null
+                );
+            }
+
             String tossInfoApiUrl = tossPaymentUtil.getTossInfoRequestUrl(requestDto.paymentKey());
             HttpHeaders infoHeaders = tossPaymentUtil.getTossInfoRequestHeaders();
             response = tossPaymentUtil.mapToPaymentDto(restClientUtil.sendGet(tossInfoApiUrl, infoHeaders));
@@ -71,7 +90,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
             LogContext.put("payment_confirm_failed", true);
             LogContext.put("payment_key", requestDto.paymentKey());
             LogContext.put("error_message", e.getMessage());
-            
+
             return ConfirmPaymentResponseDto.of(
                     false,
                     response.orderId(),
