@@ -145,6 +145,20 @@ public class DateTimeUtil {
     }
 
     /**
+     * Dart 날짜 형식을 LocalDateTime으로 변환 (yyyy.MM.dd HH:mm:ss)
+     */
+    public static LocalDateTime convertDartStringToLocalDateTime(String date) {
+        return LocalDateTime.parse(date, DartDateTimeFormatter);
+    }
+
+    /**
+     * Dart 날짜 형식을 LocalDateTime으로 변환 (yyyy.MM.dd HH:mm)
+     */
+    public static LocalDateTime convertDartStringToLocalDateTimeWithoutSecond(String date) {
+        return LocalDateTime.parse(date, DartDateTimeFormatterWithoutSecond);
+    }
+
+    /**
      * LocalDateTime을 Dart 날짜 형식으로 변환 (yyyy.MM.dd HH:mm)
      *
      * @param dateTime LocalDateTime

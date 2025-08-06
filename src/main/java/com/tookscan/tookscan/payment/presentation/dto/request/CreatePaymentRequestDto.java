@@ -13,7 +13,7 @@ public record CreatePaymentRequestDto(
         Integer totalAmount,
 
         @JsonProperty("approved_at")
-        LocalDateTime approvedAt,
+        String approvedAt,
 
         @JsonProperty("method")
         EPaymentMethod method
