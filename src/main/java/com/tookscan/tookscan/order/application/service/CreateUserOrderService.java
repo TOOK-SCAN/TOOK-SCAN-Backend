@@ -112,7 +112,9 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .orderStatus(EOrderStatus.APPLY_COMPLETED)
-                .deliveryExpirationDate(LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD + 1).withHour(0).withMinute(0).withSecond(0).withNano(0))
+                .deliveryExpirationDate(
+                        LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD).withHour(23).withMinute(59)
+                                .withSecond(59).withNano(999999999))
                 .scanCopyrightComplianceAgreed(LocalDateTime.now())
                 .illegalDistributionProhibitionAgreed(LocalDateTime.now())
                 .cuttingAgreed(LocalDateTime.now())

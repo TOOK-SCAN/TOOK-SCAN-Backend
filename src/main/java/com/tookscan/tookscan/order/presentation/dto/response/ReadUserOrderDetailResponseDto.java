@@ -14,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -113,6 +112,15 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
     @JsonProperty("customer_key")
     private final UUID customerKey;
+
+    @JsonProperty("is_delivery")
+    private final Boolean isDelivery;
+
+    @JsonProperty("tracking_number")
+    private final String trackingNumber;
+
+    @JsonProperty("carrier_name")
+    private final String carrierName;
 
     @Getter
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
@@ -226,7 +234,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             String receiptUrl,
             String couponName,
             Integer ocrPrice,
-            UUID customerKey
+            UUID customerKey,
+            Boolean isDelivery,
+            String trackingNumber,
+            String carrierName
     ) {
         this.id = id;
         this.orderNumber = orderNumber;
@@ -256,6 +267,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.couponName = couponName;
         this.ocrPrice = ocrPrice;
         this.customerKey = customerKey;
+        this.isDelivery = isDelivery;
+        this.trackingNumber = trackingNumber;
+        this.carrierName = carrierName;
         this.validateSelf();
     }
 
@@ -264,7 +278,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
         String paymentDate = paymentOpt
                 .map(Payment::getCreatedAt)
-                .map(DateTimeUtil::convertLocalDateTimeToDartString)
+                .map(DateTimeUtil::convertLocalDateTimeToDartStringWithoutSecond)
                 .orElse(null);
 
         List<DocumentInfoDto> docs = order.getDocuments().stream()
@@ -299,12 +313,13 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .id(order.getId().toString())
                 .orderNumber(order.getOrderNumber())
                 .orderStatus(order.getOrderStatus())
-                .orderDate(DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt()))
+                .orderDate(DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(order.getCreatedAt()))
                 .deliveryExpirationDate(
-                        DateTimeUtil.convertLocalDateTimeToDartString(order.getDeliveryExpirationDate()))
+                        DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(order.getDeliveryExpirationDate()))
                 .paymentExpirationDate(
                         order.getPaymentExpirationDate() != null
-                                ? DateTimeUtil.convertLocalDateTimeToDartString(order.getPaymentExpirationDate())
+                                ? DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(
+                                order.getPaymentExpirationDate())
                                 : null)
                 .paymentDate(paymentDate)
                 .phoneNumber(order.getDelivery().getPhoneNumber())
@@ -330,6 +345,11 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
                 .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
                 .customerKey(customerKey)
+                .isDelivery(order.isDelivery())
+                .trackingNumber(
+                        order.getDelivery().getTrackingNumber() != null ? order.getDelivery().getTrackingNumber()
+                                : null)
+                .carrierName("한진택배")
                 .build();
     }
 }

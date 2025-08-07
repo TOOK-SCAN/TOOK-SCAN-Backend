@@ -69,11 +69,31 @@ public class ReadStatisticsSummariesResponseDto extends SelfValidating<ReadStati
         @JsonProperty("raw_count")
         private final Integer rawCount;
 
+        @JsonProperty("spring_average_page_count")
+        private final Double springAveragePageCount;
+
+        @JsonProperty("raw_average_page_count")
+        private final Double rawAveragePageCount;
+
+        @JsonProperty("discard_average_page_count")
+        private final Double discardAveragePageCount;
+
+        @JsonProperty("spring_average_book_price")
+        private final Double springAverageBookPrice;
+
+        @JsonProperty("raw_average_book_price")
+        private final Double rawAverageBookPrice;
+
+        @JsonProperty("discard_average_book_price")
+        private final Double discardAverageBookPrice;
+
         @Builder
         public MonthlyStatisticsDto(String yearMonth, Integer pageViewCount, Integer visitantCount,
                                     Integer signUpCount, Integer orderCount, Integer appliedCount,
                                     Integer arrivedCount, Integer completedCount, Integer discardedCount,
-                                    Integer springCount, Integer rawCount) {
+                                    Integer springCount, Integer rawCount,
+                                    Double springAveragePageCount, Double rawAveragePageCount, Double discardAveragePageCount,
+                                    Double springAverageBookPrice, Double rawAverageBookPrice, Double discardAverageBookPrice) {
             this.yearMonth = yearMonth;
             this.pageViewCount = pageViewCount;
             this.visitantCount = visitantCount;
@@ -85,12 +105,20 @@ public class ReadStatisticsSummariesResponseDto extends SelfValidating<ReadStati
             this.discardedCount = discardedCount;
             this.springCount = springCount;
             this.rawCount = rawCount;
+            this.springAveragePageCount = springAveragePageCount != null ? Math.round(springAveragePageCount * 10.0) / 10.0 : 0.0;
+            this.rawAveragePageCount = rawAveragePageCount != null ? Math.round(rawAveragePageCount * 10.0) / 10.0 : 0.0;
+            this.discardAveragePageCount = discardAveragePageCount != null ? Math.round(discardAveragePageCount * 10.0) / 10.0 : 0.0;
+            this.springAverageBookPrice = springAverageBookPrice != null ? Math.round(springAverageBookPrice * 10.0) / 10.0 : 0.0;
+            this.rawAverageBookPrice = rawAverageBookPrice != null ? Math.round(rawAverageBookPrice * 10.0) / 10.0 : 0.0;
+            this.discardAverageBookPrice = discardAverageBookPrice != null ? Math.round(discardAverageBookPrice * 10.0) / 10.0 : 0.0;
         }
 
         public static MonthlyStatisticsDto of(String yearMonth, Integer pageViewCount, Integer visitantCount,
                                               Integer signUpCount, Integer orderCount, Integer appliedCount,
                                                 Integer arrivedCount, Integer completedCount,
-                                                Integer discardedCount, Integer springCount, Integer rawCount) {
+                                                Integer discardedCount, Integer springCount, Integer rawCount,
+                                                Double springAveragePageCount, Double rawAveragePageCount, Double discardAveragePageCount,
+                                                Double springAverageBookPrice, Double rawAverageBookPrice, Double discardAverageBookPrice) {
             return MonthlyStatisticsDto.builder()
                     .yearMonth(yearMonth)
                     .pageViewCount(pageViewCount)
@@ -103,6 +131,12 @@ public class ReadStatisticsSummariesResponseDto extends SelfValidating<ReadStati
                     .discardedCount(discardedCount)
                     .springCount(springCount)
                     .rawCount(rawCount)
+                    .springAveragePageCount(springAveragePageCount)
+                    .rawAveragePageCount(rawAveragePageCount)
+                    .discardAveragePageCount(discardAveragePageCount)
+                    .springAverageBookPrice(springAverageBookPrice)
+                    .rawAverageBookPrice(rawAverageBookPrice)
+                    .discardAverageBookPrice(discardAverageBookPrice)
                     .build();
         }
     }

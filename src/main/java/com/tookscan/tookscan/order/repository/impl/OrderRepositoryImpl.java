@@ -17,12 +17,14 @@ import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -454,19 +456,22 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate) {
+    public Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
         QOrder order = QOrder.order;
         QDocument document = QDocument.document;
+        
+        BooleanExpression predicate = order.createdAt.between(startDate, endDate);
+        predicate = predicate.and(buildFilterPredicate(order, isApplied, isArrived, isCompleted));
         
         return jpaQueryFactory
                 .select(
                         Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
                         document.recoveryOption,
-                        order.count().intValue()
+                        document.count().intValue()
                 )
                 .from(order)
                 .join(order.documents, document)
-                .where(order.createdAt.between(startDate, endDate))
+                .where(predicate)
                 .groupBy(
                         Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
                         document.recoveryOption
@@ -478,6 +483,70 @@ public class OrderRepositoryImpl implements OrderRepository {
                         Collectors.toMap(
                                 tuple -> tuple.get(1, ERecoveryOption.class),
                                 tuple -> tuple.get(2, Integer.class)
+                        )
+                ));
+    }
+
+    @Override
+    public Map<String, Map<ERecoveryOption, Double>> findMonthlyRecoveryOptionAveragePageCounts(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
+        QOrder order = QOrder.order;
+        QDocument document = QDocument.document;
+        
+        BooleanExpression predicate = order.createdAt.between(startDate, endDate);
+        predicate = predicate.and(buildFilterPredicate(order, isApplied, isArrived, isCompleted));
+        
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        document.recoveryOption,
+                        document.pageCount.avg()
+                )
+                .from(order)
+                .join(order.documents, document)
+                .where(predicate)
+                .groupBy(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        document.recoveryOption
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(0, String.class),
+                        Collectors.toMap(
+                                tuple -> tuple.get(1, ERecoveryOption.class),
+                                tuple -> Optional.ofNullable(tuple.get(2, Double.class)).orElse(0.0)
+                        )
+                ));
+    }
+
+    @Override
+    public Map<String, Map<ERecoveryOption, Double>> findMonthlyRecoveryOptionAverageBookPrices(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
+        QOrder order = QOrder.order;
+        QDocument document = QDocument.document;
+        
+        BooleanExpression predicate = order.createdAt.between(startDate, endDate);
+        predicate = predicate.and(buildFilterPredicate(order, isApplied, isArrived, isCompleted));
+        
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        document.recoveryOption,
+                        document.totalAmount.avg()
+                )
+                .from(order)
+                .join(order.documents, document)
+                .where(predicate)
+                .groupBy(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        document.recoveryOption
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(0, String.class),
+                        Collectors.toMap(
+                                tuple -> tuple.get(1, ERecoveryOption.class),
+                                tuple -> Optional.ofNullable(tuple.get(2, Double.class)).orElse(0.0)
                         )
                 ));
     }
@@ -560,5 +629,25 @@ public class OrderRepositoryImpl implements OrderRepository {
                 default -> order.id.desc();
             };
         }
+    }
+
+
+    private BooleanExpression buildFilterPredicate(QOrder order, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
+        BooleanExpression predicate = Expressions.TRUE;
+        
+        if (isApplied != null && isApplied) {
+            predicate = predicate.and(order.orderStatus.isNotNull())
+                                .and(order.orderStatus.ne(EOrderStatus.CANCEL));
+        }
+        
+        if (isArrived != null && isArrived) {
+            predicate = predicate.and(order.arrivedAt.isNotNull());
+        }
+        
+        if (isCompleted != null && isCompleted) {
+            predicate = predicate.and(order.orderStatus.eq(EOrderStatus.ALL_COMPLETED));
+        }
+        
+        return predicate;
     }
 }

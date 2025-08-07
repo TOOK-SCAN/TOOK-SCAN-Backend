@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -129,11 +128,15 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             @JsonProperty("email")
             private final String email;
 
+            @JsonProperty("tracking_number")
+            private final String trackingNumber;
+
             @Builder
-            public DeliveryInfoDto(String receiverName, String phoneNumber, String email) {
+            public DeliveryInfoDto(String receiverName, String phoneNumber, String email, String trackingNumber) {
                 this.receiverName = receiverName;
                 this.phoneNumber = phoneNumber;
                 this.email = email;
+                this.trackingNumber = trackingNumber;
             }
         }
 
@@ -167,11 +170,11 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
             Integer paymentTotal = paymentOpt.map(Payment::getTotalAmount)
                     .orElse(order.getTotalAmount());
 
-            String deliveryExpirationDate = DateTimeUtil.convertLocalDateTimeToDartString(
+            String deliveryExpirationDate = DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(
                     order.getDeliveryExpirationDate());
 
             String paymentExpiration = Optional.ofNullable(order.getPaymentExpirationDate())
-                    .map(DateTimeUtil::convertLocalDateTimeToDartString)
+                    .map(DateTimeUtil::convertLocalDateTimeToDartStringWithoutSecond)
                     .orElse(null);
 
             List<DocumentDto> docs = order.getDocuments().stream()
@@ -189,6 +192,8 @@ public class ReadUserOrderOverviewResponseDto extends SelfValidating<ReadUserOrd
                             .receiverName(order.getDelivery().getReceiverName())
                             .phoneNumber(order.getDelivery().getPhoneNumber())
                             .email(order.getDelivery().getEmail())
+                            .trackingNumber(order.getDelivery().getTrackingNumber() != null ?
+                                    order.getDelivery().getTrackingNumber() : null)
                             .build())
                     .orderDate(DateTimeUtil.convertLocalDateToDartString(order.getCreatedAt().toLocalDate()))
                     .orderStatus(order.getOrderStatus())

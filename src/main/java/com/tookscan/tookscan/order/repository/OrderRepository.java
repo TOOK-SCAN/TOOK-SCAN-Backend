@@ -79,7 +79,11 @@ public interface OrderRepository {
 
     Map<String, Map<EOrderStatus, Integer>> findMonthlyOrderStatusCounts(LocalDateTime startDate, LocalDateTime endDate);
 
-    Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate);
+    Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted);
+
+    Map<String, Map<ERecoveryOption, Double>> findMonthlyRecoveryOptionAveragePageCounts(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted);
+
+    Map<String, Map<ERecoveryOption, Double>> findMonthlyRecoveryOptionAverageBookPrices(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted);
 
     Order findByIdWithDocumentsOrElseThrow(Long id);
 

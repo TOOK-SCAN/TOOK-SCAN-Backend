@@ -325,6 +325,10 @@ public class ReadAdminOrderDetailResponseDto extends
             @NotBlank
             private final String id;
 
+            @JsonProperty("name")
+            @NotBlank
+            private final String name;
+
             @JsonProperty("pdf_url")
             @NotBlank
             private final String pdfUrl;
@@ -336,7 +340,8 @@ public class ReadAdminOrderDetailResponseDto extends
             private final String expiredAt;
 
             @Builder
-            public PdfDto(String pdfUrl, Boolean isExpired, String expiredAt, String id) {
+            public PdfDto(String pdfUrl, Boolean isExpired, String expiredAt, String id, String name) {
+                this.name = name;
                 this.pdfUrl = pdfUrl;
                 this.isExpired = isExpired;
                 this.expiredAt = expiredAt;
@@ -351,6 +356,7 @@ public class ReadAdminOrderDetailResponseDto extends
                         .expiredAt(pdf.getExpiredAt() != null
                                 ? DateTimeUtil.convertLocalDateTimeToDartString(pdf.getExpiredAt()) : null)
                         .id(pdf.getId().toString())
+                        .name(pdf.getName())
                         .build();
             }
         }
