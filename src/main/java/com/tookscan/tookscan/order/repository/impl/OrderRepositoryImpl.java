@@ -8,8 +8,8 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Order;
-import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.order.domain.QDocument;
+import com.tookscan.tookscan.order.domain.QOrder;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.repository.OrderRepository;
@@ -17,14 +17,12 @@ import com.tookscan.tookscan.order.repository.mysql.OrderJpaRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -54,6 +52,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Order findByIdOrElseThrow(Long id) {
         return orderJpaRepository.findById(id)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ORDER, "주문 ID: " + id));
+    }
+
+    @Override
+    public Integer countByIsAsInProgressTrue() {
+        return orderJpaRepository.countByIsAsInProgressTrue();
     }
 
     @Override

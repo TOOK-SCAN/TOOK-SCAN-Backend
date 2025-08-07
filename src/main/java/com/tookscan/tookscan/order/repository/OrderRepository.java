@@ -3,12 +3,11 @@ package com.tookscan.tookscan.order.repository;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
+import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -88,5 +87,7 @@ public interface OrderRepository {
     Order findByIdWithDocumentsOrElseThrow(Long id);
 
     Order findByIdWithDocumentsAndDeliveryOrElseThrow(Long id);
+
+    Integer countByIsAsInProgressTrue();
 
 }

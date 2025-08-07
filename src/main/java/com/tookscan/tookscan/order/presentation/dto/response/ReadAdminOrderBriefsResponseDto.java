@@ -67,13 +67,18 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
     @Min(0)
     private final Integer allCompletedCount;
 
+    @JsonProperty("as_count")
+    @NotNull
+    @Min(0)
+    private final Integer asCount;
+
     @Builder
     public ReadAdminOrderBriefsResponseDto(Integer totalCount, Integer applyCompletedCount, Integer companyArrivedCount,
                                            Integer paymentWaitingCount, Integer paymentCompletedCount,
                                            Integer scanInProgressCount, Integer scanCompletedCount,
                                            Integer recoveryInProgressCount,
                                            Integer postWaitingCount, Integer cancelCount,
-                                           Integer allCompletedCount) {
+                                           Integer allCompletedCount, Integer asCount) {
         this.totalCount = totalCount;
         this.applyCompletedCount = applyCompletedCount;
         this.companyArrivedCount = companyArrivedCount;
@@ -85,10 +90,12 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
         this.postWaitingCount = postWaitingCount;
         this.cancelCount = cancelCount;
         this.allCompletedCount = allCompletedCount;
+        this.asCount = asCount;
         this.validateSelf();
     }
 
-    public static ReadAdminOrderBriefsResponseDto of(Map<EOrderStatus, Integer> counts){
+    public static ReadAdminOrderBriefsResponseDto of(Map<EOrderStatus, Integer> counts,
+                                                     Integer asCount) {
         return ReadAdminOrderBriefsResponseDto.builder()
                 .totalCount(counts.values().stream().mapToInt(Integer::intValue).sum())
                 .applyCompletedCount(counts.get(EOrderStatus.APPLY_COMPLETED))
@@ -101,6 +108,7 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
                 .postWaitingCount(counts.get(EOrderStatus.POST_WAITING))
                 .cancelCount(counts.get(EOrderStatus.CANCEL))
                 .allCompletedCount(counts.get(EOrderStatus.ALL_COMPLETED))
+                .asCount(asCount)
                 .build();
     }
 
