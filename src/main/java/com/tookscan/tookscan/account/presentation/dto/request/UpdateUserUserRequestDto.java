@@ -2,11 +2,14 @@ package com.tookscan.tookscan.account.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import java.time.LocalDate;
 
 public record UpdateUserUserRequestDto(
         @JsonProperty("phone_number")
@@ -40,6 +43,16 @@ public record UpdateUserUserRequestDto(
         @JsonProperty("is_receive_email")
         @NotNull(message = "이메일 수신 여부를 선택해주세요.")
         @Schema(description = "이메일 수신 여부", example = "true")
-        Boolean isReceiveEmail
+        Boolean isReceiveEmail,
+
+        @JsonProperty("gender")
+        @Schema(description = "성별", example = "MALE | FEMALE | UNKNOWN")
+        @NotNull(message = "성별을 선택해주세요.")
+        EGender gender,
+
+        @JsonProperty("birth")
+        @Schema(description = "생년월일 (YYYY-MM-DD 형식)", example = "1990-01-01")
+        @NotNull(message = "생년월일을 입력해주세요.")
+        LocalDate birth
 ) {
 }

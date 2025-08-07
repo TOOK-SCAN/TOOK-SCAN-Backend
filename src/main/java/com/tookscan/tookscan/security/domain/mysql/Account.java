@@ -118,4 +118,12 @@ public abstract class Account {
     public void updateReasonDeletion(String reasonDeletion) {
         this.reasonDeletion = reasonDeletion;
     }
+
+    public void updateGender(EGender gender) {
+        this.gender = gender;
+    }
+
+    public void updateBirth(LocalDate birth) {
+        this.birth = birth;
+    }
 }

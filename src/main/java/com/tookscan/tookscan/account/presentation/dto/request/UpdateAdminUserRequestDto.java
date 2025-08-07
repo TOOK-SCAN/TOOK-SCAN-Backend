@@ -2,11 +2,15 @@ package com.tookscan.tookscan.account.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import java.time.LocalDate;
 
 public record UpdateAdminUserRequestDto(
         @JsonProperty("name")
@@ -34,7 +38,16 @@ public record UpdateAdminUserRequestDto(
         String deliveryRequest,
 
         @JsonProperty("memo")
-        String memo
+        String memo,
+
+        @JsonProperty("gender")
+        @Schema(description = "성별", example = "MALE | FEMALE | UNKNOWN")
+        @NotNull
+        EGender gender,
+
+        @JsonProperty("birth")
+        @Schema(description = "생년월일 (YYYY-MM-DD 형식)", example = "1990-01-01")
+        LocalDate birth
 
 ) {
 }

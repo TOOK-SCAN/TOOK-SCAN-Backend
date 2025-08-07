@@ -58,7 +58,9 @@ public class UpdateUserUserService implements UpdateUserUserUseCase {
                 requestDto.deliveryRequest(),
                 requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
                 requestDto.isReceiveEmail(),
-                requestDto.isReceiveSms()
+                requestDto.isReceiveSms(),
+                requestDto.gender(),
+                requestDto.birth()
         );
         userRepository.save(user);
 
