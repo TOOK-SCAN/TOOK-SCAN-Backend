@@ -3,6 +3,7 @@ package com.tookscan.tookscan.account.domain;
 import com.tookscan.tookscan.address.domain.Address;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.security.domain.mysql.Account;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.persistence.CascadeType;
@@ -15,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,9 +100,11 @@ public class User extends Account {
             LocalDateTime serviceAgreed,
             LocalDateTime marketingAllowed,
             Boolean isReceiveEmail,
-            Boolean isReceiveSms
+            Boolean isReceiveSms,
+            EGender gender,
+            LocalDate birth
     ) {
-        super(provider, serialId, password, phoneNumber);
+        super(provider, serialId, password, phoneNumber, gender, birth);
         this.name = name;
         this.email = null;
         this.over14Agreed = over14Agreed;

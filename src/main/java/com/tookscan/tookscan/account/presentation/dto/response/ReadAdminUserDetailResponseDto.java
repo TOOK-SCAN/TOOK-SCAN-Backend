@@ -5,9 +5,12 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -67,12 +70,12 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
     private final Integer totalOrderDocumentCount;
 
     @JsonProperty("gender")
-    @Schema(description = "성별", example = "남성")
-    private final String gender;
+    @Schema(description = "성별", example = "MALE | FEMALE")
+    private final EGender gender;
 
     @JsonProperty("birth")
-    @Schema(description = "출생년도", example = "1990년")
-    private final String birth;
+    @Schema(description = "출생년월일", example = "1990-01-01")
+    private final LocalDate birth;
 
     @JsonProperty("is_deleted")
     @Schema(description = "탈퇴 여부", example = "true")
@@ -94,7 +97,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                                           String email, AddressResponseDto address, String deliveryRequest, String memo,
                                           Integer totalPaymentAmount, Integer totalOrderCount,
                                           Integer totalOrderDocumentCount,
-                                          String gender, String birth, LocalDateTime deletedAt, String reasonDeletion,
+                                          EGender gender, LocalDate birth, LocalDateTime deletedAt, String reasonDeletion,
                                           Boolean isDeleted
                                           ) {
         this.signUpDate = signUpDate;
@@ -109,8 +112,8 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
         this.totalPaymentAmount = totalPaymentAmount;
         this.totalOrderCount = totalOrderCount;
         this.totalOrderDocumentCount = totalOrderDocumentCount;
-        this.gender = gender != null ? gender : " - ";
-        this.birth = birth != null ? birth : " - ";
+        this.gender = gender != null ? gender : EGender.UNKNOWN;
+        this.birth = birth;
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt != null ? DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(deletedAt) : " - ";
         this.reasonDeletion = reasonDeletion != null ? reasonDeletion : " - ";

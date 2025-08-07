@@ -80,7 +80,9 @@ public class SignUpOauthService implements SignUpOauthUseCase {
                 requestDto.phoneNumber(),
                 requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
                 requestDto.isReceiveEmail(),
-                requestDto.isReceiveSms()
+                requestDto.isReceiveSms(),
+                null,
+                null
         );
         User savedUser = userRepository.save(user);
 

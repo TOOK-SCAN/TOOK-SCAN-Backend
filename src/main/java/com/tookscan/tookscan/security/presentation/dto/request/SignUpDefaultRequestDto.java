@@ -2,9 +2,13 @@ package com.tookscan.tookscan.security.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.core.annotation.validation.ValidPassword;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @ValidPassword
 public record SignUpDefaultRequestDto(
@@ -42,6 +46,14 @@ public record SignUpDefaultRequestDto(
 
         @JsonProperty("is_receive_sms")
         @NotNull(message = "SMS 수신 동의 여부를 선택해주세요.")
-        Boolean isReceiveSms
+        Boolean isReceiveSms,
+
+        @JsonProperty("gender")
+        @NotNull
+        EGender gender,
+
+        @JsonProperty("birth")
+        @NotBlank(message = "생년월일을 입력해주세요.")
+        LocalDate birth
 ) {
 }

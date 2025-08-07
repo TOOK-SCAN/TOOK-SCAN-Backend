@@ -36,7 +36,7 @@ public class Admin extends Account {
             String serialId,
             String password
     ) {
-        super(ESecurityProvider.DEFAULT, serialId, password, null);
+        super(ESecurityProvider.DEFAULT, serialId, password, null, null, null);
     }
 
     @Override
