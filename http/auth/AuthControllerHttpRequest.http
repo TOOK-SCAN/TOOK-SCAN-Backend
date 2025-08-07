@@ -44,7 +44,9 @@ Content-Type: application/json
     "password": "{{auth.API_2_1_2.password}}",
     "phone_number": "{{auth.API_2_1_2.phone_number}}",
     "is_receive_email" : true,
-    "is_receive_sms" : true
+    "is_receive_sms" : true,
+    "gender": "MALE",
+    "birth": "2000-04-04"
 }
 
 ### 2.1.5 회원 정보 검증
@@ -73,7 +75,7 @@ GET {{host_url}}/v1/auth/existence/phone-number?phone-number=01012341234
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "755530"
+@authentication_code = "880675"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 
@@ -86,3 +88,26 @@ Content-Type: application/json
 ### 2.2.2 계정 간단 정보 조회
 // @no-log
 GET {{host_url}}/v1/auth/briefs
+
+### 아이디 찾기
+// @no-log
+POST {{host_url}}/v1/auth/verification/serial-id
+Content-Type: application/json
+
+{
+    "name": "장동겸",
+    "phone_number": "01056175155"
+}
+
+### 비밀번호 찾기
+// @no-log
+POST {{host_url}}/v1/auth/verification/password
+
+### 회원탈퇴
+// @no-log
+DELETE {{host_url}}/v1/auth
+Content-Type: application/json
+
+{
+    "reason": "그냥"
+}
