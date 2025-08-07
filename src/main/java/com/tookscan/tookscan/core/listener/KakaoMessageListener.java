@@ -114,6 +114,7 @@ public class KakaoMessageListener {
                 .addKeyValue("order_name", event.getOrderName())
                 .addKeyValue("order_id", event.getOrderId())
                 .addKeyValue("order_price", event.getOrderPrice())
+                .addKeyValue("customer_key", event.getCustomerKey())
                 .log("[Kakao Message] Received request payment message event");
 
         try {
@@ -124,12 +125,14 @@ public class KakaoMessageListener {
                     event.getOrderNumber(),
                     event.getEmail(),
                     event.getUserName(),
-                    event.getPhoneNumber()
+                    event.getPhoneNumber(),
+                    event.getCustomerKey()
             );
             log.atInfo()
                     .addKeyValue("order_name", event.getOrderName())
                     .addKeyValue("order_id", event.getOrderId())
                     .addKeyValue("order_price", event.getOrderPrice())
+                    .addKeyValue("customer_key", event.getCustomerKey())
                     .log("[Kakao Message] Successfully sent request payment message");
         } catch (Exception e) {
             log.atError()
@@ -137,6 +140,7 @@ public class KakaoMessageListener {
                     .addKeyValue("order_name", event.getOrderName())
                     .addKeyValue("order_id", event.getOrderId())
                     .addKeyValue("order_price", event.getOrderPrice())
+                    .addKeyValue("customer_key", event.getCustomerKey())
                     .log("[Kakao Message] Failed to send request payment message");
         }
     }
