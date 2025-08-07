@@ -47,7 +47,8 @@ public class UpdateAdminOrderStatusPaymentWaitingService implements UpdateAdminO
                         order.getOrderNumber(),
                         order.getUser().getPhoneNumber(),
                         order.getUser().getEmail(),
-                        order.getUser().getName()
+                        order.getUser().getName(),
+                        order.getUser().getId()
                 )
         );
         

@@ -3,6 +3,8 @@ package com.tookscan.tookscan.message.domain.event;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Builder
 @Getter
 public class RequestPaymentMessageEvent {
@@ -14,8 +16,9 @@ public class RequestPaymentMessageEvent {
     private final String phoneNumber;
     private final String email;
     private final String userName;
+    private final UUID customerKey;
 
-    public static RequestPaymentMessageEvent of(String orderName, Integer orderPrice, Long orderId, String orderNumber, String phoneNumber, String email, String userName) {
+    public static RequestPaymentMessageEvent of(String orderName, Integer orderPrice, Long orderId, String orderNumber, String phoneNumber, String email, String userName, UUID customerKey) {
         return RequestPaymentMessageEvent.builder()
                 .orderName(orderName)
                 .orderPrice(orderPrice)
@@ -24,6 +27,7 @@ public class RequestPaymentMessageEvent {
                 .phoneNumber(phoneNumber)
                 .email(email)
                 .userName(userName)
+                .customerKey(customerKey)
                 .build();
     }
 }
