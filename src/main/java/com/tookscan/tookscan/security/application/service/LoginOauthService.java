@@ -39,7 +39,7 @@ public class LoginOauthService implements LoginOauthUseCase {
         LogContext.put("provider", principal.getProvider());
 
         return jsonWebTokenUtil.generateOauthJsonWebTokens(
-                principal.getSerialId() + ":" + principal.getProvider()
+                principal.getSerialId() + ":" + principal.getProvider() + ":" + principal.getGender() + ":" + principal.getBirth()
         );
     }
 
