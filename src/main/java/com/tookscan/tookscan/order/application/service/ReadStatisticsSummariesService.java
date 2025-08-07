@@ -1,11 +1,11 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.account.repository.UserRepository;
+import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.domain.type.ERecoveryOption;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto.MonthlyStatisticsDto;
-import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.payment.repository.PaymentRepository;
 import java.time.LocalDate;
@@ -70,7 +70,7 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
         // 필터링된 월별 복구 옵션별 통계
         Map<String, Map<ERecoveryOption, Integer>> recoveryOptionCounts = orderRepository.findMonthlyRecoveryOptionCounts(periodStart, periodEnd, isApplied, isArrived, isCompleted);
         Map<String, Map<ERecoveryOption, Double>> recoveryOptionAveragePageCounts = orderRepository.findMonthlyRecoveryOptionAveragePageCounts(periodStart, periodEnd, isApplied, isArrived, isCompleted);
-        Map<String, Map<ERecoveryOption, Double>> recoveryOptionAverageBookPrices = orderRepository.findMonthlyRecoveryOptionAverageBookPrices(periodStart, periodEnd, isApplied, isArrived, isCompleted);
+        Map<String, Map<ERecoveryOption, Double>> recoveryOptionAverageDocumentPrices = orderRepository.findMonthlyRecoveryOptionAverageDocumentPrices(periodStart, periodEnd, isApplied, isArrived, isCompleted);
         
         List<MonthlyStatisticsDto> result = new ArrayList<>();
         LocalDate current = start;
@@ -100,11 +100,12 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
             Double rawAvgPageCount = avgPageCountMap.getOrDefault(ERecoveryOption.RAW, 0.0);
             Double discardAvgPageCount = avgPageCountMap.getOrDefault(ERecoveryOption.DISCARD, 0.0);
             
-            // 복구 옵션별 평균 책 금액
-            Map<ERecoveryOption, Double> avgBookPriceMap = recoveryOptionAverageBookPrices.getOrDefault(yearMonth, Map.of());
-            Double springAvgBookPrice = avgBookPriceMap.getOrDefault(ERecoveryOption.SPRING, 0.0);
-            Double rawAvgBookPrice = avgBookPriceMap.getOrDefault(ERecoveryOption.RAW, 0.0);
-            Double discardAvgBookPrice = avgBookPriceMap.getOrDefault(ERecoveryOption.DISCARD, 0.0);
+            // 복구 옵션별 평균 문서 금액
+            Map<ERecoveryOption, Double> avgDocumentPriceMap = recoveryOptionAverageDocumentPrices.getOrDefault(yearMonth,
+                    Map.of());
+            Double springAvgDocumentPrice = avgDocumentPriceMap.getOrDefault(ERecoveryOption.SPRING, 0.0);
+            Double rawAvgDocumentPrice = avgDocumentPriceMap.getOrDefault(ERecoveryOption.RAW, 0.0);
+            Double discardAvgDocumentPrice = avgDocumentPriceMap.getOrDefault(ERecoveryOption.DISCARD, 0.0);
             
             // 현재는 하드코딩된 값 (추후 구글 애널리틱스 연동 시 수정)
             Integer pageViewCount = 0;
@@ -125,9 +126,9 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
                     springAvgPageCount,
                     rawAvgPageCount,
                     discardAvgPageCount,
-                    springAvgBookPrice,
-                    rawAvgBookPrice,
-                    discardAvgBookPrice
+                    springAvgDocumentPrice,
+                    rawAvgDocumentPrice,
+                    discardAvgDocumentPrice
             ));
             
             current = current.plusMonths(1);
