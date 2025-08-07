@@ -69,7 +69,9 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
                 requestDto.phoneNumber(),
                 requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
                 requestDto.isReceiveEmail(),
-                requestDto.isReceiveSms()
+                requestDto.isReceiveSms(),
+                requestDto.gender(),
+                requestDto.birth()
         );
         User savedUser = userRepository.save(user);
 

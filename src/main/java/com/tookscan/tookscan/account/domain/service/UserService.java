@@ -2,7 +2,10 @@ package com.tookscan.tookscan.account.domain.service;
 
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +20,9 @@ public class UserService {
             String phoneNumber,
             Boolean marketingAllowed,
             Boolean isReceiveEmail,
-            Boolean isReceiveSms
+            Boolean isReceiveSms,
+            EGender gender,
+            LocalDate birth
     ) {
         return User.builder()
                 .provider(provider)
@@ -30,6 +35,8 @@ public class UserService {
                 .marketingAllowed(marketingAllowed ? LocalDateTime.now() : null)
                 .isReceiveEmail(isReceiveEmail)
                 .isReceiveSms(isReceiveSms)
+                .gender(gender)
+                .birth(birth)
                 .build();
     }
 

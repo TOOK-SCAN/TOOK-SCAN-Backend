@@ -1,5 +1,6 @@
 package com.tookscan.tookscan.security.domain.mysql;
 
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.hibernate.annotations.SQLDelete;
@@ -66,10 +68,11 @@ public abstract class Account {
     private String reasonDeletion;
 
     @Column(name = "gender")
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private EGender gender;
 
     @Column(name = "birth")
-    private String birth;
+    private LocalDate birth;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
@@ -78,7 +81,9 @@ public abstract class Account {
             ESecurityProvider provider,
             String serialId,
             String password,
-            String phoneNumber
+            String phoneNumber,
+            EGender gender,
+            LocalDate birth
     ) {
         this.provider = provider;
         this.serialId = serialId;
@@ -88,8 +93,8 @@ public abstract class Account {
         this.updatedAt = LocalDateTime.now();
         this.deletedAt = null;
         this.reasonDeletion = null;
-        this.gender = null;
-        this.birth = null;
+        this.gender = gender;
+        this.birth = birth;
     }
 
     public abstract ESecurityRole getRole();
