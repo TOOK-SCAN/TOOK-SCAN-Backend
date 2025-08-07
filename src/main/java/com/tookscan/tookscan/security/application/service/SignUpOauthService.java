@@ -12,6 +12,7 @@ import com.tookscan.tookscan.security.application.usecase.SignUpOauthUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
 import com.tookscan.tookscan.security.domain.service.AuthenticationCodeService;
 import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpOauthRequestDto;
 import com.tookscan.tookscan.security.repository.AccountRepository;
@@ -19,6 +20,8 @@ import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryReposi
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
 import com.tookscan.tookscan.security.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
+
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,6 +61,8 @@ public class SignUpOauthService implements SignUpOauthUseCase {
         String[] split = claims.get(Constants.ACCOUNT_ID_CLAIM_NAME,String.class).split(":");
         String serialId = split[0];
         ESecurityProvider provider = ESecurityProvider.valueOf(split[1]);
+        EGender gender = EGender.valueOf(split[2]);
+        LocalDate birth = LocalDate.parse(split[3]);
 
         // 중복된 아이디인지 확인
         accountRepository.existsBySerialIdAndProviderAndDeletedAtIsNullThenThrow(serialId, provider);
@@ -81,8 +86,8 @@ public class SignUpOauthService implements SignUpOauthUseCase {
                 requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
                 requestDto.isReceiveEmail(),
                 requestDto.isReceiveSms(),
-                null,
-                null
+                gender,
+                birth
         );
         User savedUser = userRepository.save(user);
 

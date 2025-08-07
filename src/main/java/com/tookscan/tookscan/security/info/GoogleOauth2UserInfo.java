@@ -1,7 +1,9 @@
 package com.tookscan.tookscan.security.info;
 
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.info.factory.Oauth2UserInfo;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 public class GoogleOauth2UserInfo extends Oauth2UserInfo {
@@ -12,5 +14,26 @@ public class GoogleOauth2UserInfo extends Oauth2UserInfo {
     @Override
     public String getId() {
         return (String) attributes.get("sub");
+    }
+
+    @Override
+    public EGender getGender() {
+        if (attributes.get("gender") != null) {
+            return switch ((String) attributes.get("gender")) {
+                case "male" -> EGender.MALE;
+                case "female" -> EGender.FEMALE;
+                default -> EGender.UNKNOWN;
+            };
+        }
+        return EGender.UNKNOWN;
+    }
+
+    @Override
+    public LocalDate getBirth() {
+        if (attributes.get("birthdate") != null) {
+            String birthdate = (String) attributes.get("birthdate");
+            return LocalDate.parse(birthdate);
+        }
+        return null;
     }
 }
