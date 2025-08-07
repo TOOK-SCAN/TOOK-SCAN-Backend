@@ -75,7 +75,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
 
     @JsonProperty("birth")
     @Schema(description = "출생년월일", example = "1990-01-01")
-    private final LocalDate birth;
+    private final String birth;
 
     @JsonProperty("is_deleted")
     @Schema(description = "탈퇴 여부", example = "true")
@@ -97,7 +97,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                                           String email, AddressResponseDto address, String deliveryRequest, String memo,
                                           Integer totalPaymentAmount, Integer totalOrderCount,
                                           Integer totalOrderDocumentCount,
-                                          EGender gender, LocalDate birth, LocalDateTime deletedAt, String reasonDeletion,
+                                          EGender gender, String birth, LocalDateTime deletedAt, String reasonDeletion,
                                           Boolean isDeleted
                                           ) {
         this.signUpDate = signUpDate;
@@ -145,7 +145,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                         .mapToLong(order -> order.getDocuments().size())
                         .sum())
                 .gender(user.getGender())
-                .birth(user.getBirth())
+                .birth(user.getBirth() != null ? DateTimeUtil.convertLocalDateToDartString(user.getBirth()) : " - ")
                 .isDeleted(user.getDeletedAt() != null)
                 .deletedAt(user.getDeletedAt())
                 .reasonDeletion(user.getReasonDeletion())

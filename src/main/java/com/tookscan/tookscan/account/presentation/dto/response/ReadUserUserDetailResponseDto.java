@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
+import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -63,12 +64,12 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
 
     @JsonProperty("birth")
     @Schema(description = "생년월일 (YYYY-MM-DD 형식)", example = "1990-01-01")
-    private LocalDate birth;
+    private String birth;
 
     @Builder
     public ReadUserUserDetailResponseDto(String name, ESecurityProvider provider, String serialId, String phoneNumber,
                                          String email, AddressResponseDto address, String deliveryRequest, Boolean isReceiveEmail, Boolean isReceiveSms,
-                                         EGender gender, LocalDate birth) {
+                                         EGender gender, String birth) {
         this.name = name;
         this.provider = provider;
         this.serialId = serialId;
@@ -95,7 +96,7 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
                 .isReceiveEmail(user.getIsReceiveEmail())
                 .isReceiveSms(user.getIsReceiveSms())
                 .gender(user.getGender())
-                .birth(user.getBirth())
+                .birth(user.getBirth() != null ? DateTimeUtil.convertLocalDateToDartString(user.getBirth()) : " - ")
                 .build();
     }
 }
