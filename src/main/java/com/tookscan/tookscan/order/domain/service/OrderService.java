@@ -150,7 +150,7 @@ public class OrderService {
 
     public void updatePaymentExpirationDate(Order order) {
         order.updatePaymentExpirationDate(
-                LocalDateTime.now().plusDays(PAYMENT_EXPIRATION_PERIOD + 1).withHour(0).withMinute(0).withSecond(0)
-                        .withNano(0));
+                LocalDateTime.now().plusDays(DELIVERY_EXPIRATION_PERIOD).withHour(23).withMinute(59)
+                        .withSecond(59).withNano(999999999));
     }
 }
