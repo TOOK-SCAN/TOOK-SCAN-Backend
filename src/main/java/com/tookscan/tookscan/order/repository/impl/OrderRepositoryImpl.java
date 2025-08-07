@@ -235,7 +235,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
 
         // 데이터 조회
-        List<Long> orderIds = jpaQueryFactory.select(order.id)
+        List<Order> orders = jpaQueryFactory
+                .select(order)
                 .from(order)
                 .join(order.user).fetchJoin()
                 .where(predicate)
@@ -243,6 +244,10 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        List <Long> orderIds = orders.stream()
+                .map(Order::getId)
+                .collect(Collectors.toList());
 
         // 전체 데이터 개수 조회
         long totalCount = Optional.ofNullable(
