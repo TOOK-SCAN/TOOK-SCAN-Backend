@@ -78,6 +78,7 @@ public class CookieUtil {
      *
      * @param request  HttpServletRequest
      * @param response HttpServletResponse
+     * @param cookieDomain Cookie 도메인
      * @param name     삭제할 Cookie 이름
      */
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieDomain, String name) {
@@ -92,6 +93,8 @@ public class CookieUtil {
                         .path("/")
                         .maxAge(0)
                         .httpOnly(true)
+                        .secure(true)          // HTTPS 환경에서 쿠키 삭제를 위해 필요
+                        .sameSite("Lax")      // 생성시와 동일한 sameSite 설정
                         .build();
                 response.addHeader("Set-Cookie", removedCookie.toString());
             }
