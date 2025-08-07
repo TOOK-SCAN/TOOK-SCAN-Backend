@@ -74,7 +74,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
                 return ConfirmPaymentResponseDto.of(
                         true,
                         order.getOrderNumber(),
-                        payment.getApprovedAt() != null ? payment.getApprovedAt().toString() : null,
+                        payment.getApprovedAt() != null ? payment.getApprovedAt() : null,
                         payment.getMethod() != null ? payment.getMethod() : null,
                         payment.getEasyPaymentProvider() != null ? payment.getEasyPaymentProvider() : null,
                         payment.getTotalAmount(),
@@ -145,7 +145,7 @@ public class ConfirmPaymentService implements ConfirmPaymentUseCase {
         return ConfirmPaymentResponseDto.of(
                 true,
                 order.getOrderNumber(),
-                payment.getApprovedAt() != null ? payment.getApprovedAt().toString() : null,
+                payment.getApprovedAt() != null ? payment.getApprovedAt() : null,
                 payment.getMethod() != null ? payment.getMethod() : null,
                 payment.getEasyPaymentProvider() != null ? payment.getEasyPaymentProvider() : null,
                 payment.getTotalAmount(),
