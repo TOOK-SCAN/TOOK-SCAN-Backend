@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDate;
 
 @Getter
 public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDetailResponseDto> {
@@ -54,9 +57,18 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
     @Schema(description = "SMS 수신 여부", example = "true")
     private Boolean isReceiveSms;
 
+    @JsonProperty("gender")
+    @Schema(description = "성별", example = "MALE | FEMALE | UNKNOWN")
+    private EGender gender;
+
+    @JsonProperty("birth")
+    @Schema(description = "생년월일 (YYYY-MM-DD 형식)", example = "1990-01-01")
+    private LocalDate birth;
+
     @Builder
     public ReadUserUserDetailResponseDto(String name, ESecurityProvider provider, String serialId, String phoneNumber,
-                                         String email, AddressResponseDto address, String deliveryRequest, Boolean isReceiveEmail, Boolean isReceiveSms) {
+                                         String email, AddressResponseDto address, String deliveryRequest, Boolean isReceiveEmail, Boolean isReceiveSms,
+                                         EGender gender, LocalDate birth) {
         this.name = name;
         this.provider = provider;
         this.serialId = serialId;
@@ -66,6 +78,8 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
         this.deliveryRequest = deliveryRequest;
         this.isReceiveEmail = isReceiveEmail;
         this.isReceiveSms = isReceiveSms;
+        this.gender = gender;
+        this.birth = birth;
         this.validateSelf();
     }
 
@@ -80,6 +94,8 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
                 .deliveryRequest(user.getDeliveryRequest() != null ? user.getDeliveryRequest() : null)
                 .isReceiveEmail(user.getIsReceiveEmail())
                 .isReceiveSms(user.getIsReceiveSms())
+                .gender(user.getGender())
+                .birth(user.getBirth())
                 .build();
     }
 }
