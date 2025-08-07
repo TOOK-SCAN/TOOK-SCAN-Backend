@@ -1,11 +1,13 @@
 package com.tookscan.tookscan.payment.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.payment.domain.type.EEasyPaymentProvider;
 import com.tookscan.tookscan.payment.domain.type.EPaymentMethod;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -46,11 +48,11 @@ public class ConfirmPaymentResponseDto {
         this.customerKey = customerKey;
     }
 
-    public static ConfirmPaymentResponseDto of(boolean paymentResult, String orderNumber, String approvedAt, EPaymentMethod method, EEasyPaymentProvider easyPaymentProvider, Integer totalAmount, String failReason, UUID customerKey) {
+    public static ConfirmPaymentResponseDto of(boolean paymentResult, String orderNumber, LocalDateTime approvedAt, EPaymentMethod method, EEasyPaymentProvider easyPaymentProvider, Integer totalAmount, String failReason, UUID customerKey) {
         return ConfirmPaymentResponseDto.builder()
                 .paymentResult(paymentResult)
                 .orderNumber(orderNumber)
-                .approvedAt(approvedAt)
+                .approvedAt(approvedAt != null ? DateTimeUtil.convertLocalDateTimeToDartStringWithoutSecond(approvedAt) : null)
                 .method(method)
                 .easyPaymentProvider(easyPaymentProvider)
                 .totalAmount(totalAmount)
