@@ -525,7 +525,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Map<String, Map<ERecoveryOption, Double>> findMonthlyRecoveryOptionAverageBookPrices(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
+    public Map<String, Map<ERecoveryOption, Double>> findMonthlyRecoveryOptionAverageDocumentPrices(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
         QOrder order = QOrder.order;
         QDocument document = QDocument.document;
         
