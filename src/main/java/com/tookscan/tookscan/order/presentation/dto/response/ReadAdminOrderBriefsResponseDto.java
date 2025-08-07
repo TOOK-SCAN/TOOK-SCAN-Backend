@@ -42,6 +42,11 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
     @Min(0)
     private final Integer scanInProgressCount;
 
+    @JsonProperty("scan_completed_count")
+    @NotNull
+    @Min(0)
+    private final Integer scanCompletedCount;
+
     @JsonProperty("recovery_in_progress_count")
     @NotNull
     @Min(0)
@@ -65,8 +70,9 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
     @Builder
     public ReadAdminOrderBriefsResponseDto(Integer totalCount, Integer applyCompletedCount, Integer companyArrivedCount,
                                            Integer paymentWaitingCount, Integer paymentCompletedCount,
-                                           Integer scanInProgressCount, Integer recoveryInProgressCount,
-                                           Integer postWaitingCount, Integer cancelCount, Integer asCount,
+                                           Integer scanInProgressCount, Integer scanCompletedCount,
+                                           Integer recoveryInProgressCount,
+                                           Integer postWaitingCount, Integer cancelCount,
                                            Integer allCompletedCount) {
         this.totalCount = totalCount;
         this.applyCompletedCount = applyCompletedCount;
@@ -74,6 +80,7 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
         this.paymentWaitingCount = paymentWaitingCount;
         this.paymentCompletedCount = paymentCompletedCount;
         this.scanInProgressCount = scanInProgressCount;
+        this.scanCompletedCount = scanCompletedCount;
         this.recoveryInProgressCount = recoveryInProgressCount;
         this.postWaitingCount = postWaitingCount;
         this.cancelCount = cancelCount;
@@ -89,6 +96,7 @@ public class ReadAdminOrderBriefsResponseDto extends SelfValidating<ReadAdminOrd
                 .paymentWaitingCount(counts.get(EOrderStatus.PAYMENT_WAITING))
                 .paymentCompletedCount(counts.get(EOrderStatus.PAYMENT_COMPLETED))
                 .scanInProgressCount(counts.get(EOrderStatus.SCAN_IN_PROGRESS))
+                .scanCompletedCount(counts.get(EOrderStatus.SCAN_COMPLETED))
                 .recoveryInProgressCount(counts.get(EOrderStatus.RECOVERY_IN_PROGRESS))
                 .postWaitingCount(counts.get(EOrderStatus.POST_WAITING))
                 .cancelCount(counts.get(EOrderStatus.CANCEL))

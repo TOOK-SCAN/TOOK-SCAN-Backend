@@ -47,7 +47,7 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
         }
 
         // 1. 트랜잭션 내에서 모든 DB 조회 결과만 수집
-        List<MonthlyStatisticsDto> statistics = loadStatistics(start, end);
+        List<MonthlyStatisticsDto> statistics = loadStatistics(start, end, isApplied, isArrived, isCompleted);
 
         // 2. 트랜잭션 밖에서 정렬 처리
         statistics.sort((a, b) -> b.getYearMonth().compareTo(a.getYearMonth()));
@@ -57,7 +57,7 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
     }
 
     @Transactional(readOnly = true)
-    protected List<MonthlyStatisticsDto> loadStatistics(LocalDate start, LocalDate end) {
+    protected List<MonthlyStatisticsDto> loadStatistics(LocalDate start, LocalDate end, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
         LocalDateTime periodStart = start.atStartOfDay();
         LocalDateTime periodEnd = end.plusMonths(1).atStartOfDay();
         
@@ -66,7 +66,11 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
         Map<String, Integer> orderCounts = orderRepository.findMonthlyOrderCounts(periodStart, periodEnd);
         Map<String, Integer> paymentAmounts = paymentRepository.findMonthlyPaymentAmounts(periodStart, periodEnd);
         Map<String, Map<EOrderStatus, Integer>> orderStatusCounts = orderRepository.findMonthlyOrderStatusCounts(periodStart, periodEnd);
-        Map<String, Map<ERecoveryOption, Integer>> recoveryOptionCounts = orderRepository.findMonthlyRecoveryOptionCounts(periodStart, periodEnd);
+        
+        // 필터링된 월별 복구 옵션별 통계
+        Map<String, Map<ERecoveryOption, Integer>> recoveryOptionCounts = orderRepository.findMonthlyRecoveryOptionCounts(periodStart, periodEnd, isApplied, isArrived, isCompleted);
+        Map<String, Map<ERecoveryOption, Double>> recoveryOptionAveragePageCounts = orderRepository.findMonthlyRecoveryOptionAveragePageCounts(periodStart, periodEnd, isApplied, isArrived, isCompleted);
+        Map<String, Map<ERecoveryOption, Double>> recoveryOptionAverageBookPrices = orderRepository.findMonthlyRecoveryOptionAverageBookPrices(periodStart, periodEnd, isApplied, isArrived, isCompleted);
         
         List<MonthlyStatisticsDto> result = new ArrayList<>();
         LocalDate current = start;
@@ -90,6 +94,18 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
             Integer springCount = recoveryMap.getOrDefault(ERecoveryOption.SPRING, 0);
             Integer rawCount = recoveryMap.getOrDefault(ERecoveryOption.RAW, 0);
             
+            // 복구 옵션별 평균 페이지수
+            Map<ERecoveryOption, Double> avgPageCountMap = recoveryOptionAveragePageCounts.getOrDefault(yearMonth, Map.of());
+            Double springAvgPageCount = avgPageCountMap.getOrDefault(ERecoveryOption.SPRING, 0.0);
+            Double rawAvgPageCount = avgPageCountMap.getOrDefault(ERecoveryOption.RAW, 0.0);
+            Double discardAvgPageCount = avgPageCountMap.getOrDefault(ERecoveryOption.DISCARD, 0.0);
+            
+            // 복구 옵션별 평균 책 금액
+            Map<ERecoveryOption, Double> avgBookPriceMap = recoveryOptionAverageBookPrices.getOrDefault(yearMonth, Map.of());
+            Double springAvgBookPrice = avgBookPriceMap.getOrDefault(ERecoveryOption.SPRING, 0.0);
+            Double rawAvgBookPrice = avgBookPriceMap.getOrDefault(ERecoveryOption.RAW, 0.0);
+            Double discardAvgBookPrice = avgBookPriceMap.getOrDefault(ERecoveryOption.DISCARD, 0.0);
+            
             // 현재는 하드코딩된 값 (추후 구글 애널리틱스 연동 시 수정)
             Integer pageViewCount = 0;
             Integer visitantCount = 0;
@@ -105,7 +121,13 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
                     completedCount,
                     discardedCount,
                     springCount,
-                    rawCount
+                    rawCount,
+                    springAvgPageCount,
+                    rawAvgPageCount,
+                    discardAvgPageCount,
+                    springAvgBookPrice,
+                    rawAvgBookPrice,
+                    discardAvgBookPrice
             ));
             
             current = current.plusMonths(1);
