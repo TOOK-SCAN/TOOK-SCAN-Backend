@@ -170,7 +170,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Page<Long> findOrderOverviews(String startDate, String endDate,
                                          String search, String searchType, String sort, Direction direction,
                                          Pageable pageable, EOrderStatus orderStatus, Boolean isOneDayScan,
-                                         Boolean hasRecoveryOption, Boolean isAsInProgress, Boolean isInProgress) {
+                                         Boolean hasRecoveryOption, Boolean isAsInProgress, Boolean isInProgress, UUID customerKey) {
         QOrder order = QOrder.order;
 
         // 검색 조건 동적 생성
@@ -223,6 +223,11 @@ public class OrderRepositoryImpl implements OrderRepository {
             }
         }
 
+        if (customerKey != null) {
+            // customerKey가 있는 경우, 해당 키로 필터링
+            predicate = predicate.and(order.user.id.eq(customerKey));
+        }
+
         if (direction == null) {
             direction = Direction.DESC; // 기본 정렬 방향
         }
@@ -230,6 +235,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         // 데이터 조회
         List<Long> orderIds = jpaQueryFactory.select(order.id)
                 .from(order)
+                .join(order.user).fetchJoin()
                 .where(predicate)
                 .orderBy(resolveSort(order, sort, direction))
                 .offset(pageable.getOffset())
