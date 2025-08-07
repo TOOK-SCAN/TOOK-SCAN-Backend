@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @Tag(name = "Order", description = "Order 관련 API 입니다.")
 @RestController
 @RequiredArgsConstructor
@@ -118,11 +120,12 @@ public class OrderAdminQueryV1Controller {
             @RequestParam(value = "is-one-day-scan", required = false) Boolean isOneDayScan,
             @RequestParam(value = "has-recovery-option", required = false) Boolean hasRecoveryOption,
             @RequestParam(value = "is-as-in-progress", required = false) Boolean isAsInProgress,
-            @RequestParam(value = "is-in-progress", required = false) Boolean isInProgress
+            @RequestParam(value = "is-in-progress", required = false) Boolean isInProgress,
+            @RequestParam(value = "customer-key", required = false) UUID customerKey
     ) {
         return ResponseDto.ok(
                 readAdminOrderOverviewsUseCase.execute(page, size, startDate, endDate, search,
-                        searchType, sort, direction, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress, isInProgress));
+                        searchType, sort, direction, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress, isInProgress, customerKey));
     }
 
 

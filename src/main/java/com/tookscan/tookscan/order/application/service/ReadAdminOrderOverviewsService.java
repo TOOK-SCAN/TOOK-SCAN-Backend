@@ -6,6 +6,8 @@ import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderOverviewsResponseDto;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,12 +28,12 @@ public class ReadAdminOrderOverviewsService implements ReadAdminOrderOverviewsUs
                                                       String search, String searchType, String sort,
                                                       Direction direction, EOrderStatus orderStatus,
                                                       Boolean isOneDayScan, Boolean hasRecoveryOption,
-                                                      Boolean isAsInProgress, Boolean isInProgress) {
+                                                      Boolean isAsInProgress, Boolean isInProgress, UUID customerKey) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<Long> orderIdPages = orderRepository.findOrderOverviews(startDate, endDate, search,
                 searchType, sort, direction, pageable, orderStatus, isOneDayScan, hasRecoveryOption, isAsInProgress,
-                isInProgress);
+                isInProgress, customerKey);
 
         List<Order> orders = orderRepository.findAllWithDocumentsByIdIn(orderIdPages.getContent());
 
