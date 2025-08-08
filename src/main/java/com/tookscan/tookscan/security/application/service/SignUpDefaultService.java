@@ -8,6 +8,7 @@ import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.JsonWebTokenUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.domain.service.RefreshTokenService;
+import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.presentation.dto.request.SignUpDefaultRequestDto;
 import com.tookscan.tookscan.security.application.usecase.SignUpDefaultUseCase;
 import com.tookscan.tookscan.security.domain.redis.AuthenticationCode;
@@ -70,8 +71,8 @@ public class SignUpDefaultService implements SignUpDefaultUseCase {
                 requestDto.isReceiveEmail() || requestDto.isReceiveSms(),
                 requestDto.isReceiveEmail(),
                 requestDto.isReceiveSms(),
-                requestDto.gender(),
-                requestDto.birth()
+                requestDto.gender() != null ? requestDto.gender() : EGender.UNKNOWN,
+                requestDto.birth() != null ? requestDto.birth() : null
         );
         User savedUser = userRepository.save(user);
 

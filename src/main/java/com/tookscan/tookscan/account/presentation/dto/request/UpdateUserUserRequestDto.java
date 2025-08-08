@@ -52,7 +52,6 @@ public record UpdateUserUserRequestDto(
 
         @JsonProperty("birth")
         @Schema(description = "생년월일 (YYYY-MM-DD 형식)", example = "1990-01-01")
-        @NotNull(message = "생년월일을 입력해주세요.")
         LocalDate birth
 ) {
 }

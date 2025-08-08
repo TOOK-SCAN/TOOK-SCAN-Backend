@@ -61,8 +61,18 @@ public class SignUpOauthService implements SignUpOauthUseCase {
         String[] split = claims.get(Constants.ACCOUNT_ID_CLAIM_NAME,String.class).split(":");
         String serialId = split[0];
         ESecurityProvider provider = ESecurityProvider.valueOf(split[1]);
-        EGender gender = EGender.valueOf(split[2]);
-        LocalDate birth = LocalDate.parse(split[3]);
+        EGender gender;
+        LocalDate birth;
+        try {
+            gender = EGender.valueOf(split[2]);
+        } catch (Exception e) {
+            gender = EGender.UNKNOWN;
+        }
+        try {
+            birth = LocalDate.parse(split[3]);
+        } catch (Exception e) {
+            birth = null;
+        }
 
         // 중복된 아이디인지 확인
         accountRepository.existsBySerialIdAndProviderAndDeletedAtIsNullThenThrow(serialId, provider);
