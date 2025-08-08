@@ -75,7 +75,7 @@ public class ReadGuestOrderDetailResponseDto extends SelfValidating<ReadGuestOrd
                 .orderName(order.getDocumentsDescription())
                 .phoneNumber(order.getUser().getPhoneNumber())
                 .userName(order.getUser().getName())
-                .email(order.getUser().getEmail())
+                .email(order.getUser().getEmail() != null ? order.getUser().getEmail() : order.getDelivery().getEmail())
                 .customerKey(order.getUser().getId())
                 .build();
     }

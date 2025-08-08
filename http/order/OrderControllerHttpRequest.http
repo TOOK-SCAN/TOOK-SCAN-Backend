@@ -146,3 +146,7 @@ POST {{host_url}}/v1/admins/coupon-templates/738695615050511029/issued-coupons/e
 ### 관리자 사용 쿠폰 엑셀 다운로드
 //@no-log
 POST {{host_url}}/v1/admins/coupon-templates/738696461221983066/used-coupons/export
+
+### 비회원 주문 조회
+//@no-log
+GET {{host_url}}/v1/guests/orders/0MG33RRV7JWVA/details
