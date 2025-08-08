@@ -339,24 +339,31 @@ public class ReadAdminOrderDetailResponseDto extends
             @JsonProperty("expired_at")
             private final String expiredAt;
 
+            @JsonProperty("upload_status")
+            private final String uploadStatus;
+
             @Builder
-            public PdfDto(String pdfUrl, Boolean isExpired, String expiredAt, String id, String name) {
+            public PdfDto(String pdfUrl, Boolean isExpired, String expiredAt, String id, String name,
+                          String uploadStatus) {
                 this.name = name;
                 this.pdfUrl = pdfUrl;
                 this.isExpired = isExpired;
                 this.expiredAt = expiredAt;
                 this.id = id;
+                this.uploadStatus = uploadStatus;
                 this.validateSelf();
             }
 
             public static PdfDto fromEntity(Pdf pdf) {
                 return PdfDto.builder()
-                        .pdfUrl(pdf.getPdfUrlForAdmin())
+                        .pdfUrl(pdf.getPdfUrlForAdmin() != null
+                                ? pdf.getPdfUrlForAdmin() : null)
                         .isExpired(pdf.getExpiredAt() != null)
                         .expiredAt(pdf.getExpiredAt() != null
                                 ? DateTimeUtil.convertLocalDateTimeToDartString(pdf.getExpiredAt()) : null)
                         .id(pdf.getId().toString())
                         .name(pdf.getName())
+                        .uploadStatus(pdf.getUploadStatus() != null ? pdf.getUploadStatus().name() : null)
                         .build();
             }
         }

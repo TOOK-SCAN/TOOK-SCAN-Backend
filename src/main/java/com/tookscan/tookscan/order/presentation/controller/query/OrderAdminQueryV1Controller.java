@@ -4,6 +4,7 @@ import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateDetailUseCase;
+import com.tookscan.tookscan.order.application.usecase.SubscribePdfProgressUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminIssuedCouponOverviewUseCase;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.UUID;
 
@@ -53,6 +55,7 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminIssuedCouponOverviewUseCase readAdminIssuedCouponOverviewUseCase;
     private final ReadAdminUsedCouponOverviewUseCase readAdminUsedCouponOverviewUseCase;
     private final ReadAdminCouponTemplateDetailUseCase readAdminCouponTemplateDetailUseCase;
+    private final SubscribePdfProgressUseCase subscribePdfProgressUseCase;
 
     /**
      * 4.2.5 관리자 주문 요약 정보 조회
@@ -212,5 +215,12 @@ public class OrderAdminQueryV1Controller {
             @PathVariable Long id
     ) {
         return ResponseDto.ok(readAdminCouponTemplateDetailUseCase.execute(id));
+    }
+
+    @Operation(summary = "관리자용 PDF 업로드 진행 SSE", description = "관리자가 주문/문서 단위 업로드 진행 이벤트를 수신합니다.")
+    @ApiErrorCode({})
+    @GetMapping(value = "/orders/pdfs/{pdfId}/progress", produces = "text/event-stream")
+    public SseEmitter subscribePdfProgress(@PathVariable Long pdfId) {
+        return subscribePdfProgressUseCase.execute(pdfId);
     }
 }

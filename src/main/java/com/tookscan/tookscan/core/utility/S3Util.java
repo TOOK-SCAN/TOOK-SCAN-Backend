@@ -26,6 +26,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.FileUpload;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
+import software.amazon.awssdk.transfer.s3.progress.TransferListener;
 
 @Slf4j
 @Configuration
@@ -102,10 +103,12 @@ public class S3Util {
      * @param document       업로드할 파일의 메타데이터
      * @param file           업로드할 실제 파일
      * @param uniqueFileName S3에 저장될 고유 파일명 (확장자 포함, 예: "uuid.pdf")
+     * @param originalFileName 원본 파일명 (한글 파일명 지원)
+     * @param transferListener S3 업로드 진행 상황을 모니터링할 TransferListener (선택 사항)
      * @return 생성된 CloudFront Signed URL
      */
     public String uploadPdfAndGetSignedUrlForAdmin(Document document, File file, String uniqueFileName,
-                                                   String originalFileName) {
+                                                   String originalFileName, TransferListener transferListener) {
         String s3Key = buildPdfS3Key(document, uniqueFileName);
 
         try {
@@ -113,20 +116,24 @@ public class S3Util {
                     java.nio.charset.StandardCharsets.UTF_8);
 
             // 1. S3에 파일 업로드
-            UploadFileRequest uploadFileRequest = UploadFileRequest.builder()
+            UploadFileRequest.Builder uploadBuilder = UploadFileRequest.builder()
                     .putObjectRequest(b -> b.bucket(bucketName)
                             .key(s3Key)
-                            .contentDisposition(contentDisposition))
-                    .source(file)
-                    .build();
+                            .contentDisposition(contentDisposition)
+                            .contentType("application/pdf"))
+                    .source(file);
+
+            if (transferListener != null) {
+                uploadBuilder.addTransferListener(transferListener);
+            }
+
+            UploadFileRequest uploadFileRequest = uploadBuilder.build();
 
             FileUpload fileUpload = s3TransferManager.uploadFile(uploadFileRequest);
-
             fileUpload.completionFuture().join();
 
             log.info("PDF uploaded to S3. S3 Key: {}", s3Key);
 
-            // 2. CloudFront Signed URL 생성 (30일 유효)
             return generateCloudFrontSignedUrl(s3Key, PDF_EXPIRATION_DATE_FOR_ADMIN);
         } catch (Exception e) {
             throw new CommonException(ErrorCode.EXTERNAL_SERVER_ERROR,

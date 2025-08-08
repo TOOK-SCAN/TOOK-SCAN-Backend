@@ -37,11 +37,14 @@ import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersSta
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusCompanyArrivedRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRecoveryOptionRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.response.UploadAdminDocumentsPdfResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ValidateAdminPdfResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -60,9 +63,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.UUID;
 
 @Tag(name = "Order", description = "Order 관련 API 입니다.")
 @RestController
@@ -163,12 +163,11 @@ public class OrderAdminCommandV1Controller {
             ErrorCode.ACCESS_DENIED
     })
     @PostMapping(value = "/documents/{documentId}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseDto<Void> uploadPdf(
+    public ResponseDto<UploadAdminDocumentsPdfResponseDto> uploadPdf(
             @PathVariable Long documentId,
             @RequestPart("files") List<MultipartFile> files
     ) {
-        uploadAdminDocumentsPdfUseCase.execute(documentId, files);
-        return ResponseDto.ok(null);
+        return ResponseDto.ok(uploadAdminDocumentsPdfUseCase.execute(documentId, files));
     }
 
     /**
