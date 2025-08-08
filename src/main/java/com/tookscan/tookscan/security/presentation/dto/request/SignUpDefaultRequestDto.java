@@ -49,11 +49,9 @@ public record SignUpDefaultRequestDto(
         Boolean isReceiveSms,
 
         @JsonProperty("gender")
-        @NotNull(message = "성별을 선택해주세요.")
         EGender gender,
 
         @JsonProperty("birth")
-        @NotNull(message = "생년월일을 입력해주세요.")
         LocalDate birth
 ) {
 }

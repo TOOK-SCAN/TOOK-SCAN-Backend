@@ -95,7 +95,7 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
                 .deliveryRequest(user.getDeliveryRequest() != null ? user.getDeliveryRequest() : null)
                 .isReceiveEmail(user.getIsReceiveEmail())
                 .isReceiveSms(user.getIsReceiveSms())
-                .gender(user.getGender())
+                .gender(user.getGender()!= null ? user.getGender() : EGender.UNKNOWN)
                 .birth(user.getBirth() != null ? DateTimeUtil.convertLocalDateToDartString(user.getBirth()) : " - ")
                 .build();
     }
