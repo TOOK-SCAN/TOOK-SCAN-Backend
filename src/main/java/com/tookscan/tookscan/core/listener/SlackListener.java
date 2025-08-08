@@ -58,7 +58,6 @@ public class SlackListener {
                     slackWebhookUrl,
                     JsonParseUtil.convertFromObjectToJson(content)
             );
-            System.out.println(response);
         } catch (IOException e) {
             log.atError()
                 .setCause(e)

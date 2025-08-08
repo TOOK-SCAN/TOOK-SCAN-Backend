@@ -55,15 +55,10 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        System.out.println(cookieDomain);
-        System.out.println(accessTokenCookieName);
-        System.out.println(refreshTokenCookieName);
-        System.out.println(temporaryTokenCookieName);
-
         String requestURI = request.getRequestURI();
 
         Optional<String> accessTokenOptional = CookieUtil.refineCookie(request, accessTokenCookieName);
-        System.out.println(accessTokenOptional);
+
         if (AUTH_BRIEFS_URL.equals(requestURI)) {
             if (accessTokenOptional.isEmpty()) {
                 writeGuestResponse(response);
