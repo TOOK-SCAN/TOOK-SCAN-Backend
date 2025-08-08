@@ -132,7 +132,7 @@ public class UpdateUserOrderHistoryService implements UpdateUserOrderHistoryUseC
         Set<Long> toDeleteIds = orderDocumentIds.stream()
                 .filter(id -> !requestExistingIds.contains(id))
                 .collect(Collectors.toSet());
-        System.out.println("toDeleteIds = " + toDeleteIds);
+
         // 삭제 처리 (필요하다면 Order 엔티티에서도 해당 Document를 제거)
         order.getDocuments().removeIf(doc -> toDeleteIds.contains(doc.getId()));
         toDeleteIds.forEach(documentRepository::deleteByIdOrElseThrow);
