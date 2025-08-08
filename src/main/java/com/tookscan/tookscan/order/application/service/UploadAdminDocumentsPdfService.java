@@ -132,6 +132,13 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
                 Pdf pdf = pdfRepository.save(preCreated);
                 pdfs.add(pdf);
 
+                try {
+                    System.out.println(pdf.getId().toString());
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error("Thread was interrupted while simulating delay for PDF upload: {}", e.getMessage());
+                }
                 // 비동기 처리 시작 - 이벤트 퍼블리시 (AFTER_COMMIT에 비동기 핸들링)
                 AdminPdfUploadRequestedEvent event = AdminPdfUploadRequestedEvent.builder()
                         .pdfId(preCreated.getId())

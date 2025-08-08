@@ -4,6 +4,7 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.PdfWatermarkUtil;
 import com.tookscan.tookscan.core.utility.S3Util;
+import com.tookscan.tookscan.order.application.service.S3UploadProgressListener;
 import com.tookscan.tookscan.order.application.service.SubscribePdfProgressService;
 import com.tookscan.tookscan.order.application.usecase.UpdateOrderStatusAfterPdfProcessingUseCase;
 import com.tookscan.tookscan.order.domain.Document;
@@ -70,12 +71,15 @@ public class AdminPdfUploadListener {
     ) {
         log.info("Starting async PDF processing for file: {} (document ID: {})", originalFileName, documentId);
 
+        Pdf pdf = pdfRepository.findByIdOrElseThrow(pdfId);
+        pdf.updateUploadStatus(EPdfUploadStatus.IN_PROGRESS);
+        pdfRepository.save(pdf);
+
         File watermarkedFile = null;
         try {
             CustomMultipartFile multipartFile = new CustomMultipartFile("file", originalFileName, "application/pdf", fileContent);
             watermarkedFile = PdfWatermarkUtil.embedWatermark(multipartFile, userName, userPhone, orderNumber, orderCreatedAt, aesKey);
             log.debug("Watermark processing completed for file: {}", originalFileName);
-            progressService.sendEvent(pdfId, "WATERMARK_DONE", originalFileName);
 
             // 업로드/저장/상태변경은 IO 전용 실행기로 위임
             uploadAndPersistAsync(pdfId, documentId, watermarkedFile, storedFileName, originalFileName, orderId, originalFileName);
@@ -83,10 +87,9 @@ public class AdminPdfUploadListener {
             log.error("Failed to process PDF file: {} (document ID: {}). Error: {}", originalFileName, documentId, e.getMessage(), e);
             // 워터마크 단계 실패 시에도 Pdf 상태를 FAILED로 업데이트
             try {
-                Pdf target = pdfRepository.findByIdOrElseThrow(pdfId);
-                target.updateUploadStatus(EPdfUploadStatus.FAILED);
-                pdfRepository.save(target);
-                progressService.sendEvent(pdfId, "pdfUploadStatus", "FAILED");
+                pdf.updateUploadStatus(EPdfUploadStatus.FAILED);
+                pdfRepository.save(pdf);
+                progressService.sendEvent(pdfId, "pdf_upload_status", EPdfUploadStatus.FAILED);
             } catch (Exception ignored) {}
             try {
                 orderStatusUpdateService.execute(orderId);
@@ -109,28 +112,25 @@ public class AdminPdfUploadListener {
                     watermarkedFile,
                     storedFileName,
                     originalFileName,
-                    new com.tookscan.tookscan.order.application.service.S3UploadProgressListener(progressService, storedFileName, pdfId)
+                    new S3UploadProgressListener(progressService, pdfId)
             );
             log.debug("S3 upload completed for file: {}", logName);
-            // 완료 이벤트는 리스너에서 발행됨
 
             // 사전 생성 Pdf 업데이트
             Pdf pdf = pdfRepository.findByIdOrElseThrow(pdfId);
             pdf.updatePdfUrlForAdmin(pdfUrl);
-            pdf.updateUploadStatus(com.tookscan.tookscan.order.domain.type.EPdfUploadStatus.COMPLETED);
+            pdf.updateUploadStatus(EPdfUploadStatus.COMPLETED);
             pdfRepository.save(pdf);
-            progressService.sendEvent(pdfId, "PDF_ENTITY_SAVED", pdf.getId());
 
             orderStatusUpdateService.execute(orderId);
-            progressService.sendEvent(pdfId, "ORDER_STATUS_UPDATED", orderId);
             log.info("Successfully completed PDF processing for file: {} (document ID: {})", logName, documentId);
         } catch (Exception ex) {
             log.error("Failed upload/persist for file: {} (document ID: {}). Error: {}", logName, documentId, ex.getMessage(), ex);
             try {
                 Pdf target = pdfRepository.findByIdOrElseThrow(pdfId);
-                target.updateUploadStatus(com.tookscan.tookscan.order.domain.type.EPdfUploadStatus.FAILED);
+                target.updateUploadStatus(EPdfUploadStatus.FAILED);
                 pdfRepository.save(target);
-                progressService.sendEvent(pdfId, "pdfUploadStatus", "FAILED");
+                progressService.sendEvent(pdfId, "pdf_upload_status", EPdfUploadStatus.FAILED);
             } catch (Exception ignored) {
                 log.error("Failed to update PDF status to FAILED for file: {} (pdf ID: {}). Error: {}", logName, pdfId, ignored.getMessage(), ignored);
             }
