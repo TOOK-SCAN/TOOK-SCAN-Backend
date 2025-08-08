@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -41,8 +40,10 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
 
-    @Value("${web-engine.cookie-domain}")
-    private String cookieDomain;
+    private final String cookieDomain;
+    private final String accessTokenCookieName;
+    private final String refreshTokenCookieName;
+    private final String temporaryTokenCookieName;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,11 +55,15 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        System.out.println(cookieDomain);
+        System.out.println(accessTokenCookieName);
+        System.out.println(refreshTokenCookieName);
+        System.out.println(temporaryTokenCookieName);
 
         String requestURI = request.getRequestURI();
 
-        Optional<String> accessTokenOptional = CookieUtil.refineCookie(request, Constants.ACCESS_TOKEN);
-
+        Optional<String> accessTokenOptional = CookieUtil.refineCookie(request, accessTokenCookieName);
+        System.out.println(accessTokenOptional);
         if (AUTH_BRIEFS_URL.equals(requestURI)) {
             if (accessTokenOptional.isEmpty()) {
                 writeGuestResponse(response);
@@ -75,7 +80,7 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
                 if (e.getErrorCode() == ErrorCode.EXPIRED_TOKEN_ERROR) {
                     // 리프레시 토큰을 가져옵니다.
                     Optional<String> refreshTokenOptional = CookieUtil.refineCookie(request,
-                            Constants.REFRESH_TOKEN);
+                            refreshTokenCookieName);
                     if (refreshTokenOptional.isEmpty()) {
                         clearTokenCookies(request, response);
                         throw new HttpSecurityException(
@@ -89,9 +94,9 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
                     var newTokens = reissueJsonWebTokenUseCase.execute(refreshToken);
 
                     // 새로운 토큰으로 쿠키를 업데이트합니다.
-                    CookieUtil.addCookie(response, cookieDomain, Constants.ACCESS_TOKEN,
+                    CookieUtil.addCookie(response, cookieDomain, accessTokenCookieName,
                             newTokens.getAccessToken());
-                    CookieUtil.addSecureCookie(response, cookieDomain, Constants.REFRESH_TOKEN,
+                    CookieUtil.addSecureCookie(response, cookieDomain, refreshTokenCookieName,
                             newTokens.getRefreshToken(),
                             (int) (jsonWebTokenUtil.getRefreshTokenExpirePeriod() / 1000L));
 
@@ -201,7 +206,7 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
     private boolean tryRefreshToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            Optional<String> refreshTokenOptional = CookieUtil.refineCookie(request, Constants.REFRESH_TOKEN);
+            Optional<String> refreshTokenOptional = CookieUtil.refineCookie(request, refreshTokenCookieName);
             if (refreshTokenOptional.isEmpty()) {
                 return false; // 리프레시 토큰이 없으면 재발급 불가
             }
@@ -211,8 +216,8 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
             var newTokens = reissueJsonWebTokenUseCase.execute(refreshToken);
 
             // 새로운 액세스 토큰으로 쿠키 설정
-            CookieUtil.addCookie(response, cookieDomain, Constants.ACCESS_TOKEN, newTokens.getAccessToken());
-            CookieUtil.addSecureCookie(response, cookieDomain, Constants.REFRESH_TOKEN, newTokens.getRefreshToken(),
+            CookieUtil.addCookie(response, cookieDomain, accessTokenCookieName, newTokens.getAccessToken());
+            CookieUtil.addSecureCookie(response, cookieDomain, refreshTokenCookieName, newTokens.getRefreshToken(),
                     (int) (jsonWebTokenUtil.getRefreshTokenExpirePeriod() / 1000L));
 
             // 새 액세스 토큰으로 인증 처리
@@ -249,9 +254,9 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
      * 토큰 관련 쿠키 삭제
      */
     private void clearTokenCookies(HttpServletRequest request, HttpServletResponse response) {
-        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.ACCESS_TOKEN);
-        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.REFRESH_TOKEN);
-        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.TEMPORARY_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, accessTokenCookieName);
+        CookieUtil.deleteCookie(request, response, cookieDomain, refreshTokenCookieName);
+        CookieUtil.deleteCookie(request, response, cookieDomain, temporaryTokenCookieName);
     }
 
     @Override
