@@ -73,54 +73,43 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
                 return;
             } catch (HttpSecurityException e) {
                 if (e.getErrorCode() == ErrorCode.EXPIRED_TOKEN_ERROR) {
-                    try {
-                        // 리프레시 토큰을 가져옵니다.
-                        Optional<String> refreshTokenOptional = CookieUtil.refineCookie(request,
-                                Constants.REFRESH_TOKEN);
-                        if (refreshTokenOptional.isEmpty()) {
-                            // 리프레시 토큰이 없으면 재발급 불가, 게스트로 처리
-                            writeGuestResponse(response);
-                            return;
-                        }
-
-                        // 리프레시 토큰으로 새 토큰들을 발급받습니다.
-                        String refreshToken = refreshTokenOptional.get();
-                        var newTokens = reissueJsonWebTokenUseCase.execute(refreshToken);
-
-                        // 새로운 토큰으로 쿠키를 업데이트합니다.
-                        CookieUtil.addCookie(response, cookieDomain, Constants.ACCESS_TOKEN,
-                                newTokens.getAccessToken());
-                        CookieUtil.addSecureCookie(response, cookieDomain, Constants.REFRESH_TOKEN,
-                                newTokens.getRefreshToken(),
-                                (int) (jsonWebTokenUtil.getRefreshTokenExpirePeriod() / 1000L));
-
-                        // 재발급된 새 액세스 토큰으로 다시 계정 정보 조회를 시도합니다.
-                        Claims claims = jsonWebTokenUtil.validateToken(newTokens.getAccessToken());
-                        UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
-                        ReadAccountBriefResponseDto responseDto = readAccountBriefUseCase.execute(accountId);
-                        writeAccountBriefResponse(response, responseDto);
-                        return;
-
-                    } catch (Exception refreshException) {
+                    // 리프레시 토큰을 가져옵니다.
+                    Optional<String> refreshTokenOptional = CookieUtil.refineCookie(request,
+                            Constants.REFRESH_TOKEN);
+                    if (refreshTokenOptional.isEmpty()) {
                         clearTokenCookies(request, response);
-                        writeGuestResponse(response);
-                        return;
+                        throw new HttpSecurityException(
+                                "리프레시 토큰이 없습니다. 다시 로그인해주세요.",
+                                ErrorCode.INVALID_TOKEN_ERROR
+                        );
                     }
-                } else if (isTokenInvalidError(e.getErrorCode())) {
-                    // 만료가 아닌 다른 종류의 토큰 오류일 경우 쿠키를 삭제합니다.
-                    clearTokenCookies(request, response);
-                }
-                // 처리되지 않은 예외는 그대로 던져서 전역 핸들러가 처리하도록 합니다.
-                throw e;
 
+                    // 리프레시 토큰으로 새 토큰들을 발급받습니다.
+                    String refreshToken = refreshTokenOptional.get();
+                    var newTokens = reissueJsonWebTokenUseCase.execute(refreshToken);
+
+                    // 새로운 토큰으로 쿠키를 업데이트합니다.
+                    CookieUtil.addCookie(response, cookieDomain, Constants.ACCESS_TOKEN,
+                            newTokens.getAccessToken());
+                    CookieUtil.addSecureCookie(response, cookieDomain, Constants.REFRESH_TOKEN,
+                            newTokens.getRefreshToken(),
+                            (int) (jsonWebTokenUtil.getRefreshTokenExpirePeriod() / 1000L));
+
+                    // 재발급된 새 액세스 토큰으로 다시 계정 정보 조회를 시도합니다.
+                    Claims claims = jsonWebTokenUtil.validateToken(newTokens.getAccessToken());
+                    UUID accountId = UUID.fromString(claims.get(Constants.ACCOUNT_ID_CLAIM_NAME, String.class));
+                    ReadAccountBriefResponseDto responseDto = readAccountBriefUseCase.execute(accountId);
+                    writeAccountBriefResponse(response, responseDto);
+                    return;
+                }
+                clearTokenCookies(request, response);
+                throw e;
             } catch (Exception e) {
-                // 기타 예외 발생 시 안전하게 게스트로 처리합니다.
-                writeGuestResponse(response);
-                return;
+                throw e;
             }
         }
 
-        String accessToken = accessTokenOptional.orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
+        String accessToken = accessTokenOptional.orElseThrow(() -> new CommonException(ErrorCode.TOKEN_TYPE_ERROR));
 
         try {
             // 액세스 토큰 검증
@@ -158,12 +147,8 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
                 if (tryRefreshToken(request, response, filterChain)) {
                     return; // 재발급 성공 시 요청 계속 처리
                 }
-                // 재발급 실패 시 쿠키 삭제 후 401 반환 (리프레시 토큰도 만료됨)
-                clearTokenCookies(request, response);
-            } else if (isTokenInvalidError(e.getErrorCode())) {
-                // 유효하지 않은 토큰인 경우 쿠키 삭제
-                clearTokenCookies(request, response);
             }
+            clearTokenCookies(request, response);
             throw e;
         }
     }
@@ -268,17 +253,6 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
         CookieUtil.deleteCookie(request, response, cookieDomain, Constants.REFRESH_TOKEN);
         CookieUtil.deleteCookie(request, response, cookieDomain, Constants.TEMPORARY_TOKEN);
     }
-
-    /**
-     * 토큰이 유효하지 않은 오류인지 확인
-     */
-    private boolean isTokenInvalidError(ErrorCode errorCode) {
-        return errorCode == ErrorCode.TOKEN_MALFORMED_ERROR ||
-                errorCode == ErrorCode.TOKEN_TYPE_ERROR ||
-                errorCode == ErrorCode.TOKEN_UNSUPPORTED_ERROR ||
-                errorCode == ErrorCode.TOKEN_UNKNOWN_ERROR;
-    }
-
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
