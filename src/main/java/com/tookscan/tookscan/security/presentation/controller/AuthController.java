@@ -45,6 +45,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -79,6 +80,12 @@ public class AuthController {
 
     private final HttpServletUtil httpServletUtil;
 
+    @Value("${web-engine.cookie.refresh-token-name}")
+    private String refreshTokenCookieName;
+
+    @Value("${web-engine.cookie.temporary-token-name}")
+    private String temporaryTokenCookieName;
+
     /**
      * 1.2.2 JWT 재발급
      */
@@ -99,7 +106,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        String refreshToken = CookieUtil.refineCookie(request, Constants.REFRESH_TOKEN)
+        String refreshToken = CookieUtil.refineCookie(request, refreshTokenCookieName)
                 .orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
 
         DefaultJsonWebTokenDto tokenDto = reissueJsonWebTokenUseCase.execute(refreshToken);
@@ -194,7 +201,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        String temporaryToken = CookieUtil.refineCookie(request, Constants.TEMPORARY_TOKEN)
+        String temporaryToken = CookieUtil.refineCookie(request, temporaryTokenCookieName)
                 .orElseThrow(() -> new CommonException(ErrorCode.INVALID_COOKIE_ERROR));
 
         DefaultJsonWebTokenDto tokenDto = signUpOauthUseCase.execute(temporaryToken, requestDto);

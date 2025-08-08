@@ -25,6 +25,15 @@ public class HttpServletUtil {
     @Value("${web-engine.cookie-domain}")
     private String cookieDomain;
 
+    @Value("${web-engine.cookie.access-token-name}")
+    private String accessTokenCookieName;
+
+    @Value("${web-engine.cookie.refresh-token-name}")
+    private String refreshTokenCookieName;
+
+    @Value("${web-engine.cookie.temporary-token-name}")
+    private String temporaryTokenCookieName;
+
     @Value("${json-web-token.refresh-token-expire-period}")
     private Long refreshTokenExpirePeriod;
 
@@ -44,14 +53,14 @@ public class HttpServletUtil {
             CookieUtil.addCookie(
                     response,
                     cookieDomain,
-                    Constants.ACCESS_TOKEN,
+                    accessTokenCookieName,
                     tokenDto.getAccessToken()
             );
 
             CookieUtil.addSecureCookie(
                     response,
                     cookieDomain,
-                    Constants.REFRESH_TOKEN,
+                    refreshTokenCookieName,
                     tokenDto.getRefreshToken(),
                     (int) (refreshTokenExpirePeriod / 1000L)
             );
@@ -61,7 +70,7 @@ public class HttpServletUtil {
             CookieUtil.addCookie(
                     response,
                     cookieDomain,
-                    Constants.TEMPORARY_TOKEN,
+                    temporaryTokenCookieName,
                     tokenDto.getTemporaryToken()
             );
         }
@@ -80,13 +89,13 @@ public class HttpServletUtil {
         CookieUtil.addCookie(
                 response,
                 cookieDomain,
-                Constants.ACCESS_TOKEN,
+                accessTokenCookieName,
                 tokenDto.getAccessToken()
         );
         CookieUtil.addSecureCookie(
                 response,
                 cookieDomain,
-                Constants.REFRESH_TOKEN,
+                refreshTokenCookieName,
                 tokenDto.getRefreshToken(),
                 (int) (refreshTokenExpirePeriod / 10000L) // 기존 기한의 10분의 1로 설정 (로그인 유지 체크 안함)
         );
@@ -111,13 +120,13 @@ public class HttpServletUtil {
         CookieUtil.addCookie(
                 response,
                 cookieDomain,
-                Constants.ACCESS_TOKEN,
+                accessTokenCookieName,
                 tokenDto.getAccessToken()
         );
         CookieUtil.addSecureCookie(
                 response,
                 cookieDomain,
-                Constants.REFRESH_TOKEN,
+                refreshTokenCookieName,
                 tokenDto.getRefreshToken(),
                 (int) (refreshTokenExpirePeriod / 1000L)
         );

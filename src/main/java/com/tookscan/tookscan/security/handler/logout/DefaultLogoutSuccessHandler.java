@@ -26,6 +26,15 @@ public class DefaultLogoutSuccessHandler
     @Value("${web-engine.cookie-domain}")
     private String cookieDomain;
 
+    @Value("${web-engine.cookie.access-token-name}")
+    private String accessTokenCookieName;
+
+    @Value("${web-engine.cookie.refresh-token-name}")
+    private String refreshTokenCookieName;
+
+    @Value("${web-engine.cookie.temporary-token-name}")
+    private String temporaryTokenCookieName;
+
     @Override
     public void onLogoutSuccess(
             HttpServletRequest request,
@@ -38,9 +47,9 @@ public class DefaultLogoutSuccessHandler
         }
 
 
-        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.ACCESS_TOKEN);
-        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.REFRESH_TOKEN);
-        CookieUtil.deleteCookie(request, response, cookieDomain, Constants.TEMPORARY_TOKEN);
+        CookieUtil.deleteCookie(request, response, cookieDomain, accessTokenCookieName);
+        CookieUtil.deleteCookie(request, response, cookieDomain, refreshTokenCookieName);
+        CookieUtil.deleteCookie(request, response, cookieDomain, temporaryTokenCookieName);
         CookieUtil.deleteCookie(request, response, cookieDomain, "JSESSIONID");
 
 

@@ -144,6 +144,10 @@ web-engine:
   server-url: ${WEB_ENGINE_SERVER_URL}
   client-url: ${WEB_ENGINE_CLIENT_URL}
   cookie-domain: ${WEB_ENGINE_COOKIE_DOMAIN}
+  cookie:
+    access-token-name: ${SPRING_PROFILES_ACTIVE}_access_token
+    refresh-token-name: ${SPRING_PROFILES_ACTIVE}_refresh_token
+    temporary-token-name: ${SPRING_PROFILES_ACTIVE}_temporary_token
 
 # === JWT (JSON Web Token) 공통 설정 ===
 json-web-token:

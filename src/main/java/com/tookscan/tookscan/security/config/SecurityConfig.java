@@ -27,6 +27,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
@@ -51,6 +52,15 @@ public class SecurityConfig {
     private final ReissueJsonWebTokenUseCase reissueJsonWebTokenUseCase;
 
     private final JsonWebTokenUtil jsonWebTokenUtil;
+
+    @Value("${web-engine.cookie-domain}")
+    private String cookieDomain;
+    @Value("${web-engine.cookie.access-token-name}")
+    private String accessTokenCookieName;
+    @Value("${web-engine.cookie.refresh-token-name}")
+    private String refreshTokenCookieName;
+    @Value("${web-engine.cookie.temporary-token-name}")
+    private String temporaryTokenCookieName;
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -102,7 +112,11 @@ public class SecurityConfig {
                                 authenticateJsonWebTokenUseCase,
                                 readAccountBriefUseCase,
                                 reissueJsonWebTokenUseCase,
-                                jsonWebTokenUtil
+                                jsonWebTokenUtil,
+                                cookieDomain,
+                                accessTokenCookieName,
+                                refreshTokenCookieName,
+                                temporaryTokenCookieName
                         ),
                         LogoutFilter.class
                 )
