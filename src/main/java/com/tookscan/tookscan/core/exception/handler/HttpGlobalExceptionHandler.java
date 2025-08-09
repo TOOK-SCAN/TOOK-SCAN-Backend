@@ -35,7 +35,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.atWarn()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.BAD_REQUEST_JSON.name())
+                .addKeyValue("app.error.code", ErrorCode.BAD_REQUEST_JSON.name())
             .log("HTTP 메시지 읽기 실패 - 비정상적인 요청 데이터");
         return ResponseDto.fail(new CommonException(ErrorCode.BAD_REQUEST_JSON));
     }
@@ -45,7 +45,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
         log.atWarn()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.UNSUPPORTED_MEDIA_TYPE.name())
+                .addKeyValue("app.error.code", ErrorCode.UNSUPPORTED_MEDIA_TYPE.name())
             .addKeyValue("supported_types", e.getSupportedMediaTypes())
             .log("지원되지 않는 미디어 타입 사용");
         return ResponseDto.fail(new CommonException(ErrorCode.UNSUPPORTED_MEDIA_TYPE));
@@ -56,7 +56,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleNoHandlerFoundException(NoHandlerFoundException e) {
         log.atWarn()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.METHOD_NOT_ALLOWED.name())
+                .addKeyValue("app.error.code", ErrorCode.METHOD_NOT_ALLOWED.name())
             .addKeyValue("requested_url", e.getRequestURL())
             .addKeyValue("http_method", e.getHttpMethod())
             .log("존재하지 않는 엔드포인트 요청");
@@ -68,7 +68,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         log.atWarn()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.METHOD_NOT_ALLOWED.name())
+                .addKeyValue("app.error.code", ErrorCode.METHOD_NOT_ALLOWED.name())
             .addKeyValue("requested_method", e.getMethod())
             .addKeyValue("supported_methods", e.getSupportedMethods())
             .log("지원되지 않는 HTTP 메소드 사용");
@@ -85,7 +85,7 @@ public class HttpGlobalExceptionHandler {
 
         log.atWarn()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.INVALID_ARGUMENT.name())
+                .addKeyValue("app.error.code", ErrorCode.INVALID_ARGUMENT.name())
             .addKeyValue("validation_message", message)
             .addKeyValue("field_errors", e.getFieldErrorCount())
             .addKeyValue("global_errors", e.getGlobalErrorCount())
@@ -166,13 +166,13 @@ public class HttpGlobalExceptionHandler {
         if (httpStatusCode >= 500) {
             log.atError()
                     .setCause(e)
-                    .addKeyValue("error.code", errorCode.name())
+                    .addKeyValue("app.error.code", errorCode.name())
                     .log("비즈니스 로직 예외 발생 - 서버 측 오류");
             sendSlackEvent(e);
         } else {
             log.atWarn()
                     .setCause(e)
-                    .addKeyValue("error.code", errorCode.name())
+                    .addKeyValue("app.error.code", errorCode.name())
                     .log("비즈니스 로직 예외 발생 - 클라이언트 측 오류");
         }
         return ResponseDto.fail(e);
@@ -192,7 +192,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleSocketTimeoutException(SocketTimeoutException e) {
         log.atError()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.EXTERNAL_SERVER_ERROR.name())
+                .addKeyValue("app.error.code", ErrorCode.EXTERNAL_SERVER_ERROR.name())
             .log("외부 서버 연결 타임아웃 - 요청 처리 실패");
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.EXTERNAL_SERVER_ERROR, "타임아웃이 발생했습니다."));
@@ -203,7 +203,7 @@ public class HttpGlobalExceptionHandler {
     public ResponseDto<?> handleException(Exception e) {
         log.atError()
             .setCause(e)
-            .addKeyValue("error.code", ErrorCode.INTERNAL_SERVER_ERROR.name())
+                .addKeyValue("app.error.code", ErrorCode.INTERNAL_SERVER_ERROR.name())
             .log("예상치 못한 시스템 오류 발생 - 요청 처리 실패");
         sendSlackEvent(e);
         return ResponseDto.fail(new CommonException(ErrorCode.INTERNAL_SERVER_ERROR));

@@ -4,6 +4,7 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.security.handler.common.AbstractFailureHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class DefaultLoginFailureHandler
         extends AbstractFailureHandler implements AuthenticationFailureHandler {
 
@@ -38,6 +40,13 @@ public class DefaultLoginFailureHandler
             case AUTHENTICATION_CREDENTIALS_NOT_FOUND_EXCEPTION -> AUTHENTICATION_CREDENTIALS_NOT_FOUND_MESSAGE;
             default -> DEFAULT_MESSAGE;
         };
+
+        log.atWarn()
+            .setCause(exception)
+            .addKeyValue("app.error.code", ErrorCode.FAILURE_LOGIN.name())
+            .addKeyValue("requested_url", request.getRequestURI())
+            .addKeyValue("http_method", request.getMethod())
+            .log("Login failed - Authentication error");
 
         setErrorResponse(
                 response,
