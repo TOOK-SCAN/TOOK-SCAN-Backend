@@ -60,7 +60,7 @@ public class ExceptionFilter extends OncePerRequestFilter {
     private void logError(Throwable throwable, ErrorCode errorCode) {
         log.atError()
             .setCause(throwable)
-            .addKeyValue("error.code", errorCode.name())
+                .addKeyValue("app.error.code", errorCode.name())
             .log("FilterException {} occurred", throwable.getClass().getSimpleName());
     }
 
