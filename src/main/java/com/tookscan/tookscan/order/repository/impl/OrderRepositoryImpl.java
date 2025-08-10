@@ -3,6 +3,7 @@ package com.tookscan.tookscan.order.repository.impl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
@@ -464,16 +465,66 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Map<String, Integer> findMonthlyCompanyArrivedCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.arrivedAt),
+                        order.count().intValue()
+                )
+                .from(order)
+                .where(order.arrivedAt.isNotNull()
+                        .and(order.arrivedAt.between(startDate, endDate)))
+                .groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.arrivedAt))
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, String.class),
+                        tuple -> tuple.get(1, Integer.class)
+                ));
+    }
+
+    @Override
+    public Map<String, Integer> findMonthlyAllCompletedCounts(LocalDateTime startDate, LocalDateTime endDate) {
+        QOrder order = QOrder.order;
+
+        return jpaQueryFactory
+                .select(
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.allCompletedAt),
+                        order.count().intValue()
+                )
+                .from(order)
+                .where(order.allCompletedAt.isNotNull()
+                        .and(order.allCompletedAt.between(startDate, endDate)))
+                .groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.allCompletedAt))
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, String.class),
+                        tuple -> tuple.get(1, Integer.class)
+                ));
+    }
+
+    @Override
     public Map<String, Map<ERecoveryOption, Integer>> findMonthlyRecoveryOptionCounts(LocalDateTime startDate, LocalDateTime endDate, Boolean isApplied, Boolean isArrived, Boolean isCompleted) {
         QOrder order = QOrder.order;
         QDocument document = QDocument.document;
         
-        BooleanExpression predicate = order.createdAt.between(startDate, endDate);
-        predicate = predicate.and(buildFilterPredicate(order, isApplied, isArrived, isCompleted));
+        DateTimePath<LocalDateTime> timePath = order.createdAt;
+        if (Boolean.TRUE.equals(isCompleted)) {
+            timePath = order.allCompletedAt;
+        } else if (Boolean.TRUE.equals(isArrived)) {
+            timePath = order.arrivedAt;
+        } else {
+            timePath = order.createdAt; // APPLY 기준
+        }
+
+        BooleanExpression predicate = timePath.isNotNull().and(timePath.between(startDate, endDate));
         
         return jpaQueryFactory
                 .select(
-                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", timePath),
                         document.recoveryOption,
                         document.count().intValue()
                 )
@@ -481,7 +532,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .join(order.documents, document)
                 .where(predicate)
                 .groupBy(
-                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", timePath),
                         document.recoveryOption
                 )
                 .fetch()
@@ -500,12 +551,20 @@ public class OrderRepositoryImpl implements OrderRepository {
         QOrder order = QOrder.order;
         QDocument document = QDocument.document;
         
-        BooleanExpression predicate = order.createdAt.between(startDate, endDate);
-        predicate = predicate.and(buildFilterPredicate(order, isApplied, isArrived, isCompleted));
+        DateTimePath<LocalDateTime> timePath = order.createdAt;
+        if (Boolean.TRUE.equals(isCompleted)) {
+            timePath = order.allCompletedAt;
+        } else if (Boolean.TRUE.equals(isArrived)) {
+            timePath = order.arrivedAt;
+        } else {
+            timePath = order.createdAt; // APPLY 기준
+        }
+
+        BooleanExpression predicate = timePath.isNotNull().and(timePath.between(startDate, endDate));
         
         return jpaQueryFactory
                 .select(
-                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", timePath),
                         document.recoveryOption,
                         document.pageCount.avg()
                 )
@@ -513,7 +572,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .join(order.documents, document)
                 .where(predicate)
                 .groupBy(
-                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", timePath),
                         document.recoveryOption
                 )
                 .fetch()
@@ -532,12 +591,20 @@ public class OrderRepositoryImpl implements OrderRepository {
         QOrder order = QOrder.order;
         QDocument document = QDocument.document;
         
-        BooleanExpression predicate = order.createdAt.between(startDate, endDate);
-        predicate = predicate.and(buildFilterPredicate(order, isApplied, isArrived, isCompleted));
+        DateTimePath<LocalDateTime> timePath = order.createdAt;
+        if (Boolean.TRUE.equals(isCompleted)) {
+            timePath = order.allCompletedAt;
+        } else if (Boolean.TRUE.equals(isArrived)) {
+            timePath = order.arrivedAt;
+        } else {
+            timePath = order.createdAt; // APPLY 기준
+        }
+
+        BooleanExpression predicate = timePath.isNotNull().and(timePath.between(startDate, endDate));
         
         return jpaQueryFactory
                 .select(
-                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", timePath),
                         document.recoveryOption,
                         document.totalAmount.avg()
                 )
@@ -545,7 +612,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .join(order.documents, document)
                 .where(predicate)
                 .groupBy(
-                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", order.createdAt),
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", timePath),
                         document.recoveryOption
                 )
                 .fetch()

@@ -65,7 +65,8 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
         Map<String, Integer> signUpCounts = userRepository.findMonthlySignUpCounts(periodStart, periodEnd);
         Map<String, Integer> orderCounts = orderRepository.findMonthlyOrderCounts(periodStart, periodEnd);
         Map<String, Integer> paymentAmounts = paymentRepository.findMonthlyPaymentAmounts(periodStart, periodEnd);
-        Map<String, Map<EOrderStatus, Integer>> orderStatusCounts = orderRepository.findMonthlyOrderStatusCounts(periodStart, periodEnd);
+        Map<String, Integer> companyArrivedCounts = orderRepository.findMonthlyCompanyArrivedCounts(periodStart, periodEnd);
+        Map<String, Integer> allCompletedCounts = orderRepository.findMonthlyAllCompletedCounts(periodStart, periodEnd);
         
         // 필터링된 월별 복구 옵션별 통계
         Map<String, Map<ERecoveryOption, Integer>> recoveryOptionCounts = orderRepository.findMonthlyRecoveryOptionCounts(periodStart, periodEnd, isApplied, isArrived, isCompleted);
@@ -82,11 +83,10 @@ public class ReadStatisticsSummariesService implements ReadStatisticsSummariesUs
             Integer orderCount = orderCounts.getOrDefault(yearMonth, 0);
             Integer totalAmount = paymentAmounts.getOrDefault(yearMonth, 0);
             
-            // 주문 상태별 통계
-            Map<EOrderStatus, Integer> statusMap = orderStatusCounts.getOrDefault(yearMonth, Map.of());
-            Integer appliedCount = statusMap.getOrDefault(EOrderStatus.APPLY_COMPLETED, 0);
-            Integer arrivedCount = statusMap.getOrDefault(EOrderStatus.COMPANY_ARRIVED, 0);
-            Integer completedCount = statusMap.getOrDefault(EOrderStatus.ALL_COMPLETED, 0);
+            // 주문 이벤트 시점별 통계
+            Integer appliedCount = orderCount; // 생성 시점(APPLY_COMPLETED)
+            Integer arrivedCount = companyArrivedCounts.getOrDefault(yearMonth, 0); // 업체 도착 시점
+            Integer completedCount = allCompletedCounts.getOrDefault(yearMonth, 0); // 작업 완료 시점
             
             // 복구 옵션별 통계
             Map<ERecoveryOption, Integer> recoveryMap = recoveryOptionCounts.getOrDefault(yearMonth, Map.of());
