@@ -25,7 +25,7 @@ public class DocumentService {
                 .order(order)
                 .cuttingPrice(cuttingPrice)
                 .defaultPricePerPage(defaultPricePerPage)
-                .recoveryOptionPrice(recoveryOption.getPrice())
+                .recoveryOptionPrice(calculateRecoveryOptionPrice(pageCount, recoveryOption))
                 .isOcrEnabled(isOcrEnabled)
                 .additionalPriceForOcr(additionalPriceForOcr)
                 .totalAmount(0) // 초기 총액은 0으로 설정
@@ -47,11 +47,26 @@ public class DocumentService {
         document.updatePageCount(pageCount);
         document.updateRecoveryOption(recoveryOption);
         document.updateOcrEnabled(isOcrEnabled, additionalPriceForOcr);
+        document.updateRecoveryOptionPrice(calculateRecoveryOptionPrice(pageCount, recoveryOption));
         document.calculateTotalAmount();
     }
 
     public void updateRecoveryOptionPrice(Document document, Integer recoveryOptionPrice) {
         document.updateRecoveryOptionPrice(recoveryOptionPrice);
         document.calculateTotalAmount();
+    }
+
+    private int calculateRecoveryOptionPrice(int pageCount, ERecoveryOption recoveryOption) {
+        if (recoveryOption == ERecoveryOption.SPRING) {
+            int basePrice = 3000; // 300페이지까지 기본 3,000원
+            if (pageCount <= 300) {
+                return basePrice;
+            }
+            int extraPages = pageCount - 300;
+            int increments = (int) Math.ceil(extraPages / 100.0); // 100페이지당 1,000원 (올림)
+            return basePrice + (increments * 1000);
+        }
+        // 기타 옵션은 고정가(현재 0원)
+        return recoveryOption.getPrice();
     }
 }
