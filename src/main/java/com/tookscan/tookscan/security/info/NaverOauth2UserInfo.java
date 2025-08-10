@@ -7,38 +7,42 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class NaverOauth2UserInfo extends Oauth2UserInfo {
+
+    private final Map<String, Object> resp;
+
     public NaverOauth2UserInfo(Map<String, Object> attributes) {
         super(attributes);
+        Object r = attributes.get("response");
+        this.resp = (r instanceof Map) ? (Map<String, Object>) r : attributes;
     }
 
     @Override
     public String getId() {
-        return (String) attributes.get("id");
+        Object id = resp.get("id");
+        return id != null ? id.toString() : null;
     }
 
     @Override
     public EGender getGender() {
-        String gender = (String) attributes.get("gender");
-        if (gender != null) {
-            return switch (gender) {
-                case "M" -> EGender.MALE;
-                case "F" -> EGender.FEMALE;
-                default -> EGender.UNKNOWN;
-            };
-        }
-        return EGender.UNKNOWN;
+        Object g = resp.get("gender");
+        if (g == null) return EGender.UNKNOWN;
+        return switch (g.toString().trim().toUpperCase()) {
+            case "M" -> EGender.MALE;
+            case "F" -> EGender.FEMALE;
+            default  -> EGender.UNKNOWN;
+        };
     }
 
     @Override
     public LocalDate getBirth() {
-        String birth = (String) attributes.get("birth");
-        String birthYear = (String) attributes.get("birthyear");
+        Object year = resp.get("birthyear");
+        Object mmdd = resp.get("birthday");
+        if (year == null || mmdd == null) return null;
 
-        if (birth != null && birthYear != null) {
-            try {
-                return LocalDate.parse(birthYear + "-" + birth);
-            } catch (Exception ignored) {}
+        try {
+            return LocalDate.parse(year + "-" + mmdd);
+        } catch (Exception ignored) {
+            return null;
         }
-        return null;
     }
 }
