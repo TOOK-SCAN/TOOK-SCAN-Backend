@@ -38,24 +38,24 @@ public class UpdateUserOrderInfoService implements UpdateUserOrderInfoUseCase {
         orderService.validateOrderUser(order, user);
         if (requestDto.address() != null || requestDto.deliveryRequest() != null) {
             orderService.validateUpdatableOrder(order);
+            Address address = addressService.createAddress(
+                    requestDto.address().addressName(),
+                    requestDto.address().region1DepthName(),
+                    requestDto.address().region2DepthName(),
+                    requestDto.address().region3DepthName(),
+                    requestDto.address().region4DepthName(),
+                    requestDto.address().addressDetail(),
+                    requestDto.address().zoneCode(),
+                    requestDto.address().latitude(),
+                    requestDto.address().longitude()
+            );
+            order.getDelivery().updateAddress(address);
+            order.getDelivery().updateRequest(requestDto.deliveryRequest());
         }
         
         orderService.validateUpdatableOrderInfo(order);
-
         order.getDelivery().updateEmail(requestDto.email());
-        Address address = addressService.createAddress(
-                requestDto.address().addressName(),
-                requestDto.address().region1DepthName(),
-                requestDto.address().region2DepthName(),
-                requestDto.address().region3DepthName(),
-                requestDto.address().region4DepthName(),
-                requestDto.address().addressDetail(),
-                requestDto.address().zoneCode(),
-                requestDto.address().latitude(),
-                requestDto.address().longitude()
-        );
-        order.getDelivery().updateAddress(address);
-        order.getDelivery().updateRequest(requestDto.deliveryRequest());
+
         orderRepository.save(order);
         
         LogContext.put("order_id", orderId);
