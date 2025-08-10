@@ -136,6 +136,10 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         @NotNull
         private final Integer pageCount;
 
+        @JsonProperty("page_price")
+        @NotNull
+        private final Integer pagePrice;
+
         @JsonProperty("document_price")
         @NotNull
         private final Integer documentPrice;
@@ -167,6 +171,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         @Builder
         public DocumentInfoDto(String name,
                                Integer pageCount,
+                               Integer pagePrice,
                                Integer documentPrice,
                                ERecoveryOption recoveryOption,
                                Boolean isOcrEnabled,
@@ -178,6 +183,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         ) {
             this.name = name;
             this.pageCount = pageCount;
+            this.pagePrice = pagePrice;
             this.documentPrice = documentPrice;
             this.recoveryOption = recoveryOption;
             this.isOcrEnabled = isOcrEnabled;
@@ -193,6 +199,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
+                    .pagePrice(document.getDefaultPricePerPage())
                     .documentPrice(document.getDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .isOcrEnabled(document.getIsOcrEnabled())
