@@ -330,7 +330,6 @@ public class ReadAdminOrderDetailResponseDto extends
             private final String name;
 
             @JsonProperty("pdf_url")
-            @NotBlank
             private final String pdfUrl;
 
             @JsonProperty("is_expired")
