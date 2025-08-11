@@ -1,8 +1,11 @@
 package com.tookscan.tookscan.order.domain;
 
 import com.tookscan.tookscan.core.domain.BaseEntity;
+import com.tookscan.tookscan.order.domain.type.EPdfUploadStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,7 +29,7 @@ public class Pdf extends BaseEntity {
     /* -------------------------------------------- */
     /* Information Column ------------------------- */
     /* -------------------------------------------- */
-    @Column(name = "pdf_url_for_admin", nullable = false, length = 2048)
+    @Column(name = "pdf_url_for_admin", length = 2048)
     private String pdfUrlForAdmin;
 
     @Column(name = "pdf_url_for_user", length = 2048)
@@ -44,6 +47,10 @@ public class Pdf extends BaseEntity {
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "upload_status", nullable = false, length = 32)
+    private EPdfUploadStatus uploadStatus;
+
     /* -------------------------------------------- */
     /* Many To One Mapping ------------------------ */
     /* -------------------------------------------- */
@@ -55,12 +62,14 @@ public class Pdf extends BaseEntity {
     /* Methods ------------------------------------ */
     /* -------------------------------------------- */
     @Builder
-    public Pdf(String pdfUrlForAdmin, String name, boolean isChecked, Document document, String storedFileName) {
+    public Pdf(String pdfUrlForAdmin, String name, boolean isChecked, Document document, String storedFileName,
+               EPdfUploadStatus uploadStatus) {
         this.pdfUrlForAdmin = pdfUrlForAdmin;
         this.name = name;
         this.isChecked = isChecked;
         this.document = document;
         this.storedFileName = storedFileName;
+        this.uploadStatus = uploadStatus;
     }
     public void updateExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
@@ -73,5 +82,10 @@ public class Pdf extends BaseEntity {
     public void updatePdfUrlForUser(String pdfUrlForUser) {
         this.pdfUrlForUser = pdfUrlForUser;
     }
+
+    public void updateUploadStatus(EPdfUploadStatus status) {
+        this.uploadStatus = status;
+    }
+
 
 }

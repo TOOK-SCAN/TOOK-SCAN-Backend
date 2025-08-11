@@ -1,7 +1,6 @@
 package com.tookscan.tookscan.core.config;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +94,33 @@ public class AsyncConfig implements AsyncConfigurer {
             .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
             .addKeyValue("queueCapacity", executor.getQueueCapacity())
             .log("[Async Thread] File Processing TaskExecutor initialized");
+
+        return executor;
+    }
+
+    /**
+     * IO 집약적 작업용 스레드 풀 (S3 업로드 등)
+     * - 높은 동시성 허용
+     * - 블로킹을 피하고 논블로킹 콜백을 주로 사용하되, 필요 시 버퍼 역할
+     */
+    @Bean(name = "ioBoundTaskExecutor")
+    public ThreadPoolTaskExecutor ioBoundTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(PROCESSORS * 2);
+        executor.setMaxPoolSize(PROCESSORS * 8);
+        executor.setQueueCapacity(500);
+        executor.setKeepAliveSeconds(60);
+        executor.setThreadNamePrefix("io-bound-async-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.initialize();
+
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] IO Bound TaskExecutor initialized");
 
         return executor;
     }

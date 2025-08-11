@@ -34,7 +34,7 @@ public class AwsConfig {
      */
     @Bean
     public S3AsyncClient s3AsyncClient() {
-        return S3AsyncClient.builder()
+        return S3AsyncClient.crtBuilder()
                 .credentialsProvider(awsCredentialsProvider())
                 .region(Region.of(region))
                 .build();
