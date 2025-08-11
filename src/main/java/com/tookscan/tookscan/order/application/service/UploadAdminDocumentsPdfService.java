@@ -4,6 +4,7 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.account.repository.UserRepository;
 import com.tookscan.tookscan.core.annotation.BusinessLog;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
+import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.util.LogContext;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
@@ -100,7 +101,10 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         List<EOrderStatus> validStatuses = List.of(
                 EOrderStatus.PAYMENT_COMPLETED,
                 EOrderStatus.SCAN_IN_PROGRESS,
-                EOrderStatus.SCAN_COMPLETED
+                EOrderStatus.SCAN_COMPLETED,
+                EOrderStatus.RECOVERY_IN_PROGRESS,
+                EOrderStatus.POST_WAITING,
+                EOrderStatus.ALL_COMPLETED
         );
 
         orderService.validateOrderStatuses(order, validStatuses, ErrorCode.INVALID_ORDER_STATUS);
@@ -111,7 +115,7 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         String orderNumber = order.getOrderNumber();
         String orderCreatedAt = DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt());
 
-        // 4. 요청 내 중복 파일명 선제 차단 (for문 전에 전체 검사) + 파일 객체 보관
+        // 4. 요청 내 중복 파일명 선제 차단 (for문 전에 전체 검사) + 기존 문서와의 중복 배치 검증 + 파일 객체 보관
         Set<String> requestDuplicateGuard = new HashSet<>();
         List<PreparedUploadFile> preparedFiles = new ArrayList<>(files.size());
         for (MultipartFile file : files) {
@@ -120,10 +124,13 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
                 originalFileName = "unnamed.pdf";
             }
             if (!requestDuplicateGuard.add(originalFileName)) {
-                throw new RuntimeException("동일 요청 내에서 중복된 파일명이 존재합니다: " + originalFileName);
+                throw new CommonException(ErrorCode.DUPLICATE_PDF_FILENAME, "중복된 파일명이 감지되었습니다: " + originalFileName);
             }
             preparedFiles.add(new PreparedUploadFile(originalFileName, file));
         }
+
+        // 기존 문서의 PDF 파일명과의 중복을 일괄 검증
+        pdfService.validateUniqueFilenames(document, requestDuplicateGuard);
 
         List<Pdf> pdfs = new ArrayList<>();
 
@@ -132,9 +139,6 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
             String originalFileName = prepared.getOriginalFileName();
             MultipartFile file = prepared.getFile();
             try {
-                // 파일명 중복 검증 (메인 트랜잭션에서)
-                pdfService.validateUniqueFilename(document, originalFileName);
-
                 // S3에 저장할 고유 파일명 생성
                 String extension = StringUtils.getFilenameExtension(originalFileName);
                 if (extension == null || extension.isBlank()) {
