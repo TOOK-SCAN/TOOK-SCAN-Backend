@@ -3,17 +3,25 @@ package com.tookscan.tookscan.security.domain.mysql;
 import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
@@ -72,7 +80,7 @@ public abstract class Account {
     private EGender gender;
 
     @Column(name = "birth")
-    private LocalDate birth;
+    private Integer birth;
 
     /* -------------------------------------------- */
     /* Methods ------------------------------------ */
@@ -83,7 +91,7 @@ public abstract class Account {
             String password,
             String phoneNumber,
             EGender gender,
-            LocalDate birth
+            Integer birth
     ) {
         this.provider = provider;
         this.serialId = serialId;
@@ -123,7 +131,7 @@ public abstract class Account {
         this.gender = gender;
     }
 
-    public void updateBirth(LocalDate birth) {
+    public void updateBirth(Integer birth) {
         this.birth = birth;
     }
 }

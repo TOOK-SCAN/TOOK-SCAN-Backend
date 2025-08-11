@@ -10,8 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-import java.time.LocalDate;
-
 public record UpdateAdminUserRequestDto(
         @JsonProperty("name")
         @NotBlank(message = "이름을 입력해주세요.")
@@ -46,8 +44,8 @@ public record UpdateAdminUserRequestDto(
         EGender gender,
 
         @JsonProperty("birth")
-        @Schema(description = "생년월일 (YYYY-MM-DD 형식)", example = "1990-01-01")
-        LocalDate birth
+        @Schema(description = "생년월일 (YYYY)", example = "2000")
+        Integer birth
 
 ) {
 }

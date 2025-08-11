@@ -114,9 +114,15 @@ Content-Type: application/json
 {
   "name": "수동 쿠폰",
   "format": "DEFINED",
-  "defined_code": "TEST12345",
-  "defined_max_used_count": 10,
-  "type": "OCR_FREE"
+  "defined_code": "EHDUD05291",
+  "defined_max_used_count": 5,
+  "type": "PERCENTAGE",
+  "discount_percent": 20,
+  "max_discount_price": 5000,
+  "min_order_price": 2000,
+  "start_date_time": null,
+  "end_date_time": null,
+  "max_used_per_user_count": 4
 }
 
 ### 관리자 쿠폰 템플릿 요약 조회

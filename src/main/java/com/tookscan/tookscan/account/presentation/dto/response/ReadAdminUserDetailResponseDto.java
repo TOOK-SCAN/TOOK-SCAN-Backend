@@ -9,11 +9,10 @@ import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @Getter
 public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUserDetailResponseDto> {
@@ -145,7 +144,7 @@ public class ReadAdminUserDetailResponseDto extends SelfValidating<ReadAdminUser
                         .mapToLong(order -> order.getDocuments().size())
                         .sum())
                 .gender(user.getGender())
-                .birth(user.getBirth() != null ? DateTimeUtil.convertLocalDateToDartString(user.getBirth()) : " - ")
+                .birth(user.getBirth() != null ? user.getBirth().toString() : " - ")
                 .isDeleted(user.getDeletedAt() != null)
                 .deletedAt(user.getDeletedAt())
                 .reasonDeletion(user.getReasonDeletion())

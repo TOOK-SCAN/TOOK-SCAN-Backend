@@ -4,7 +4,6 @@ import com.tookscan.tookscan.security.domain.type.EGender;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 @Getter
@@ -13,5 +12,5 @@ public abstract class Oauth2UserInfo {
     protected final Map<String, Object> attributes;
     public abstract String getId();
     public abstract EGender getGender();
-    public abstract LocalDate getBirth();
+    public abstract Integer getBirthYear();
 }

@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
-import com.tookscan.tookscan.core.utility.DateTimeUtil;
 import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDate;
 
 @Getter
 public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDetailResponseDto> {
@@ -96,7 +93,7 @@ public class ReadUserUserDetailResponseDto extends SelfValidating<ReadUserUserDe
                 .isReceiveEmail(user.getIsReceiveEmail())
                 .isReceiveSms(user.getIsReceiveSms())
                 .gender(user.getGender()!= null ? user.getGender() : EGender.UNKNOWN)
-                .birth(user.getBirth() != null ? DateTimeUtil.convertLocalDateToDartString(user.getBirth()) : " - ")
+                .birth(user.getBirth() != null ? user.getBirth().toString() : " - ")
                 .build();
     }
 }

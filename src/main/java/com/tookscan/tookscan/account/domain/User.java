@@ -15,11 +15,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +22,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -102,7 +101,7 @@ public class User extends Account {
             Boolean isReceiveEmail,
             Boolean isReceiveSms,
             EGender gender,
-            LocalDate birth
+            Integer birth
     ) {
         super(provider, serialId, password, phoneNumber, gender, birth);
         this.name = name;
