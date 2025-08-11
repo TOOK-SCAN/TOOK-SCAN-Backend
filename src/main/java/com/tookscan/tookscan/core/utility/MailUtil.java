@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.core.utility;
 
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ public class MailUtil {
     private String mailTemplateImagesUrl;
 
     @Value("${spring.mail.username}")
-    private String mailSenderAddress;
+    private String mailSenderUsername;
 
     private static final String TEST_EMAIL_TEMPLATE = """
         <!doctype html>
@@ -150,7 +152,8 @@ public class MailUtil {
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송하는 코드
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom(mailSenderAddress, "TOOK-SCAN");
+        mimeMessageHelper.setFrom(new InternetAddress(mailSenderUsername, "TOOK-SCAN", StandardCharsets.UTF_8.name()));
+
         mimeMessageHelper.setTo(receiverAddress);
 
         String content = TEST_EMAIL_TEMPLATE.replace("${MailImgUrl}", mailTemplateImagesUrl);
@@ -172,7 +175,7 @@ public class MailUtil {
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom(mailSenderAddress, "TOOK-SCAN");
+        mimeMessageHelper.setFrom(new InternetAddress(mailSenderUsername, "TOOK-SCAN", StandardCharsets.UTF_8.name()));
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
         String content = PDF_EMAIL_TEMPLATE
@@ -195,7 +198,7 @@ public class MailUtil {
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송하는 코드
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom(mailSenderAddress, "TOOK-SCAN");
+        mimeMessageHelper.setFrom(new InternetAddress(mailSenderUsername, "TOOK-SCAN", StandardCharsets.UTF_8.name()));
         mimeMessageHelper.setTo(receiverAddress);
 
         // UTF-8로 인코딩
