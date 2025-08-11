@@ -58,6 +58,25 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
     private final ApplicationEventPublisher eventPublisher;
     private final PdfRepository pdfRepository;
 
+    // 요청 파일 사전 준비용 내부 클래스
+    private static class PreparedUploadFile {
+        private final String originalFileName;
+        private final MultipartFile file;
+
+        private PreparedUploadFile(String originalFileName, MultipartFile file) {
+            this.originalFileName = originalFileName;
+            this.file = file;
+        }
+
+        public String getOriginalFileName() {
+            return originalFileName;
+        }
+
+        public MultipartFile getFile() {
+            return file;
+        }
+    }
+
     // 워터마크 처리를 위한 AES 키 설정
     @Value("${aes-key}")
     private String aesKeyString;
@@ -92,29 +111,35 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         String orderNumber = order.getOrderNumber();
         String orderCreatedAt = DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt());
 
-        // 4. 요청 내 중복 파일명 선제 차단 (동일 요청 내에서 동일 파일명 업로드 방지)
+        // 4. 요청 내 중복 파일명 선제 차단 (for문 전에 전체 검사) + 파일 객체 보관
         Set<String> requestDuplicateGuard = new HashSet<>();
+        List<PreparedUploadFile> preparedFiles = new ArrayList<>(files.size());
+        for (MultipartFile file : files) {
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                originalFileName = "unnamed.pdf";
+            }
+            if (!requestDuplicateGuard.add(originalFileName)) {
+                throw new RuntimeException("동일 요청 내에서 중복된 파일명이 존재합니다: " + originalFileName);
+            }
+            preparedFiles.add(new PreparedUploadFile(originalFileName, file));
+        }
 
         List<Pdf> pdfs = new ArrayList<>();
 
         // 5. 각 파일을 비동기로 처리
-        for (MultipartFile file : files) {
+        for (PreparedUploadFile prepared : preparedFiles) {
+            String originalFileName = prepared.getOriginalFileName();
+            MultipartFile file = prepared.getFile();
             try {
-                String originalFileName = file.getOriginalFilename();
-                if (originalFileName == null || originalFileName.trim().isEmpty()) {
-                    originalFileName = "unnamed.pdf";
-                }
-
-                // 동일 요청 내 중복 파일명 방지
-                if (!requestDuplicateGuard.add(originalFileName)) {
-                    throw new RuntimeException("동일 요청 내에서 중복된 파일명이 존재합니다: " + originalFileName);
-                }
-
                 // 파일명 중복 검증 (메인 트랜잭션에서)
                 pdfService.validateUniqueFilename(document, originalFileName);
 
                 // S3에 저장할 고유 파일명 생성
                 String extension = StringUtils.getFilenameExtension(originalFileName);
+                if (extension == null || extension.isBlank()) {
+                    extension = "pdf";
+                }
                 String storedFileName = UUID.randomUUID() + "." + extension;
 
                 // MultipartFile을 byte[]로 변환
@@ -132,13 +157,6 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
                 Pdf pdf = pdfRepository.save(preCreated);
                 pdfs.add(pdf);
 
-                try {
-                    System.out.println(pdf.getId().toString());
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    log.error("Thread was interrupted while simulating delay for PDF upload: {}", e.getMessage());
-                }
                 // 비동기 처리 시작 - 이벤트 퍼블리시 (AFTER_COMMIT에 비동기 핸들링)
                 AdminPdfUploadRequestedEvent event = AdminPdfUploadRequestedEvent.builder()
                         .pdfId(preCreated.getId())
@@ -160,8 +178,8 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
 
             } catch (IOException e) {
                 log.error("Failed to read file content for file: {} (document ID: {}). Error: {}",
-                        file.getOriginalFilename(), documentId, e.getMessage(), e);
-                throw new RuntimeException("파일 읽기 실패: " + file.getOriginalFilename(), e);
+                        originalFileName, documentId, e.getMessage(), e);
+                throw new RuntimeException("파일 읽기 실패: " + originalFileName, e);
             }
         }
 
