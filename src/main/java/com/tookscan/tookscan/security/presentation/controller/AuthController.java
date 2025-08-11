@@ -1,12 +1,11 @@
 package com.tookscan.tookscan.security.presentation.controller;
 
 import com.tookscan.tookscan.core.annotation.security.AccountID;
-import com.tookscan.tookscan.core.constant.Constants;
+import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.CookieUtil;
-import com.tookscan.tookscan.core.utility.HeaderUtil;
 import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.usecase.ChangePasswordUseCase;
@@ -40,7 +39,6 @@ import com.tookscan.tookscan.security.presentation.dto.response.ValidationRespon
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -388,11 +386,14 @@ public class AuthController {
         ErrorCode.FAILURE_LOGIN
     })
     @DeleteMapping("")
-    public ResponseDto<Void> deleteAccount(
+    public void deleteAccount(
             @Parameter(hidden = true) @AccountID UUID accountId,
-            @RequestBody DeleteAccountRequestDto requestDto
-    ) {
+            @RequestBody DeleteAccountRequestDto requestDto,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
         deleteAccountUseCase.execute(accountId, requestDto);
-        return ResponseDto.ok(null);
+
+        httpServletUtil.onSuccessBodyResponseWithDeletedJWTCookie(request, response);
     }
 }

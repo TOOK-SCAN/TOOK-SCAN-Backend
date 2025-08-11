@@ -5,6 +5,7 @@ import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.dto.OauthJsonWebTokenDto;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,6 +99,43 @@ public class HttpServletUtil {
                 refreshTokenCookieName,
                 tokenDto.getRefreshToken(),
                 (int) (refreshTokenExpirePeriod / 10000L) // 기존 기한의 10분의 1로 설정 (로그인 유지 체크 안함)
+        );
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("success", true);
+        result.put("data", null);
+        result.put("error", null);
+
+        response.getWriter().write(objectMapper.writeValueAsString(result));
+    }
+
+    public void onSuccessBodyResponseWithDeletedJWTCookie(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpStatus.CREATED.value());
+
+        CookieUtil.deleteCookie(
+                request,
+                response,
+                cookieDomain,
+                accessTokenCookieName
+        );
+        CookieUtil.deleteCookie(
+                request,
+                response,
+                cookieDomain,
+                refreshTokenCookieName
+        );
+
+        CookieUtil.deleteCookie(
+                request,
+                response,
+                cookieDomain,
+                temporaryTokenCookieName
         );
 
         Map<String, Object> result = new HashMap<>();
