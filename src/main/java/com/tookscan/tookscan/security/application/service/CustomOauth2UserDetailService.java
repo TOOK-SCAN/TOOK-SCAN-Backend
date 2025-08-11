@@ -35,7 +35,7 @@ public class CustomOauth2UserDetailService extends DefaultOAuth2UserService {
         // 최초 가입 유저라면 CustomTemporaryUserPrincipal 반환
         if (account == null) {
             return new CustomTemporaryUserPrincipal(oauth2UserInfo.getId(), provider,
-                    oauth2UserInfo.getGender(), oauth2UserInfo.getBirth());
+                    oauth2UserInfo.getGender(), oauth2UserInfo.getBirthYear());
         }
 
         // 임시 유저가 아니라면 CustomUserPrincipal 반환

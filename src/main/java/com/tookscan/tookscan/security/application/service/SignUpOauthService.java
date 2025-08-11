@@ -20,13 +20,12 @@ import com.tookscan.tookscan.security.repository.AuthenticationCodeHistoryReposi
 import com.tookscan.tookscan.security.repository.AuthenticationCodeRepository;
 import com.tookscan.tookscan.security.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
-
-import java.time.LocalDate;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -62,14 +61,14 @@ public class SignUpOauthService implements SignUpOauthUseCase {
         String serialId = split[0];
         ESecurityProvider provider = ESecurityProvider.valueOf(split[1]);
         EGender gender;
-        LocalDate birth;
+        Integer birth;
         try {
             gender = EGender.valueOf(split[2]);
         } catch (Exception e) {
             gender = EGender.UNKNOWN;
         }
         try {
-            birth = LocalDate.parse(split[3]);
+            birth = Integer.parseInt(split[3]);
         } catch (Exception e) {
             birth = null;
         }

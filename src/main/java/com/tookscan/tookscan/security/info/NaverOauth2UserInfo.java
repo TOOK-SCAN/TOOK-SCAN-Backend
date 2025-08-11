@@ -3,7 +3,6 @@ package com.tookscan.tookscan.security.info;
 import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.info.factory.Oauth2UserInfo;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 public class NaverOauth2UserInfo extends Oauth2UserInfo {
@@ -34,13 +33,13 @@ public class NaverOauth2UserInfo extends Oauth2UserInfo {
     }
 
     @Override
-    public LocalDate getBirth() {
+    public Integer getBirthYear() {
         Object year = resp.get("birthyear");
-        Object mmdd = resp.get("birthday");
-        if (year == null || mmdd == null) return null;
+
+        if (year == null) return null;
 
         try {
-            return LocalDate.parse(year + "-" + mmdd);
+            return Integer.parseInt(year.toString());
         } catch (Exception ignored) {
             return null;
         }

@@ -29,11 +29,17 @@ public class GoogleOauth2UserInfo extends Oauth2UserInfo {
     }
 
     @Override
-    public LocalDate getBirth() {
-        if (attributes.get("birthdate") != null) {
-            String birthdate = (String) attributes.get("birthdate");
-            return LocalDate.parse(birthdate);
+    public Integer getBirthYear() {
+        if (attributes.get("birthdate") == null) return null;
+        String birthdate = (String) attributes.get("birthdate");
+
+        if (birthdate == null || birthdate.isEmpty()) return null;
+
+        try {
+            LocalDate date = LocalDate.parse(birthdate);
+            return date.getYear();
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 }

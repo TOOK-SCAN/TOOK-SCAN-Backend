@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,7 @@ public class CustomTemporaryUserPrincipal implements OAuth2User {
     private final String serialId;
     private final ESecurityProvider provider;
     private final EGender gender;
-    private final LocalDate birth;
+    private final Integer birth;
 
     @Override
     public Map<String, Object> getAttributes() {

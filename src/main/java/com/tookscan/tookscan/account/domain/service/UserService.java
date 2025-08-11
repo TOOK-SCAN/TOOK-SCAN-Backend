@@ -4,10 +4,9 @@ import com.tookscan.tookscan.account.domain.User;
 import com.tookscan.tookscan.address.dto.request.AddressRequestDto;
 import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.domain.type.ESecurityProvider;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -22,7 +21,7 @@ public class UserService {
             Boolean isReceiveEmail,
             Boolean isReceiveSms,
             EGender gender,
-            LocalDate birth
+            Integer birth
     ) {
         return User.builder()
                 .provider(provider)
@@ -57,7 +56,7 @@ public class UserService {
             Boolean isReceiveEmail,
             Boolean isReceiveSms,
             EGender gender,
-            LocalDate birth
+            Integer birth
     ) {
         boolean currentMarketingAllowed = user.getMarketingAllowed() != null;
 
@@ -85,7 +84,7 @@ public class UserService {
             String deliveryRequest,
             String memo,
             EGender gender,
-            LocalDate birth
+            Integer birth
     ) {
         user.updateName(name);
         user.updatePhone(phoneNumber);

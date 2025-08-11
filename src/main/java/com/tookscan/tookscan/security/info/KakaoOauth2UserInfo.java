@@ -3,7 +3,6 @@ package com.tookscan.tookscan.security.info;
 import com.tookscan.tookscan.security.domain.type.EGender;
 import com.tookscan.tookscan.security.info.factory.Oauth2UserInfo;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 public class KakaoOauth2UserInfo extends Oauth2UserInfo {
@@ -30,18 +29,17 @@ public class KakaoOauth2UserInfo extends Oauth2UserInfo {
     }
 
     @Override
-    public LocalDate getBirth() {
+    public Integer getBirthYear() {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        if (kakaoAccount != null) {
-            String birthyear = (String) kakaoAccount.get("birthyear");
-            String birthday = (String) kakaoAccount.get("birthday");
+        if (kakaoAccount == null) return null;
+        String birthyear = (String) kakaoAccount.get("birthyear");
 
-            if (birthyear != null && birthday != null) {
-                try {
-                    return LocalDate.parse(birthyear + "-" + birthday);
-                } catch (Exception ignored) {}
-            }
+        if (birthyear == null) return null;
+
+        try {
+            return Integer.parseInt(birthyear);
+        } catch (Exception ignored) {
+            return null;
         }
-        return null;
     }
 }
