@@ -8,12 +8,17 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
+
 @Component
 @RequiredArgsConstructor
 public class MailUtil {
 
     @Value("${spring.cloud.aws.s3.mail-template-images.url}")
     private String mailTemplateImagesUrl;
+
+    @Value("${spring.mail.username}")
+    private String mailSenderAddress;
 
     private static final String TEST_EMAIL_TEMPLATE = """
         <!doctype html>
@@ -33,7 +38,7 @@ public class MailUtil {
               </div>
               
               <div class="img" style="text-align: center;">
-                <img src=${MailImgUrl} alt="mailimg" style="max-width: 250px; height: auto;" />
+                <img src="${MailImgUrl}" alt="mailimg" style="max-width: 250px; height: auto;" />
               </div>
               
               <div class="message-section" style="padding: 20px; font-size: 1.25rem; color: #333; text-align: start; margin-top: 3.125rem; margin-bottom: 5rem;">
@@ -68,7 +73,7 @@ public class MailUtil {
                              <!-- 🖼️ 상단 배너 이미지 -->
                              <tr>
                                <td align="center">
-                                 <img src=${MailImgUrl}
+                                 <img src="${MailImgUrl}"
                                       alt="툭스캔 PDF 도착 안내"
                                       style="width:100%; max-width:600px; min-width:280px; height:auto; display:block;" />
                                </td>
@@ -139,13 +144,13 @@ public class MailUtil {
 
     public void sendTestEmail(
             String receiverAddress
-    ) throws MessagingException {
+    ) throws MessagingException, UnsupportedEncodingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setSubject("TOOK-SCAN 테스트 이메일");
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송하는 코드
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom("TOOK-SCAN");
+        mimeMessageHelper.setFrom(mailSenderAddress, "TOOK-SCAN");
         mimeMessageHelper.setTo(receiverAddress);
 
         String content = TEST_EMAIL_TEMPLATE.replace("${MailImgUrl}", mailTemplateImagesUrl);
@@ -161,13 +166,13 @@ public class MailUtil {
             String orderNumber,
             String orderName,
             String pdfUrl
-    ) throws MessagingException {
+    ) throws MessagingException, UnsupportedEncodingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setSubject("[툭스캔] 주문하신 PDF 파일이 도착했어요.");
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom("TOOK-SCAN");
+        mimeMessageHelper.setFrom(mailSenderAddress, "TOOK-SCAN");
         mimeMessageHelper.setTo(receiverAddress);
         // UTF-8로 인코딩
         String content = PDF_EMAIL_TEMPLATE
@@ -184,13 +189,13 @@ public class MailUtil {
     public void sendTemporaryPassword(
             String receiverAddress,
             String temporaryPassword
-    ) throws MessagingException {
+    ) throws MessagingException, UnsupportedEncodingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setSubject("TOOK-SCAN 임시 비밀번호 안내");
 
         // 위 HTML을 이용하여 이메일을 작성하고 전송하는 코드
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom("TOOK-SCAN");
+        mimeMessageHelper.setFrom(mailSenderAddress, "TOOK-SCAN");
         mimeMessageHelper.setTo(receiverAddress);
 
         // UTF-8로 인코딩
