@@ -98,6 +98,7 @@ public enum ErrorCode {
     EXCEEDED_MAX_USED_COUPON_PER_USER(40059, HttpStatus.BAD_REQUEST, "한 유저 당 사용 가능한 해당 쿠폰의 사용 횟수를 초과했습니다."),
     EXCEEDED_MAX_USED_COUPON(40060, HttpStatus.BAD_REQUEST, "해당 쿠폰의 전체 사용 횟수를 초과했습니다."),
     NOT_ENOUGH_ORDER_PRICE_FOR_COUPON(40061, HttpStatus.BAD_REQUEST, "쿠폰을 사용하기 위한 최소 주문 금액이 충족되지 않았습니다. 주문 취소 후 다시 진행해주세요."),
+    NOT_PDF_UPLOADED(40063, HttpStatus.BAD_REQUEST, "PDF 파일이 업로드되지 않았습니다."),
 
     // Conflict Error
     DUPLICATE_COUPON_CODE(40900, HttpStatus.CONFLICT, "이미 존재하는 쿠폰 코드입니다."),

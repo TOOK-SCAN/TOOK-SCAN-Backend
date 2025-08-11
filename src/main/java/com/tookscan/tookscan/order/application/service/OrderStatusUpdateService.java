@@ -3,7 +3,10 @@ package com.tookscan.tookscan.order.application.service;
 import com.tookscan.tookscan.order.application.usecase.UpdateOrderStatusAfterPdfProcessingUseCase;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.service.OrderService;
+import com.tookscan.tookscan.order.domain.type.EOrderStatus;
 import com.tookscan.tookscan.order.repository.OrderRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,17 @@ public class OrderStatusUpdateService implements UpdateOrderStatusAfterPdfProces
     public void execute(Long orderId) {
         try {
             Order order = orderRepository.findByIdOrElseThrow(orderId);
+
+            List<EOrderStatus> validStatuses = List.of(
+                    EOrderStatus.RECOVERY_IN_PROGRESS,
+                    EOrderStatus.POST_WAITING,
+                    EOrderStatus.ALL_COMPLETED
+            );
+
+            if (validStatuses.contains(order.getOrderStatus())) {
+                order.updateScanCompletedAt(LocalDateTime.now());
+                return;
+            }
 
             boolean hasAnyPdf = order.getDocuments().stream().anyMatch(doc -> !doc.getPdfs().isEmpty());
             boolean allDocumentsHavePdf = order.getDocuments().stream().noneMatch(doc -> doc.getPdfs().isEmpty());
