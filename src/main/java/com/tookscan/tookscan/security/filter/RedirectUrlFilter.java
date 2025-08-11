@@ -25,8 +25,8 @@ public class RedirectUrlFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        return !(requestURI.startsWith(Constants.KAKAO_OAUTH2_HREF) || requestURI.startsWith(Constants.GOOGLE_OAUTH2_HREF));
+        return !(requestURI.startsWith(Constants.KAKAO_OAUTH2_HREF) || requestURI.startsWith(Constants.GOOGLE_OAUTH2_HREF) || requestURI.startsWith(Constants.NAVER_OAUTH2_HREF));
     }
 }
