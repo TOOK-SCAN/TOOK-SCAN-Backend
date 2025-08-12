@@ -69,7 +69,7 @@ public class IssuedCoupon extends BaseEntity {
     }
 
     public void useCoupon() {
-        if (usedCount < maxUsedCount) {
+        if (maxUsedCount == null || usedCount < maxUsedCount) {
             usedCount++;
         } else {
             throw new CommonException(ErrorCode.EXCEEDED_MAX_USED_COUPON);
