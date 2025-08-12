@@ -1,6 +1,7 @@
 package com.tookscan.tookscan.order.application.service;
 
 import com.tookscan.tookscan.order.application.usecase.SubscribePdfProgressUseCase;
+import com.tookscan.tookscan.order.repository.PdfRepository;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,11 +17,16 @@ public class SubscribePdfProgressService implements SubscribePdfProgressUseCase 
 
     private static final long DEFAULT_TIMEOUT = 60L * 60L * 1000L; // 1시간
 
+    private final PdfRepository pdfRepository;
+
     // key: pdfId
     private final Map<String, SseEmitter> emitterMap = new ConcurrentHashMap<>();
 
     @Override
     public SseEmitter execute(Long pdfId) {
+
+        pdfRepository.findByIdOrElseThrow(pdfId);
+
         String key = buildKey(pdfId);
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
