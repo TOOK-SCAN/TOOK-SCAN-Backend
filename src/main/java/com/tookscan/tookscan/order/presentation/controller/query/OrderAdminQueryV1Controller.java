@@ -4,7 +4,6 @@ import com.tookscan.tookscan.core.annotation.swagger.ApiErrorCode;
 import com.tookscan.tookscan.core.dto.ResponseDto;
 import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateDetailUseCase;
-import com.tookscan.tookscan.order.application.usecase.SubscribePdfProgressUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminCouponTemplateOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminDocumentsPdfsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminIssuedCouponOverviewUseCase;
@@ -13,6 +12,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCa
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminUsedCouponOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
+import com.tookscan.tookscan.order.application.usecase.SubscribePdfProgressUseCase;
 import com.tookscan.tookscan.order.domain.type.ECouponFormat;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import com.tookscan.tookscan.order.domain.type.EOrderStatus;
@@ -29,16 +29,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.UUID;
 
 @Tag(name = "Order", description = "Order 관련 API 입니다.")
 @RestController
@@ -219,7 +219,7 @@ public class OrderAdminQueryV1Controller {
 
     @Operation(summary = "관리자용 PDF 업로드 진행 SSE", description = "관리자가 주문/문서 단위 업로드 진행 이벤트를 수신합니다.")
     @ApiErrorCode({})
-    @GetMapping(value = "/orders/pdfs/{pdfId}/progress", produces = "text/event-stream")
+    @GetMapping(value = "/orders/pdfs/{pdfId}/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribePdfProgress(@PathVariable Long pdfId) {
         return subscribePdfProgressUseCase.execute(pdfId);
     }
