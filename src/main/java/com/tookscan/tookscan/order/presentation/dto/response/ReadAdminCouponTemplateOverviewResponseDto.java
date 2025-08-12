@@ -97,7 +97,7 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
             String description = null;
 
             if (couponTemplate.getType().equals(ECouponType.PERCENTAGE)) {
-                int percent = couponTemplate.getDiscountPercent() != null ? couponTemplate.getDiscountPercent() : 0;
+                int percent = couponTemplate.getDiscountPercent();
                 Integer minPrice = couponTemplate.getMinOrderPrice();
                 Integer maxPrice = couponTemplate.getMaxDiscountPrice();
 
@@ -112,7 +112,7 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                 }
 
             } else if (couponTemplate.getType().equals(ECouponType.AMOUNT)) {
-                int amount = couponTemplate.getDiscountPrice() != null ? couponTemplate.getDiscountPrice() : 0;
+                int amount = couponTemplate.getDiscountPrice();
                 Integer minPrice = couponTemplate.getMinOrderPrice();
                 Integer maxPrice = couponTemplate.getMaxDiscountPrice();
 
