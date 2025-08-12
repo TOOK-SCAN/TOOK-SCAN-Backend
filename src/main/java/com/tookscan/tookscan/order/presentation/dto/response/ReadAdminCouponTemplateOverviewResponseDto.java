@@ -8,7 +8,6 @@ import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -131,16 +130,12 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                 description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
             }
 
-            List<IssuedCoupon> issuedCoupons = couponTemplate.getIssuedCoupons() != null
-                    ? couponTemplate.getIssuedCoupons()
-                    : Collections.emptyList();
-
-            int usedCountSum = issuedCoupons.stream()
+            int usedCountSum = couponTemplate.getIssuedCoupons().stream()
                     .mapToInt(IssuedCoupon::getUsedCount)
                     .sum();
 
             Integer maxUsedCountSum = couponTemplate.getMaxUsedPerUserCount() != null
-                    ? issuedCoupons.stream()
+                    ? couponTemplate.getIssuedCoupons().stream()
                     .mapToInt(IssuedCoupon::getMaxUsedCount)
                     .sum()
                     : null;
