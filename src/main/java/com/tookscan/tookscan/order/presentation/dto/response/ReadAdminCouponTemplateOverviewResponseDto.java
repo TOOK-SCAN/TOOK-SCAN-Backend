@@ -7,12 +7,12 @@ import com.tookscan.tookscan.order.domain.CouponTemplate;
 import com.tookscan.tookscan.order.domain.IssuedCoupon;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 public class ReadAdminCouponTemplateOverviewResponseDto {
@@ -97,7 +97,7 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
             String description = null;
 
             if (couponTemplate.getType().equals(ECouponType.PERCENTAGE)) {
-                int percent = couponTemplate.getDiscountPercent();
+                int percent = couponTemplate.getDiscountPercent() != null ? couponTemplate.getDiscountPercent() : 0;
                 Integer minPrice = couponTemplate.getMinOrderPrice();
                 Integer maxPrice = couponTemplate.getMaxDiscountPrice();
 
@@ -112,7 +112,7 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                 }
 
             } else if (couponTemplate.getType().equals(ECouponType.AMOUNT)) {
-                int amount = couponTemplate.getDiscountPrice();
+                int amount = couponTemplate.getDiscountPrice() != null ? couponTemplate.getDiscountPrice() : 0;
                 Integer minPrice = couponTemplate.getMinOrderPrice();
                 Integer maxPrice = couponTemplate.getMaxDiscountPrice();
 
@@ -131,6 +131,20 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                 description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
             }
 
+            List<IssuedCoupon> issuedCoupons = couponTemplate.getIssuedCoupons() != null
+                    ? couponTemplate.getIssuedCoupons()
+                    : Collections.emptyList();
+
+            int usedCountSum = issuedCoupons.stream()
+                    .mapToInt(IssuedCoupon::getUsedCount)
+                    .sum();
+
+            Integer maxUsedCountSum = couponTemplate.getMaxUsedPerUserCount() != null
+                    ? issuedCoupons.stream()
+                    .mapToInt(IssuedCoupon::getMaxUsedCount)
+                    .sum()
+                    : null;
+
             return CouponOverviewDto.builder()
                     .id(couponTemplate.getId().toString())
                     .name(couponTemplate.getName())
@@ -144,14 +158,8 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                             : "진행중")
                     .format(couponTemplate.getFormat().getDescription())
                     .type(couponTemplate.getType().getDescription())
-                    .usedCount(couponTemplate.getIssuedCoupons()
-                            .stream()
-                            .mapToInt(IssuedCoupon::getUsedCount)
-                            .sum())
-                    .maxUsedCount(couponTemplate.getIssuedCoupons()
-                            .stream()
-                            .mapToInt(IssuedCoupon::getMaxUsedCount)
-                            .sum())
+                    .usedCount(usedCountSum)
+                    .maxUsedCount(maxUsedCountSum)
                     .startAt(couponTemplate.getStartDateTime() != null ? couponTemplate.getStartDateTime().toString() : null)
                     .endAt(couponTemplate.getEndDateTime() != null ? couponTemplate.getEndDateTime().toString() : null)
                     .createdAt(couponTemplate.getCreatedAt().toString())
