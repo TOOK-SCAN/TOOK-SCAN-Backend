@@ -167,6 +167,10 @@ public class CreateUserOrderService implements CreateUserOrderUseCase {
 
             issuedCoupon.useCoupon();
             issuedCouponRepository.save(issuedCoupon);
+
+            // 쿠폰 적용 후 주문 금액 계산
+            order.updateUsedCoupon(usedCoupon);
+            order.calculateTotalAmount();
         }
 
         applicationEventPublisher.publishEvent(
