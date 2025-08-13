@@ -130,15 +130,22 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                 description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
             }
 
-            int usedCountSum = couponTemplate.getIssuedCoupons().stream()
-                    .mapToInt(IssuedCoupon::getUsedCount)
-                    .sum();
+            List<IssuedCoupon> issuedCoupons = couponTemplate.getIssuedCoupons();
 
-            Integer maxUsedCountSum = couponTemplate.getMaxUsedPerUserCount() != null
-                    ? couponTemplate.getIssuedCoupons().stream()
-                    .mapToInt(IssuedCoupon::getMaxUsedCount)
-                    .sum()
-                    : null;
+            Integer usedCount = null;
+            Integer maxUsedCount = null;
+
+            if (issuedCoupons != null) {
+                usedCount = issuedCoupons.stream()
+                        .mapToInt(IssuedCoupon::getUsedCount)
+                        .sum();
+
+                maxUsedCount = couponTemplate.getMaxUsedPerUserCount() != null
+                        ? issuedCoupons.stream()
+                        .mapToInt(IssuedCoupon::getMaxUsedCount)
+                        .sum()
+                        : null;
+            }
 
             return CouponOverviewDto.builder()
                     .id(couponTemplate.getId().toString())
@@ -153,8 +160,8 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                             : "진행중")
                     .format(couponTemplate.getFormat().getDescription())
                     .type(couponTemplate.getType().getDescription())
-                    .usedCount(usedCountSum)
-                    .maxUsedCount(maxUsedCountSum)
+                    .usedCount(usedCount)
+                    .maxUsedCount(maxUsedCount)
                     .startAt(couponTemplate.getStartDateTime() != null ? couponTemplate.getStartDateTime().toString() : null)
                     .endAt(couponTemplate.getEndDateTime() != null ? couponTemplate.getEndDateTime().toString() : null)
                     .createdAt(couponTemplate.getCreatedAt().toString())
