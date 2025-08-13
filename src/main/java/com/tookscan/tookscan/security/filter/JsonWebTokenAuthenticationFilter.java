@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.util.AntPathMatcher;
 
 @RequiredArgsConstructor
 public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
@@ -258,9 +259,14 @@ public class JsonWebTokenAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
 
-        // 인증이 필요 없는 URL 목록에 포함되는지 확인
-        return Constants.NO_NEED_AUTH_URLS.stream()
-                .anyMatch(excludePattern -> requestURI.matches(excludePattern.replace("**", ".*")));
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+
+        // 인증이 필요 없는 URL 목록에 포함되는지 확인 (Ant 패턴 + {var} 지원)
+        return Constants.NO_NEED_AUTH_URLS.stream().anyMatch(pattern -> {
+            // PathPattern 스타일의 {variable}을 Ant 패턴의 * 로 정규화
+            String normalized = pattern.replaceAll("\\{[^/]+}", "*");
+            return antPathMatcher.match(normalized, requestURI);
+        });
     }
 }
 
