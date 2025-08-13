@@ -69,7 +69,10 @@ public class Constants {
             "/v3/api-docs/**",
 
             // Health Check
-            "/actuator/health"
+            "/actuator/health",
+
+            // SSE
+            "/v1/admins/orders/pdfs/{pdfId}/subscribe"
     );
 
     /**
