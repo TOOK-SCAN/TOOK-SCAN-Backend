@@ -20,6 +20,7 @@ import com.tookscan.tookscan.order.presentation.dto.response.UploadAdminDocument
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.OrderRepository;
 import com.tookscan.tookscan.order.repository.PdfRepository;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -62,19 +63,19 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
     // 요청 파일 사전 준비용 내부 클래스
     private static class PreparedUploadFile {
         private final String originalFileName;
-        private final MultipartFile file;
+        private final File tempFile;
 
-        private PreparedUploadFile(String originalFileName, MultipartFile file) {
+        private PreparedUploadFile(String originalFileName, File tempFile) {
             this.originalFileName = originalFileName;
-            this.file = file;
+            this.tempFile = tempFile;
         }
 
         public String getOriginalFileName() {
             return originalFileName;
         }
 
-        public MultipartFile getFile() {
-            return file;
+        public File getTempFile() {
+            return tempFile;
         }
     }
 
@@ -115,9 +116,8 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
         String orderNumber = order.getOrderNumber();
         String orderCreatedAt = DateTimeUtil.convertLocalDateTimeToDartString(order.getCreatedAt());
 
-        // 4. 요청 내 중복 파일명 선제 차단 (for문 전에 전체 검사) + 기존 문서와의 중복 배치 검증 + 파일 객체 보관
+        // 4. 요청 내 중복 파일명 선제 차단 (for문 전에 전체 검사)
         Set<String> requestDuplicateGuard = new HashSet<>();
-        List<PreparedUploadFile> preparedFiles = new ArrayList<>(files.size());
         for (MultipartFile file : files) {
             String originalFileName = file.getOriginalFilename();
             if (originalFileName == null || originalFileName.trim().isEmpty()) {
@@ -126,65 +126,70 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
             if (!requestDuplicateGuard.add(originalFileName)) {
                 throw new CommonException(ErrorCode.DUPLICATE_PDF_FILENAME, "중복된 파일명이 감지되었습니다: " + originalFileName);
             }
-            preparedFiles.add(new PreparedUploadFile(originalFileName, file));
         }
 
         // 기존 문서의 PDF 파일명과의 중복을 일괄 검증
         pdfService.validateUniqueFilenames(document, requestDuplicateGuard);
+
+        // 4-1. 임시 파일로 저장하여 보관 (메모리 사용 방지)
+        List<PreparedUploadFile> preparedFiles = new ArrayList<>(files.size());
+        for (MultipartFile file : files) {
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                originalFileName = "unnamed.pdf";
+            }
+            try {
+                File tempFile = File.createTempFile("upload-", ".pdf");
+                file.transferTo(tempFile);
+                preparedFiles.add(new PreparedUploadFile(originalFileName, tempFile));
+            } catch (IOException ioException) {
+                throw new CommonException(ErrorCode.UPLOAD_FILE_ERROR, "임시 파일 생성/저장 실패: " + originalFileName);
+            }
+        }
 
         List<Pdf> pdfs = new ArrayList<>();
 
         // 5. 각 파일을 비동기로 처리
         for (PreparedUploadFile prepared : preparedFiles) {
             String originalFileName = prepared.getOriginalFileName();
-            MultipartFile file = prepared.getFile();
-            try {
-                // S3에 저장할 고유 파일명 생성
-                String extension = StringUtils.getFilenameExtension(originalFileName);
-                if (extension == null || extension.isBlank()) {
-                    extension = "pdf";
-                }
-                String storedFileName = UUID.randomUUID() + "." + extension;
-
-                // MultipartFile을 byte[]로 변환
-                byte[] fileContent = file.getBytes();
-
-                // 업로드 태스크 ID 생성 및 사전 저장 (PENDING)
-                Pdf preCreated = Pdf.builder()
-                        .pdfUrlForAdmin("")
-                        .name(originalFileName)
-                        .storedFileName(storedFileName)
-                        .isChecked(false)
-                        .document(document)
-                        .uploadStatus(EPdfUploadStatus.PENDING)
-                        .build();
-                Pdf pdf = pdfRepository.save(preCreated);
-                pdfs.add(pdf);
-
-                // 비동기 처리 시작 - 이벤트 퍼블리시 (AFTER_COMMIT에 비동기 핸들링)
-                AdminPdfUploadRequestedEvent event = AdminPdfUploadRequestedEvent.builder()
-                        .pdfId(preCreated.getId())
-                        .documentId(documentId)
-                        .fileContent(fileContent)
-                        .originalFileName(originalFileName)
-                        .storedFileName(storedFileName)
-                        .userName(userName)
-                        .userPhone(userPhone)
-                        .orderNumber(orderNumber)
-                        .orderCreatedAt(orderCreatedAt)
-                        .orderId(order.getId())
-                        .aesKey(aesKeyString.getBytes(StandardCharsets.UTF_8))
-                        .build();
-                eventPublisher.publishEvent(event);
-
-                log.info("Successfully initiated async processing for file: {} (document ID: {})",
-                        originalFileName, documentId);
-
-            } catch (IOException e) {
-                log.error("Failed to read file content for file: {} (document ID: {}). Error: {}",
-                        originalFileName, documentId, e.getMessage(), e);
-                throw new RuntimeException("파일 읽기 실패: " + originalFileName, e);
+            File tempFile = prepared.getTempFile();
+            // S3에 저장할 고유 파일명 생성
+            String extension = StringUtils.getFilenameExtension(originalFileName);
+            if (extension == null || extension.isBlank()) {
+                extension = "pdf";
             }
+            String storedFileName = UUID.randomUUID() + "." + extension;
+
+            // 업로드 태스크 ID 생성 및 사전 저장 (PENDING)
+            Pdf preCreated = Pdf.builder()
+                    .pdfUrlForAdmin("")
+                    .name(originalFileName)
+                    .storedFileName(storedFileName)
+                    .isChecked(false)
+                    .document(document)
+                    .uploadStatus(EPdfUploadStatus.PENDING)
+                    .build();
+            Pdf pdf = pdfRepository.save(preCreated);
+            pdfs.add(pdf);
+
+            // 비동기 처리 시작 - 이벤트 퍼블리시 (AFTER_COMMIT에 비동기 핸들링)
+            AdminPdfUploadRequestedEvent event = AdminPdfUploadRequestedEvent.builder()
+                    .pdfId(preCreated.getId())
+                    .documentId(documentId)
+                    .tempFilePath(tempFile.getAbsolutePath())
+                    .originalFileName(originalFileName)
+                    .storedFileName(storedFileName)
+                    .userName(userName)
+                    .userPhone(userPhone)
+                    .orderNumber(orderNumber)
+                    .orderCreatedAt(orderCreatedAt)
+                    .orderId(order.getId())
+                    .aesKey(aesKeyString.getBytes(StandardCharsets.UTF_8))
+                    .build();
+            eventPublisher.publishEvent(event);
+
+            log.info("Successfully initiated async processing for file: {} (document ID: {})",
+                    originalFileName, documentId);
         }
 
         // 6. 로깅 (즉시 응답)
