@@ -72,7 +72,7 @@ public class Constants {
             "/actuator/health",
 
             // SSE
-            "/v1/admins/orders/pdfs/{pdfId}/subscribe"
+            "/v1/admins/orders/pdfs/**/subscribe"
     );
 
     /**
