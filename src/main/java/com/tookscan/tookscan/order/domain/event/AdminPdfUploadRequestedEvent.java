@@ -8,7 +8,7 @@ import lombok.Getter;
 public class AdminPdfUploadRequestedEvent {
     private final Long pdfId;
     private final Long documentId;
-    private final byte[] fileContent;
+    private final String tempFilePath;
     private final String originalFileName;
     private final String storedFileName;
     private final String userName;

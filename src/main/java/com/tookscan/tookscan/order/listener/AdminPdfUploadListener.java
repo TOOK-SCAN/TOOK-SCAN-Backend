@@ -13,10 +13,12 @@ import com.tookscan.tookscan.order.domain.event.AdminPdfUploadRequestedEvent;
 import com.tookscan.tookscan.order.domain.type.EPdfUploadStatus;
 import com.tookscan.tookscan.order.repository.DocumentRepository;
 import com.tookscan.tookscan.order.repository.PdfRepository;
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -44,7 +46,7 @@ public class AdminPdfUploadListener {
         processFile(
                 event.getPdfId(),
                 event.getDocumentId(),
-                event.getFileContent(),
+                event.getTempFilePath(),
                 event.getOriginalFileName(),
                 event.getStoredFileName(),
                 event.getUserName(),
@@ -59,7 +61,7 @@ public class AdminPdfUploadListener {
     public void processFile(
             Long pdfId,
             Long documentId,
-            byte[] fileContent,
+            String tempFilePath,
             String originalFileName,
             String storedFileName,
             String userName,
@@ -76,8 +78,14 @@ public class AdminPdfUploadListener {
         pdfRepository.save(pdf);
 
         File watermarkedFile = null;
+        File originTempFile = null;
         try {
-            CustomMultipartFile multipartFile = new CustomMultipartFile("file", originalFileName, "application/pdf", fileContent);
+            originTempFile = new File(tempFilePath);
+            if (!originTempFile.exists()) {
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "임시 업로드 파일을 찾을 수 없습니다.");
+            }
+            MultipartFile multipartFile = new TempFileMultipartFile("file", originalFileName, "application/pdf",
+                    originTempFile);
             watermarkedFile = PdfWatermarkUtil.embedWatermark(multipartFile, userName, userPhone, orderNumber, orderCreatedAt, aesKey);
             log.debug("Watermark processing completed for file: {}", originalFileName);
 
@@ -98,6 +106,12 @@ public class AdminPdfUploadListener {
                         originalFileName, orderId, statusUpdateException.getMessage(), statusUpdateException);
             }
             throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR , "PDF 처리 실패: " + originalFileName);
+        } finally {
+            if (originTempFile != null && originTempFile.exists()) {
+                if (!originTempFile.delete()) {
+                    log.warn("Failed to delete origin temp file: {}", originTempFile.getName());
+                }
+            }
         }
     }
 
@@ -144,19 +158,18 @@ public class AdminPdfUploadListener {
         }
     }
 
-    
 
-    private static class CustomMultipartFile implements MultipartFile {
+    private static class TempFileMultipartFile implements MultipartFile {
         private final String name;
         private final String originalFilename;
         private final String contentType;
-        private final byte[] content;
+        private final File file;
 
-        public CustomMultipartFile(String name, String originalFilename, String contentType, byte[] content) {
+        public TempFileMultipartFile(String name, String originalFilename, String contentType, File file) {
             this.name = name;
             this.originalFilename = originalFilename;
             this.contentType = contentType;
-            this.content = content != null ? content.clone() : new byte[0];
+            this.file = file;
         }
 
         @Override
@@ -169,20 +182,28 @@ public class AdminPdfUploadListener {
         public String getContentType() { return contentType; }
 
         @Override
-        public boolean isEmpty() { return content.length == 0; }
+        public boolean isEmpty() {
+            return file.length() == 0;
+        }
 
         @Override
-        public long getSize() { return content.length; }
+        public long getSize() {
+            return file.length();
+        }
 
         @Override
-        public byte[] getBytes() throws IOException { return content.clone(); }
+        public byte[] getBytes() throws IOException {
+            return Files.readAllBytes(file.toPath());
+        }
 
         @Override
-        public InputStream getInputStream() throws IOException { return new ByteArrayInputStream(content); }
+        public InputStream getInputStream() throws IOException {
+            return new FileInputStream(file);
+        }
 
         @Override
         public void transferTo(File dest) throws IOException, IllegalStateException {
-            java.nio.file.Files.write(dest.toPath(), content);
+            Files.copy(file.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }
