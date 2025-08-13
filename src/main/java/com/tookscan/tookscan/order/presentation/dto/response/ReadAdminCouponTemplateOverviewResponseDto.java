@@ -132,21 +132,6 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
 
             List<IssuedCoupon> issuedCoupons = couponTemplate.getIssuedCoupons();
 
-            Integer usedCount = null;
-            Integer maxUsedCount = null;
-
-            if (issuedCoupons != null) {
-                usedCount = issuedCoupons.stream()
-                        .mapToInt(IssuedCoupon::getUsedCount)
-                        .sum();
-
-                maxUsedCount = couponTemplate.getMaxUsedPerUserCount() != null
-                        ? issuedCoupons.stream()
-                        .mapToInt(IssuedCoupon::getMaxUsedCount)
-                        .sum()
-                        : null;
-            }
-
             return CouponOverviewDto.builder()
                     .id(couponTemplate.getId().toString())
                     .name(couponTemplate.getName())
@@ -160,8 +145,13 @@ public class ReadAdminCouponTemplateOverviewResponseDto {
                             : "진행중")
                     .format(couponTemplate.getFormat().getDescription())
                     .type(couponTemplate.getType().getDescription())
-                    .usedCount(usedCount)
-                    .maxUsedCount(maxUsedCount)
+                    .usedCount(issuedCoupons.stream()
+                            .mapToInt(IssuedCoupon::getUsedCount)
+                            .sum())
+                    .maxUsedCount(issuedCoupons.get(0).getMaxUsedCount() != null
+                            ? issuedCoupons.stream()
+                            .mapToInt(IssuedCoupon::getMaxUsedCount)
+                            .sum() : null)
                     .startAt(couponTemplate.getStartDateTime() != null ? couponTemplate.getStartDateTime().toString() : null)
                     .endAt(couponTemplate.getEndDateTime() != null ? couponTemplate.getEndDateTime().toString() : null)
                     .createdAt(couponTemplate.getCreatedAt().toString())
