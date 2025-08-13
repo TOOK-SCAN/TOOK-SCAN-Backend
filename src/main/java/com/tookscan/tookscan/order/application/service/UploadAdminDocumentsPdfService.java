@@ -143,7 +143,7 @@ public class UploadAdminDocumentsPdfService implements UploadAdminDocumentsPdfUs
                 file.transferTo(tempFile);
                 preparedFiles.add(new PreparedUploadFile(originalFileName, tempFile));
             } catch (IOException ioException) {
-                throw new CommonException(ErrorCode.UPLOAD_FILE_ERROR, "임시 파일 생성/저장 실패: " + originalFileName);
+                throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "파일 업로드 중 오류가 발생했습니다.");
             }
         }
 
