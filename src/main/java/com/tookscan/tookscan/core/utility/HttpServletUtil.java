@@ -1,20 +1,18 @@
 package com.tookscan.tookscan.core.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tookscan.tookscan.core.constant.Constants;
 import com.tookscan.tookscan.security.application.dto.DefaultJsonWebTokenDto;
 import com.tookscan.tookscan.security.application.dto.OauthJsonWebTokenDto;
 import com.tookscan.tookscan.security.domain.type.ESecurityRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -240,5 +238,13 @@ public class HttpServletUtil {
 
             response.getWriter().write(objectMapper.writeValueAsString(result));
         }
+    }
+
+    public static String getClientIp(HttpServletRequest request) {
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+        if (xForwardedForHeader == null || xForwardedForHeader.isBlank()) {
+            return request.getRemoteAddr();
+        }
+        return xForwardedForHeader.split(",")[0].trim();
     }
 }

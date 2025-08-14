@@ -1,5 +1,6 @@
 package com.tookscan.tookscan.security.filter;
 
+import com.tookscan.tookscan.core.utility.HttpServletUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ public class GlobalLoggerFilter extends OncePerRequestFilter {
             MDC.put("http.request.method", request.getMethod());
             MDC.put("url.path", request.getRequestURI());
             MDC.put("user_agent.original", request.getHeader("User-Agent"));
-            MDC.put("client.ip", request.getRemoteAddr());
+            MDC.put("client.ip", HttpServletUtil.getClientIp(request));
 
             log.atInfo().log("[Global] HTTP Request Received");
 
