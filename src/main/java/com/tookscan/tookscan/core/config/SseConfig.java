@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -27,12 +26,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  */
 @Slf4j
 @Configuration
-@Profile("!test")
 @RequiredArgsConstructor
 public class SseConfig {
 
     // SSE 설정 상수
-    public static final long DEFAULT_TIMEOUT = 10L * 60L * 1000L; // 10분
+    public static final long DEFAULT_TIMEOUT = 60L * 1000L; // 1분
     public static final int MAX_HISTORY = 200;
     public static final long HISTORY_TTL_SECONDS = 60L * 60L; // 1시간
     

@@ -4,6 +4,8 @@ import com.tookscan.tookscan.core.exception.error.ErrorCode;
 import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
+import com.tookscan.tookscan.order.repository.PdfRepository;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PdfService {
+
+    private final PdfRepository pdfRepository;
 
     /**
      * Pdf 엔티티의 URL을 업데이트하는 메서드
@@ -52,15 +56,16 @@ public class PdfService {
      * @throws CommonException 중복된 파일명이 하나라도 존재할 경우
      */
     public void validateUniqueFilenames(Document document, Iterable<String> fileNames) {
-        Set<String> existingFilenames = document.getPdfs().stream()
-                .map(Pdf::getName)
+        Set<String> requested = StreamSupport.stream(fileNames.spliterator(), false)
                 .collect(Collectors.toSet());
 
-        String duplicateFileNames = StreamSupport.stream(fileNames.spliterator(), false)
-                .filter(existingFilenames::contains)
-                .collect(Collectors.joining(", "));
+        if (requested.isEmpty()) {
+            return;
+        }
 
-        if (!duplicateFileNames.isEmpty()) {
+        List<String> duplicates = pdfRepository.findExistingNames(document.getId(), requested);
+        if (!duplicates.isEmpty()) {
+            String duplicateFileNames = String.join(", ", duplicates);
             throw new CommonException(ErrorCode.DUPLICATE_PDF_FILENAME,
                     "기존 문서와 중복된 파일명이 포함되어 있습니다. 파일명: " + duplicateFileNames);
         }
