@@ -79,9 +79,9 @@ public class AsyncConfig implements AsyncConfigurer {
     @Bean(name = "fileProcessingTaskExecutor")
     public ThreadPoolTaskExecutor fileProcessingTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(PROCESSORS);
-        executor.setQueueCapacity(50);
+        executor.setCorePoolSize(Math.max(2, PROCESSORS / 2));
+        executor.setMaxPoolSize(Math.max(4, PROCESSORS));
+        executor.setQueueCapacity(200);
         executor.setKeepAliveSeconds(120);
         executor.setThreadNamePrefix("file-processing-async-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());

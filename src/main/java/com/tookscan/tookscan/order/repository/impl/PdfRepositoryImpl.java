@@ -7,6 +7,7 @@ import com.tookscan.tookscan.order.repository.PdfRepository;
 import com.tookscan.tookscan.order.repository.mysql.PdfJpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -46,5 +47,10 @@ public class PdfRepositoryImpl implements PdfRepository {
     @Override
     public void saveAll(List<Pdf> pdfs) {
         pdfJpaRepository.saveAll(pdfs);
+    }
+
+    @Override
+    public List<String> findExistingNames(Long documentId, Collection<String> names) {
+        return pdfJpaRepository.findExistingNames(documentId, names);
     }
 }
