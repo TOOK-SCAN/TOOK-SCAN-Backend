@@ -5,7 +5,7 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.core.utility.PdfWatermarkUtil;
 import com.tookscan.tookscan.core.utility.S3Util;
 import com.tookscan.tookscan.order.application.service.S3UploadProgressListener;
-import com.tookscan.tookscan.order.application.service.SubscribePdfProgressService;
+import com.tookscan.tookscan.order.domain.event.PdfProgressEvent;
 import com.tookscan.tookscan.order.application.usecase.UpdateOrderStatusAfterPdfProcessingUseCase;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.context.ApplicationEventPublisher;
 
 @Slf4j
 @Component
@@ -37,7 +38,7 @@ public class AdminPdfUploadListener {
     private final DocumentRepository documentRepository;
     private final PdfRepository pdfRepository;
     private final S3Util s3Util;
-    private final SubscribePdfProgressService progressService;
+    private final ApplicationEventPublisher eventPublisher;
     private final UpdateOrderStatusAfterPdfProcessingUseCase orderStatusUpdateService;
 
     @Async("fileProcessingTaskExecutor")
@@ -97,7 +98,8 @@ public class AdminPdfUploadListener {
             try {
                 pdf.updateUploadStatus(EPdfUploadStatus.FAILED);
                 pdfRepository.save(pdf);
-                progressService.sendEvent(pdfId, "pdf_upload_status", EPdfUploadStatus.FAILED);
+                PdfProgressEvent event = PdfProgressEvent.createCustomEvent(pdfId, "pdf_upload_status", EPdfUploadStatus.FAILED);
+                eventPublisher.publishEvent(event);
             } catch (Exception ignored) {}
             try {
                 orderStatusUpdateService.execute(orderId);
@@ -126,7 +128,7 @@ public class AdminPdfUploadListener {
                     watermarkedFile,
                     storedFileName,
                     originalFileName,
-                    new S3UploadProgressListener(progressService, pdfId)
+                    new S3UploadProgressListener(eventPublisher, pdfId)
             );
             log.debug("S3 upload completed for file: {}", logName);
 
@@ -144,7 +146,8 @@ public class AdminPdfUploadListener {
                 Pdf target = pdfRepository.findByIdOrElseThrow(pdfId);
                 target.updateUploadStatus(EPdfUploadStatus.FAILED);
                 pdfRepository.save(target);
-                progressService.sendEvent(pdfId, "pdf_upload_status", EPdfUploadStatus.FAILED);
+                PdfProgressEvent event = PdfProgressEvent.createCustomEvent(pdfId, "pdf_upload_status", EPdfUploadStatus.FAILED);
+                eventPublisher.publishEvent(event);
             } catch (Exception ignored) {
                 log.error("Failed to update PDF status to FAILED for file: {} (pdf ID: {}). Error: {}", logName, pdfId, ignored.getMessage(), ignored);
             }

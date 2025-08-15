@@ -5,6 +5,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @UseCase
 public interface SubscribePdfProgressUseCase {
-    SseEmitter execute(Long pdfId);
+    SseEmitter execute(Long pdfId, String lastEventId);
 }
 

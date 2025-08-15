@@ -5,8 +5,8 @@ import com.tookscan.tookscan.core.exception.type.CommonException;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Pdf;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -56,11 +56,13 @@ public class PdfService {
                 .map(Pdf::getName)
                 .collect(Collectors.toSet());
 
-        boolean hasDuplicate = StreamSupport.stream(fileNames.spliterator(), false)
-                .anyMatch(existingFilenames::contains);
+        String duplicateFileNames = StreamSupport.stream(fileNames.spliterator(), false)
+                .filter(existingFilenames::contains)
+                .collect(Collectors.joining(", "));
 
-        if (hasDuplicate) {
-            throw new CommonException(ErrorCode.DUPLICATE_PDF_FILENAME, "기존 문서와 중복된 파일명이 포함되어 있습니다.");
+        if (!duplicateFileNames.isEmpty()) {
+            throw new CommonException(ErrorCode.DUPLICATE_PDF_FILENAME,
+                    "기존 문서와 중복된 파일명이 포함되어 있습니다. 파일명: " + duplicateFileNames);
         }
     }
 }

@@ -35,6 +35,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -220,7 +221,10 @@ public class OrderAdminQueryV1Controller {
     @Operation(summary = "관리자용 PDF 업로드 진행 SSE", description = "관리자가 주문/문서 단위 업로드 진행 이벤트를 수신합니다.")
     @ApiErrorCode({})
     @GetMapping(value = "/orders/pdfs/{pdfId}/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribePdfProgress(@PathVariable Long pdfId) {
-        return subscribePdfProgressUseCase.execute(pdfId);
+    public SseEmitter subscribePdfProgress(
+            @PathVariable Long pdfId,
+            @RequestHeader(value = "Last-Event-ID", required = false) String lastEventId
+    ) {
+        return subscribePdfProgressUseCase.execute(pdfId, lastEventId);
     }
 }

@@ -126,6 +126,34 @@ public class AsyncConfig implements AsyncConfigurer {
     }
 
     /**
+     * SSE 이벤트 발송용 전용 스레드 풀
+     * - 실시간 이벤트 전송
+     * - 네트워크 I/O 집약적 작업
+     * - 빠른 응답성 요구
+     */
+    @Bean(name = "sseTaskExecutor")
+    public ThreadPoolTaskExecutor sseTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(PROCESSORS);
+        executor.setMaxPoolSize(PROCESSORS * 3);
+        executor.setQueueCapacity(100);
+        executor.setKeepAliveSeconds(60);
+        executor.setThreadNamePrefix("sse-async-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.initialize();
+
+        log.atInfo()
+            .addKeyValue("corePoolSize", executor.getCorePoolSize())
+            .addKeyValue("maxPoolSize", executor.getMaxPoolSize())
+            .addKeyValue("queueCapacity", executor.getQueueCapacity())
+            .log("[Async Thread] SSE TaskExecutor initialized");
+
+        return executor;
+    }
+
+    /**
      * 스케줄러 전용 스레드 풀 - 스케줄러 작업 전담 - 장시간 실행 작업 고려
      */
     @Bean(name = "schedulerTaskExecutor")
