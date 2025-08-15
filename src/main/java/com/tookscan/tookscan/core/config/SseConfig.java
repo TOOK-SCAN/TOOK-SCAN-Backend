@@ -30,7 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseConfig {
 
     // SSE 설정 상수
-    public static final long DEFAULT_TIMEOUT = 60L * 1000L; // 1분
+    public static final long DEFAULT_TIMEOUT = 10L * 60L * 1000L; // 10분
     public static final int MAX_HISTORY = 200;
     public static final long HISTORY_TTL_SECONDS = 60L * 60L; // 1시간
     
