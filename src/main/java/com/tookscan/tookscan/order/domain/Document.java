@@ -154,5 +154,13 @@ public class Document extends BaseEntity {
 
         return pageCount * additionalPriceForOcr;
     }
+
+    public int getEstimatedOcrPrice() {
+        return pageCount * additionalPriceForOcr;
+    }
+
+    public int getEstimatedOneDayScanPrice() {
+        return pageCount * order.getAdditionalPriceForOneDayScan();
+    }
 }
 

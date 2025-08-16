@@ -49,6 +49,12 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
     @JsonProperty("payment_total")
     private final Integer paymentTotal;
 
+    @JsonProperty("estimated_ocr_price")
+    private final Integer estimatedOcrPrice;
+
+    @JsonProperty("estimated_one_day_scan_price")
+    private final Integer estimatedOneDayScanPrice;
+
     @Getter
     @Valid
     public static class DocumentInfoDto extends SelfValidating<DocumentInfoDto> {
@@ -88,6 +94,14 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         @NotNull
         private final Integer cuttingPrice;
 
+        @JsonProperty("estimated_ocr_price")
+        @NotNull
+        private final Integer estimatedOcrPrice;
+
+        @JsonProperty("estimated_one_day_scan_price")
+        @NotNull
+        private final Integer estimatedOneDayScanPrice;
+
         @Builder
         public DocumentInfoDto(String name,
                                Integer pageCount,
@@ -97,7 +111,9 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                                Integer recoveryPrice,
                                Integer oneDayScanPrice,
                                Integer cuttingPrice,
-                               Integer ocrPrice) {
+                               Integer ocrPrice,
+                               Integer estimatedOcrPrice,
+                               Integer estimatedOneDayScanPrice) {
             this.name = name;
             this.pageCount = pageCount;
             this.pagePrice = pagePrice;
@@ -107,6 +123,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
             this.oneDayScanPrice = oneDayScanPrice;
             this.ocrPrice = ocrPrice;
             this.cuttingPrice = cuttingPrice;
+            this.estimatedOcrPrice = estimatedOcrPrice;
+            this.estimatedOneDayScanPrice = estimatedOneDayScanPrice;
             this.validateSelf();
         }
 
@@ -121,6 +139,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                     .oneDayScanPrice(document.getOneDayScanPrice())
                     .ocrPrice(document.getOcrPrice())
                     .cuttingPrice(document.getCuttingPrice())
+                    .estimatedOcrPrice(document.getEstimatedOcrPrice())
+                    .estimatedOneDayScanPrice(document.getEstimatedOneDayScanPrice())
                     .build();
         }
     }
@@ -137,7 +157,9 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
             Integer couponPrice,
             Integer couponPercentage,
             Integer paymentTotal,
-            Integer ocrPrice
+            Integer ocrPrice,
+            Integer estimatedOcrPrice,
+            Integer estimatedOneDayScanPrice
     ) {
         this.documents = documents;
         this.documentsPrice = documentsPrice;
@@ -150,6 +172,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         this.couponPercentage = couponPercentage;
         this.paymentTotal = paymentTotal;
         this.ocrPrice = ocrPrice;
+        this.estimatedOcrPrice = estimatedOcrPrice;
+        this.estimatedOneDayScanPrice = estimatedOneDayScanPrice;
         this.validateSelf();
     }
 
@@ -182,6 +206,12 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
         int recoveryPriceSum = checkedDocs.stream()
                 .mapToInt(DocumentInfoDto::getRecoveryPrice)
                 .sum();
+        int estimatedOcrPriceSum = checkedDocs.stream()
+                .mapToInt(DocumentInfoDto::getEstimatedOcrPrice)
+                .sum();
+        int estimatedOneDayScanPriceSum = checkedDocs.stream()
+                .mapToInt(DocumentInfoDto::getEstimatedOneDayScanPrice)
+                .sum();
 
         return EstimateUserOrderPriceResponseDto.builder()
                 .documents(allDocs)
@@ -193,6 +223,8 @@ public class EstimateUserOrderPriceResponseDto extends SelfValidating<EstimateUs
                 .deliveryPrice(order.getDelivery().getDeliveryPrice())
                 .recoveryPrice(recoveryPriceSum)
                 .cuttingPrice(cuttingPriceSum)
+                .estimatedOcrPrice(estimatedOcrPriceSum)
+                .estimatedOneDayScanPrice(estimatedOneDayScanPriceSum)
                 .couponPrice(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), ocrPriceSum, order.getDelivery().getDeliveryPrice()) : 0)
                 .paymentTotal(order.getTotalAmount())
                 .build();

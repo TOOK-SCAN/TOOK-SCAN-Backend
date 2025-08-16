@@ -58,13 +58,14 @@ public class DocumentService {
 
     private int calculateRecoveryOptionPrice(int pageCount, ERecoveryOption recoveryOption) {
         if (recoveryOption == ERecoveryOption.SPRING) {
-            int basePrice = 3000; // 300페이지까지 기본 3,000원
-            if (pageCount <= 300) {
+            int basePrice = 3000; // 400페이지까지 기본 3,000원
+            if (pageCount <= 400) {
                 return basePrice;
             }
-            int extraPages = pageCount - 300;
-            int increments = (int) Math.ceil(extraPages / 100.0); // 100페이지당 1,000원 (올림)
-            return basePrice + (increments * 1000);
+            // 이후 300페이지 단위로 3,000원씩 추가
+            int extraPages = pageCount - 400;
+            int increments = (int) Math.ceil(extraPages / 300.0); // 300페이지당 3,000원 (올림)
+            return basePrice + (increments * 3000);
         }
         // 기타 옵션은 고정가(현재 0원)
         return recoveryOption.getPrice();
