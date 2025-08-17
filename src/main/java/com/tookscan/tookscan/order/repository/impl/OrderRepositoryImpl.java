@@ -1,5 +1,6 @@
 package com.tookscan.tookscan.order.repository.impl;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -724,5 +725,39 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
         
         return predicate;
+    }
+
+    @Override
+    public Map<EOrderStatus, Long> findOrderStatusCountsByIsInProgress(Boolean isInProgress) {
+        QOrder order = QOrder.order;
+        
+        BooleanExpression predicate = Expressions.TRUE;
+        
+        if (isInProgress != null) {
+            if (isInProgress) {
+                // 진행 중인 상태(취소·완료 제외)
+                predicate = predicate.and(
+                        order.orderStatus.notIn(EOrderStatus.CANCEL, EOrderStatus.ALL_COMPLETED)
+                );
+            } else {
+                // 진행 중이 아닌 상태(취소 혹은 전부 완료)
+                predicate = predicate.and(
+                        order.orderStatus.in(EOrderStatus.CANCEL, EOrderStatus.ALL_COMPLETED)
+                );
+            }
+        }
+        
+        List<Tuple> results = jpaQueryFactory
+                .select(order.orderStatus, order.count())
+                .from(order)
+                .where(predicate)
+                .groupBy(order.orderStatus)
+                .fetch();
+        
+        return results.stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(order.orderStatus),
+                        tuple -> tuple.get(order.count())
+                ));
     }
 }
