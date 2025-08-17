@@ -19,6 +19,9 @@ import org.springframework.data.domain.Page;
 
 @Getter
 public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdminOrderOverviewsResponseDto> {
+    @JsonProperty("orders_info")
+    private final OrderOverviewsInfoDto ordersInfo;
+
     @JsonProperty("orders")
     private final List<OrderOverviewsDto> orders;
 
@@ -26,28 +29,142 @@ public class ReadAdminOrderOverviewsResponseDto extends SelfValidating<ReadAdmin
     private final PageInfoDto pageInfo;
 
     @Builder
-    public ReadAdminOrderOverviewsResponseDto(List<OrderOverviewsDto> orders, PageInfoDto pageInfo) {
+    public ReadAdminOrderOverviewsResponseDto(List<OrderOverviewsDto> orders, PageInfoDto pageInfo,
+                                              OrderOverviewsInfoDto ordersInfo) {
+        this.ordersInfo = ordersInfo;
         this.orders = orders;
         this.pageInfo = pageInfo;
         this.validateSelf();
     }
 
-    public static ReadAdminOrderOverviewsResponseDto of(List<Order> orders, Page<Long> pageInfo) {
+    public static ReadAdminOrderOverviewsResponseDto of(List<Order> filteredOrders, Map<EOrderStatus, Long> statusCounts, Map<EOrderStatus, Long> overallStatusCounts, Page<Long> pageInfo) {
 
         List<Long> orderIds = pageInfo.getContent();
 
-        Map<Long, Order> orderMap = orders.stream()
+        Map<Long, Order> orderMap = filteredOrders.stream()
                 .collect(Collectors.toMap(Order::getId, Function.identity()));
 
         List<Order> sortedOrders = orderIds.stream()
                 .map(orderMap::get)
                 .toList();
+        OrderOverviewsInfoDto ordersInfo = OrderOverviewsInfoDto.fromStatusCounts(sortedOrders, statusCounts, overallStatusCounts);
 
         return ReadAdminOrderOverviewsResponseDto.builder()
                 .orders(sortedOrders.stream().map(OrderOverviewsDto::fromEntity).toList())
                 .pageInfo(PageInfoDto.fromEntity(pageInfo))
+                .ordersInfo(ordersInfo)
                 .build();
     }
+
+    public static class OrderOverviewsInfoDto extends SelfValidating<OrderOverviewsInfoDto> {
+        @JsonProperty("total_count")
+        private final Integer totalCount;
+
+        @JsonProperty("apply_completed_count")
+        private final Integer applyCompletedCount;
+
+        @JsonProperty("company_arrived_count")
+        private final Integer companyArrivedCount;
+
+        @JsonProperty("payment_waiting_count")
+        private final Integer paymentWaitingCount;
+
+        @JsonProperty("payment_completed_count")
+        private final Integer paymentCompletedCount;
+
+        @JsonProperty("scan_in_progress_count")
+        private final Integer scanInProgressCount;
+
+        @JsonProperty("scan_completed_count")
+        private final Integer scanCompletedCount;
+
+        @JsonProperty("recovery_in_progress_count")
+        private final Integer recoveryInProgressCount;
+
+        @JsonProperty("post_waiting_count")
+        private final Integer postWaitingCount;
+
+        @JsonProperty("all_completed_count")
+        private final Integer allCompletedCount;
+
+        @JsonProperty("cancel_count")
+        private final Integer cancelCount;
+
+        @JsonProperty("overall_total_count")
+        private final Integer overallTotalCount;
+
+        @JsonProperty("overall_in_progress_count")
+        private final Integer overallInProgressCount;
+
+        @JsonProperty("overall_completed_count")
+        private final Integer overallCompletedCount;
+
+        @Builder
+        public OrderOverviewsInfoDto(Integer applyCompletedCount, Integer companyArrivedCount,
+                                     Integer paymentWaitingCount,
+                                     Integer paymentCompletedCount, Integer scanInProgressCount,
+                                     Integer scanCompletedCount, Integer recoveryInProgressCount,
+                                     Integer postWaitingCount, Integer allCompletedCount, Integer cancelCount,
+                                     Integer totalCount, Integer overallTotalCount, Integer overallInProgressCount,
+                                     Integer overallCompletedCount) {
+            this.totalCount = totalCount;
+            this.applyCompletedCount = applyCompletedCount;
+            this.companyArrivedCount = companyArrivedCount;
+            this.paymentWaitingCount = paymentWaitingCount;
+            this.paymentCompletedCount = paymentCompletedCount;
+            this.scanInProgressCount = scanInProgressCount;
+            this.scanCompletedCount = scanCompletedCount;
+            this.recoveryInProgressCount = recoveryInProgressCount;
+            this.postWaitingCount = postWaitingCount;
+            this.allCompletedCount = allCompletedCount;
+            this.cancelCount = cancelCount;
+            this.overallTotalCount = overallTotalCount;
+            this.overallInProgressCount = overallInProgressCount;
+            this.overallCompletedCount = overallCompletedCount;
+            this.validateSelf();
+        }
+
+        public static OrderOverviewsInfoDto fromStatusCounts(List<Order> currentPageOrders, Map<EOrderStatus, Long> statusCounts, Map<EOrderStatus, Long> overallStatusCounts) {
+            return OrderOverviewsInfoDto.builder()
+                    .totalCount(currentPageOrders.size())
+                    .applyCompletedCount(getStatusCount(statusCounts, EOrderStatus.APPLY_COMPLETED))
+                    .companyArrivedCount(getStatusCount(statusCounts, EOrderStatus.COMPANY_ARRIVED))
+                    .paymentWaitingCount(getStatusCount(statusCounts, EOrderStatus.PAYMENT_WAITING))
+                    .paymentCompletedCount(getStatusCount(statusCounts, EOrderStatus.PAYMENT_COMPLETED))
+                    .scanInProgressCount(getStatusCount(statusCounts, EOrderStatus.SCAN_IN_PROGRESS))
+                    .scanCompletedCount(getStatusCount(statusCounts, EOrderStatus.SCAN_COMPLETED))
+                    .recoveryInProgressCount(getStatusCount(statusCounts, EOrderStatus.RECOVERY_IN_PROGRESS))
+                    .postWaitingCount(getStatusCount(statusCounts, EOrderStatus.POST_WAITING))
+                    .allCompletedCount(getStatusCount(statusCounts, EOrderStatus.ALL_COMPLETED))
+                    .cancelCount(getStatusCount(statusCounts, EOrderStatus.CANCEL))
+                    .overallTotalCount(calculateTotalCount(overallStatusCounts))
+                    .overallInProgressCount(calculateInProgressCount(overallStatusCounts))
+                    .overallCompletedCount(calculateCompletedCount(overallStatusCounts))
+                    .build();
+        }
+        
+        private static Integer calculateTotalCount(Map<EOrderStatus, Long> statusCounts) {
+            return Math.toIntExact(statusCounts.values().stream().mapToLong(Long::longValue).sum());
+        }
+        
+        private static Integer calculateInProgressCount(Map<EOrderStatus, Long> statusCounts) {
+            long cancelCount = statusCounts.getOrDefault(EOrderStatus.CANCEL, 0L);
+            long allCompletedCount = statusCounts.getOrDefault(EOrderStatus.ALL_COMPLETED, 0L);
+            long totalCount = statusCounts.values().stream().mapToLong(Long::longValue).sum();
+            return Math.toIntExact(totalCount - cancelCount - allCompletedCount);
+        }
+        
+        private static Integer calculateCompletedCount(Map<EOrderStatus, Long> statusCounts) {
+            long cancelCount = statusCounts.getOrDefault(EOrderStatus.CANCEL, 0L);
+            long allCompletedCount = statusCounts.getOrDefault(EOrderStatus.ALL_COMPLETED, 0L);
+            return Math.toIntExact(cancelCount + allCompletedCount);
+        }
+
+        private static Integer getStatusCount(Map<EOrderStatus, Long> statusCounts, EOrderStatus status) {
+            return Math.toIntExact(statusCounts.getOrDefault(status, 0L));
+        }
+    }
+
 
     public static class OrderOverviewsDto extends SelfValidating<OrderOverviewsDto> {
         @JsonProperty("order_id")

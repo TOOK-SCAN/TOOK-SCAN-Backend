@@ -94,4 +94,6 @@ public interface OrderRepository {
 
     Integer countByIsAsInProgressTrue();
 
+    Map<EOrderStatus, Long> findOrderStatusCountsByIsInProgress(Boolean isInProgress);
+
 }

@@ -199,7 +199,7 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             return DocumentInfoDto.builder()
                     .name(document.getName())
                     .pageCount(document.getPageCount())
-                    .pagePrice(document.getDefaultPricePerPage())
+                    .pagePrice(document.getPagePrice())
                     .documentPrice(document.getDocumentPrice())
                     .recoveryOption(document.getRecoveryOption())
                     .isOcrEnabled(document.getIsOcrEnabled())
