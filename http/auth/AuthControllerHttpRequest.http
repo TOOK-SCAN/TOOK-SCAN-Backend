@@ -46,7 +46,7 @@ Content-Type: application/json
     "is_receive_email" : true,
     "is_receive_sms" : true,
     "gender": "MALE",
-    "birth": "2000-04-04"
+    "birth": 2000
 }
 
 ### 2.1.5 회원 정보 검증
@@ -75,7 +75,7 @@ GET {{host_url}}/v1/auth/existence/phone-number?phone-number=01012341234
 
 ### 2.3.1 휴대폰 인증번호 검증
 // @no-log
-@authentication_code = "880675"
+@authentication_code = "368968"
 PATCH {{host_url}}/v1/auth/authentication-code
 Content-Type: application/json
 
