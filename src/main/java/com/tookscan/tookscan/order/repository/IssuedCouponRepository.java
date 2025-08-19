@@ -10,7 +10,7 @@ public interface IssuedCouponRepository {
 
     IssuedCoupon findByIdOrElseThrow(Long id);
 
-    IssuedCoupon findByCodeOrElseThrow(String couponCode);
+    IssuedCoupon findWithCouponTemplateByCodeOrElseThrow(String couponCode);
 
     void save(IssuedCoupon issuedCoupon);
 

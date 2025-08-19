@@ -156,3 +156,8 @@ POST {{host_url}}/v1/admins/coupon-templates/738696461221983066/used-coupons/exp
 ### 비회원 주문 조회
 //@no-log
 GET {{host_url}}/v1/guests/orders/0MG33RRV7JWVA/details
+
+
+### 쿠폰 조회
+//@no-log
+GET {{host_url}}/v1/users/orders/coupon/detail?coupon-code=TOOK081220

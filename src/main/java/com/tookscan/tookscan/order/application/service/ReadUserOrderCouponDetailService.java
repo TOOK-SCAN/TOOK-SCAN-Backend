@@ -24,7 +24,7 @@ public class ReadUserOrderCouponDetailService implements ReadUserOrderCouponDeta
     @Override
     @Transactional(readOnly = true)
     public ReadUserOrderCouponDetailResponseDto execute(UUID accountId, String couponCode) {
-        IssuedCoupon issuedCoupon = issuedCouponRepository.findByCodeOrElseThrow(couponCode);
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findWithCouponTemplateByCodeOrElseThrow(couponCode);
         this.validateCouponExpiration(accountId, issuedCoupon);
         return ReadUserOrderCouponDetailResponseDto.fromEntity(issuedCoupon);
     }

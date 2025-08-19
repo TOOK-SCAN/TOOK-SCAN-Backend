@@ -11,13 +11,14 @@ import java.util.Optional;
 
 public interface IssuedCouponJpaRepository extends JpaRepository<IssuedCoupon, Long> {
 
-    Optional<IssuedCoupon> findByCode(String couponCode);
-
     @EntityGraph(attributePaths = {"usedCoupons"})
     Page<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"usedCoupons"})
     List<IssuedCoupon> findByCouponTemplateId(Long couponTemplateId);
+
+    @EntityGraph(attributePaths = {"couponTemplate"})
+    Optional<IssuedCoupon> findWithCouponTemplateByCode(String couponCode);
 
     boolean existsByCode(String couponCode);
 

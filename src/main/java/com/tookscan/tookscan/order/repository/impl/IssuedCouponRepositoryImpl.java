@@ -25,8 +25,8 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     }
 
     @Override
-    public IssuedCoupon findByCodeOrElseThrow(String couponCode) {
-        return issuedCouponJpaRepository.findByCode(couponCode)
+    public IssuedCoupon findWithCouponTemplateByCodeOrElseThrow(String couponCode) {
+        return issuedCouponJpaRepository.findWithCouponTemplateByCode(couponCode)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ISSUED_COUPON, "쿠폰 코드: " + couponCode));
     }
 
