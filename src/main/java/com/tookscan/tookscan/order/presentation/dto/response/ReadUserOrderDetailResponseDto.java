@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tookscan.tookscan.address.dto.response.AddressResponseDto;
 import com.tookscan.tookscan.core.dto.SelfValidating;
 import com.tookscan.tookscan.core.utility.DateTimeUtil;
+import com.tookscan.tookscan.order.domain.CouponTemplate;
 import com.tookscan.tookscan.order.domain.Document;
 import com.tookscan.tookscan.order.domain.Order;
 import com.tookscan.tookscan.order.domain.type.ECouponType;
@@ -103,6 +104,15 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
 
     @JsonProperty("coupon_percentage")
     private final Integer couponPercentage;
+
+    @JsonProperty("coupon_description")
+    private final String couponDescription;
+
+    @JsonProperty("coupon_start_date")
+    private final String couponStartDate;
+
+    @JsonProperty("coupon_end_date")
+    private final String couponEndDate;
 
     @JsonProperty("payment_total")
     private final Integer paymentTotal;
@@ -237,6 +247,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
             ECouponType couponType,
             Integer couponPrice,
             Integer couponPercentage,
+            String couponDescription,
+            String couponStartDate,
+            String couponEndDate,
             Integer paymentTotal,
             String receiptUrl,
             String couponName,
@@ -269,6 +282,9 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
         this.couponType = couponType;
         this.couponPrice = couponPrice;
         this.couponPercentage = couponPercentage;
+        this.couponDescription = couponDescription;
+        this.couponStartDate = couponStartDate;
+        this.couponEndDate = couponEndDate;
         this.paymentTotal = paymentTotal;
         this.receiptUrl = receiptUrl;
         this.couponName = couponName;
@@ -316,6 +332,46 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName()
                 : null;
 
+        String description = null;
+        if (order.getUsedCoupon() != null) {
+            CouponTemplate couponTemplate = order.getUsedCoupon().getIssuedCoupon().getCouponTemplate();
+
+            if (couponTemplate.getType().equals(ECouponType.PERCENTAGE)) {
+                int percent = couponTemplate.getDiscountPercent();
+                Integer minPrice = couponTemplate.getMinOrderPrice();
+                Integer maxPrice = couponTemplate.getMaxDiscountPrice();
+
+                if (minPrice != null && maxPrice != null) {
+                    description = String.format("%d%% 할인 (%d원 이상 / 최대 %d원)", percent, minPrice, maxPrice);
+                } else if (maxPrice != null) {
+                    description = String.format("%d%% 할인 (최대 %d원)", percent, maxPrice);
+                } else if (minPrice != null) {
+                    description = String.format("%d%% 할인 (%d원 이상)", percent, minPrice);
+                } else {
+                    description = String.format("%d%% 할인", percent);
+                }
+
+            } else if (couponTemplate.getType().equals(ECouponType.AMOUNT)) {
+                int amount = couponTemplate.getDiscountPrice();
+                Integer minPrice = couponTemplate.getMinOrderPrice();
+                Integer maxPrice = couponTemplate.getMaxDiscountPrice();
+
+                if (minPrice != null && maxPrice != null) {
+                    description = String.format("%d원 할인 (%d원 이상 / 최대 %d원)", amount, minPrice, maxPrice);
+                } else if (maxPrice != null) {
+                    description = String.format("%d원 할인 (최대 %d원)", amount, maxPrice);
+                } else if (minPrice != null) {
+                    description = String.format("%d원 할인 (%d원 이상)", amount, minPrice);
+                } else {
+                    description = String.format("%d원 할인", amount);
+                }
+            } else if (couponTemplate.getType().equals(ECouponType.OCR_FREE)) {
+                description = ECouponType.OCR_FREE.getDescription();
+            } else if (couponTemplate.getType().equals(ECouponType.DELIVERY_PRICE_FREE)) {
+                description = ECouponType.DELIVERY_PRICE_FREE.getDescription();
+            }
+        }
+
         return ReadUserOrderDetailResponseDto.builder()
                 .id(order.getId().toString())
                 .orderNumber(order.getOrderNumber())
@@ -349,6 +405,13 @@ public class ReadUserOrderDetailResponseDto extends SelfValidating<ReadUserOrder
                 .cuttingPrice(cuttingPriceSum)
                 .ocrPrice(ocrPriceSum)
                 .couponPrice(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), ocrPriceSum, order.getDelivery().getDeliveryPrice()) : null)
+                .couponDescription(description)
+                .couponStartDate(order.getUsedCoupon() != null && order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getStartDateTime() != null
+                        ? DateTimeUtil.convertLocalDateToDartString(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getStartDateTime().toLocalDate())
+                        : null)
+                .couponEndDate(order.getUsedCoupon() != null && order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getEndDateTime() != null
+                        ? DateTimeUtil.convertLocalDateToDartString(order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getEndDateTime().toLocalDate())
+                        : null)
                 .paymentTotal(paymentOpt.map(Payment::getTotalAmount).orElse(order.getTotalAmount()))
                 .receiptUrl(paymentOpt.map(Payment::getReceiptUrl).orElse(null))
                 .customerKey(customerKey)
