@@ -342,7 +342,7 @@ public class Order extends BaseEntity {
                     content += "</ul></li>";
                     return content;
                 })
-                .reduce((doc1, doc2) -> doc1 + "<br /> <br />" + doc2)
+                .reduce((doc1, doc2) -> doc1 + "<br />" + doc2)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DOCUMENT));
     }
 
