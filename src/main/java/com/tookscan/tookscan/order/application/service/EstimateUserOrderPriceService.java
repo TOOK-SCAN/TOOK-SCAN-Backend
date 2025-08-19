@@ -91,15 +91,13 @@ public class EstimateUserOrderPriceService implements EstimateUserOrderPriceUseC
         if (requestDto.couponId() != null) {
             IssuedCoupon issuedCoupon = issuedCouponRepository.findByIdOrElseThrow(requestDto.couponId());
 
-            // 쿠폰 적용
+            // 쿠폰 생성 (단, 실제로 쿠폰을 사용하는 것이 아니라 useCoupon 메소드 호출 X)
             usedCoupon = UsedCoupon.builder()
                     .issuedCoupon(issuedCoupon)
                     .user(user)
                     .initialOrder(null)
                     .order(order)
                     .build();
-
-            issuedCoupon.useCoupon();
         }
 
         // 쿠폰 저장
