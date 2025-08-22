@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserJpaRepository extends JpaRepository<User, UUID> {
 
-    Optional<User> findByPhoneNumberAndName(String phoneNumber, String name);
+    Optional<User> findByPhoneNumberAndNameAndDeletedAtIsNull(String phoneNumber, String name);
 
     @Query("SELECT u FROM User u " +
             "LEFT JOIN FETCH u.userGroups " +

@@ -52,7 +52,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByPhoneNumberAndNameOrElseThrow(String phoneNumber, String name) {
-        return userJpaRepository.findByPhoneNumberAndName(phoneNumber, name)
+        return userJpaRepository.findByPhoneNumberAndNameAndDeletedAtIsNull(phoneNumber, name)
                 .orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_ACCOUNT));
     }
 
