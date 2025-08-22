@@ -85,7 +85,7 @@ public class ReadAdminIssuedCouponOverviewResponseDto {
                     .id(issuedCoupon.getId().toString())
                     .code(issuedCoupon.getCode())
                     .createdAt(issuedCoupon.getCreatedAt().toString())
-                    .isUsed(issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount())
+                    .isUsed(issuedCoupon.getMaxUsedCount() != null && issuedCoupon.getUsedCount() >= issuedCoupon.getMaxUsedCount())
                     .order(IssuedCouponOrderDto.fromEntity(issuedCoupon.getUsedCoupons().size() != 1 ? null :
                                     issuedCoupon.getUsedCoupons().get(0).getOrder()))
                     .build();
