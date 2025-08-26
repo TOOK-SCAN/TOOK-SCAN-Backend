@@ -568,6 +568,9 @@ public class ReadAdminOrderDetailResponseDto extends
             @NotNull
             private final Integer deliveryPrice;
 
+            @JsonProperty("coupon_id")
+            private final Long couponId;
+
             @JsonProperty("coupon_name")
             private final String couponName;
 
@@ -581,13 +584,14 @@ public class ReadAdminOrderDetailResponseDto extends
 
             @Builder
             public PaymentInfoDto(Integer documentsPrice, Integer cuttingPrice, Boolean isOneDayScan,
-                                  Integer oneDayScanPrice, Integer deliveryPrice, Integer couponDiscount,
+                                  Integer oneDayScanPrice, Integer deliveryPrice, Long couponId, Integer couponDiscount,
                                   Integer totalPrice, String couponName) {
                 this.documentsPrice = documentsPrice;
                 this.cuttingPrice = cuttingPrice;
                 this.isOneDayScan = isOneDayScan;
                 this.oneDayScanPrice = oneDayScanPrice;
                 this.deliveryPrice = deliveryPrice;
+                this.couponId = couponId;
                 this.couponDiscount = couponDiscount;
                 this.couponName = couponName;
                 this.totalPrice = totalPrice;
@@ -607,6 +611,7 @@ public class ReadAdminOrderDetailResponseDto extends
                                 .map(Document::getOneDayScanPrice)
                                 .reduce(0, Integer::sum))
                         .deliveryPrice(order.getDelivery().getDeliveryPrice())
+                        .couponId(order.getUsedCoupon() != null ? order.getUsedCoupon().getId() : null)
                         .couponName(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName() : null)
                         .couponDiscount(order.getUsedCoupon() != null ?
                                 order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), order.getDocuments().stream().mapToInt(Document::getOcrPrice).sum(), order.getDelivery().getDeliveryPrice()) : 0)
