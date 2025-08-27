@@ -569,7 +569,7 @@ public class ReadAdminOrderDetailResponseDto extends
             private final Integer deliveryPrice;
 
             @JsonProperty("coupon_id")
-            private final Long couponId;
+            private final String couponId;
 
             @JsonProperty("coupon_name")
             private final String couponName;
@@ -584,7 +584,7 @@ public class ReadAdminOrderDetailResponseDto extends
 
             @Builder
             public PaymentInfoDto(Integer documentsPrice, Integer cuttingPrice, Boolean isOneDayScan,
-                                  Integer oneDayScanPrice, Integer deliveryPrice, Long couponId, Integer couponDiscount,
+                                  Integer oneDayScanPrice, Integer deliveryPrice, String couponId, Integer couponDiscount,
                                   Integer totalPrice, String couponName) {
                 this.documentsPrice = documentsPrice;
                 this.cuttingPrice = cuttingPrice;
@@ -611,7 +611,7 @@ public class ReadAdminOrderDetailResponseDto extends
                                 .map(Document::getOneDayScanPrice)
                                 .reduce(0, Integer::sum))
                         .deliveryPrice(order.getDelivery().getDeliveryPrice())
-                        .couponId(order.getUsedCoupon() != null ? order.getUsedCoupon().getId() : null)
+                        .couponId(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getId().toString() : null)
                         .couponName(order.getUsedCoupon() != null ? order.getUsedCoupon().getIssuedCoupon().getCouponTemplate().getName() : null)
                         .couponDiscount(order.getUsedCoupon() != null ?
                                 order.getUsedCoupon().getIssuedCoupon().getDiscountPrice(order.getDocumentsTotalAmount(), order.getDocuments().stream().mapToInt(Document::getOcrPrice).sum(), order.getDelivery().getDeliveryPrice()) : 0)
