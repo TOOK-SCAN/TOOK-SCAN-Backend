@@ -3,10 +3,12 @@ package com.tookscan.tookscan.core.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
 @Configuration
@@ -51,6 +53,17 @@ public class AwsConfig {
     public S3TransferManager s3TransferManager(S3AsyncClient s3AsyncClient) {
         return S3TransferManager.builder()
                 .s3Client(s3AsyncClient)
+                .build();
+    }
+
+    /**
+     * S3 Presigner Bean 설정 (프리사인드 URL 생성용)
+     */
+    @Bean
+    public S3Presigner s3Presigner() {
+        return S3Presigner.builder()
+                .credentialsProvider((AwsCredentialsProvider) awsCredentialsProvider())
+                .region(Region.of(region))
                 .build();
     }
 }

@@ -7,12 +7,17 @@ import com.tookscan.tookscan.order.domain.Pdf;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +27,11 @@ import software.amazon.awssdk.services.cloudfront.model.CannedSignerRequest;
 import software.amazon.awssdk.services.cloudfront.url.SignedUrl;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.FileUpload;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
@@ -35,6 +44,7 @@ public class S3Util {
     private final S3Client s3Client;
     private final CloudFrontUtilities cloudFrontUtilities;
     private final S3TransferManager s3TransferManager;
+    private final S3Presigner s3Presigner;
 
     private final String pdfContentPrefix;
     private final String bucketName;
@@ -48,6 +58,7 @@ public class S3Util {
     public S3Util(
             S3Client s3Client,
             S3TransferManager s3TransferManager,
+            S3Presigner s3Presigner,
             @Value("${spring.cloud.aws.s3.pdf.prefix}") String pdfContentPrefix,
             @Value("${spring.cloud.aws.s3.bucket}") String bucketName,
             @Value("${spring.cloud.aws.cloudfront.domain}") String cloudFrontDomain,
@@ -55,12 +66,57 @@ public class S3Util {
             @Value("${spring.cloud.aws.cloudfront.private-key-path}") Resource privateKeyResource) {
         this.s3Client = s3Client;
         this.s3TransferManager = s3TransferManager;
+        this.s3Presigner = s3Presigner;
         this.pdfContentPrefix = pdfContentPrefix;
         this.bucketName = bucketName;
         this.cloudFrontDomain = cloudFrontDomain;
         this.cloudFrontKeyPairId = cloudFrontKeyPairId;
         this.privateKeyResource = privateKeyResource;
         this.cloudFrontUtilities = CloudFrontUtilities.create();
+    }
+
+    /**
+     * PDF 업로드용 Presigned PUT URL 생성 및 필수 헤더 반환
+     */
+    public PresignedUpload getPresignedPutUrlForPdf(Document document,
+                                                    String storedFileName,
+                                                    String originalFileName,
+                                                    Duration signatureDuration) {
+        String s3Key = buildPdfS3Key(document, storedFileName);
+
+        String contentDisposition = "inline; filename*=UTF-8''" +
+                URLEncoder.encode(originalFileName, java.nio.charset.StandardCharsets.UTF_8);
+
+        PutObjectRequest putRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .contentType("application/pdf")
+                .contentDisposition(contentDisposition)
+                .build();
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(signatureDuration)
+                .putObjectRequest(putRequest)
+                .build();
+
+        PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignRequest);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/pdf");
+        headers.put("Content-Disposition", contentDisposition);
+
+        return new PresignedUpload(presigned.url().toExternalForm(), headers);
+    }
+
+    @Getter
+    public static class PresignedUpload {
+        private final String url;
+        private final Map<String, String> headers;
+
+        public PresignedUpload(String url, Map<String, String> headers) {
+            this.url = url;
+            this.headers = headers;
+        }
     }
 
     /**
