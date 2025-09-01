@@ -25,6 +25,7 @@ import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusCo
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusRecoveryOptionUseCase;
 import com.tookscan.tookscan.order.application.usecase.UpdateAdminOrdersStatusUseCase;
 import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfUseCase;
+import com.tookscan.tookscan.order.application.usecase.UploadAdminDocumentsPdfWithPresignedUrlUseCase;
 import com.tookscan.tookscan.order.application.usecase.ValidateAdminPdfUseCase;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderCouponRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.CreateAdminOrderMemoRequestDto;
@@ -37,7 +38,9 @@ import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersSta
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusCompanyArrivedRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRecoveryOptionRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.request.UpdateAdminOrdersStatusRequestDto;
+import com.tookscan.tookscan.order.presentation.dto.request.UploadAdminDocumentsPdfWithPresignedUrlRequestDto;
 import com.tookscan.tookscan.order.presentation.dto.response.UploadAdminDocumentsPdfResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.UploadAdminDocumentsPdfWithPresignedUrlResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ValidateAdminPdfResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -91,6 +94,7 @@ public class OrderAdminCommandV1Controller {
     private final DeleteAdminCouponTemplateUseCase deleteAdminCouponTemplateUseCase;
     private final ExportAdminIssuedCouponExcelUseCase exportAdminIssuedCouponExcelUseCase;
     private final ExportAdminUsedCouponExcelUseCase exportAdminUsedCouponExcelUseCase;
+    private final UploadAdminDocumentsPdfWithPresignedUrlUseCase uploadAdminDocumentsPdfWithPresignedUrlUseCase;
 
     /**
      * 4.1.3 관리자 배송 리스트 내보내기
@@ -162,7 +166,7 @@ public class OrderAdminCommandV1Controller {
             ErrorCode.UPLOAD_FILE_ERROR,
             ErrorCode.ACCESS_DENIED
     })
-    @PostMapping(value = "/documents/{documentId}/pdfs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/documents/{documentId}/pdfs/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDto<UploadAdminDocumentsPdfResponseDto> uploadPdf(
             @PathVariable Long documentId,
             @RequestPart("files") List<MultipartFile> files
@@ -170,6 +174,20 @@ public class OrderAdminCommandV1Controller {
         return ResponseDto.ok(uploadAdminDocumentsPdfUseCase.execute(documentId, files));
     }
 
+    /**
+     * 4.1.6(수정) 관리자 pdf 파일 업로드 Presign URL 방식
+     */
+    @Operation(summary = "관리자 pdf 파일 업로드", description = "관리자가 pdf 파일을 업로드합니다. 단일 파일 또는 다중 파일 업로드를 지원합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_DOCUMENT
+    })
+    @PostMapping(value = "/documents/{documentId}/pdfs")
+    public ResponseDto<UploadAdminDocumentsPdfWithPresignedUrlResponseDto> getUploadPdfPresignUrls(
+            @PathVariable Long documentId,
+            @RequestBody @Valid UploadAdminDocumentsPdfWithPresignedUrlRequestDto requestDto
+    ) {
+        return ResponseDto.ok(uploadAdminDocumentsPdfWithPresignedUrlUseCase.execute(documentId, requestDto));
+    }
     /**
      * 4.3.2 관리자 주문 상태 일괄 변경
      */

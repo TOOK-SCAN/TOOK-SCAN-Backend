@@ -10,6 +10,7 @@ public enum EPdfUploadStatus {
     FAILED("실패"),
     PENDING("대기 중"),
     IN_PROGRESS("진행 중"),
+    WATERMARKING("워터마킹 중")
     ;
 
     private final String description;
@@ -20,6 +21,7 @@ public enum EPdfUploadStatus {
             case "FAILED" -> FAILED;
             case "PENDING" -> PENDING;
             case "IN_PROGRESS" -> IN_PROGRESS;
+            case "WATERMARKING" -> WATERMARKING;
             default -> throw new IllegalArgumentException("Invalid PDF upload status: " + value);
         };
     }

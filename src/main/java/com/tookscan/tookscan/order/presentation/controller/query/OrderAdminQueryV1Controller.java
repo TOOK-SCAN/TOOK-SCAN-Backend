@@ -10,6 +10,7 @@ import com.tookscan.tookscan.order.application.usecase.ReadAdminIssuedCouponOver
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderBriefsUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderDetailUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminOrderOverviewsUseCase;
+import com.tookscan.tookscan.order.application.usecase.ReadAdminPdfUploadStatusUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadAdminUsedCouponOverviewUseCase;
 import com.tookscan.tookscan.order.application.usecase.ReadStatisticsSummariesUseCase;
 import com.tookscan.tookscan.order.application.usecase.SubscribePdfProgressUseCase;
@@ -23,6 +24,7 @@ import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminIssuedCoup
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderBriefsResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderDetailResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminOrderOverviewsResponseDto;
+import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminPdfUploadStatusResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadAdminUsedCouponOverviewResponseDto;
 import com.tookscan.tookscan.order.presentation.dto.response.ReadStatisticsSummariesResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,6 +54,7 @@ public class OrderAdminQueryV1Controller {
     private final ReadAdminOrderOverviewsUseCase readAdminOrderOverviewsUseCase;
     private final ReadStatisticsSummariesUseCase readStatisticsSummariesUseCase;
     private final ReadAdminDocumentsPdfsUseCase readAdminDocumentsPdfsUseCase;
+    private final ReadAdminPdfUploadStatusUseCase readAdminPdfUploadStatusUseCase;
     private final ReadAdminCouponTemplateOverviewUseCase readAdminCouponTemplateOverviewUseCase;
     private final ReadAdminIssuedCouponOverviewUseCase readAdminIssuedCouponOverviewUseCase;
     private final ReadAdminUsedCouponOverviewUseCase readAdminUsedCouponOverviewUseCase;
@@ -216,6 +219,21 @@ public class OrderAdminQueryV1Controller {
             @PathVariable Long id
     ) {
         return ResponseDto.ok(readAdminCouponTemplateDetailUseCase.execute(id));
+    }
+
+    /**
+     * 관리자 PDF 업로드 상태 조회
+     */
+    @Operation(summary = "관리자 PDF 업로드 상태 조회", description = "관리자가 PDF 업로드 상태를 조회합니다.")
+    @ApiErrorCode({
+            ErrorCode.NOT_FOUND_PDF,
+            ErrorCode.ACCESS_DENIED
+    })
+    @GetMapping("/orders/documents/pdfs/{pdfId}/upload-status")
+    public ResponseDto<ReadAdminPdfUploadStatusResponseDto> readPdfUploadStatus(
+            @PathVariable Long pdfId
+    ) {
+        return ResponseDto.ok(readAdminPdfUploadStatusUseCase.execute(pdfId));
     }
 
     @Operation(summary = "관리자용 PDF 업로드 진행 SSE", description = "관리자가 주문/문서 단위 업로드 진행 이벤트를 수신합니다.")
